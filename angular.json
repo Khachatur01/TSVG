@@ -3,5 +3,37 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-  }
+    "SVG": {
+      "projectType": "library",
+      "root": "projects/svg",
+      "sourceRoot": "projects/svg/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/svg/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/svg/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/svg/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/svg/src/test.ts",
+            "tsConfig": "projects/svg/tsconfig.spec.json",
+            "karmaConfig": "projects/svg/karma.conf.js"
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "SVG"
 }
