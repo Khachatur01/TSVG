@@ -4,7 +4,7 @@ import {EditTool} from "./EditTool";
 import {Rect} from "../../../model/Rect";
 import {Matrix} from "../../math/Matrix";
 import {TSVG} from "../../../TSVG";
-import {Callback} from "../../../dataSource/Callback";
+import {Callback} from "../../../dataSource/constant/Callback";
 
 export class Node extends EllipseView {
   private readonly editTool: EditTool;
@@ -23,33 +23,50 @@ export class Node extends EllipseView {
     this.svgElement.style.cursor = "move";
     this.editTool = editTool;
     this.order = order;
-    if (this.container.mouseEventSwitches.nodeEdit) {
-      this.svgElement.addEventListener("mousedown", this._start);
-      this.svgElement.addEventListener("touchstart", this._start);
-    }
   }
 
-  public makeMouseDown(position: Point) {}
-  public makeMouseMove(position: Point) {
+  public makeMouseDown(position: Point, call: boolean = true) {
+    if (call) {
+      this._container.call(Callback.NODE_EDIT_START, {order: this.order, position: position, element: this.editTool.editableElement});
+    }
+  }
+  public makeMouseMove(position: Point, call: boolean = true) {
     if (!this.editTool.editableElement) return;
-    position = Matrix.rotate(
+    let rotatedPosition = Matrix.rotate(
       [position],
       this.editTool.editableElement.refPoint,
       this.editTool.editableElement.angle
     )[0];
 
-    this.editTool.editableElement.replacePoint(this.order, position);
-    this.position = position;
-    this._container.call(Callback.NODE_EDIT, {order: this.order, position: position});
-  }
-  public makeMouseUp(position: Point) {}
+    this.editTool.editableElement.replacePoint(this.order, rotatedPosition);
+    this.position = rotatedPosition;
 
-  protected onStart(): void {
+    if (call) {
+      this._container.call(Callback.NODE_EDIT, {order: this.order, position: position, element: this.editTool.editableElement});
+    }
+  }
+  public makeMouseUp(position: Point, call: boolean = true) {
+    this.makeMouseMove(position, false);
+    if (call) {
+      this._container.call(Callback.NODE_EDIT_END, {order: this.order, position: position, element: this.editTool.editableElement});
+    }
+  }
+
+  protected onStart(event: MouseEvent | TouchEvent): void {
     this.editTool.container.HTML.addEventListener("mousemove", this._move);
     this.editTool.container.HTML.addEventListener("touchmove", this._move);
     document.addEventListener("mouseup", this._end);
     document.addEventListener("touchend", this._end);
-    this._container.call(Callback.NODE_EDIT_START, {order: this.order});
+
+    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
+    let eventPosition = TSVG.eventToPosition(event);
+    event.preventDefault();
+
+    let position = this._container.grid.getSnapPoint({
+      x: eventPosition.x - containerRect.x,
+      y: eventPosition.y - containerRect.y
+    });
+    this.makeMouseDown(position);
   };
   protected onMove(event: MouseEvent | TouchEvent): void {
     let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
@@ -63,11 +80,25 @@ export class Node extends EllipseView {
 
     this.makeMouseMove(position);
   };
-  protected onEnd(): void {
+  protected onEnd(event: MouseEvent | TouchEvent): void {
     this.editTool.container.HTML.removeEventListener("mousemove", this._move);
     this.editTool.container.HTML.removeEventListener("touchmove", this._move);
     document.removeEventListener("mouseup", this._end);
     document.removeEventListener("touchend", this._end);
-    this._container.call(Callback.NODE_EDIT_END, {order: this.order});
+
+    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
+    let eventPosition = TSVG.eventToPosition(event);
+    event.preventDefault();
+
+    let position = this._container.grid.getSnapPoint({
+      x: eventPosition.x - containerRect.x,
+      y: eventPosition.y - containerRect.y
+    });
+    this.makeMouseUp(position);
   };
+
+  public on() {
+    this.svgElement.addEventListener("mousedown", this._start);
+    this.svgElement.addEventListener("touchstart", this._start);
+  }
 }

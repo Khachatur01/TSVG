@@ -1,9 +1,9 @@
 import {MoveDraw} from "../../mode/MoveDraw";
 import {Point} from "../../../../../model/Point";
 import {ElementView} from "../../../../../element/ElementView";
-import {TSVG} from "../../../../../TSVG";
-import {Callback} from "../../../../../dataSource/Callback";
+import {Callback} from "../../../../../dataSource/constant/Callback";
 import {ImageView} from "../../../../../element/foreign/media/ImageView";
+import {ElementType} from "../../../../../dataSource/constant/ElementType";
 
 export class DrawImage extends MoveDraw {
   public src: string = "";
@@ -13,32 +13,43 @@ export class DrawImage extends MoveDraw {
     return imageView;
   }
 
-  protected override onIsNotComplete() {
-    if (!this.drawableElement) return;
-    this.drawableElement.setSize({
+  protected override onIsNotComplete(call: boolean) {
+    if (!this._drawableElement) return;
+    this._drawableElement.setSize({
       x: this.startPos.x - 150,
       y: this.startPos.y - 100,
       width: 300,
       height: 200
     }, null);
-    this.drawableElement.refPoint = this.drawableElement?.center;
+    this._drawableElement.refPoint = this._drawableElement?.center;
   }
-  protected override onEnd() {
-    this.container.selectTool.on();
-    if (this.drawableElement)
-      this.container.focus(this.drawableElement);
+  protected override onEnd(call: boolean) {
+    if (call) {
+      this.container.selectTool.on();
+      if (this._drawableElement)
+        this.container.focus(this._drawableElement);
+    }
   }
 
-  public override start(container: TSVG) {
-    super.start(container);
-    container.call(Callback.IMAGE_TOOL_ON);
+  public override start(call: boolean) {
+    super.start(call);
+
+    if (call) {
+      this.container.call(Callback.IMAGE_TOOL_ON);
+    }
   }
-  public override stop() {
-    super.stop();
-    this.container.call(Callback.IMAGE_TOOL_OFF);
+  public override stop(call: boolean) {
+    super.stop(call);
+
+    if (call) {
+      this.container.call(Callback.IMAGE_TOOL_OFF);
+    }
   }
 
   public _new(): DrawImage {
     return new DrawImage(this.container);
+  }
+  public get type(): ElementType {
+    return ElementType.IMAGE;
   }
 }

@@ -4,6 +4,7 @@ import {Rect} from "../../../../../model/Rect";
 import {Point} from "../../../../../model/Point";
 import {TSVG} from "../../../../../TSVG";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
+import {ElementType} from "../../../../../dataSource/constant/ElementType";
 
 /*
 *  0_____1
@@ -12,17 +13,17 @@ import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
 * */
 
 export class RectangleView extends PolygonView implements MoveDrawable {
-  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}) {
+  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, [
       /* 0 */                                                                                        /* 1 */
       {x: position.x, y: position.y},                            {x: size.width + position.x, y: position.y},
       {x: size.width + position.x, y: size.height + position.y}, {x: position.x, y: size.height + position.y}
       /* 2 */                                                                                        /* 3 */
-
-    ]);
+    ], ownerId, index);
 
     this.setOverEvent();
     this.style.setDefaultStyle();
+    this.type = ElementType.RECTANGLE;
   }
 
   public override get copy(): RectangleView {

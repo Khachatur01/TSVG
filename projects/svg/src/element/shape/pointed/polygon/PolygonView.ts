@@ -2,13 +2,15 @@ import {ElementView} from "../../../ElementView";
 import {Point} from "../../../../model/Point";
 import {PointedView} from "../PointedView";
 import {TSVG} from "../../../../TSVG";
-import {PathView} from "../PathView";
+import {PathView} from "../polyline/PathView";
 import {Close} from "../../../../model/path/close/Close";
+import {ElementType} from "../../../../dataSource/constant/ElementType";
 
 export class PolygonView extends PointedView {
-  public constructor(container: TSVG, points: Point[] = []) {
-    super(container);
+  public constructor(container: TSVG, points: Point[] = [], ownerId?: string, index?: number) {
+    super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "polygon");
+    this.type = ElementType.POLYGON;
     this.svgElement.id = this.id;
 
     this.points = points;

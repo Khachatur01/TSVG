@@ -15,13 +15,16 @@ import {RotatePoint} from "./grip/rotate/RotatePoint";
 import {ElementView} from "../../../../element/ElementView";
 import {BoxView} from "../../../../element/shape/BoxView";
 import {Size} from "../../../../model/Size";
+import {Focus} from "../Focus";
+import {Compass} from "../../../../dataSource/constant/Compass";
 
 export class BoundingBox extends BoxView {
   private _grips: Grip[] = [];
-  private xRefPoint: RefPoint;
-  private xRotatePoint: RotatePoint;
+  private referencePoint: RefPoint;
+  private rotatePoint: RotatePoint;
   private readonly _boundingBoxGroup: SVGGElement;
   private readonly _refPointGroup: SVGGElement;
+  private readonly focus: Focus;
   private _boundingRect: Rect = {
     x: 0,
     y: 0,
@@ -29,7 +32,7 @@ export class BoundingBox extends BoxView {
     height: 0
   };
 
-  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}) {
+  public constructor(container: TSVG, focus: Focus, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}) {
     super(container, position, size);
     this.style.fillColor = "transparent";
     this.style.strokeColor = "#002fff";
@@ -39,34 +42,34 @@ export class BoundingBox extends BoxView {
     this.svgElement.style.display = "none";
     this.removeOverEvent();
 
-    this.xRefPoint = new RefPoint(container);
-    this.xRotatePoint = new RotatePoint(container);
-    this._grips.push(
-      new NWGrip(container),
-      new NGrip(container),
+    this.focus = focus;
+    this.referencePoint = new RefPoint(container, this.focus, 0, 0);
+    this.rotatePoint = new RotatePoint(container, this.focus, 0, 0);
 
-      new NEGrip(container),
-      new EGrip(container),
+    this._grips[Compass.NW] = new NWGrip(container, this.focus);
+    this._grips[Compass.N] = new NGrip(container, this.focus);
 
-      new SEGrip(container),
-      new SGrip(container),
+    this._grips[Compass.NE] = new NEGrip(container, this.focus);
+    this._grips[Compass.E] = new EGrip(container, this.focus);
 
-      new SWGrip(container),
-      new WGrip(container)
-    );
+    this._grips[Compass.SE] = new SEGrip(container, this.focus);
+    this._grips[Compass.S] = new SGrip(container, this.focus);
+
+    this._grips[Compass.SW] = new SWGrip(container, this.focus);
+    this._grips[Compass.W] = new WGrip(container, this.focus);
 
     /* create svg group */
     this._boundingBoxGroup = document.createElementNS(ElementView.svgURI, "g");
     this._boundingBoxGroup.id = "bounding-box";
     this._boundingBoxGroup.appendChild(this.svgElement);
-    this._boundingBoxGroup.appendChild(this.xRotatePoint.SVG);
+    this._boundingBoxGroup.appendChild(this.rotatePoint.SVG);
     for (let grip of this._grips) {
       this._boundingBoxGroup.appendChild(grip.SVG);
     }
 
     this._refPointGroup = document.createElementNS(ElementView.svgURI, "g");
     this._refPointGroup.id = "reference-point";
-    this._refPointGroup.appendChild(this.xRefPoint.SVG);
+    this._refPointGroup.appendChild(this.referencePoint.SVG);
   }
 
   public set transparentClick(transparent: boolean) {
@@ -81,13 +84,13 @@ export class BoundingBox extends BoxView {
   }
 
   public fixRefPoint() {
-    this.xRefPoint.fixPosition();
+    this.referencePoint.fixPosition();
   }
   public set lastRefPoint(refPoint: Point) {
-    this.xRefPoint.lastRefPoint = refPoint;
+    this.referencePoint.lastRefPoint = refPoint;
   }
   public get lastRefPoint(): Point {
-    return this.xRefPoint.lastRefPoint;
+    return this.referencePoint.lastRefPoint;
   }
 
   public singleFocus(rotatable: boolean = true) {
@@ -96,11 +99,11 @@ export class BoundingBox extends BoxView {
       grip.show();
 
     if (rotatable) {
-      this.xRefPoint.show();
-      this.xRotatePoint.show();
+      this.referencePoint.show();
+      this.rotatePoint.show();
     } else {
-      this.xRefPoint.hide();
-      this.xRotatePoint.hide();
+      this.referencePoint.hide();
+      this.rotatePoint.hide();
     }
   }
   public multipleFocus(rotatable: boolean = true) {
@@ -116,11 +119,11 @@ export class BoundingBox extends BoxView {
       grip.hide();
 
     if (rotatable) {
-      this.xRefPoint.show();
-      this.xRotatePoint.show();
+      this.referencePoint.show();
+      this.rotatePoint.show();
     } else {
-      this.xRefPoint.hide();
-      this.xRotatePoint.hide();
+      this.referencePoint.hide();
+      this.rotatePoint.hide();
     }
   }
   public blur() {
@@ -128,8 +131,8 @@ export class BoundingBox extends BoxView {
     for (let grip of this._grips)
       grip.hide();
 
-    this.xRefPoint.hide();
-    this.xRotatePoint.hide();
+    this.referencePoint.hide();
+    this.rotatePoint.hide();
   }
 
   public override get boundingRect(): Rect {
@@ -162,7 +165,7 @@ export class BoundingBox extends BoxView {
     for (let grip of this._grips)
       grip.setPosition(points);
 
-    this.xRotatePoint.position = {
+    this.rotatePoint.position = {
       x: (points[0].x + points[1].x) / 2,
       y: (points[0].y + points[1].y) / 2,
     }
@@ -197,7 +200,7 @@ export class BoundingBox extends BoxView {
   }
 
   public set refPointView(refPoint: Point) {
-    this.xRefPoint.position = refPoint;
+    this.referencePoint.position = refPoint;
     this._refPointGroup.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
   }
 
@@ -206,5 +209,50 @@ export class BoundingBox extends BoxView {
     this._refPointGroup.style.transform = "rotate(" + angle + "deg)";
 
     this._angle = angle;
+  }
+
+  public makeResizeMouseDown(position: Point, compass: number, call: boolean = true) {
+    this._grips[compass].makeMouseDown(position, call);
+  }
+  public makeResizeMouseMove(position: Point, compass: number, call: boolean = true) {
+    this._grips[compass].makeMouseMove(position, call);
+  }
+  public makeResizeMouseUp(position: Point, compass: number, call: boolean = true) {
+    this._grips[compass].makeMouseUp(position, call);
+  }
+
+  public makeRefPointMouseDown(position: Point, call: boolean = true) {
+    this.referencePoint.makeMouseDown(position, call);
+  }
+  public makeRefPointMouseMove(position: Point, call: boolean = true) {
+    this.referencePoint.makeMouseMove(position, call);
+  }
+  public makeRefPointMouseUp(position: Point, call: boolean = true) {
+    this.referencePoint.makeMouseUp(position, call);
+  }
+
+  public makeRotateMouseDown(position: Point, call: boolean = true) {
+    this.rotatePoint.makeMouseDown(position, call);
+  }
+  public makeRotateMouseMove(position: Point, call: boolean = true) {
+    this.rotatePoint.makeMouseMove(position, call);
+  }
+  public makeRotateMouseUp(position: Point, call: boolean = true) {
+    this.rotatePoint.makeMouseUp(position, call);
+  }
+
+  public on() {
+    this.rotatePoint.on();
+    this.referencePoint.on();
+    this._grips.forEach((grip: Grip) => {
+      grip.on();
+    });
+  }
+  public off() {
+    this.rotatePoint.off();
+    this.referencePoint.off();
+    this._grips.forEach((grip: Grip) => {
+      grip.off();
+    });
   }
 }

@@ -2,21 +2,22 @@ import {TSVG} from "../../../../../../TSVG";
 import {MoveTo} from "../../../../../../model/path/point/MoveTo";
 import {Arc} from "../../../../../../model/path/curve/arc/Arc";
 import {LineTo} from "../../../../../../model/path/line/LineTo";
-import {PathView} from "../../../../../../element/shape/pointed/PathView";
+import {PathView} from "../../../../../../element/shape/pointed/polyline/PathView";
 import {Point} from "../../../../../../model/Point";
-import {Callback} from "../../../../../../dataSource/Callback";
+import {Callback} from "../../../../../../dataSource/constant/Callback";
+import {Focus} from "../../../Focus";
 
 export class RefPoint extends PathView {
   private readonly _r: number = 5; /* radius */
   private _center: Point = {x: 0, y: 0};
-  private _lastPoint: Point = {x: 0, y: 0};
+  private focus: Focus;
 
   private moving: boolean = false;
   private _start = this.start.bind(this);
   private _move = this.move.bind(this);
   private _end = this.end.bind(this);
 
-  public constructor(container: TSVG, x: number = 0, y: number = 0) {
+  public constructor(container: TSVG, focus: Focus, x: number = 0, y: number = 0) {
     super(container);
     this.removeOverEvent();
     this.style.fillColor = "transparent";
@@ -25,10 +26,42 @@ export class RefPoint extends PathView {
 
     this._center = {x: x, y: y};
     this.drawPoint(this._center);
+    this.focus = focus;
 
     this.svgElement.style.display = "none";
     this.svgElement.style.cursor = "crosshair";
-    this.on();
+  }
+
+  public makeMouseDown(position: Point, call: boolean = true) {
+    this.focus.fixRect();
+    this._lastPosition = Object.assign({}, this.position);
+
+    position = this._container.grid.getSnapPoint(position);
+    this.focus.refPointView = Object.assign({}, position);
+
+    if (call) {
+      this._container.call(Callback.REF_POINT_VIEW_CHANGE_START, {position: position, elements: this.focus.children});
+    }
+  }
+  public makeMouseMove(position: Point, call: boolean = true) {
+    position = this._container.grid.getSnapPoint(position);
+
+    this.focus.refPointView = Object.assign({}, position);
+
+    if (call) {
+      this._container.call(Callback.REF_POINT_VIEW_CHANGE, {position: position});
+    }
+  }
+  public makeMouseUp(position: Point, call: boolean = true) {
+    let refPoint = Object.assign({}, position);
+    this.focus.refPoint = refPoint;
+    this.focus.correct(refPoint);
+
+    this.makeMouseMove(position);
+    if (call) {
+      // this._container.call(Callback.REF_POINT_CHANGE, {position: position});
+      this._container.call(Callback.REF_POINT_VIEW_CHANGE_END, {position: position});
+    }
   }
 
   public get lastRefPoint(): Point {
@@ -77,15 +110,6 @@ export class RefPoint extends PathView {
     this.svgElement.style.display = "none";
   }
 
-  private initLastPoint(event: MouseEvent | TouchEvent) {
-    let eventPosition = TSVG.eventToPosition(event);
-    event.preventDefault();
-
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    this._lastPoint.x = eventPosition.x - containerRect.left;
-    this._lastPoint.y = eventPosition.y - containerRect.top;
-  }
-
   private start(event: MouseEvent | TouchEvent) {
     this._container.HTML.addEventListener("mousemove", this._move);
     this._container.HTML.addEventListener("touchmove", this._move);
@@ -93,27 +117,30 @@ export class RefPoint extends PathView {
     document.addEventListener("touchend", this._end);
     this.moving = true;
     this._container.activeTool.off();
-    this._container.focused.fixRect();
-    this._lastPosition = Object.assign({}, this.position);
 
-    this.initLastPoint(event);
-    this._lastPoint = this._container.grid.getSnapPoint(this._lastPoint);
-    this._container.focused.refPointView = Object.assign({}, this._lastPoint);
+    let eventPosition = TSVG.eventToPosition(event);
+    event.preventDefault();
 
-    this._container.call(Callback.REF_POINT_VIEW_CHANGE_START);
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let position = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    }
+    this.makeMouseDown(position);
   }
   private move(event: MouseEvent | TouchEvent) {
-    this.initLastPoint(event);
-    this._lastPoint = this._container.grid.getSnapPoint(this._lastPoint);
+    let eventPosition = TSVG.eventToPosition(event);
+    event.preventDefault();
 
-    this._container.focused.refPointView = Object.assign({}, this._lastPoint);
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let position = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    }
+    this.makeMouseMove(position);
   }
-  private end() {
+  private end(event: MouseEvent | TouchEvent) {
     if (!this.moving) return;
-
-    let refPoint = Object.assign({}, this._lastPoint);
-    this._container.focused.refPoint = refPoint;
-    this._container.focused.correct(refPoint);
 
     this._container.HTML.removeEventListener("mousemove", this._move);
     this._container.HTML.removeEventListener("touchmove", this._move);
@@ -121,14 +148,20 @@ export class RefPoint extends PathView {
     document.removeEventListener("touchend", this._end);
     this._container.activeTool.on();
     this.moving = false;
-    this._container.call(Callback.REF_POINT_VIEW_CHANGE_END);
+
+    let eventPosition = TSVG.eventToPosition(event);
+    event.preventDefault();
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let position = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    }
+    this.makeMouseUp(position);
   }
 
   public on() {
-    if (this._container.mouseEventSwitches.refPoint) {
-      this.svgElement.addEventListener("mousedown", this._start);
-      this.svgElement.addEventListener("touchstart", this._start);
-    }
+    this.svgElement.addEventListener("mousedown", this._start);
+    this.svgElement.addEventListener("touchstart", this._start);
   }
   public off() {
     this.svgElement.removeEventListener("mousedown", this._start);

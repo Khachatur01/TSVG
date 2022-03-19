@@ -5,11 +5,14 @@ import {Point} from "../../../../model/Point";
 import {Angle} from "../../../math/Angle";
 import {Path} from "../../../../model/path/Path";
 import {MoveTo} from "../../../../model/path/point/MoveTo";
-import {Callback} from "../../../../dataSource/Callback";
+import {Callback} from "../../../../dataSource/constant/Callback";
+import {ElementType} from "../../../../dataSource/constant/ElementType";
+import {ElementView} from "../../../../element/ElementView";
 
 export class DrawFree implements Drawable {
-  private container: TSVG;
-  private drawableElement: FreeView | null = null;
+  private readonly container: TSVG;
+  private _drawableElement: FreeView | null = null;
+  public turnOnSelectToolOnDrawEnd: boolean = true;
 
   private _drawStart = this.drawStart.bind(this);
   private _draw = this.draw.bind(this);
@@ -19,47 +22,74 @@ export class DrawFree implements Drawable {
     this.container = container;
   }
 
-  public makeMouseDown(position: Point) {
+  public makeMouseDown(position: Point, call: boolean = true) {
     position = this.container.grid.getSnapPoint(position);
 
     let pathObject = new Path();
     pathObject.add(new MoveTo(position));
-    this.drawableElement = new FreeView(this.container, pathObject);
+    this._drawableElement = new FreeView(this.container, pathObject);
 
-    this.container.add(this.drawableElement);
-    this.container.call(Callback.DRAW_CLICK, {position: position});
+    this.container.add(this._drawableElement);
+
+    if (call) {
+      this.container.call(Callback.DRAW_MOUSE_DOWN, {position: position, element: this._drawableElement});
+    }
   }
-  public makeMouseMove(position: Point) {
-    if (!this.drawableElement) return;
+  public makeMouseMove(position: Point, call: boolean = true, additional?: any) {
+    if (!this._drawableElement) return;
 
-    if (this.container.grid.isSnap()) {
-      position = this.container.grid.getSnapPoint(position);
-      this.drawableElement.pushPoint(position);
-    } else if (this.container.perfect) {
-      try {
-        let lastPoint: Point = this.drawableElement.getPoint(-2);
-        position = Angle.snapLineEnd(lastPoint, position) as Point;
-        this.drawableElement.replacePoint(-1, position);
-      } catch (typeError) {
-        /* lastPoint may be undefined */
+    if (additional) {
+      this._drawableElement.setAttr({
+        d: additional.path
+      });
+    } else {
+      if (this.container.grid.isSnap()) {
+        position = this.container.grid.getSnapPoint(position);
+        this._drawableElement.pushPoint(position);
+      } else if (this.container.perfect) {
+        try {
+          let lastPoint: Point = this._drawableElement.getPoint(-2);
+          position = Angle.snapLineEnd(lastPoint, position) as Point;
+          this._drawableElement.replacePoint(-1, position);
+        } catch (typeError) {
+          /* lastPoint may be undefined */
+        }
+      } else {
+        this._drawableElement.pushPoint(position);
       }
-    } else {
-      this.drawableElement.pushPoint(position);
     }
-    this.container.call(Callback.DRAW_MOVE, {position: position});
+
+    if (call) {
+      this.container.call(Callback.DRAW_MOUSE_MOVE, {position: position, element: this._drawableElement});
+    }
   }
-  public makeMouseUp(position: Point) {
-    if (!this.drawableElement) return;
-    if (this.drawableElement.getAttr("points").split(" ").length == 2) {
-      this.container.remove(this.drawableElement);
-    } else {
-      this.drawableElement.refPoint = this.drawableElement.center;
+  public makeMouseUp(position: Point, call: boolean = true, additional?: any) {
+    if (!this._drawableElement) return;
+    if (additional) {
+      this._drawableElement.path.fromString(additional.path);
+      this._drawableElement.setAttr({
+        d: additional.path
+      });
     }
-    this.container.call(Callback.DRAW_END);
+    if (this._drawableElement.getAttr("points").split(" ").length == 2) {
+      this.container.remove(this._drawableElement);
+    } else {
+      this._drawableElement.refPoint = this._drawableElement.center;
+    }
+
+    if (call) {
+      this.container.call(Callback.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
+    }
   }
 
   public _new(): DrawFree {
     return new DrawFree(this.container);
+  }
+  public get type(): ElementType {
+    return ElementType.FREE;
+  }
+  public get drawableElement(): ElementView | null {
+    return this._drawableElement;
   }
 
   private drawStart(event: MouseEvent | TouchEvent) {
@@ -97,17 +127,20 @@ export class DrawFree implements Drawable {
     this.makeMouseUp({x: 0, y: 0});
   }
 
-  public start(container: TSVG): void {
-    this.container = container;
-    if (container.mouseEventSwitches.draw) {
-      this.container.HTML.addEventListener('mousedown', this._drawStart);
-      this.container.HTML.addEventListener('touchstart', this._drawStart);
+  public start(call: boolean = true): void {
+    this.container.HTML.addEventListener('mousedown', this._drawStart);
+    this.container.HTML.addEventListener('touchstart', this._drawStart);
+
+    if (call) {
+      this.container.call(Callback.FREE_HAND_TOOL_ON);
     }
-    container.call(Callback.FREE_HAND_TOOL_ON);
   }
-  public stop(): void {
+  public stop(call: boolean = true): void {
     this.container.HTML.removeEventListener('mousedown', this._drawStart);
     this.container.HTML.removeEventListener('touchstart', this._drawStart);
-    this.container.call(Callback.FREE_HAND_TOOL_OFF);
+
+    if (call) {
+      this.container.call(Callback.FREE_HAND_TOOL_OFF);
+    }
   }
 }

@@ -1,5 +1,7 @@
 import {Grip} from "../Grip";
 import {Point} from "../../../../../../../model/Point";
+import {Callback} from "../../../../../../../dataSource/constant/Callback";
+import {Compass} from "../../../../../../../dataSource/constant/Compass";
 
 export class WGrip extends Grip {
   public setPosition(points: Point[]): void {
@@ -11,10 +13,16 @@ export class WGrip extends Grip {
     }
   }
 
-  protected onEnd(): void {
+  public override makeMouseDown(client: Point, call: boolean = true): void {
+    super.makeMouseDown(client, call);
+
+    if (call) {
+      this._container.call(Callback.RESIZE_START, {position: client, compass: Compass.W, elements: this.focus.children});
+    }
   }
-  protected onMove(client: Point): void {
-    let elementRect = this._container.focused.lastRect;
+  public override makeMouseMove(client: Point, call: boolean = true): void {
+    super.makeMouseMove(client, call);
+    let elementRect = this.focus.lastRect;
     let width = (client.x) - (elementRect.x + elementRect.width);
 
     this._lastResize = {
@@ -23,8 +31,17 @@ export class WGrip extends Grip {
       width: width,
       height: elementRect.height
     };
-    this._container.focused.setSize(this._lastResize);
+    this.focus.setSize(this._lastResize);
+
+    if (call) {
+      this._container.call(Callback.RESIZE, {position: client, compass: Compass.W});
+    }
   }
-  protected onStart(): void {
+  public override makeMouseUp(client: Point, call: boolean = true): void {
+    super.makeMouseUp(client, call);
+
+    if (call) {
+      this._container.call(Callback.RESIZE_END, {position: client, compass: Compass.W});
+    }
   }
 }

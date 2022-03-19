@@ -3,20 +3,22 @@ import {TSVG} from "../../TSVG";
 import {Point} from "../../model/Point";
 import {Size} from "../../model/Size";
 import {Rect} from "../../model/Rect";
-import {PathView} from "../shape/pointed/PathView";
-import {Callback} from "../../dataSource/Callback";
+import {PathView} from "../shape/pointed/polyline/PathView";
+import {Callback} from "../../dataSource/constant/Callback";
 import {ForeignView} from "../type/ForeignView";
 import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
+import {ElementType} from "../../dataSource/constant/ElementType";
 
 export class ForeignObjectView extends ForeignView implements MoveDrawable {
   protected _content: HTMLElement | null = null;
   public readonly outline: string = "thin solid #999";
 
-  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}) {
-    super(container);
+  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, ownerId?: string, index?: number) {
+    super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "foreignObject");
-    this.svgElement.style.outline = "none";
+    this.type = ElementType.FOREIGN_OBJECT;
     this.svgElement.id = this.id;
+    this.svgElement.style.outline = "none";
     this.style.cursor.edit = "text";
 
     this.position = position;
@@ -42,6 +44,8 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
         this._content.style.userSelect = "unset";
       }
     });
+
+    this.addEditCallBack();
   }
 
   public override get HTML(): SVGElement | HTMLElement {
@@ -127,14 +131,9 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     });
   }
 
-  public get content(): HTMLElement | null {
-    return this._content;
-  }
-
-  public addEditCallBack() {
+  protected addEditCallBack() {
     this._content?.addEventListener("input", () => {
-      this.container.call(Callback.ASSET_EDIT,
-        {content: this._content});
+      this._container.call(Callback.ASSET_EDIT, {content: this._content});
     });
   }
 
@@ -145,6 +144,9 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.svgElement.style.outline = "unset";
   }
 
+  public get content(): HTMLElement | null {
+    return this._content;
+  }
   public setContent(content: HTMLElement, setListeners: boolean = true): void {
     this._content = content;
     content.style.userSelect = "none";
@@ -167,7 +169,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     let points = this.points;
     return this.calculateBoundingBox(points);
   }
-  public get rotatedBoundingRect(): Rect {
+  public get visibleBoundingRect(): Rect {
     let points = this.rotatedPoints;
     return this.calculateBoundingBox(points);
   }

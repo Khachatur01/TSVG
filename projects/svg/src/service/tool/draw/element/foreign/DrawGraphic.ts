@@ -2,8 +2,8 @@ import {Point} from "../../../../../model/Point";
 import {GraphicView} from "../../../../../element/foreign/graphic/GraphicView";
 import {ElementView} from "../../../../../element/ElementView";
 import {MoveDraw} from "../../mode/MoveDraw";
-import {TSVG} from "../../../../../TSVG";
-import {Callback} from "../../../../../dataSource/Callback";
+import {Callback} from "../../../../../dataSource/constant/Callback";
+import {ElementType} from "../../../../../dataSource/constant/ElementType";
 
 export class DrawGraphic extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
@@ -17,29 +17,36 @@ export class DrawGraphic extends MoveDraw {
     return graphicView;
   }
 
-  protected override onIsNotComplete() {
-    if (!this.drawableElement) return;
-    this.drawableElement.setSize({
+  protected override onIsNotComplete(call: boolean) {
+    if (!this._drawableElement) return;
+    this._drawableElement.setSize({
       x: this.startPos.x - 150,
       y: this.startPos.y - 100,
       width: 300,
       height: 200
     }, null);
-    this.drawableElement.refPoint = this.drawableElement.center;
-    this.container.focus(this.drawableElement);
-    this.container.selectTool.on();
+    this._drawableElement.refPoint = this._drawableElement.center;
   }
 
-  public override start(container: TSVG) {
-    super.start(container);
-    container.call(Callback.GRAPHIC_TOOL_ON);
+  public override start(call: boolean) {
+    super.start(call);
+
+    if (call) {
+      this.container.call(Callback.GRAPHIC_TOOL_ON);
+    }
   }
-  public override stop() {
-    super.stop();
-    this.container.call(Callback.GRAPHIC_TOOL_OFF);
+  public override stop(call: boolean) {
+    super.stop(call);
+
+    if (call) {
+      this.container.call(Callback.GRAPHIC_TOOL_OFF);
+    }
   }
 
   public _new(): DrawGraphic {
     return new DrawGraphic(this.container);
+  }
+  public get type(): ElementType {
+    return ElementType.GRAPHIC;
   }
 }

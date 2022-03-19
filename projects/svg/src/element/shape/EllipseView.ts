@@ -4,16 +4,18 @@ import {Rect} from "../../model/Rect";
 import {ElementView} from "../ElementView";
 import {TSVG} from "../../TSVG";
 import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
-import {PathView} from "./pointed/PathView";
+import {PathView} from "./pointed/polyline/PathView";
 import {Path} from "../../model/path/Path";
 import {Arc} from "../../model/path/curve/arc/Arc";
 import {MoveTo} from "../../model/path/point/MoveTo";
 import {ShapeView} from "../type/ShapeView";
+import {ElementType} from "../../dataSource/constant/ElementType";
 
 export class EllipseView extends ShapeView implements MoveDrawable {
-  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, rx: number = 0, ry: number = 0) {
-    super(container);
+  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, rx: number = 0, ry: number = 0, ownerId?: string, index?: number) {
+    super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "ellipse");
+    this.type = ElementType.ELLIPSE;
     this.svgElement.id = this.id;
 
     this.position = position;
@@ -123,7 +125,7 @@ export class EllipseView extends ShapeView implements MoveDrawable {
     let points = this.points;
     return this.calculateBoundingBox(points);
   }
-  public get rotatedBoundingRect(): Rect {
+  public get visibleBoundingRect(): Rect {
     let containerRect: Rect = this._container.HTML.getBoundingClientRect();
     let stoke = parseInt(this.style.strokeWidth);
     let rotatedBoundingRect: Rect = this.svgElement.getBoundingClientRect();

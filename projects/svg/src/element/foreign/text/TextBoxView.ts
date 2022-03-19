@@ -1,12 +1,13 @@
 import {ForeignObjectView} from "../ForeignObjectView";
 import {TSVG} from "../../../TSVG";
-import {Callback} from "../../../dataSource/Callback";
+import {Callback} from "../../../dataSource/constant/Callback";
 import {Point} from "../../../model/Point";
 import {Size} from "../../../model/Size";
+import {ElementType} from "../../../dataSource/constant/ElementType";
 
 export class TextBoxView extends ForeignObjectView {
-  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, removeOnEmpty: boolean = true) {
-    super(container);
+  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, removeOnEmpty: boolean = true, ownerId?: string, index?: number) {
+    super(container, position, size, ownerId, index);
     this.position = position;
     this.setSize({
       x: position.x,
@@ -32,22 +33,23 @@ export class TextBoxView extends ForeignObjectView {
 
     textarea.addEventListener('blur', () => {
       if (textarea.value == "") {
-        this._container.remove(this);
+        this._container.remove(this, true);
         this._container.selectTool.on();
       }
     });
     this.style.setDefaultStyle();
+    this.type = ElementType.TEXT_BOX;
   }
 
   public set text(text: string) {
     if(this._content)
-      this._content.innerText = text;
+      (this._content as HTMLTextAreaElement).value = text;
   }
 
   public override addEditCallBack() {
     this._content?.addEventListener("input", () => {
-      this.container.call(Callback.TEXT_TYPING,
-        {text: (this._content as HTMLTextAreaElement).value}
+      this._container.call(Callback.TEXT_TYPING,
+        {text: (this._content as HTMLTextAreaElement).value, element: this}
       );
     });
   }

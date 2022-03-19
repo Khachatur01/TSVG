@@ -1,13 +1,15 @@
 import {Point} from "../../../../../../model/Point";
 import {TSVG} from "../../../../../../TSVG";
 import {Angle} from "../../../../../math/Angle";
-import {PathView} from "../../../../../../element/shape/pointed/PathView";
+import {PathView} from "../../../../../../element/shape/pointed/polyline/PathView";
 import {MoveTo} from "../../../../../../model/path/point/MoveTo";
 import {Arc} from "../../../../../../model/path/curve/arc/Arc";
 import {LineTo} from "../../../../../../model/path/line/LineTo";
 import {ElementView} from "../../../../../../element/ElementView";
 import {Rect} from "../../../../../../model/Rect";
-import {Callback} from "../../../../../../dataSource/Callback";
+import {Callback} from "../../../../../../dataSource/constant/Callback";
+import {Focus} from "../../../Focus";
+import {pipe} from "rxjs";
 
 export class RotatePoint extends PathView {
   private _start = this.start.bind(this);
@@ -18,8 +20,9 @@ export class RotatePoint extends PathView {
   private _lineLength: number = 25;
   private _center: Point = {x: 0, y: 0};
   private dAngle: number = 0; /* delta angle */
+  private focus: Focus;
 
-  public constructor(container: TSVG, x: number = 0, y: number = 0) {
+  public constructor(container: TSVG, focus: Focus, x: number = 0, y: number = 0) {
     super(container);
     this.removeOverEvent();
     this.style.fillColor = "transparent";
@@ -27,11 +30,44 @@ export class RotatePoint extends PathView {
     this.style.strokeWidth = "1";
 
     this._center = {x: x, y: y};
+    this.focus = focus;
 
     this.drawPoint(this._center);
     this.svgElement.style.display = "none";
     this.svgElement.style.cursor = "move";
-    this.on();
+  }
+
+  public makeMouseDown(position: Point, call: boolean = true) {
+    this.dAngle = Angle.fromPoints(
+      {x: 0, y: this.focus.refPoint.y},
+      this.focus.refPoint,
+      position
+    ) - this.focus.angle;
+
+    this.focus.children.forEach((child: ElementView) => {
+      child.fixAngle();
+    });
+    this.focus.lastAngle = this.getAngle(position);
+
+    if (call) {
+      this._container.call(Callback.ROTATE_START, {position: position, refPoint: this.focus.refPoint, elements: this.focus.children});
+    }
+  }
+  public makeMouseMove(position: Point, call: boolean = true) {
+    let angle = this.getAngle(position);
+    if (this._container.grid.isSnap())
+      angle = Math.round(angle / 15) * 15;
+    this.focus.rotate(angle);
+
+    if (call) {
+      this._container.call(Callback.ROTATE, {angle: angle, position: position});
+    }
+  }
+  public makeMouseUp(position: Point, call: boolean = true) {
+    this.makeMouseMove(position, false);
+    if (call) {
+      this._container.call(Callback.ROTATE_END, {position: position});
+    }
   }
 
   public override get position(): Point {
@@ -68,17 +104,11 @@ export class RotatePoint extends PathView {
     this.svgElement.style.display = "none";
   }
 
-  public getAngle(containerRect: Rect, event: MouseEvent | TouchEvent): number {
-    let eventPosition = TSVG.eventToPosition(event);
-    event.preventDefault();
-
-    let x = eventPosition.x - containerRect.x;
-    let y = eventPosition.y - containerRect.y;
-
+  public getAngle(position: Point): number {
     let angle = Angle.fromPoints(
-      {x: 0, y: this._container.focused.refPoint.y},
-      this._container.focused.refPoint,
-      {x: x, y: y}
+      {x: 0, y: this.focus.refPoint.y},
+      this.focus.refPoint,
+      position
     );
 
     angle -= this.dAngle;
@@ -95,47 +125,49 @@ export class RotatePoint extends PathView {
     this._container.HTML.addEventListener("touchmove", this._move);
     document.addEventListener("mouseup", this._end);
     document.addEventListener("touchend", this._end);
+
     let eventPosition = TSVG.eventToPosition(event);
     event.preventDefault();
-
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let x = eventPosition.x - containerRect.left;
-    let y = eventPosition.y - containerRect.top;
+    let position = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
 
-    this.dAngle = Angle.fromPoints(
-      {x: 0, y: this._container.focused.refPoint.y},
-      this._container.focused.refPoint,
-      {x: x, y: y}
-    ) - this._container.focused.angle;
-
-    this._container.focused.children.forEach((child: ElementView) => {
-      child.fixAngle();
-    });
-    this._container.focused.lastAngle = this.getAngle(containerRect, event);
-
-    this._container.call(Callback.ROTATE_START);
+    this.makeMouseDown(position);
   }
   private move(event: MouseEvent | TouchEvent) {
-    let angle = this.getAngle(this._container.HTML.getBoundingClientRect(), event);
-    if (this._container.grid.isSnap())
-      angle = Math.round(angle / 15) * 15;
-    this._container.focused.rotate(angle);
+    let eventPosition = TSVG.eventToPosition(event);
+    event.preventDefault();
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let position = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+
+    this.makeMouseMove(position);
   }
-  private end() {
+  private end(event: MouseEvent | TouchEvent) {
     this._container.selectTool.on();
     this._container.HTML.removeEventListener("mousemove", this._move);
     this._container.HTML.removeEventListener("touchmove", this._move);
     document.removeEventListener("mouseup", this._end);
     document.removeEventListener("touchend", this._end);
 
-    this._container.call(Callback.ROTATE_END);
+    let eventPosition = TSVG.eventToPosition(event);
+    event.preventDefault();
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let position = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+
+    this.makeMouseUp(position);
   }
 
   public on() {
-    if (this._container.mouseEventSwitches.rotate) {
-      this.svgElement.addEventListener("mousedown", this._start);
-      this.svgElement.addEventListener("touchstart", this._start);
-    }
+    this.svgElement.addEventListener("mousedown", this._start);
+    this.svgElement.addEventListener("touchstart", this._start);
   }
   public off() {
     this.svgElement.removeEventListener("mousedown", this._start);

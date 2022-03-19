@@ -1,5 +1,12 @@
 export enum Callback {
-  STYLE_CHANGE, /* callback parameter (strokeWidth, fontBackground, strokeColor, fillColor, fontSize, fontColor, fontBackground) */
+  STROKE_WIDTH_CHANGE, /* callback parameter (strokeWidth) */
+  STROKE_DASH_ARRAY_CHANGE, /* callback parameter (strokeDashArray) */
+  STROKE_COLOR_CHANGE, /* callback parameter (strokeColor) */
+  FILL_COLOR_CHANGE, /* callback parameter (fillColor) */
+  FONT_SIZE_CHANGE, /* callback parameter (fontSize) */
+  FONT_COLOR_CHANGE, /* callback parameter (fontColor) */
+  FONT_BACKGROUND_CHANGE, /* callback parameter (fontBackground) */
+  STYLE_CHANGE, /* callback parameter (strokeWidth, strokeColor, fillColor, fontSize, fontColor, fontBackground) */
 
   SELECT_TOOl_ON,
   SELECT_TOOl_OFF,
@@ -30,7 +37,7 @@ export enum Callback {
   FREE_HAND_TOOL_OFF,
   TEXT_TOOL_ON,
   ASSET_EDIT, /* callback parameter (asset content) */
-  TEXT_TYPING, /* callback parameter (text) */
+  TEXT_TYPING, /* callback parameter (text, element) */
   TEXT_TOOL_OFF,
   VIDEO_TOOL_ON,
   VIDEO_TOOL_OFF,
@@ -49,23 +56,33 @@ export enum Callback {
   GROUP,
   UNGROUP,
 
+  SELECT_AREA_START, /* callback parameter (element) */
+  SELECT_AREA, /* callback parameter (element) */
+  SELECT_AREA_END, /* callback parameter (element) */
+  HIGHLIGHT_START, /* callback parameter (element) */
+  HIGHLIGHT, /* callback parameter (element) */
+  HIGHLIGHT_END, /* callback parameter (element) */
+  POINTER_MOVE, /* callback parameter (element) */
+  POINTER_CHANGE,
   ELEMENT_FOCUSED, /* callback parameter (element) */
   ELEMENT_BLURRED, /* callback parameter (element) */
   BLURRED,
   PERFECT_MODE_ON,
   PERFECT_MODE_OFF,
-  DRAW_CLICK, /* callback parameter (position) */
-  DRAW_MOVE, /* callback parameter (position) */
-  DRAW_END,
+  DRAW_MOUSE_DOWN, /* callback parameter (position, element) */
+  DRAW_MOUSE_MOVE, /* callback parameter (position) */
+  DRAW_MOUSE_UP,
+  STOP_CLICK_DRAWING,
   DRAG_TOOL_ON,
-  DRAG_START,
-  DRAG, /* callback parameter (position) for translation */
-  DRAG_END, /* callback parameter (position) for drag */
+  DRAG_MOUSE_DOWN, /* callback parameter (elements) */
+  DRAG_MOUSE_MOVE, /* callback parameter (position) for translation */
+  DRAG_MOUSE_UP, /* callback parameter (position) for drag */
   DRAG_TOOL_OFF,
   REF_POINT_VIEW_CHANGE_START,
   REF_POINT_VIEW_CHANGE, /* callback parameter (position) */
   REF_POINT_VIEW_CHANGE_END,
   REF_POINT_CHANGE, /* callback parameter (position) */
+  RECENTER_REFERENCE_POINT,
   ROTATE_START,
   ROTATE,
   ROTATE_END,

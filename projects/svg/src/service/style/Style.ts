@@ -1,4 +1,4 @@
-import {Callback} from "../../dataSource/Callback";
+import {Callback} from "../../dataSource/constant/Callback";
 
 export class Style {
   protected _styleCallBacks: Map<Callback, Function[]> = new Map<Callback, Function[]>();
@@ -80,13 +80,19 @@ export class Style {
     this.style.set("background-color", color);
   }
 
-  public set set(style: Style) {
-    this.strokeWidth = style.strokeWidth;
-    this.strokeColor = style.strokeColor;
-    this.fillColor = style.fillColor;
-    this.fontSize = style.fontSize;
-    this.fontColor = style.fontColor;
-    this.backgroundColor = style.backgroundColor;
+  public set set(style: Style | any) {
+    if (style.strokeWidth)
+      this.strokeWidth = style.strokeWidth;
+    if (style.strokeColor)
+      this.strokeColor = style.strokeColor;
+    if (style.fillColor)
+      this.fillColor = style.fillColor;
+    if (style.fontSize)
+      this.fontSize = style.fontSize;
+    if (style.fontColor)
+      this.fontColor = style.fontColor;
+    if (style.backgroundColor)
+      this.backgroundColor = style.backgroundColor;
   }
 
   public get object() {

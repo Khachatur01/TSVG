@@ -4,8 +4,9 @@ import {Point} from "../../../../../../model/Point";
 import {Angle} from "../../../../../math/Angle";
 import {ElementView} from "../../../../../../element/ElementView";
 import {TSVG} from "../../../../../../TSVG";
-import {Callback} from "../../../../../../dataSource/Callback";
+import {Callback} from "../../../../../../dataSource/constant/Callback";
 import {PointedView} from "../../../../../../element/shape/pointed/PointedView";
+import {ElementType} from "../../../../../../dataSource/constant/ElementType";
 
 export class DrawLine extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
@@ -14,46 +15,55 @@ export class DrawLine extends MoveDraw {
     return element;
   }
 
+  public override makeMouseMove(position: Point, call: boolean = true) {
+    if (this.container.grid.isSnap()) {
+      position = this.container.grid.getSnapPoint({
+        x: position.x,
+        y: position.y
+      });
+    } else if (this.container.perfect) {
+      position = Angle.snapLineEnd(this.startPos, position) as Point;
+    }
+
+    (this._drawableElement as PointedView).replacePoint(1, position);
+
+    this.container.call(Callback.DRAW_MOUSE_MOVE,
+      {position: position, element: this._drawableElement}
+    );
+  }
+
   protected override draw(event: MouseEvent | TouchEvent) {
-    if (!this.container || !this.drawableElement) return;
+    if (!this.container || !this._drawableElement) return;
 
     let eventPosition = TSVG.eventToPosition(event);
     event.preventDefault();
 
     let containerRect = this.container.HTML.getBoundingClientRect();
-    let x2 = eventPosition.x - containerRect.left;
-    let y2 = eventPosition.y - containerRect.top;
+    this.makeMouseMove({
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    });
+  }
 
-    if (this.container.grid.isSnap()) {
-      let snapPoint = this.container.grid.getSnapPoint({
-        x: x2,
-        y: y2
-      });
-      x2 = snapPoint.x;
-      y2 = snapPoint.y;
-    } else if (this.container.perfect) {
-      let position: Point = Angle.snapLineEnd(this.startPos, {x: x2, y: y2}) as Point;
-      x2 = position.x;
-      y2 = position.y;
+  public override start(call: boolean = true) {
+    super.start(call);
+
+    if (call) {
+      this.container.call(Callback.LINE_TOOL_ON);
     }
-
-    (this.drawableElement as PointedView).replacePoint(1, {x: x2, y: y2});
-
-    this.container.call(Callback.DRAW_MOVE,
-      {position: {x: x2, y: y2}}
-    );
   }
+  public override stop(call: boolean = true) {
+    super.stop(call);
 
-  public override start(container: TSVG) {
-    super.start(container);
-    container.call(Callback.LINE_TOOL_ON);
-  }
-  public override stop() {
-    super.stop();
-    this.container.call(Callback.LINE_TOOL_OFF);
+    if (call) {
+      this.container.call(Callback.LINE_TOOL_OFF);
+    }
   }
 
   public _new(): DrawLine {
     return new DrawLine(this.container);
+  }
+  public get type(): ElementType {
+    return ElementType.LINE;
   }
 }

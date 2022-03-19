@@ -3,21 +3,24 @@ import {TSVG} from "../../../TSVG";
 import {RectangleView} from "../../../element/shape/pointed/polygon/rectangle/RectangleView";
 import {Point} from "../../../model/Point";
 import {DragTool} from "../drag/DragTool";
-import {Callback} from "../../../dataSource/Callback";
+import {Callback} from "../../../dataSource/constant/Callback";
+import {Focus} from "../../edit/group/Focus";
 
 export class SelectTool extends Tool {
   private readonly boundingBox: RectangleView;
   private position: Point = {x: 0, y: 0};
+  public readonly dragTool: DragTool;
+  public focus: Focus;
+
   private _start = this.start.bind(this);
   private _select = this.select.bind(this);
   private _end = this.end.bind(this);
 
-  public readonly dragTool: DragTool;
-
-  public constructor(container: TSVG) {
+  public constructor(container: TSVG, focus: Focus) {
     super(container);
     this.boundingBox = new RectangleView(container);
-    this.dragTool = new DragTool(container);
+    this.dragTool = new DragTool(container, focus);
+    this.focus = focus;
 
     this.boundingBox.style.fillColor = "none";
     this.boundingBox.style.strokeColor = "#1545ff";
@@ -27,7 +30,7 @@ export class SelectTool extends Tool {
     this.boundingBox.removeOverEvent();
   }
 
-  public makeMouseDown(position: Point) {
+  public makeMouseDown(position: Point, call: boolean = true) {
     this.position = position;
     this.boundingBox.setSize({
       x: position.x,
@@ -37,8 +40,12 @@ export class SelectTool extends Tool {
     });
 
     this._container.HTML.appendChild(this.boundingBox.SVG);
+
+    if (call) {
+      this._container.call(Callback.SELECT_AREA_START, {position: position});
+    }
   }
-  public makeMouseMove(position: Point) {
+  public makeMouseMove(position: Point, call: boolean = true) {
     let width = position.x - this.position.x;
     let height = position.y - this.position.y;
 
@@ -48,8 +55,12 @@ export class SelectTool extends Tool {
       width: width,
       height: height
     });
+
+    if (call) {
+      this._container.call(Callback.SELECT_AREA, {position: position});
+    }
   }
-  public makeMouseUp(position: Point) {
+  public makeMouseUp(position: Point, call: boolean = true) {
     let width = position.x - this.position.x;
 
     this._container.HTML.removeChild(this.boundingBox.SVG);
@@ -77,19 +88,23 @@ export class SelectTool extends Tool {
             )
               continue elementsLoop;
 
-          this._container.focus(element);
+          this._container.focus(element, true, false);
         } else {/* if select box drawn from left to right */
           for (let point of elementPoints)
             if (/* one point match */
               point.x > boxPoints.topLeft.x && point.x < boxPoints.bottomRight.x &&
               point.y > boxPoints.topLeft.y && point.y < boxPoints.bottomRight.y
             ) {
-              this._container.focus(element);
+              this._container.focus(element, true, false);
               break;
             }
         }
       }
     this._container.singleSelect();
+
+    if (call) {
+      this._container.call(Callback.SELECT_AREA_END, {position: position});
+    }
   }
 
   private start(event: MouseEvent | TouchEvent): void {
@@ -135,23 +150,25 @@ export class SelectTool extends Tool {
     document.removeEventListener("touchend", this._end);
   }
 
-  protected _on(): void {
-    if (this._container.mouseEventSwitches.areaSelect) {
-      this._container.HTML.addEventListener("mousedown", this._start);
-      this._container.HTML.addEventListener("touchstart", this._start);
-    }
+  protected _on(call: boolean = true): void {
+    this._container.HTML.addEventListener("mousedown", this._start);
+    this._container.HTML.addEventListener("touchstart", this._start);
     this._isOn = true;
-    this.dragTool.on();
+    this.dragTool.on(call);
     this._container.HTML.style.cursor = "default";
 
-    this._container.call(Callback.SELECT_TOOl_ON);
+    if (call) {
+      this._container.call(Callback.SELECT_TOOl_ON);
+    }
   }
-  public off(): void {
+  public off(call: boolean = true): void {
     this._container.HTML.removeEventListener("mousedown", this._start);
     this._container.HTML.removeEventListener("touchstart", this._start);
     this._isOn = false;
-    this.dragTool.off();
+    this.dragTool.off(call);
 
-    this._container.call(Callback.SELECT_TOOl_OFF);
+    if (call) {
+      this._container.call(Callback.SELECT_TOOl_OFF);
+    }
   }
 }

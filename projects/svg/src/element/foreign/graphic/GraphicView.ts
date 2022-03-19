@@ -1,8 +1,8 @@
- import {ForeignView} from "../../type/ForeignView";
+import {ForeignView} from "../../type/ForeignView";
 import {Rect} from "../../../model/Rect";
 import {Point} from "../../../model/Point";
 import {Size} from "../../../model/Size";
-import {PathView} from "../../shape/pointed/PathView";
+import {PathView} from "../../shape/pointed/polyline/PathView";
 import {TSVG} from "../../../TSVG";
 import {ElementView} from "../../ElementView";
 import {Path} from "../../../model/path/Path";
@@ -10,6 +10,7 @@ import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {Matrix} from "../../../service/math/Matrix";
+import {ElementType} from "../../../dataSource/constant/ElementType";
 
 interface Graphic {
   path: PathView;
@@ -32,8 +33,8 @@ export class GraphicView extends ForeignView implements MoveDrawable {
   private readonly _maxRulerStepSize: number = 50;      // px
   public override rotatable: boolean = false;
 
-  public constructor(container: TSVG, center: Point = {x: 0, y: 0}, size: Size = {width: 1, height: 1}) {
-    super(container);
+  public constructor(container: TSVG, center: Point = {x: 0, y: 0}, size: Size = {width: 1, height: 1}, ownerId?: string, index?: number) {
+    super(container, ownerId, index);
 
     this.svgElement = document.createElementNS(ElementView.svgURI, "svg");
     this._axisGroup = document.createElementNS(ElementView.svgURI, "g");
@@ -69,6 +70,7 @@ export class GraphicView extends ForeignView implements MoveDrawable {
       height: size.height
     });
     this.drawAxis();
+    this.type = ElementType.GRAPHIC;
   }
 
   public zoomIn() {
@@ -302,7 +304,7 @@ export class GraphicView extends ForeignView implements MoveDrawable {
     let position = this.position;
     return {x: position.x, y: position.y, width: this._size.width, height: this._size.height};
   }
-  public get rotatedBoundingRect(): Rect {
+  public get visibleBoundingRect(): Rect {
     let boundingRect = this.boundingRect;
     let left = boundingRect.x;
     let top = boundingRect.y;

@@ -13,20 +13,20 @@ export abstract class Tool {
     return this._container;
   }
 
-  protected abstract _on(setMouseEvents?: boolean): void; /* setMouseEvents: boolean = true */
-  public on(setMouseEvents: boolean = true): void {
-    this._container.activeTool.off();
+  protected abstract _on(call?: boolean): void; /* setMouseEvents: boolean = true */
+  public on(call: boolean = true): void {
+    this._container.activeTool.off(call);
     this._container.activeTool = this;
-    this._on(setMouseEvents);
+    this._on(call);
   }
 
-  abstract off(): void;
+  abstract off(call?: boolean): void;
 
   public isOn(): boolean {
     return this._isOn;
   }
 
-  abstract makeMouseDown(position: Point, parameter?: any): void;
-  abstract makeMouseMove(position: Point, parameter?: any): void;
-  abstract makeMouseUp(position: Point, parameter?: any): void;
+  abstract makeMouseDown(position: Point, call?: boolean, parameter?: any): void;
+  abstract makeMouseMove(position: Point, call?: boolean, parameter?: any): void;
+  abstract makeMouseUp(position: Point, call?: boolean, parameter?: any): void;
 }

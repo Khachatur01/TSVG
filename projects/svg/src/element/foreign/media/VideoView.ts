@@ -2,13 +2,14 @@ import {TSVG} from "../../../TSVG";
 import {ForeignObjectView} from "../ForeignObjectView";
 import {Point} from "../../../model/Point";
 import {Size} from "../../../model/Size";
+import {ElementType} from "../../../dataSource/constant/ElementType";
 
 export class VideoView extends ForeignObjectView {
   private readonly source: HTMLSourceElement;
   private readonly _video: HTMLVideoElement;
 
-  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}) {
-    super(container, position, size);
+  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, ownerId?: string, index?: number) {
+    super(container, position, size, ownerId, index);
     this._video = document.createElement("video");
     this._video.style.width = "calc(100% - 20px)";
     this._video.style.height = "calc(100% - 20px)";
@@ -20,6 +21,7 @@ export class VideoView extends ForeignObjectView {
     this.source = document.createElement("source");
     this._video.appendChild(this.source);
     this.setContent(this._video, false);
+    this.type = ElementType.VIDEO;
   }
 
   public override get copy(): VideoView {

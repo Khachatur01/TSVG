@@ -2,8 +2,8 @@ import {MoveDraw} from "../../mode/MoveDraw";
 import {Point} from "../../../../../model/Point";
 import {ElementView} from "../../../../../element/ElementView";
 import {TextBoxView} from "../../../../../element/foreign/text/TextBoxView";
-import {TSVG} from "../../../../../TSVG";
-import {Callback} from "../../../../../dataSource/Callback";
+import {Callback} from "../../../../../dataSource/constant/Callback";
+import {ElementType} from "../../../../../dataSource/constant/ElementType";
 
 export class DrawTextBox extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
@@ -12,33 +12,44 @@ export class DrawTextBox extends MoveDraw {
     return textBox;
   }
 
-  protected override onIsNotComplete() {
-    if (!this.drawableElement) return;
-    this.drawableElement.setSize({
+  protected override onIsNotComplete(call: boolean) {
+    if (!this._drawableElement) return;
+    this._drawableElement.setSize({
       x: this.startPos.x,
       y: this.startPos.y,
       width: 200,
       height: 100
     }, null);
-    this.drawableElement.refPoint = this.drawableElement?.center;
+    this._drawableElement.refPoint = this._drawableElement?.center;
   }
-  protected override onEnd() {
-    this.container.editTool.on();
-    let textBox = (this.drawableElement as TextBoxView);
-    textBox.content?.focus();
-    textBox.onFocus();
+  protected override onEnd(call: boolean) {
+    if (call) {
+      this.container.editTool.on();
+      let textBox = (this._drawableElement as TextBoxView);
+      textBox.content?.focus();
+      textBox.onFocus();
+    }
   }
 
-  public override start(container: TSVG) {
-    super.start(container);
-    container.call(Callback.TEXT_TOOL_ON);
+  public override start(call: boolean) {
+    super.start(call);
+
+    if (call) {
+      this.container.call(Callback.TEXT_TOOL_ON);
+    }
   }
-  public override stop() {
-    super.stop();
-    this.container.call(Callback.TEXT_TOOL_OFF);
+  public override stop(call: boolean) {
+    super.stop(call);
+
+    if (call) {
+      this.container.call(Callback.TEXT_TOOL_OFF);
+    }
   }
 
   public _new(): DrawTextBox {
     return new DrawTextBox(this.container);
+  }
+  public get type(): ElementType {
+    return ElementType.TEXT_BOX;
   }
 }

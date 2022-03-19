@@ -1,7 +1,7 @@
 import {Point} from "../../../model/Point";
 import {Size} from "../../../model/Size";
 import {Rect} from "../../../model/Rect";
-import {PathView} from "./PathView";
+import {PathView} from "./polyline/PathView";
 import {Path} from "../../../model/path/Path";
 import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
@@ -122,7 +122,7 @@ export abstract class PointedView extends ShapeView {
     let points = this.points;
     return this.calculateBoundingBox(points);
   }
-  public get rotatedBoundingRect(): Rect {
+  public get visibleBoundingRect(): Rect {
     let points = this.rotatedPoints;
     return this.calculateBoundingBox(points);
   }

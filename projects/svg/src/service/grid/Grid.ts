@@ -4,7 +4,7 @@ import {Point} from "../../model/Point";
 import {Path} from "../../model/path/Path";
 import {MoveTo} from "../../model/path/point/MoveTo";
 import {LineTo} from "../../model/path/line/LineTo";
-import {Callback} from "../../dataSource/Callback";
+import {Callback} from "../../dataSource/constant/Callback";
 
 export class Grid {
   private readonly container: TSVG;
@@ -25,10 +25,13 @@ export class Grid {
     return this._group;
   }
 
-  public snapOn() {
+  public snapOn(call: boolean = true) {
     if (this._isGrid) {
       this._isSnap = true;
-      this.container.call(Callback.SNAP_ON);
+
+      if (call) {
+        this.container.call(Callback.SNAP_ON);
+      }
     }
   }
   public snapOff() {
@@ -72,10 +75,9 @@ export class Grid {
   public gridOff(call: boolean = true) {
     this._group.innerHTML = "";
     this._isGrid = false;
-    this._isSnap = false;
+
     if (call) {
       this.container.call(Callback.GRID_OFF);
-      this.container.call(Callback.SNAP_OFF);
     }
   }
   public isGrid(): boolean {

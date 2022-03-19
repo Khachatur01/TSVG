@@ -5,9 +5,10 @@ import {Rect} from "../model/Rect";
 import {Draggable} from "../service/tool/drag/Draggable";
 import {Matrix} from "../service/math/Matrix";
 import {TSVG} from "../TSVG";
-import {PathView} from "./shape/pointed/PathView";
+import {PathView} from "./shape/pointed/polyline/PathView";
 import {GroupView} from "./group/GroupView";
 import {Style} from "../service/style/Style";
+import {ElementType} from "../dataSource/constant/ElementType";
 
 interface CursorStyle {
   select: string,
@@ -104,11 +105,14 @@ export class ElementStyle extends Style {
 export abstract class ElementView implements Resizeable, Draggable {
   public static readonly svgURI: "http://www.w3.org/2000/svg" = "http://www.w3.org/2000/svg";
   protected svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "rect"); // default element
+  protected type: ElementType = ElementType.RECTANGLE;
 
   public readonly style;
   public readonly rotatable: boolean = true;
 
-  protected readonly id: string;
+  protected _ownerId: string;
+  protected _index: number;
+
   protected _container: TSVG;
   protected _lastPosition: Point = {x: 0, y: 0};
   protected _lastSize: Size = {width: 0, height: 0};
@@ -120,10 +124,45 @@ export abstract class ElementView implements Resizeable, Draggable {
   private _highlight = this.highlight.bind(this);
   private _lowlight = this.lowlight.bind(this);
 
-  public constructor(container: TSVG) {
+  public constructor(container: TSVG, ownerId?: string, index?: number) {
     this._container = container;
     this.style = new ElementStyle(this);
-    this.id = container.nextId;
+
+    if (ownerId) {
+      this._ownerId = ownerId;
+    } else {
+      this._ownerId = container.ownerId;
+    }
+    if (index) {
+      this._index = index;
+    } else {
+      this._index = container.nextElementIndex;
+    }
+  }
+
+  public get id(): string {
+    return this._container.idPrefix + "_u" + this._ownerId + "_e" + this._index;
+  }
+  public setId(ownerId: string, index: number) {
+    this._ownerId = ownerId;
+    this._index = index;
+    this.svgElement.id = this.id;
+  }
+
+  get ownerId(): string {
+    return this._ownerId;
+  }
+  public set ownerId(ownerId: string) {
+    this._ownerId = ownerId;
+    this.svgElement.id = this.id;
+  }
+
+  get index(): number {
+    return this._index;
+  }
+  public set index(index: number) {
+    this._index = index;
+    this.svgElement.id = this.id;
   }
 
   public abstract get size(): Size;
@@ -133,7 +172,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   public abstract set position(delta: Point);
   public abstract get points(): Point[];
   public abstract get boundingRect(): Rect;
-  public abstract get rotatedBoundingRect(): Rect;
+  public abstract get visibleBoundingRect(): Rect;
   public abstract toPath(): PathView;
   public abstract get copy(): ElementView;
 
@@ -205,20 +244,38 @@ export abstract class ElementView implements Resizeable, Draggable {
     };
   }
 
+  // public get rotatedCenter(): Point {
+  //   return Matrix.rotate(
+  //     [this.center],
+  //     this._refPoint,
+  //     -this._angle
+  //   )[0];
+  // }
+  // public get center(): Point {
+  //   let rect = this.boundingRect;
+  //
+  //   return {
+  //     x: rect.x + rect.width / 2,
+  //     y: rect.y + rect.height / 2
+  //   }
+  // }
+
   public get center(): Point {
     let rect = this.boundingRect;
 
-    return {
+    let center = {
       x: rect.x + rect.width / 2,
       y: rect.y + rect.height / 2
     }
-  }
-  public get rotatedCenter(): Point {
-    return Matrix.rotate(
-      [this.center],
-      this._refPoint,
-      -this._angle
-    )[0];
+    if (this._angle == 0) {
+      return center;
+    } else {
+      return Matrix.rotate(
+        [center],
+        this._refPoint,
+        -this._angle
+      )[0];
+    }
   }
 
   public get refPoint(): Point {
@@ -272,7 +329,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
 
   public remove() {
-    this.svgElement.remove();
+    this.svgElement.parentElement?.removeChild(this.svgElement);
   }
 
   public highlight(): void {

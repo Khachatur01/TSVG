@@ -2,11 +2,15 @@ import {ElementView} from "../../ElementView";
 import {PointedView} from "./PointedView";
 import {Point} from "../../../model/Point";
 import {TSVG} from "../../../TSVG";
+import {ElementType} from "../../../dataSource/constant/ElementType";
+import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
+import {Rect} from "../../../model/Rect";
 
-export class LineView extends PointedView {
-  public constructor(container: TSVG, startPoint: Point = {x: 0, y: 0}, endPoint: Point = {x: 0, y: 0}) {
-    super(container);
+export class LineView extends PointedView implements MoveDrawable {
+  public constructor(container: TSVG, startPoint: Point = {x: 0, y: 0}, endPoint: Point = {x: 0, y: 0}, ownerId?: string, index?: number) {
+    super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "line");
+    this.type = ElementType.LINE;
     this.svgElement.id = this.id;
 
     this.setAttr({
@@ -29,6 +33,10 @@ export class LineView extends PointedView {
     line.style.set = this.style;
 
     return line;
+  }
+
+  public drawSize(rect: Rect) {
+    this.setSize(rect);
   }
 
   public override get points(): Point[] {

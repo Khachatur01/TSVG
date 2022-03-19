@@ -1,6 +1,8 @@
 import {Grip} from "../Grip";
 import {Point} from "../../../../../../../model/Point";
 import {Angle} from "../../../../../../math/Angle";
+import {Callback} from "../../../../../../../dataSource/constant/Callback";
+import {Compass} from "../../../../../../../dataSource/constant/Compass";
 
 export class SEGrip extends Grip {
   public setPosition(points: Point[]): void {
@@ -10,15 +12,21 @@ export class SEGrip extends Grip {
     }
   }
 
-  protected onStart(client: Point): void {
+  public override makeMouseDown(client: Point, call: boolean = true): void {
+    super.makeMouseDown(client, call);
     this._lastAngle = Angle.fromPoints(
-      this._container.focused.lastRect,
+      this.focus.lastRect,
       client,
       {x: 0, y: client.y}
     );
+
+    if (call) {
+      this._container.call(Callback.RESIZE_START, {position: client, compass: Compass.SE, elements: this.focus.children});
+    }
   }
-  protected onMove(client: Point): void {
-    let position = this._container.focused.lastRect;
+  public override makeMouseMove(client: Point, call: boolean = true): void {
+    super.makeMouseMove(client, call);
+    let position = this.focus.lastRect;
 
     if (this._container.perfect) {
       let angle = this._lastAngle;
@@ -30,7 +38,7 @@ export class SEGrip extends Grip {
         angle = 360 - angle;
 
       client = Angle.lineFromVector(
-        this._container.focused.lastRect,
+        this.focus.lastRect,
         angle,
         Angle.lineLength(position, client)
       );
@@ -44,8 +52,17 @@ export class SEGrip extends Grip {
       width: width,
       height: height
     };
-    this._container.focused.setSize(this._lastResize);
+    this.focus.setSize(this._lastResize);
+
+    if (call) {
+      this._container.call(Callback.RESIZE, {position: client, compass: Compass.SE});
+    }
   }
-  protected onEnd(): void {
+  public override makeMouseUp(client: Point, call: boolean = true): void {
+    super.makeMouseUp(client, call);
+
+    if (call) {
+      this._container.call(Callback.RESIZE_END, {position: client, compass: Compass.SE});
+    }
   }
 }

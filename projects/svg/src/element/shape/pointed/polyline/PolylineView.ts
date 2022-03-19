@@ -4,8 +4,8 @@ import {PointedView} from "../PointedView";
 import {TSVG} from "../../../../TSVG";
 
 export class PolylineView extends PointedView {
-  public constructor(container: TSVG, points: Point[] = []) {
-    super(container);
+  public constructor(container: TSVG, points: Point[] = [], ownerId?: string, index?: number) {
+    super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "polyline");
     this.svgElement.id = this.id;
 

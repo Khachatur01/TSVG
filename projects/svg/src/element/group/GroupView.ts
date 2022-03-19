@@ -2,15 +2,19 @@ import {ElementView} from "../ElementView";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
 import {Size} from "../../model/Size";
-import {PathView} from "../shape/pointed/PathView";
+import {PathView} from "../shape/pointed/polyline/PathView";
 import {TSVG} from "../../TSVG";
+import {ElementType} from "../../dataSource/constant/ElementType";
+import {Matrix} from "../../service/math/Matrix";
 
 export class GroupView extends ElementView {
   private _elements: ElementView[] = [];
 
-  public constructor(container: TSVG) {
-    super(container);
+  public constructor(container: TSVG, ownerId?: string, index?: number) {
+    super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "g");
+    this.type = ElementType.GROUP;
+    this.svgElement.id = this.id;
   }
 
   public get copy(): GroupView {
@@ -62,7 +66,7 @@ export class GroupView extends ElementView {
   }
 
   public get position(): Point {
-    let boundingRect = this.rotatedBoundingRect;
+    let boundingRect = this.visibleBoundingRect;
 
     return {
       x: boundingRect.x,
@@ -81,7 +85,7 @@ export class GroupView extends ElementView {
   }
 
   public get size(): Size {
-    let boundingRect = this.rotatedBoundingRect;
+    let boundingRect = this.visibleBoundingRect;
 
     return {
       width: boundingRect.width,
@@ -98,10 +102,19 @@ export class GroupView extends ElementView {
     });
   }
 
-  public get boundingRect(): Rect {
-    return this.rotatedBoundingRect;
+  public override get center(): Point {
+    let rect = this.boundingRect;
+
+    return {
+      x: rect.x + rect.width / 2,
+      y: rect.y + rect.height / 2
+    }
   }
-  public get rotatedBoundingRect(): Rect {
+
+  public get boundingRect(): Rect {
+    return this.visibleBoundingRect;
+  }
+  public get visibleBoundingRect(): Rect {
     let minX, minY;
     let maxX, maxY;
 
@@ -116,7 +129,7 @@ export class GroupView extends ElementView {
 
     let firstChild = children[0];
 
-    let firstBoundingRect = firstChild.rotatedBoundingRect;
+    let firstBoundingRect = firstChild.visibleBoundingRect;
 
     minX = firstBoundingRect.x;
     minY = firstBoundingRect.y;
@@ -124,7 +137,7 @@ export class GroupView extends ElementView {
     maxY = firstBoundingRect.height + minY;
 
     for (let i = 1; i < children.length; i++) {
-      let boundingRect = children[i].rotatedBoundingRect;
+      let boundingRect = children[i].visibleBoundingRect;
       if (boundingRect.x < minX)
         minX = boundingRect.x;
       if (boundingRect.y < minY)

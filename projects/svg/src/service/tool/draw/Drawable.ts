@@ -1,12 +1,17 @@
-import {TSVG} from "../../../TSVG";
 import {Point} from "../../../model/Point";
+import {ElementType} from "../../../dataSource/constant/ElementType";
+import {ElementView} from "../../../element/ElementView";
 
 export interface Drawable {
+  turnOnSelectToolOnDrawEnd: boolean;
   _new(): Drawable;
-  start(container: TSVG): void;
-  stop(): void;
+  start(call?: boolean): void;
+  stop(call?: boolean): void;
 
-  makeMouseDown(position: Point): void;
-  makeMouseMove(position: Point): void;
-  makeMouseUp(position: Point): void;
+  makeMouseDown(position: Point, call?: boolean, parameter?: any): void;
+  makeMouseMove(position: Point, call?: boolean, parameter?: any): void;
+  makeMouseUp(position: Point, call?: boolean, parameter?: any): void;
+
+  get type(): ElementType;
+  get drawableElement(): ElementView | null;
 }

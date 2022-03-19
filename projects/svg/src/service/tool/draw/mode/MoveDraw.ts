@@ -3,34 +3,38 @@ import {ElementView} from "../../../../element/ElementView";
 import {TSVG} from "../../../../TSVG";
 import {Point} from "../../../../model/Point";
 import {MoveDrawable} from "../type/MoveDrawable";
-import {Callback} from "../../../../dataSource/Callback";
+import {Callback} from "../../../../dataSource/constant/Callback";
+import {ElementType} from "../../../../dataSource/constant/ElementType";
 
 export abstract class MoveDraw implements Drawable {
   protected container: TSVG;
   protected startPos: Point = {x: 0, y: 0}
+  public turnOnSelectToolOnDrawEnd: boolean = true;
 
   private _drawStart = this.drawStart.bind(this);
   private _draw = this.draw.bind(this);
   private _drawEnd = this.drawEnd.bind(this);
 
-  protected drawableElement: ElementView | null = null;
+  protected _drawableElement: ElementView | null = null;
 
   public constructor(container: TSVG) {
     this.container = container;
   }
 
-  public makeMouseDown(position: Point) {
+  public makeMouseDown(position: Point, call: boolean = true) {
     this.startPos.x = position.x; //x position within the element.
     this.startPos.y = position.y; //y position within the element.
 
     this.startPos = this.container.grid.getSnapPoint(this.startPos);
 
-    this.drawableElement = this.createDrawableElement(this.startPos);
-    this.container.add(this.drawableElement);
+    this._drawableElement = this.createDrawableElement(this.startPos);
+    this.container.add(this._drawableElement);
     this.container.drawTool.drawing();
-    this.container.call(Callback.DRAW_CLICK, {position: this.startPos});
+    if (call) {
+      this.container.call(Callback.DRAW_MOUSE_DOWN, {position: this.startPos, element: this._drawableElement});
+    }
   }
-  public makeMouseMove(position: Point) {
+  public makeMouseMove(position: Point, call: boolean = true) {
     let width = position.x - this.startPos.x;
     let height = position.y - this.startPos.y;
 
@@ -55,39 +59,54 @@ export abstract class MoveDraw implements Drawable {
       height = snapPoint.y - this.startPos.y;
     }
 
-    /* if xElement instance of MoveDrawable, set drawSize */
-    (this.drawableElement as unknown as MoveDrawable)?.drawSize({
+    /* if _drawableElement instance of MoveDrawable, set drawSize */
+    (this._drawableElement as unknown as MoveDrawable)?.drawSize({
       x: this.startPos.x,
       y: this.startPos.y,
       width: width,
       height: height
     });
-    this.container.call(Callback.DRAW_MOVE, {position: position});
+
+    if (call) {
+      this.container.call(Callback.DRAW_MOUSE_MOVE, {position: position, element: this._drawableElement});
+    }
   }
-  public makeMouseUp(position: Point) {
-    if (!this.drawableElement) return;
+  public makeMouseUp(position: Point, call: boolean = true) {
+    if (!this._drawableElement) return;
 
-    /* if element isn't drawn */
-    if (this.drawableElement.isComplete()) {
-      this.container.blur();
+    this.makeMouseMove(position, false);
 
-      this.drawableElement.refPoint = this.drawableElement.center;
-      this.container.focused.lastRefPoint = this.drawableElement.refPoint;
+    /* if element is drawn */
+    if (this._drawableElement.isComplete()) {
+      this._drawableElement.refPoint = this._drawableElement.center;
 
-      this.container.focus(this.drawableElement);
-      this.container.focused.fixRect();
-      this.container.selectTool.on();
+      if (this.turnOnSelectToolOnDrawEnd) {
+        this.container.blur();
+        this.container.focused.lastRefPoint = this._drawableElement.refPoint;
+
+        this.container.focus(this._drawableElement);
+        this.container.focused.fixRect();
+        this.container.selectTool.on();
+      }
     } else {
-      this.onIsNotComplete();
+      this.onIsNotComplete(call);
     }
 
-    this.onEnd();
+    this.onEnd(call);
     this.container.drawTool.drawingEnd();
-    this.drawableElement = null;
-    this.container.call(Callback.DRAW_END);
+    this._drawableElement = null;
+
+    if (call) {
+      this.container.call(Callback.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
+    }
   }
 
   public abstract _new(): MoveDraw;
+  public abstract get type(): ElementType;
+  public get drawableElement(): ElementView | null {
+    return this._drawableElement;
+  }
+
   protected abstract createDrawableElement(position: Point): ElementView;
 
   protected drawStart(event: MouseEvent | TouchEvent) {
@@ -106,7 +125,7 @@ export abstract class MoveDraw implements Drawable {
     });
   }
   protected draw(event: MouseEvent | TouchEvent) {
-    if (!this.drawableElement) return;
+    if (!this._drawableElement) return;
     let eventPosition = TSVG.eventToPosition(event);
     event.preventDefault();
 
@@ -117,28 +136,33 @@ export abstract class MoveDraw implements Drawable {
       y: eventPosition.y - containerRect.top
     });
   }
-  protected drawEnd() {
+  protected drawEnd(event: MouseEvent | TouchEvent) {
     this.container.HTML.removeEventListener('mousemove', this._draw);
     this.container.HTML.removeEventListener('touchmove', this._draw);
     document.removeEventListener('mouseup', this._drawEnd);
     document.removeEventListener('touchend', this._drawEnd);
-    this.makeMouseUp({x: 0, y: 0});
+    let eventPosition = TSVG.eventToPosition(event);
+    event.preventDefault();
+
+    let containerRect = this.container.HTML.getBoundingClientRect();
+
+    this.makeMouseUp({
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    });
   }
 
-  protected onEnd() {}
-  protected onIsNotComplete() {
-    if (this.drawableElement)
-      this.container.remove(this.drawableElement);
+  protected onEnd(call: boolean) {}
+  protected onIsNotComplete(call: boolean) {
+    if (this._drawableElement)
+      this.container.remove(this._drawableElement);
   }
 
-  public start(container: TSVG): void {
-    this.container = container;
-    if (container.mouseEventSwitches.draw) {
-      this.container.HTML.addEventListener('mousedown', this._drawStart);
-      this.container.HTML.addEventListener('touchstart', this._drawStart);
-    }
+  public start(call: boolean = true): void {
+    this.container.HTML.addEventListener('mousedown', this._drawStart);
+    this.container.HTML.addEventListener('touchstart', this._drawStart);
   }
-  public stop(): void {
+  public stop(call: boolean = true): void {
     this.container.HTML.removeEventListener('mousedown', this._drawStart);
     this.container.HTML.removeEventListener('touchstart', this._drawStart);
   }

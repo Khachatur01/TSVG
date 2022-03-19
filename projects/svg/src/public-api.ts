@@ -5,10 +5,9 @@ export * from './TSVG'
 
 export * from './colorPicker/ColorPicker';
 
-export * from './dataSource/Callback';
+export * from './dataSource/constant/Callback';
 export * from './dataSource/DemoAsset';
 export * from './dataSource/DrawTools';
-export * from './dataSource/ElementsClipboard';
 
 export * from './element/foreign/ForeignObjectView';
 export * from './element/foreign/graphic/GraphicView';
@@ -19,7 +18,7 @@ export * from './element/group/GroupView';
 export * from './element/shape/BoxView';
 export * from './element/shape/EllipseView';
 export * from './element/shape/pointed/LineView';
-export * from './element/shape/pointed/PathView';
+export * from './element/shape/pointed/polyline/PathView';
 export * from './element/shape/pointed/PointedView';
 export * from './element/shape/pointed/polygon/PolygonView';
 export * from './element/shape/pointed/polygon/rectangle/RectangleView';
@@ -30,6 +29,22 @@ export * from './element/shape/pointed/polyline/FreeView';
 export * from './element/shape/pointed/polyline/PolylineView';
 export * from './element/type/ForeignView';
 export * from './element/type/ShapeView';
+
+export * from './model/Size';
+export * from './model/Rect';
+export * from './model/Point';
+export * from './model/path/Path';
+export * from './model/path/PathCommand';
+export * from './model/path/close/Close';
+export * from './model/path/curve/arc/Arc';
+export * from './model/path/curve/bezier/cubic/SCBezier';
+export * from './model/path/curve/bezier/cubic/CBezier';
+export * from './model/path/curve/bezier/quadratic/SQBezier';
+export * from './model/path/curve/bezier/quadratic/QBezier';
+export * from './model/path/line/LineTo';
+export * from './model/path/line/oriented/HLineTo';
+export * from './model/path/line/oriented/VLineTo';
+export * from './model/path/point/MoveTo';
 
 export * from './service/edit/group/Focus';
 export * from './service/edit/group/bound/BoundingBox';

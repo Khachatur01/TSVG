@@ -1,7 +1,7 @@
 import {Tool} from "../Tool";
 import {TSVG} from "../../../TSVG";
-import {Callback} from "../../../dataSource/Callback";
-import {PathView} from "../../../element/shape/pointed/PathView";
+import {Callback} from "../../../dataSource/constant/Callback";
+import {PathView} from "../../../element/shape/pointed/polyline/PathView";
 import {Path} from "../../../model/path/Path";
 import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
@@ -13,56 +13,99 @@ export class HighlightTool extends Tool {
   private _color: string = "#7efca0AA";
   private _width: string = "20";
   private path: PathView | null = null;
-  private readonly group: SVGGElement;
+  private group: SVGGElement;
 
   private _start = this.start.bind(this);
   private _highlight = this.highlight.bind(this);
   private _end = this.end.bind(this);
 
-  public constructor(container: TSVG) {
+  public constructor(container: TSVG, group?: SVGGElement) {
     super(container);
-    this.group = document.createElementNS(ElementView.svgURI, "g");
-    this.group.id = "highlight";
+
+    if (group) {
+      this.group = group;
+    } else {
+      this.group = document.createElementNS(ElementView.svgURI, "g");
+      this.group.id = "highlight";
+    }
   }
 
-  public makeMouseDown(position: Point) {
+  public makeMouseDown(position: Point, call: boolean = true, settings?: any) {
     let start = new Path();
     start.add(
       new MoveTo(position)
     );
+
+    if (settings) {
+      this._timeout = settings.timeout;
+      this._color = settings.color;
+      this._width = settings.width;
+    }
 
     this.path = new PathView(this._container, start);
     this.path.removeOverEvent();
     this.path.style.strokeWidth = this._width;
     this.path.style.strokeColor = this._color;
     this.path.style.fillColor = "none";
+    this.path.SVG.style.pointerEvents = "none";
 
     this.group.appendChild(this.path.SVG);
+
+    if (call) {
+      this._container.call(Callback.HIGHLIGHT_START, {position: position, element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
+    }
   }
-  public makeMouseMove(position: Point) {
-    this.path?.addCommand(new LineTo(position));
+  public makeMouseMove(position: Point, call: boolean = true, path?: string) {
+    if (path) {
+      this.path?.setAttr({
+        d: path
+      });
+    } else {
+      this.path?.addCommand(new LineTo(position));
+    }
+
+    if (call) {
+      this._container.call(Callback.HIGHLIGHT, {position: position, element: this.path});
+    }
   }
-  public makeMouseUp(position: Point) {
-    let path = this.path;
+  public makeMouseUp(position: Point, call: boolean = true, path?: string) {
+    if (path) {
+      /*
+         there is no need to parse path string, because highlight path should not be dragged or resized
+         this.path?.path.fromString(path);
+      */
+
+      this.path?.setAttr({
+        d: path
+      });
+    }
+
+    let pathView = this.path;
+
     setTimeout(() => {
-      if (path) this.group.removeChild(path.SVG)
+      if (pathView) this.group.removeChild(pathView.SVG)
     }, this._timeout);
+
+    if (call) {
+      this._container.call(Callback.HIGHLIGHT_END, {position: position, element: this.path});
+    }
   }
 
   public set timeout(milliseconds: number) {
     this._timeout = milliseconds;
   }
-
   public set color(color: string) {
     this._color = color;
   }
-
   public set width(width: number) {
     this._width = width + "";
   }
 
   public get SVG(): SVGGElement {
     return this.group;
+  }
+  public set SVG(group: SVGGElement) {
+    this.group = group;
   }
 
   private start(event: MouseEvent | TouchEvent): void {
@@ -94,31 +137,41 @@ export class HighlightTool extends Tool {
 
     this.makeMouseMove(movePosition);
   }
-  private end(): void {
-    this.makeMouseUp({x: 0, y: 0});
+  private end(event: MouseEvent | TouchEvent): void {
     this._container.HTML.removeEventListener("mousemove", this._highlight);
     this._container.HTML.removeEventListener("touchmove", this._highlight);
     document.removeEventListener("mouseup", this._end);
     document.removeEventListener("touchend", this._end);
+
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let eventPosition = TSVG.eventToPosition(event);
+    event.preventDefault();
+
+    let position = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+    this.makeMouseUp(position);
   }
 
-  protected _on(): void {
-    if (this._container.mouseEventSwitches.highlight) {
-      this._container.HTML.addEventListener("mousedown", this._start);
-      this._container.HTML.addEventListener("touchstart", this._start);
-    }
+  protected _on(call: boolean = true): void {
+    this._container.HTML.addEventListener("mousedown", this._start);
+    this._container.HTML.addEventListener("touchstart", this._start);
     this._isOn = true;
     this._container.HTML.style.cursor = "crosshair";
     this._container.blur();
 
-    this._container.call(Callback.HIGHLIGHT_TOOl_ON);
+    if (call) {
+      this._container.call(Callback.HIGHLIGHT_TOOl_ON);
+    }
   }
-
-  public off(): void {
+  public off(call: boolean = true): void {
     this._container.HTML.removeEventListener("mousedown", this._start);
     this._container.HTML.removeEventListener("touchstart", this._start);
     this._isOn = false;
 
-    this._container.call(Callback.HIGHLIGHT_TOOl_OFF);
+    if (call) {
+      this._container.call(Callback.HIGHLIGHT_TOOl_OFF);
+    }
   }
 }

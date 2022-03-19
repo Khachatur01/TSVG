@@ -12,6 +12,8 @@ import {DrawGraphic} from "../service/tool/draw/element/foreign/DrawGraphic";
 import {DrawVideo} from "../service/tool/draw/element/foreign/DrawVideo";
 import {DrawImage} from "../service/tool/draw/element/foreign/DrawImage";
 import {DrawAsset} from "../service/tool/draw/element/foreign/DrawAsset";
+import {ElementType} from "./constant/ElementType";
+import {Drawable} from "../service/tool/draw/Drawable";
 
 export class DrawTools {
   private readonly container: TSVG;
@@ -85,5 +87,46 @@ export class DrawTools {
   }
   public get graphic(): DrawGraphic {
     return this._graphic;
+  }
+
+  public getByType(type: ElementType): Drawable {
+    switch (type) {
+      case ElementType.ELLIPSE:
+        return this._ellipse;
+      // case ElementType.BOX:
+      //   return this._box;
+      // case ElementType.PATH:
+      //   return this._path;
+      case ElementType.LINE:
+        return this._line;
+      case ElementType.FREE:
+        return this._free;
+      case ElementType.POLYLINE:
+        return this._polyline;
+      case ElementType.POLYGON:
+        return this._polygon;
+      // case ElementType.TRIANGLE:
+      //   return this._triangle;
+      case ElementType.RIGHT_TRIANGLE:
+        return this._rightTriangle;
+      case ElementType.ISOSCELES_TRIANGLE:
+        return this._isoscelesTriangle;
+      case ElementType.RECTANGLE:
+        return this._rectangle;
+      // case ElementType.GROUP:
+      //   return this._group;
+      case ElementType.FOREIGN_OBJECT:
+        return this._asset;
+      case ElementType.TEXT_BOX:
+        return this._textBox;
+      case ElementType.IMAGE:
+        return this._image;
+      case ElementType.VIDEO:
+        return this._video;
+      case ElementType.GRAPHIC:
+        return this._graphic;
+      default:
+        throw Error("Type is incorrect");
+    }
   }
 }

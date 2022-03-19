@@ -6,10 +6,9 @@ import {Tool} from "./service/tool/Tool";
 import {EditTool} from "./service/tool/edit/EditTool";
 import {DrawTools} from "./dataSource/DrawTools";
 import {Grid} from "./service/grid/Grid";
-import {Callback} from "./dataSource/Callback";
+import {Callback} from "./dataSource/constant/Callback";
 import {GroupView} from "./element/group/GroupView";
 import {PointedView} from "./element/shape/pointed/PointedView";
-import {ElementsClipboard} from "./dataSource/ElementsClipboard";
 import {Style} from "./service/style/Style";
 import {HighlightTool} from "./service/tool/highlighter/HighlightTool";
 import {PointerTool} from "./service/tool/pointer/PointerTool";
@@ -38,7 +37,7 @@ class GlobalStyle extends Style {
         child.style.strokeWidth = width;
       });
     }
-    this.container.call(Callback.STYLE_CHANGE, this.object);
+    this.container.call(Callback.STROKE_WIDTH_CHANGE, {strokeWidth: width});
   }
 
   public override get strokeDashArray(): string {
@@ -53,7 +52,7 @@ class GlobalStyle extends Style {
         child.style.strokeDashArray = array;
       });
     }
-    this.container.call(Callback.STYLE_CHANGE, this.object);
+    this.container.call(Callback.STROKE_DASH_ARRAY_CHANGE, {strokeDashArray: array});
   }
 
   public override get strokeColor(): string {
@@ -68,7 +67,7 @@ class GlobalStyle extends Style {
         child.style.strokeColor = color;
       });
     }
-    this.container.call(Callback.STYLE_CHANGE, this.object);
+    this.container.call(Callback.STROKE_COLOR_CHANGE, {strokeColor: color});
   }
 
   public override get fillColor(): string {
@@ -83,7 +82,7 @@ class GlobalStyle extends Style {
         child.style.fillColor = color;
       });
     }
-    this.container.call(Callback.STYLE_CHANGE, this.object);
+    this.container.call(Callback.FILL_COLOR_CHANGE, {fillColor: color});
   }
 
   public override get fontSize(): string {
@@ -98,7 +97,7 @@ class GlobalStyle extends Style {
         child.style.fontSize = size;
       });
     }
-    this.container.call(Callback.STYLE_CHANGE, this.object);
+    this.container.call(Callback.FONT_SIZE_CHANGE, {fontSize: size});
   }
 
   public override get fontColor(): string {
@@ -113,7 +112,7 @@ class GlobalStyle extends Style {
         child.style.fontColor = color;
       });
     }
-    this.container.call(Callback.STYLE_CHANGE, this.object);
+    this.container.call(Callback.FONT_COLOR_CHANGE, {fontColor: color});
   }
 
   public override get backgroundColor(): string {
@@ -128,7 +127,7 @@ class GlobalStyle extends Style {
         child.style.backgroundColor = color;
       });
     }
-    this.container.call(Callback.STYLE_CHANGE, this.object);
+    this.container.call(Callback.FONT_BACKGROUND_CHANGE, {backgroundColor: color});
   }
 
   public recoverGlobalStyle(call: boolean = true) {
@@ -156,70 +155,51 @@ class GlobalStyle extends Style {
   }
 }
 
-export interface MouseEventSwitches {
-  draw: boolean,
-  drag: boolean,
-  resize: boolean,
-  rotate: boolean,
-  refPoint: boolean,
-  nodeEdit: boolean,
-  elementSelectBlur: boolean,
-  areaSelect: boolean,
-  blurAll: boolean,
-  highlight: boolean,
-  pointer: boolean
-}
-
 export class TSVG {
   private readonly container: HTMLElement;
-  public readonly mouseEventSwitches: MouseEventSwitches = {
-    draw: true,
-    drag: true,
-    resize: true,
-    rotate: true,
-    refPoint: true,
-    nodeEdit: true,
-    elementSelectBlur: true,
-    areaSelect: true,
-    blurAll: true,
-    highlight: true,
-    pointer: true
-  };
-
-  private _focus: Focus = new Focus(this);
+  private readonly _focus: Focus;
   private _elements: Set<ElementView> = new Set<ElementView>();
   private _callBacks: Map<Callback, Function[]> = new Map<Callback, Function[]>();
   private _multiSelect: boolean = false;
-  private lastCopyPosition: Point = {x: 0, y: 0};
-  private readonly idPrefix: string;
-  private static id: number = 0;
   private _perfect: boolean = false;
 
+  public readonly idPrefix: string;
+  public readonly ownerId: string;
+  private elementIndex: number;
+
   public readonly elementsGroup: SVGGElement;
+
+  /* tools */
   public readonly selectTool: SelectTool;
   public readonly highlightTool: HighlightTool;
   public readonly pointerTool: PointerTool;
   public readonly drawTool: DrawTool;
   public readonly editTool: EditTool;
+  /* tools */
+
   public readonly grid: Grid;
   public readonly style: GlobalStyle = new GlobalStyle(this);
   public readonly drawTools: DrawTools = new DrawTools(this);
   public activeTool: Tool;
 
-  public constructor(containerId: string, idPrefix: string = "element") {
+  public constructor(containerId: string, ownerId: string, idPrefix: string = "", elementIndex: number = 0) {
+    this.idPrefix = idPrefix;
+    this.ownerId = ownerId;
+    this.elementIndex = elementIndex;
+
     let container = document.getElementById(containerId);
     if (container)
       this.container = container;
     else
       throw new DOMException("Can't create container", "Container not found");
 
-    this.idPrefix = idPrefix;
-
+    this._focus = new Focus(this);
+    this._focus.on();
     this.drawTool = new DrawTool(this);
     this.highlightTool = new HighlightTool(this);
-    this.pointerTool = new PointerTool(this);
-    this.selectTool = new SelectTool(this);
-    this.editTool = new EditTool(this);
+    this.pointerTool = new PointerTool(this, "");
+    this.selectTool = new SelectTool(this, this._focus);
+    this.editTool = new EditTool(this, this._focus);
     this.activeTool = this.selectTool;
     this.grid = new Grid(this);
     this.style = new GlobalStyle(this);
@@ -246,16 +226,28 @@ export class TSVG {
     this.container.appendChild(this.highlightTool.SVG); /* highlight path */
     this.container.appendChild(this.editTool.SVG); /* editing nodes */
     this.container.appendChild(this._focus.SVG); /* bounding box, grips, rotation and reference point */
+    this.container.appendChild(this.pointerTool.SVG); /* pointer image */
   }
 
-  public get id(): number {
-    return TSVG.id;
+  public get nextElementIndex(): number {
+    return this.elementIndex++;
   }
-  public set id(id: number) {
-    TSVG.id = id;
+  public getElementsByOwnerId(ownerId: string): ElementView[] {
+    let elements: ElementView[] = [];
+    this._elements.forEach((element: ElementView) => {
+      if (element.ownerId === ownerId) {
+        elements.push(element);
+      }
+    });
+    return elements;
   }
-  public get nextId(): string {
-    return this.idPrefix + TSVG.id++;
+  public getElementById(ownerId: string, index: number): ElementView | undefined {
+    for (let element of this._elements) {
+      if (element.ownerId === ownerId && element.index === index) {
+        return element;
+      }
+    }
+    return undefined;
   }
 
   public call(name: Callback, parameters: any = {}): void {
@@ -282,13 +274,13 @@ export class TSVG {
     if (!this.selectTool.isOn() && !this.editTool.isOn())
       return;
 
-    this.editTool.removeEditableElement();
-
     if (this.editTool.isOn()) {
-      if (element instanceof PointedView)
+      this.editTool.removeEditableElement();
+      if (element instanceof PointedView) {
         this.editTool.editableElement = element;
-      else if (element instanceof TextBoxView)
+      } else if (element instanceof TextBoxView) {
         this.focus(element, false);
+      }
     } else {
       if (element.group) /* if element has grouped, then select group */
         element = element.group;
@@ -306,7 +298,7 @@ export class TSVG {
       }
     }
   }
-  private setElementActivity(element: ElementView) {
+  public setElementActivity(element: ElementView) {
     if (element instanceof GroupView) return;
     element.SVG.addEventListener("mousedown", () => {
       this.clickEvent(element);
@@ -316,10 +308,11 @@ export class TSVG {
     });
 
     element.SVG.addEventListener("mousemove", () => {
-      if (this.selectTool.isOn())
+      if (this.selectTool.isOn()) {
         element.SVG.style.cursor = element.style.cursor.select;
-      else if (this.editTool.isOn())
+      } else if (this.editTool.isOn()) {
         element.SVG.style.cursor = element.style.cursor.edit;
+      }
     });
   }
 
@@ -327,17 +320,23 @@ export class TSVG {
     return this._elements;
   }
 
-  public add(xElement: ElementView, setElementActivity: boolean = true) {
-    if (!xElement) return;
-    xElement.group = null;
-    this.elementsGroup.appendChild(xElement.SVG);
-    this._elements.add(xElement);
+  public add(element: ElementView, setElementActivity: boolean = true) {
+    if (!element) return;
+    element.group = null;
+    this.elementsGroup.appendChild(element.SVG);
+    this._elements.add(element);
     if(setElementActivity)
-      this.setElementActivity(xElement);
+      this.setElementActivity(element);
   }
-  public remove(xElement: ElementView) {
-    this._elements.delete(xElement);
-    xElement.remove();
+  public remove(element: ElementView, force: boolean = false, call: boolean = true) {
+    if (force || this.selectTool.isOn()) { /* if force don't check if select tool is on */
+      this._elements.delete(element);
+      element.remove();
+
+      if (call) {
+        this.call(Callback.ELEMENT_DELETED, {elements: new Set<ElementView>([element])});
+      }
+    }
   }
   public clear() {
     this._focus.clear();
@@ -355,15 +354,16 @@ export class TSVG {
       this.focus(element, showBounding);
     });
   }
-  public focus(xElement: ElementView, showBounding: boolean = true) {
-    this._focus.appendChild(xElement, showBounding);
+  public focus(element: ElementView, showBounding: boolean = true, call: boolean = true) {
+    this._focus.appendChild(element, showBounding, call);
   }
-  public blur(xElement: ElementView | null = null) {
-    if (xElement)
-      this._focus.removeChild(xElement);
+  public blur(element: ElementView | null = null) {
+    if (element)
+      this._focus.removeChild(element);
     else
       this._focus.clear();
   }
+
   public get focused(): Focus {
     return this._focus;
   }
@@ -375,45 +375,6 @@ export class TSVG {
   public singleSelect(): void {
     this._multiSelect = false;
     this._focus.boundingBox.transparentClick = false;
-  }
-  public copyFocused(): void {
-    let elements: ElementView[] = [];
-    for (let element of this._focus.children)
-      elements.push(element);
-
-    this.lastCopyPosition = this._focus.position;
-    ElementsClipboard.save(elements);
-    this.call(Callback.COPY);
-  }
-  public cutFocused(): void {
-    this.copyFocused();
-    this._focus.remove();
-    this.call(Callback.CUT);
-  }
-  public paste(): void {
-    let elements: ElementView[] = ElementsClipboard.get();
-
-    this.blur();
-    elements.forEach((element: ElementView) => {
-      element = element.copy; /* may paste many times */
-      element.container = this;
-      element.fixRect();
-      if (element instanceof GroupView)
-        element.elements.forEach((child: ElementView) => {
-          this.setElementActivity(child);
-          child.container = this;
-        });
-
-      let oldPosition = element.position;
-      element.position = {
-        x: this.lastCopyPosition.x - oldPosition.x + 10,
-        y: this.lastCopyPosition.y - oldPosition.y + 10
-      };
-      this.lastCopyPosition = element.position;
-      this.add(element);
-      this.focus(element);
-    });
-    this.call(Callback.PASTE);
   }
 
   public get perfect(): boolean {
