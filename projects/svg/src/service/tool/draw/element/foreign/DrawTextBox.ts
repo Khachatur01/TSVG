@@ -25,9 +25,13 @@ export class DrawTextBox extends MoveDraw {
   protected override onEnd(call: boolean) {
     if (call) {
       this.container.editTool.on();
-      let textBox = (this._drawableElement as TextBoxView);
-      textBox.content?.focus();
-      textBox.onFocus();
+      if (this._drawableElement) {
+        this.container.focus(this._drawableElement, false, false);
+        this.container.editTool.editableElement = this._drawableElement as TextBoxView;
+        let textBox = (this._drawableElement as TextBoxView);
+        textBox.content?.focus();
+        textBox.onFocus();
+      }
     }
   }
 

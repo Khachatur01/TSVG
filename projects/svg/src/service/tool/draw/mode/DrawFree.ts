@@ -8,11 +8,12 @@ import {MoveTo} from "../../../../model/path/point/MoveTo";
 import {Callback} from "../../../../dataSource/constant/Callback";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../../element/ElementView";
+import {DrawTool} from "../DrawTool";
 
 export class DrawFree implements Drawable {
   private readonly container: TSVG;
   private _drawableElement: FreeView | null = null;
-  public turnOnSelectToolOnDrawEnd: boolean = true;
+  public drawTool: DrawTool | null = null;
 
   private _drawStart = this.drawStart.bind(this);
   private _draw = this.draw.bind(this);
@@ -46,7 +47,7 @@ export class DrawFree implements Drawable {
       if (this.container.grid.isSnap()) {
         position = this.container.grid.getSnapPoint(position);
         this._drawableElement.pushPoint(position);
-      } else if (this.container.perfect) {
+      } else if (this.drawTool?.perfect) {
         try {
           let lastPoint: Point = this._drawableElement.getPoint(-2);
           position = Angle.snapLineEnd(lastPoint, position) as Point;

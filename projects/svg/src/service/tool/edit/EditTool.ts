@@ -6,11 +6,12 @@ import {Point} from "../../../model/Point";
 import {Node} from "./Node";
 import {Callback} from "../../../dataSource/constant/Callback";
 import {Focus} from "../../edit/group/Focus";
+import {TextBoxView} from "../../../element/foreign/text/TextBoxView";
 
 export class EditTool extends Tool {
   private readonly nodesGroup: SVGGElement;
   private nodes: Node[] = [];
-  private _editableElement: PointedView | null = null;
+  private _editableElement: PointedView | TextBoxView | null = null;
   public focus: Focus;
 
   public constructor(container: TSVG, focus: Focus) {
@@ -41,24 +42,33 @@ export class EditTool extends Tool {
     return this.nodesGroup;
   }
 
-  public get editableElement(): PointedView | null {
+  public get pointedEditableElement(): PointedView | null {
+    if (this._editableElement instanceof PointedView) {
+      return this._editableElement;
+    }
+    return null;
+  }
+  public get editableElement(): PointedView | TextBoxView  | null {
     return this._editableElement;
   }
-  public set editableElement(editableElement: PointedView | null) {
+  public set editableElement(editableElement: PointedView | TextBoxView | null) {
     if (!editableElement) return;
+
     this.focus.appendChild(editableElement, false);
     this._editableElement = editableElement;
-    let order = 0;
-    let points = editableElement.points;
-    for (let point of points) {
-      let node: Node = new Node(this._container, this, point, order++);
-      node.on();
-      this.nodes.push(node);
-      this.nodesGroup.appendChild(node.SVG);
-    }
+    if (editableElement instanceof  PointedView) {
+      let order = 0;
+      let points = editableElement.points;
+      for (let point of points) {
+        let node: Node = new Node(this._container, this, point, order++);
+        node.on();
+        this.nodes.push(node);
+        this.nodesGroup.appendChild(node.SVG);
+      }
 
-    this.refPoint = editableElement.refPoint;
-    this.rotate(editableElement.angle);
+      this.refPoint = editableElement.refPoint;
+      this.rotate(editableElement.angle);
+    }
   }
   public removeEditableElement() {
     this._editableElement = null;
@@ -85,8 +95,8 @@ export class EditTool extends Tool {
   }
   public off(call: boolean = true): void {
     this._isOn = false;
+    this.focus.clear();
     this.removeEditableElement();
-    this._container.blur();
 
     if (call) {
       this._container.call(Callback.EDIT_TOOl_OFF);

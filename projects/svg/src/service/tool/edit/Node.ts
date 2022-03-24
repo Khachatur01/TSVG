@@ -27,28 +27,28 @@ export class Node extends EllipseView {
 
   public makeMouseDown(position: Point, call: boolean = true) {
     if (call) {
-      this._container.call(Callback.NODE_EDIT_START, {order: this.order, position: position, element: this.editTool.editableElement});
+      this._container.call(Callback.NODE_EDIT_START, {order: this.order, position: position, element: this.editTool.pointedEditableElement});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
-    if (!this.editTool.editableElement) return;
+    if (!this.editTool.pointedEditableElement) return;
     let rotatedPosition = Matrix.rotate(
       [position],
-      this.editTool.editableElement.refPoint,
-      this.editTool.editableElement.angle
+      this.editTool.pointedEditableElement.refPoint,
+      this.editTool.pointedEditableElement.angle
     )[0];
 
-    this.editTool.editableElement.replacePoint(this.order, rotatedPosition);
+    this.editTool.pointedEditableElement.replacePoint(this.order, rotatedPosition);
     this.position = rotatedPosition;
 
     if (call) {
-      this._container.call(Callback.NODE_EDIT, {order: this.order, position: position, element: this.editTool.editableElement});
+      this._container.call(Callback.NODE_EDIT, {order: this.order, position: position, element: this.editTool.pointedEditableElement});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
     this.makeMouseMove(position, false);
     if (call) {
-      this._container.call(Callback.NODE_EDIT_END, {order: this.order, position: position, element: this.editTool.editableElement});
+      this._container.call(Callback.NODE_EDIT_END, {order: this.order, position: position, element: this.editTool.pointedEditableElement});
     }
   }
 

@@ -21,7 +21,7 @@ export class DrawLine extends MoveDraw {
         x: position.x,
         y: position.y
       });
-    } else if (this.container.perfect) {
+    } else if (this.drawTool?.perfect) {
       position = Angle.snapLineEnd(this.startPos, position) as Point;
     }
 

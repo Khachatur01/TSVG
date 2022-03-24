@@ -276,11 +276,12 @@ export class TSVG {
 
     if (this.editTool.isOn()) {
       this.editTool.removeEditableElement();
-      if (element instanceof PointedView) {
+      if (element instanceof PointedView || element instanceof TextBoxView) {
         this.editTool.editableElement = element;
-      } else if (element instanceof TextBoxView) {
-        this.focus(element, false);
       }
+      // else if (element instanceof TextBoxView) {
+      //   this.focus(element, false);
+      // }
     } else {
       if (element.group) /* if element has grouped, then select group */
         element = element.group;
@@ -382,6 +383,7 @@ export class TSVG {
   }
   public set perfect(perfect: boolean) {
     this._perfect = perfect;
+    this.drawTool.perfect = perfect;
     if (perfect)
       this.call(Callback.PERFECT_MODE_ON);
     else

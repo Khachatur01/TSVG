@@ -1,9 +1,10 @@
 import {Point} from "../../../model/Point";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../element/ElementView";
+import {DrawTool} from "./DrawTool";
 
 export interface Drawable {
-  turnOnSelectToolOnDrawEnd: boolean;
+  drawTool: DrawTool | null;
   _new(): Drawable;
   start(call?: boolean): void;
   stop(call?: boolean): void;

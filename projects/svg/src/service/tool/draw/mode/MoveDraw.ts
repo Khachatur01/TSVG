@@ -5,11 +5,12 @@ import {Point} from "../../../../model/Point";
 import {MoveDrawable} from "../type/MoveDrawable";
 import {Callback} from "../../../../dataSource/constant/Callback";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
+import {DrawTool} from "../DrawTool";
 
 export abstract class MoveDraw implements Drawable {
   protected container: TSVG;
-  protected startPos: Point = {x: 0, y: 0}
-  public turnOnSelectToolOnDrawEnd: boolean = true;
+  protected startPos: Point = {x: 0, y: 0};
+  public drawTool: DrawTool | null = null;
 
   private _drawStart = this.drawStart.bind(this);
   private _draw = this.draw.bind(this);
@@ -38,7 +39,7 @@ export abstract class MoveDraw implements Drawable {
     let width = position.x - this.startPos.x;
     let height = position.y - this.startPos.y;
 
-    if (this.container.perfect) {
+    if (this.drawTool?.perfect) {
       let averageSize = (Math.abs(width) + Math.abs(height)) / 2
       if (width < 0)
         width = -averageSize;
@@ -80,7 +81,7 @@ export abstract class MoveDraw implements Drawable {
     if (this._drawableElement.isComplete()) {
       this._drawableElement.refPoint = this._drawableElement.center;
 
-      if (this.turnOnSelectToolOnDrawEnd) {
+      if (this.drawTool?.turnOnSelectToolOnDrawEnd) {
         this.container.blur();
         this.container.focused.lastRefPoint = this._drawableElement.refPoint;
 

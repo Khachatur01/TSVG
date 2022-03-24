@@ -6,11 +6,12 @@ import {Angle} from "../../../math/Angle";
 import {Callback} from "../../../../dataSource/constant/Callback";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../../element/ElementView";
+import {DrawTool} from "../DrawTool";
 
 export abstract class ClickDraw implements Drawable {
   protected container: TSVG;
   protected _drawableElement: PointedView | null = null;
-  public turnOnSelectToolOnDrawEnd: boolean = true;
+  public drawTool: DrawTool | null = null;
 
   private _click = this.click.bind(this);
   private _move = this.move.bind(this);
@@ -37,7 +38,7 @@ export abstract class ClickDraw implements Drawable {
 
     if (this.container.grid.isSnap())
       position = this.container.grid.getSnapPoint(position);
-    else if (this.container.perfect) {
+    else if (this.drawTool?.perfect) {
       let lastPoint: Point = this._drawableElement.getPoint(-2);
       position = Angle.snapLineEnd(lastPoint, position) as Point;
     }
@@ -100,7 +101,7 @@ export abstract class ClickDraw implements Drawable {
       this.container.drawTool.drawingEnd();
       this._drawableElement.refPoint = this._drawableElement.center;
 
-      if (this.turnOnSelectToolOnDrawEnd) {
+      if (this.drawTool?.turnOnSelectToolOnDrawEnd) {
         this.container.blur();
         this.container.focus(this._drawableElement);
         this.container.focused.fixRect();

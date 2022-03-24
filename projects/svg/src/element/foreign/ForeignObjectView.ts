@@ -178,7 +178,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     let size = this.size;
     return size.width > 0 && size.height > 0;
   }
-
   public toPath(): PathView {
     return new PathView(this._container);
   }
