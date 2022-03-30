@@ -1,17 +1,19 @@
-import {ElementView} from "../ElementView";
+import {ElementCursor, ElementView} from "../ElementView";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
 import {Size} from "../../model/Size";
 import {TSVG} from "../../TSVG";
-import {PathView} from "./pointed/polyline/PathView";
+import {PathView} from "./pointed/PathView";
 import {ShapeView} from "../type/ShapeView";
 import {ElementType} from "../../dataSource/constant/ElementType";
+
+export class BoxCursor extends ElementCursor {}
 
 export class BoxView extends ShapeView {
   public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "rect");
-    this.type = ElementType.BOX;
+    this._type = ElementType.BOX;
     this.svgElement.id = this.id;
 
     this.position = position;
@@ -96,7 +98,7 @@ export class BoxView extends ShapeView {
     return this.calculateBoundingBox(points);
   }
   public get visibleBoundingRect(): Rect {
-    let points = this.rotatedPoints;
+    let points = this.visiblePoints;
     return this.calculateBoundingBox(points);
   }
 

@@ -1,11 +1,12 @@
-import {ElementView} from "../ElementView";
+import {ElementCursor, ElementView} from "../ElementView";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
 import {Size} from "../../model/Size";
-import {PathView} from "../shape/pointed/polyline/PathView";
+import {PathView} from "../shape/pointed/PathView";
 import {TSVG} from "../../TSVG";
 import {ElementType} from "../../dataSource/constant/ElementType";
-import {Matrix} from "../../service/math/Matrix";
+
+export class GroupCursor extends ElementCursor {}
 
 export class GroupView extends ElementView {
   private _elements: ElementView[] = [];
@@ -13,7 +14,7 @@ export class GroupView extends ElementView {
   public constructor(container: TSVG, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "g");
-    this.type = ElementType.GROUP;
+    this._type = ElementType.GROUP;
     this.svgElement.id = this.id;
   }
 
@@ -54,10 +55,10 @@ export class GroupView extends ElementView {
     });
     return points;
   }
-  public override get rotatedPoints(): Point[] {
+  public override get visiblePoints(): Point[] {
     let points: Point[] = [];
     this._elements.forEach((element: ElementView) => {
-      let elementPoints = element.rotatedPoints;
+      let elementPoints = element.visiblePoints;
       elementPoints.forEach((point: Point) => {
         points.push(Object.assign({}, point));
       });

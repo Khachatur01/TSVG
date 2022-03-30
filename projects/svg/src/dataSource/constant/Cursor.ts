@@ -1,0 +1,13 @@
+export enum Cursor {
+  SELECT,
+  EDIT,
+  DRAW,
+  DRAW_FREE,
+  POINTER,
+  HIGHLIGHTER,
+  BOUNDING_BOX,
+  GRIP,
+  REFERENCE_POINT,
+  ROTATE_POINT,
+  NODE,
+}

@@ -7,11 +7,13 @@ import {Node} from "./Node";
 import {Callback} from "../../../dataSource/constant/Callback";
 import {Focus} from "../../edit/group/Focus";
 import {TextBoxView} from "../../../element/foreign/text/TextBoxView";
+import {Cursor} from "../../../dataSource/constant/Cursor";
+import {ForeignObjectView} from "../../../element/foreign/ForeignObjectView";
 
 export class EditTool extends Tool {
   private readonly nodesGroup: SVGGElement;
   private nodes: Node[] = [];
-  private _editableElement: PointedView | TextBoxView | null = null;
+  private _editableElement: PointedView | ForeignObjectView | null = null;
   public focus: Focus;
 
   public constructor(container: TSVG, focus: Focus) {
@@ -48,14 +50,16 @@ export class EditTool extends Tool {
     }
     return null;
   }
-  public get editableElement(): PointedView | TextBoxView  | null {
+  public get editableElement(): PointedView | ForeignObjectView  | null {
     return this._editableElement;
   }
-  public set editableElement(editableElement: PointedView | TextBoxView | null) {
+  public set editableElement(editableElement: PointedView | ForeignObjectView | null) {
     if (!editableElement) return;
 
-    this.focus.appendChild(editableElement, false);
+    this.focus.appendChild(editableElement, false, false);
     this._editableElement = editableElement;
+    this._editableElement.onFocus();
+
     if (editableElement instanceof  PointedView) {
       let order = 0;
       let points = editableElement.points;
@@ -71,9 +75,12 @@ export class EditTool extends Tool {
     }
   }
   public removeEditableElement() {
-    this._editableElement = null;
     this.nodesGroup.innerHTML = "";
     this.nodes = [];
+    if (!this._editableElement) return;
+
+    this.focus.removeChild(this._editableElement, false);
+    this._editableElement = null;
   }
 
   protected _on(call: boolean = true): void {
@@ -87,8 +94,8 @@ export class EditTool extends Tool {
     this._container.blur();
     if (this._editableElement)
       this._container.focus(this._editableElement, false);
-    this._container.HTML.style.cursor = "default";
 
+    this._container.style.changeCursor(Cursor.EDIT);
     if (call) {
       this._container.call(Callback.EDIT_TOOl_ON);
     }

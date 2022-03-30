@@ -1,7 +1,7 @@
 import {Point} from "../../../model/Point";
 import {Size} from "../../../model/Size";
 import {Rect} from "../../../model/Rect";
-import {PathView} from "./polyline/PathView";
+import {PathView} from "./PathView";
 import {Path} from "../../../model/path/Path";
 import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
@@ -10,7 +10,7 @@ import {ShapeView} from "../../type/ShapeView";
 export abstract class PointedView extends ShapeView {
   protected _lastPoints: Point[] = [];
 
-  public override set points(points: Point[]) {};
+  public set points(points: Point[]) {};
 
   public abstract getPoint(index: number): Point;
   public abstract pushPoint(point: Point): void;
@@ -123,12 +123,12 @@ export abstract class PointedView extends ShapeView {
     return this.calculateBoundingBox(points);
   }
   public get visibleBoundingRect(): Rect {
-    let points = this.rotatedPoints;
+    let points = this.visiblePoints;
     return this.calculateBoundingBox(points);
   }
 
   public override toPath(): PathView {
-    let rotatedPoints = this.rotatedPoints;
+    let rotatedPoints = this.visiblePoints;
     let path = new Path();
 
     path.add(new MoveTo(rotatedPoints[0]));

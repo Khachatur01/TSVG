@@ -1,7 +1,7 @@
 import {Point} from "../../../../../../model/Point";
 import {TSVG} from "../../../../../../TSVG";
 import {Angle} from "../../../../../math/Angle";
-import {PathView} from "../../../../../../element/shape/pointed/polyline/PathView";
+import {PathView} from "../../../../../../element/shape/pointed/PathView";
 import {MoveTo} from "../../../../../../model/path/point/MoveTo";
 import {Arc} from "../../../../../../model/path/curve/arc/Arc";
 import {LineTo} from "../../../../../../model/path/line/LineTo";
@@ -10,6 +10,7 @@ import {Rect} from "../../../../../../model/Rect";
 import {Callback} from "../../../../../../dataSource/constant/Callback";
 import {Focus} from "../../../Focus";
 import {pipe} from "rxjs";
+import {Cursor} from "../../../../../../dataSource/constant/Cursor";
 
 export class RotatePoint extends PathView {
   private _start = this.start.bind(this);
@@ -34,7 +35,7 @@ export class RotatePoint extends PathView {
 
     this.drawPoint(this._center);
     this.svgElement.style.display = "none";
-    this.svgElement.style.cursor = "move";
+    this.svgElement.style.cursor = this._container.style.cursor[Cursor.ROTATE_POINT];
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {

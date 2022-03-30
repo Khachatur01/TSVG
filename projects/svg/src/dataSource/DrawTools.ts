@@ -13,7 +13,7 @@ import {DrawVideo} from "../service/tool/draw/element/foreign/DrawVideo";
 import {DrawImage} from "../service/tool/draw/element/foreign/DrawImage";
 import {DrawAsset} from "../service/tool/draw/element/foreign/DrawAsset";
 import {ElementType} from "./constant/ElementType";
-import {Drawable} from "../service/tool/draw/Drawable";
+import {Drawer} from "../service/tool/draw/Drawer";
 
 export class DrawTools {
   private readonly container: TSVG;
@@ -89,7 +89,7 @@ export class DrawTools {
     return this._graphic;
   }
 
-  public getByType(type: ElementType): Drawable {
+  public getByType(type: ElementType): Drawer {
     switch (type) {
       case ElementType.ELLIPSE:
         return this._ellipse;

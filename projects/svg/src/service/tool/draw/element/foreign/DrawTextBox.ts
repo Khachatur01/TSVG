@@ -8,7 +8,7 @@ import {ElementType} from "../../../../../dataSource/constant/ElementType";
 export class DrawTextBox extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
     let textBox = new TextBoxView(this.container, position);
-    textBox.SVG.style.outline = textBox.outline;
+    textBox.onFocus();
     return textBox;
   }
 

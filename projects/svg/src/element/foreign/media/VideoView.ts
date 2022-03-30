@@ -3,6 +3,9 @@ import {ForeignObjectView} from "../ForeignObjectView";
 import {Point} from "../../../model/Point";
 import {Size} from "../../../model/Size";
 import {ElementType} from "../../../dataSource/constant/ElementType";
+import {ElementCursor} from "../../ElementView";
+
+export class VideoCursor extends ElementCursor {}
 
 export class VideoView extends ForeignObjectView {
   private readonly source: HTMLSourceElement;
@@ -21,7 +24,7 @@ export class VideoView extends ForeignObjectView {
     this.source = document.createElement("source");
     this._video.appendChild(this.source);
     this.setContent(this._video, false);
-    this.type = ElementType.VIDEO;
+    this._type = ElementType.VIDEO;
   }
 
   public override get copy(): VideoView {

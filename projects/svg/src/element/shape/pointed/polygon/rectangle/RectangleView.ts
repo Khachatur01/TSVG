@@ -5,6 +5,9 @@ import {Point} from "../../../../../model/Point";
 import {TSVG} from "../../../../../TSVG";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
+import {ElementCursor} from "../../../../ElementView";
+
+export class RectangleCursor extends ElementCursor {}
 
 /*
 *  0_____1
@@ -23,7 +26,7 @@ export class RectangleView extends PolygonView implements MoveDrawable {
 
     this.setOverEvent();
     this.style.setDefaultStyle();
-    this.type = ElementType.RECTANGLE;
+    this._type = ElementType.RECTANGLE;
   }
 
   public override get copy(): RectangleView {

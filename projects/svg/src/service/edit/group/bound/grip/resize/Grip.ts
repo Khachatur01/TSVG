@@ -5,6 +5,7 @@ import {BoxView} from "../../../../../../element/shape/BoxView";
 import {Matrix} from "../../../../../math/Matrix";
 import {Callback} from "../../../../../../dataSource/constant/Callback";
 import {Focus} from "../../../Focus";
+import {Cursor} from "../../../../../../dataSource/constant/Cursor";
 
 export abstract class Grip extends BoxView {
   protected _lastResize: Rect = {x: 0, y: 0, width: 0, height: 0};
@@ -18,7 +19,7 @@ export abstract class Grip extends BoxView {
 
   public constructor(container: TSVG, focus: Focus) {
     super(container, {x: 0, y: 0}, {width: 10, height: 10});
-    this.svgElement.style.cursor = "crosshair";
+    this.svgElement.style.cursor = this._container.style.cursor[Cursor.GRIP];
     this.setAttr({
       fill: "white",
       "stroke-width": 0.8,

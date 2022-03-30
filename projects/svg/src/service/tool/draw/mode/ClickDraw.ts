@@ -1,4 +1,4 @@
-import {Drawable} from "../Drawable";
+import {Drawer} from "../Drawer";
 import {TSVG} from "../../../../TSVG";
 import {PointedView} from "../../../../element/shape/pointed/PointedView";
 import {Point} from "../../../../model/Point";
@@ -6,17 +6,16 @@ import {Angle} from "../../../math/Angle";
 import {Callback} from "../../../../dataSource/constant/Callback";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../../element/ElementView";
-import {DrawTool} from "../DrawTool";
 
-export abstract class ClickDraw implements Drawable {
+export abstract class ClickDraw extends Drawer {
   protected container: TSVG;
   protected _drawableElement: PointedView | null = null;
-  public drawTool: DrawTool | null = null;
 
   private _click = this.click.bind(this);
   private _move = this.move.bind(this);
 
   public constructor(container: TSVG) {
+    super();
     this.container = container;
   }
 
@@ -51,8 +50,8 @@ export abstract class ClickDraw implements Drawable {
   }
   public makeMouseUp(position: Point) {}
 
-  public abstract _new(): ClickDraw;
-  public abstract get type(): ElementType;
+  public abstract override _new(): ClickDraw;
+  public abstract override get type(): ElementType;
   public get drawableElement(): ElementView | null {
     return this._drawableElement;
   }

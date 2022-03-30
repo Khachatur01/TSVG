@@ -6,7 +6,7 @@ import {TSVG} from "../../../TSVG";
 import {Rect} from "../../../model/Rect";
 import {Resizeable} from "../resize/Resizeable";
 import {Size} from "../../../model/Size";
-import {PathView} from "../../../element/shape/pointed/polyline/PathView";
+import {PathView} from "../../../element/shape/pointed/PathView";
 import {GroupView} from "../../../element/group/GroupView";
 import {Callback} from "../../../dataSource/constant/Callback";
 import {Matrix} from "../../math/Matrix";
@@ -23,7 +23,7 @@ export class Focus implements Draggable, Resizeable {
 
   public readonly boundingBox: BoundingBox;
 
-  private lastCopyPosition: Point = {x: 0, y: 0};
+  private pasteCount: number = 0;
   private elementsClipboard: Set<ElementView> = new Set<ElementView>();
 
   public constructor(container: TSVG) {
@@ -48,7 +48,6 @@ export class Focus implements Draggable, Resizeable {
 
   public appendChild(element: ElementView, showBounding: boolean = true, call: boolean = true): void {
     this._children.add(element);
-    element.onFocus();
 
     if (this._children.size == 1) {
       this.refPointView = Object.assign({}, element.refPoint);
@@ -69,8 +68,10 @@ export class Focus implements Draggable, Resizeable {
       this.container.style.recoverGlobalStyle();
     }
     this.fit();
-    if(showBounding)
+    if(showBounding) {
+      element.onFocus();
       this.focus(element.rotatable);
+    }
 
     if (call) {
       this.container.call(Callback.ELEMENT_FOCUSED, {element: element});
@@ -79,7 +80,7 @@ export class Focus implements Draggable, Resizeable {
   public removeChild(element: ElementView, call: boolean = true): void {
     this._children.delete(element);
     element.onBlur();
-    this.container.editTool.removeEditableElement();
+
     if (this._children.size == 0) {
       /* no element */
       this.container.style.recoverGlobalStyle();
@@ -128,7 +129,7 @@ export class Focus implements Draggable, Resizeable {
       elements.add(child);
     });
 
-    this._children.forEach((child: ElementView) => this.container.remove(child, false, false));
+    this._children.forEach((child: ElementView) => this.container.remove(child, true, false));
     this.clear();
 
     if (call) {
@@ -251,6 +252,14 @@ export class Focus implements Draggable, Resizeable {
     this._children.forEach((child: ElementView) => child.correct(point, this.lastRefPoint));
 
     this.boundingBox.correct(point, this.lastRefPoint);
+  }
+  public nudge(delta: Point, call: boolean = true) {
+    this.fixPosition();
+    this.position = {x: delta.x, y: delta.y};
+
+    if (call) {
+      this.container.call(Callback.NUDGE, {elements: this._children, delta: delta});
+    }
   }
 
   public get visibleCenter(): Point {
@@ -499,7 +508,8 @@ export class Focus implements Draggable, Resizeable {
   }
 
   public copy(call: boolean = true): void {
-    this.lastCopyPosition = this.position;
+    this.pasteCount = 0;
+    this.elementsClipboard.clear();
     this._children.forEach((child: ElementView) => {
       this.elementsClipboard.add(child.copy);
     });
@@ -509,20 +519,26 @@ export class Focus implements Draggable, Resizeable {
     }
   }
   public cut(call: boolean = true): void {
+    let childrenCopy: Set<ElementView> = new Set<ElementView>();
+    this._children.forEach((child: ElementView) => {
+      let copy = child.copy;
+      copy.setId(child.ownerId, child.index);
+      childrenCopy.add(child);
+    });
+
     this.copy(false);
     this.remove(false);
 
     if (call) {
-      this.container.call(Callback.CUT, {elements: this._children});
+      this.container.call(Callback.CUT, {elements: childrenCopy});
     }
   }
   public paste(call: boolean = true, sideEffects: boolean = true): void {
+    this.pasteCount++;
     let newIds: { elementOwnerId: string; elementIndex: number; }[] = [];
-    if (sideEffects) {
-      this.blur();
-    }
+    this.clear(false);
     this.elementsClipboard.forEach((element: ElementView) => {
-      element = element.copy; /* may paste many times */
+      element = element.copy; /* may past many times */
       newIds.push({elementOwnerId: element.ownerId, elementIndex: element.index}); /* save copied element new id */
 
       element.container = this.container;
@@ -533,12 +549,10 @@ export class Focus implements Draggable, Resizeable {
           child.container = this.container;
         });
 
-      let oldPosition = element.position;
       element.position = {
-        x: this.lastCopyPosition.x - oldPosition.x + 10,
-        y: this.lastCopyPosition.y - oldPosition.y + 10
+        x: this.pasteCount * 10,
+        y: this.pasteCount * 10
       };
-      this.lastCopyPosition = element.position;
       this.container.add(element);
 
       this.appendChild(element, sideEffects);

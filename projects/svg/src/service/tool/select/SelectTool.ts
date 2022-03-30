@@ -5,6 +5,9 @@ import {Point} from "../../../model/Point";
 import {DragTool} from "../drag/DragTool";
 import {Callback} from "../../../dataSource/constant/Callback";
 import {Focus} from "../../edit/group/Focus";
+import {elementAt} from "rxjs";
+import {ElementView} from "../../../element/ElementView";
+import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class SelectTool extends Tool {
   private readonly boundingBox: RectangleView;
@@ -78,7 +81,7 @@ export class SelectTool extends Tool {
 
     elementsLoop:
       for (let element of this._container.elements) {
-        let elementPoints = element.rotatedPoints;
+        let elementPoints = element.visiblePoints;
 
         if (width > 0) {/* if select box drawn from right to left */
           for (let point of elementPoints)
@@ -155,8 +158,8 @@ export class SelectTool extends Tool {
     this._container.HTML.addEventListener("touchstart", this._start);
     this._isOn = true;
     this.dragTool.on(call);
-    this._container.HTML.style.cursor = "default";
 
+    this._container.style.changeCursor(Cursor.SELECT);
     if (call) {
       this._container.call(Callback.SELECT_TOOl_ON);
     }

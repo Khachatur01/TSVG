@@ -1,13 +1,21 @@
-import {ElementView} from "../ElementView";
+import {ElementCursor, ElementView} from "../ElementView";
 import {TSVG} from "../../TSVG";
 import {Point} from "../../model/Point";
 import {Size} from "../../model/Size";
 import {Rect} from "../../model/Rect";
-import {PathView} from "../shape/pointed/polyline/PathView";
+import {PathView} from "../shape/pointed/PathView";
 import {Callback} from "../../dataSource/constant/Callback";
 import {ForeignView} from "../type/ForeignView";
 import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../dataSource/constant/ElementType";
+import {Cursor} from "../../dataSource/constant/Cursor";
+
+export class ForeignObjectCursor extends ElementCursor {
+  constructor() {
+    super();
+    this.cursor[Cursor.EDIT] = "auto";
+  }
+}
 
 export class ForeignObjectView extends ForeignView implements MoveDrawable {
   protected _content: HTMLElement | null = null;
@@ -16,10 +24,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "foreignObject");
-    this.type = ElementType.FOREIGN_OBJECT;
+    this._type = ElementType.FOREIGN_OBJECT;
     this.svgElement.id = this.id;
     this.svgElement.style.outline = "none";
-    this.style.cursor.edit = "text";
+    this.svgElement.style.border = "none";
 
     this.position = position;
 
@@ -150,6 +158,8 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   public setContent(content: HTMLElement, setListeners: boolean = true): void {
     this._content = content;
     content.style.userSelect = "none";
+    content.style.border = "none";
+    content.style.outline = "none";
     content.contentEditable = "true";
     this.svgElement.appendChild(content);
 
@@ -170,7 +180,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     return this.calculateBoundingBox(points);
   }
   public get visibleBoundingRect(): Rect {
-    let points = this.rotatedPoints;
+    let points = this.visiblePoints;
     return this.calculateBoundingBox(points);
   }
 

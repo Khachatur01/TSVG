@@ -2,10 +2,11 @@ import {TSVG} from "../../../../../../TSVG";
 import {MoveTo} from "../../../../../../model/path/point/MoveTo";
 import {Arc} from "../../../../../../model/path/curve/arc/Arc";
 import {LineTo} from "../../../../../../model/path/line/LineTo";
-import {PathView} from "../../../../../../element/shape/pointed/polyline/PathView";
+import {PathView} from "../../../../../../element/shape/pointed/PathView";
 import {Point} from "../../../../../../model/Point";
 import {Callback} from "../../../../../../dataSource/constant/Callback";
 import {Focus} from "../../../Focus";
+import {Cursor} from "../../../../../../dataSource/constant/Cursor";
 
 export class RefPoint extends PathView {
   private readonly _r: number = 5; /* radius */
@@ -29,7 +30,7 @@ export class RefPoint extends PathView {
     this.focus = focus;
 
     this.svgElement.style.display = "none";
-    this.svgElement.style.cursor = "crosshair";
+    this.svgElement.style.cursor = this._container.style.cursor[Cursor.REFERENCE_POINT];
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
@@ -53,7 +54,7 @@ export class RefPoint extends PathView {
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
-    let refPoint = Object.assign({}, position);
+    let refPoint = this._container.grid.getSnapPoint(position);
     this.focus.refPoint = refPoint;
     this.focus.correct(refPoint);
 

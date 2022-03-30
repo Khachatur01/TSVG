@@ -1,12 +1,12 @@
 export enum Callback {
-  STROKE_WIDTH_CHANGE, /* callback parameter (strokeWidth) */
-  STROKE_DASH_ARRAY_CHANGE, /* callback parameter (strokeDashArray) */
-  STROKE_COLOR_CHANGE, /* callback parameter (strokeColor) */
-  FILL_COLOR_CHANGE, /* callback parameter (fillColor) */
-  FONT_SIZE_CHANGE, /* callback parameter (fontSize) */
-  FONT_COLOR_CHANGE, /* callback parameter (fontColor) */
-  FONT_BACKGROUND_CHANGE, /* callback parameter (fontBackground) */
-  STYLE_CHANGE, /* callback parameter (strokeWidth, strokeColor, fillColor, fontSize, fontColor, fontBackground) */
+  STROKE_WIDTH_CHANGE,
+  STROKE_DASH_ARRAY_CHANGE,
+  STROKE_COLOR_CHANGE,
+  FILL_COLOR_CHANGE,
+  FONT_SIZE_CHANGE,
+  FONT_COLOR_CHANGE,
+  FONT_BACKGROUND_CHANGE,
+  STYLE_CHANGE,
 
   SELECT_TOOl_ON,
   SELECT_TOOl_OFF,
@@ -16,7 +16,7 @@ export enum Callback {
   POINTER_TOOl_OFF,
   EDIT_TOOl_ON,
   NODE_EDIT_START,
-  NODE_EDIT, /* callback parameter (position) */
+  NODE_EDIT,
   NODE_EDIT_END,
   EDIT_TOOl_OFF,
   CIRCLE_TOOL_ON,
@@ -36,8 +36,8 @@ export enum Callback {
   FREE_HAND_TOOL_ON,
   FREE_HAND_TOOL_OFF,
   TEXT_TOOL_ON,
-  ASSET_EDIT, /* callback parameter (asset content) */
-  TEXT_TYPING, /* callback parameter (text, element) */
+  ASSET_EDIT,
+  TEXT_TYPING,
   TEXT_TOOL_OFF,
   VIDEO_TOOL_ON,
   VIDEO_TOOL_OFF,
@@ -51,43 +51,44 @@ export enum Callback {
   GRID_ON,
   GRID_OFF,
   SNAP_ON,
-  SNAP_SIDE_CHANGE, /* callback parameter (side) */
+  SNAP_SIDE_CHANGE,
   SNAP_OFF,
   GROUP,
   UNGROUP,
 
-  SELECT_AREA_START, /* callback parameter (element) */
-  SELECT_AREA, /* callback parameter (element) */
-  SELECT_AREA_END, /* callback parameter (element) */
-  HIGHLIGHT_START, /* callback parameter (element) */
-  HIGHLIGHT, /* callback parameter (element) */
-  HIGHLIGHT_END, /* callback parameter (element) */
-  POINTER_MOVE, /* callback parameter (element) */
+  SELECT_AREA_START,
+  SELECT_AREA,
+  SELECT_AREA_END,
+  HIGHLIGHT_START,
+  HIGHLIGHT,
+  HIGHLIGHT_END,
+  POINTER_MOVE,
   POINTER_CHANGE,
-  ELEMENT_FOCUSED, /* callback parameter (element) */
-  ELEMENT_BLURRED, /* callback parameter (element) */
+  ELEMENT_FOCUSED,
+  ELEMENT_BLURRED,
   BLURRED,
   PERFECT_MODE_ON,
   PERFECT_MODE_OFF,
-  DRAW_MOUSE_DOWN, /* callback parameter (position, element) */
-  DRAW_MOUSE_MOVE, /* callback parameter (position) */
+  DRAW_MOUSE_DOWN,
+  DRAW_MOUSE_MOVE,
   DRAW_MOUSE_UP,
   STOP_CLICK_DRAWING,
   DRAG_TOOL_ON,
-  DRAG_MOUSE_DOWN, /* callback parameter (elements) */
-  DRAG_MOUSE_MOVE, /* callback parameter (position) for translation */
-  DRAG_MOUSE_UP, /* callback parameter (position) for drag */
+  DRAG_MOUSE_DOWN,
+  DRAG_MOUSE_MOVE,
+  DRAG_MOUSE_UP,
+  NUDGE,
   DRAG_TOOL_OFF,
   REF_POINT_VIEW_CHANGE_START,
-  REF_POINT_VIEW_CHANGE, /* callback parameter (position) */
+  REF_POINT_VIEW_CHANGE,
   REF_POINT_VIEW_CHANGE_END,
-  REF_POINT_CHANGE, /* callback parameter (position) */
+  REF_POINT_CHANGE,
   RECENTER_REFERENCE_POINT,
   ROTATE_START,
   ROTATE,
   ROTATE_END,
   RESIZE_START,
-  RESIZE, /* callback parameter (rect) */
+  RESIZE,
   RESIZE_END,
   COPY,
   CUT,

@@ -5,22 +5,22 @@ import {Rect} from "../model/Rect";
 import {Draggable} from "../service/tool/drag/Draggable";
 import {Matrix} from "../service/math/Matrix";
 import {TSVG} from "../TSVG";
-import {PathView} from "./shape/pointed/polyline/PathView";
+import {PathView} from "./shape/pointed/PathView";
 import {GroupView} from "./group/GroupView";
 import {Style} from "../service/style/Style";
 import {ElementType} from "../dataSource/constant/ElementType";
+import {Cursor} from "../dataSource/constant/Cursor";
 
-interface CursorStyle {
-  select: string,
-  edit: string
+export class ElementCursor {
+  public cursor: any = {};
+  constructor() {
+    this.cursor[Cursor.SELECT] = "move";
+    this.cursor[Cursor.EDIT] = "crosshair";
+  }
 }
+
 export class ElementStyle extends Style {
   private element: ElementView;
-
-  public readonly cursor: CursorStyle = {
-    select: "move",
-    edit: "crosshair"
-  };
 
   public constructor(element: ElementView) {
     super();
@@ -105,9 +105,9 @@ export class ElementStyle extends Style {
 export abstract class ElementView implements Resizeable, Draggable {
   public static readonly svgURI: "http://www.w3.org/2000/svg" = "http://www.w3.org/2000/svg";
   protected svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "rect"); // default element
-  protected type: ElementType = ElementType.RECTANGLE;
+  protected _type: ElementType = ElementType.RECTANGLE;
 
-  public readonly style;
+  public readonly style: ElementStyle;
   public readonly rotatable: boolean = true;
 
   protected _ownerId: string;
@@ -124,6 +124,20 @@ export abstract class ElementView implements Resizeable, Draggable {
   private _highlight = this.highlight.bind(this);
   private _lowlight = this.lowlight.bind(this);
 
+  public abstract get size(): Size;
+  public abstract setSize(rect: Rect, delta: Point | null): void; /* if delta set, calculate rect width and height by delta */
+  public abstract isComplete(): boolean;
+  public abstract get position(): Point;
+  public abstract set position(delta: Point);
+  public abstract get points(): Point[];
+  public abstract get boundingRect(): Rect;
+  public abstract get visibleBoundingRect(): Rect;
+  public abstract toPath(): PathView;
+  public abstract get copy(): ElementView;
+
+  public abstract onFocus(): void;
+  public abstract onBlur(): void;
+
   public constructor(container: TSVG, ownerId?: string, index?: number) {
     this._container = container;
     this.style = new ElementStyle(this);
@@ -138,6 +152,10 @@ export abstract class ElementView implements Resizeable, Draggable {
     } else {
       this._index = container.nextElementIndex;
     }
+  }
+
+  public get type(): ElementType {
+    return this._type;
   }
 
   public get id(): string {
@@ -165,20 +183,6 @@ export abstract class ElementView implements Resizeable, Draggable {
     this.svgElement.id = this.id;
   }
 
-  public abstract get size(): Size;
-  public abstract setSize(rect: Rect, delta: Point | null): void; /* if delta set, calculate rect width and height by delta */
-  public abstract isComplete(): boolean;
-  public abstract get position(): Point;
-  public abstract set position(delta: Point);
-  public abstract get points(): Point[];
-  public abstract get boundingRect(): Rect;
-  public abstract get visibleBoundingRect(): Rect;
-  public abstract toPath(): PathView;
-  public abstract get copy(): ElementView;
-
-  public abstract onFocus(): void;
-  public abstract onBlur(): void;
-
   public get container(): TSVG {
     return this._container;
   }
@@ -203,19 +207,19 @@ export abstract class ElementView implements Resizeable, Draggable {
     };
   }
 
-  public get group(): GroupView | null {
-    return this._group;
-  }
-  public set group(group: GroupView | null) {
-    this._group = group;
-  }
-
-  public get rotatedPoints(): Point[] {
+  public get visiblePoints(): Point[] {
     return Matrix.rotate(
       this.points,
       this._refPoint,
       -this._angle
     );
+  }
+
+  public get group(): GroupView | null {
+    return this._group;
+  }
+  public set group(group: GroupView | null) {
+    this._group = group;
   }
 
   protected calculateBoundingBox(points: Point[]): Rect {
@@ -243,22 +247,6 @@ export abstract class ElementView implements Resizeable, Draggable {
       height: maxY - minY
     };
   }
-
-  // public get rotatedCenter(): Point {
-  //   return Matrix.rotate(
-  //     [this.center],
-  //     this._refPoint,
-  //     -this._angle
-  //   )[0];
-  // }
-  // public get center(): Point {
-  //   let rect = this.boundingRect;
-  //
-  //   return {
-  //     x: rect.x + rect.width / 2,
-  //     y: rect.y + rect.height / 2
-  //   }
-  // }
 
   public get center(): Point {
     let rect = this.boundingRect;

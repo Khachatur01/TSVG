@@ -5,6 +5,7 @@ import {Rect} from "../../../model/Rect";
 import {Matrix} from "../../math/Matrix";
 import {TSVG} from "../../../TSVG";
 import {Callback} from "../../../dataSource/constant/Callback";
+import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class Node extends EllipseView {
   private readonly editTool: EditTool;
@@ -20,7 +21,7 @@ export class Node extends EllipseView {
     this.style.fillColor = "white";
     this.style.strokeColor = "black";
     this.style.strokeWidth = "1";
-    this.svgElement.style.cursor = "move";
+    this.svgElement.style.cursor = this._container.style.cursor[Cursor.NODE];
     this.editTool = editTool;
     this.order = order;
   }

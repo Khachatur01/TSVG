@@ -4,6 +4,9 @@ import {Rect} from "../../../../../model/Rect";
 import {Point} from "../../../../../model/Point";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
+import {ElementCursor} from "../../../../ElementView";
+
+export class IsoscelesTriangleCursor extends ElementCursor {}
 
 export class IsoscelesTriangleView extends TriangleView implements MoveDrawable {
   public constructor(container: TSVG, rect: Rect | null = null, ownerId?: string, index?: number) {
@@ -15,7 +18,7 @@ export class IsoscelesTriangleView extends TriangleView implements MoveDrawable 
     } else {
       super(container, null, null, null, ownerId, index);
     }
-    this.type = ElementType.ISOSCELES_TRIANGLE;
+    this._type = ElementType.ISOSCELES_TRIANGLE;
   }
 
   public override get copy(): IsoscelesTriangleView {

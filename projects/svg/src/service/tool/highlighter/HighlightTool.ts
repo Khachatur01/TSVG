@@ -1,12 +1,13 @@
 import {Tool} from "../Tool";
 import {TSVG} from "../../../TSVG";
 import {Callback} from "../../../dataSource/constant/Callback";
-import {PathView} from "../../../element/shape/pointed/polyline/PathView";
+import {PathView} from "../../../element/shape/pointed/PathView";
 import {Path} from "../../../model/path/Path";
 import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
 import {ElementView} from "../../../element/ElementView";
 import {Point} from "../../../model/Point";
+import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class HighlightTool extends Tool {
   private _timeout: number = 3000;
@@ -158,9 +159,9 @@ export class HighlightTool extends Tool {
     this._container.HTML.addEventListener("mousedown", this._start);
     this._container.HTML.addEventListener("touchstart", this._start);
     this._isOn = true;
-    this._container.HTML.style.cursor = "crosshair";
     this._container.blur();
 
+    this._container.style.changeCursor(Cursor.HIGHLIGHTER);
     if (call) {
       this._container.call(Callback.HIGHLIGHT_TOOl_ON);
     }

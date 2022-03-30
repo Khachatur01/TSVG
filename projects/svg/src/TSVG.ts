@@ -1,5 +1,5 @@
 import {DrawTool} from "./service/tool/draw/DrawTool";
-import {ElementView} from "./element/ElementView";
+import {ElementCursor, ElementView} from "./element/ElementView";
 import {Focus} from "./service/edit/group/Focus";
 import {SelectTool} from "./service/tool/select/SelectTool";
 import {Tool} from "./service/tool/Tool";
@@ -7,22 +7,73 @@ import {EditTool} from "./service/tool/edit/EditTool";
 import {DrawTools} from "./dataSource/DrawTools";
 import {Grid} from "./service/grid/Grid";
 import {Callback} from "./dataSource/constant/Callback";
-import {GroupView} from "./element/group/GroupView";
+import {GroupCursor, GroupView} from "./element/group/GroupView";
 import {PointedView} from "./element/shape/pointed/PointedView";
 import {Style} from "./service/style/Style";
 import {HighlightTool} from "./service/tool/highlighter/HighlightTool";
 import {PointerTool} from "./service/tool/pointer/PointerTool";
 import {Point} from "./model/Point";
-import {TextBoxView} from "./element/foreign/text/TextBoxView";
+import {TextBoxCursor, TextBoxView} from "./element/foreign/text/TextBoxView";
+import {Cursor} from "./dataSource/constant/Cursor";
+import {ForeignObjectCursor, ForeignObjectView} from "./element/foreign/ForeignObjectView";
+import {ElementType} from "./dataSource/constant/ElementType";
+import {EllipseCursor} from "./element/shape/EllipseView";
+import {BoxCursor} from "./element/shape/BoxView";
+import {PathCursor} from "./element/shape/pointed/PathView";
+import {LineCursor} from "./element/shape/pointed/LineView";
+import {FreeCursor} from "./element/shape/pointed/polyline/FreeView";
+import {PolylineCursor} from "./element/shape/pointed/polyline/PolylineView";
+import {PolygonCursor} from "./element/shape/pointed/polygon/PolygonView";
+import {TriangleCursor} from "./element/shape/pointed/polygon/triangle/TriangleView";
+import {RightTriangleCursor} from "./element/shape/pointed/polygon/triangle/RightTriangleView";
+import {IsoscelesTriangleCursor} from "./element/shape/pointed/polygon/triangle/IsoscelesTriangleView";
+import {RectangleCursor} from "./element/shape/pointed/polygon/rectangle/RectangleView";
+import {ImageCursor} from "./element/foreign/media/ImageView";
+import {VideoCursor} from "./element/foreign/media/VideoView";
+import {GraphicCursor} from "./element/foreign/graphic/GraphicView";
 
 class GlobalStyle extends Style {
   private readonly default: Style;
   private container: TSVG;
 
+  public readonly cursor: any = {
+    element: {}
+  };
+
   public constructor(container: TSVG) {
     super();
     this.container = container;
     this.default = new Style();
+
+    this.cursor[Cursor.DRAW] = "crosshair";
+    this.cursor[Cursor.DRAW_FREE] = "crosshair";
+    this.cursor[Cursor.SELECT] = "default";
+    this.cursor[Cursor.EDIT] = "default";
+    this.cursor[Cursor.POINTER] = "none";
+    this.cursor[Cursor.HIGHLIGHTER] = "crosshair";
+    this.cursor[Cursor.BOUNDING_BOX] = "move";
+    this.cursor[Cursor.GRIP] = "crosshair";
+    this.cursor[Cursor.REFERENCE_POINT] = "crosshair";
+    this.cursor[Cursor.ROTATE_POINT] = "crosshair";
+    this.cursor[Cursor.NODE] = "move";
+
+    this.cursor.element[ElementType.ELLIPSE] = new EllipseCursor();
+    this.cursor.element[ElementType.BOX] = new BoxCursor();
+    this.cursor.element[ElementType.PATH] = new PathCursor();
+    this.cursor.element[ElementType.LINE] = new LineCursor();
+    this.cursor.element[ElementType.FREE] = new FreeCursor();
+    this.cursor.element[ElementType.POLYLINE] = new PolylineCursor();
+    this.cursor.element[ElementType.POLYGON] = new PolygonCursor();
+    this.cursor.element[ElementType.TRIANGLE] = new TriangleCursor();
+    this.cursor.element[ElementType.RIGHT_TRIANGLE] = new RightTriangleCursor();
+    this.cursor.element[ElementType.ISOSCELES_TRIANGLE] = new IsoscelesTriangleCursor();
+    this.cursor.element[ElementType.RECTANGLE] = new RectangleCursor();
+    this.cursor.element[ElementType.GROUP] = new GroupCursor();
+    this.cursor.element[ElementType.FOREIGN_OBJECT] = new ForeignObjectCursor();
+    this.cursor.element[ElementType.TEXT_BOX] = new TextBoxCursor();
+    this.cursor.element[ElementType.IMAGE] = new ImageCursor();
+    this.cursor.element[ElementType.VIDEO] = new VideoCursor();
+    this.cursor.element[ElementType.GRAPHIC] = new GraphicCursor();
   }
 
   public override get strokeWidth(): string {
@@ -153,6 +204,34 @@ class GlobalStyle extends Style {
       this.container.call(Callback.STYLE_CHANGE, style.object);
     }
   }
+
+  public changeCursor(tool: Cursor) {
+    this.container.HTML.style.cursor = this.container.style.cursor[tool];
+    this.container.elements.forEach((element: ElementView) => {
+      let cursor;
+
+      if (this.cursor.element[element.type].cursor[tool]) {
+        cursor = this.cursor.element[element.type].cursor[tool];
+      } else { /* set container cursor if element cursor is not defined */
+        cursor = this.container.HTML.style.cursor;
+      }
+
+      element.SVG.style.cursor = cursor;
+      if (element instanceof ForeignObjectView && element.content) { /* is element is foreign object and has content, set cursor also for content */
+        element.content.style.cursor = cursor;
+      }
+    });
+  }
+}
+
+class Clipboard {
+  private text: string = "";
+  public set(text: string) {
+    this.text = text;
+  }
+  public get(): string {
+    return this.text;
+  }
 }
 
 export class TSVG {
@@ -181,6 +260,8 @@ export class TSVG {
   public readonly style: GlobalStyle = new GlobalStyle(this);
   public readonly drawTools: DrawTools = new DrawTools(this);
   public activeTool: Tool;
+
+  public clipboard: Clipboard = new Clipboard();
 
   public constructor(containerId: string, ownerId: string, idPrefix: string = "", elementIndex: number = 0) {
     this.idPrefix = idPrefix;
@@ -219,7 +300,6 @@ export class TSVG {
 
     this.elementsGroup = document.createElementNS(ElementView.svgURI, "g");
     this.elementsGroup.id = "elements";
-    this._focus.SVG.style.cursor = "move";
 
     this.container.appendChild(this.grid.group); /* grid path */
     this.container.appendChild(this.elementsGroup); /* all elements */
@@ -276,12 +356,9 @@ export class TSVG {
 
     if (this.editTool.isOn()) {
       this.editTool.removeEditableElement();
-      if (element instanceof PointedView || element instanceof TextBoxView) {
+      if (element instanceof PointedView || element instanceof ForeignObjectView) {
         this.editTool.editableElement = element;
       }
-      // else if (element instanceof TextBoxView) {
-      //   this.focus(element, false);
-      // }
     } else {
       if (element.group) /* if element has grouped, then select group */
         element = element.group;
@@ -306,14 +383,6 @@ export class TSVG {
     });
     element.SVG.addEventListener("touchstart", () => {
       this.clickEvent(element);
-    });
-
-    element.SVG.addEventListener("mousemove", () => {
-      if (this.selectTool.isOn()) {
-        element.SVG.style.cursor = element.style.cursor.select;
-      } else if (this.editTool.isOn()) {
-        element.SVG.style.cursor = element.style.cursor.edit;
-      }
     });
   }
 

@@ -2,9 +2,9 @@ import {ForeignView} from "../../type/ForeignView";
 import {Rect} from "../../../model/Rect";
 import {Point} from "../../../model/Point";
 import {Size} from "../../../model/Size";
-import {PathView} from "../../shape/pointed/polyline/PathView";
+import {PathView} from "../../shape/pointed/PathView";
 import {TSVG} from "../../../TSVG";
-import {ElementView} from "../../ElementView";
+import {ElementCursor, ElementView} from "../../ElementView";
 import {Path} from "../../../model/path/Path";
 import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
@@ -17,6 +17,9 @@ interface Graphic {
   color: string;
   width: number;
 }
+
+export class GraphicCursor extends ElementCursor {}
+
 export class GraphicView extends ForeignView implements MoveDrawable {
   public readonly outline: string = "thin solid #999";
   private graphics: Map<Function, Graphic> = new Map<Function, Graphic>();
@@ -70,7 +73,7 @@ export class GraphicView extends ForeignView implements MoveDrawable {
       height: size.height
     });
     this.drawAxis();
-    this.type = ElementType.GRAPHIC;
+    this._type = ElementType.GRAPHIC;
   }
 
   public zoomIn() {

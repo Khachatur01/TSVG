@@ -1,24 +1,25 @@
-import {ElementView} from "../../../ElementView";
-import {Path} from "../../../../model/path/Path";
-import {Point} from "../../../../model/Point";
-import {Size} from "../../../../model/Size";
-import {TSVG} from "../../../../TSVG";
-import {PathCommand} from "../../../../model/path/PathCommand";
-import {Close} from "../../../../model/path/close/Close";
-import {PointedView} from "../PointedView";
-import {Rect} from "../../../../model/Rect";
-import {LineTo} from "../../../../model/path/line/LineTo";
-import {ElementType} from "../../../../dataSource/constant/ElementType";
+import {ElementCursor, ElementView} from "../../ElementView";
+import {Path} from "../../../model/path/Path";
+import {Point} from "../../../model/Point";
+import {Size} from "../../../model/Size";
+import {TSVG} from "../../../TSVG";
+import {PathCommand} from "../../../model/path/PathCommand";
+import {Close} from "../../../model/path/close/Close";
+import {PointedView} from "./PointedView";
+import {Rect} from "../../../model/Rect";
+import {LineTo} from "../../../model/path/line/LineTo";
+import {ElementType} from "../../../dataSource/constant/ElementType";
+
+export class PathCursor extends ElementCursor {}
 
 export class PathView extends PointedView {
-  protected _size: Size = {width: 0, height: 0};
   protected _path: Path;
   protected _lastPath: Path;
 
   public constructor(container: TSVG, path: Path = new Path(), ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "path");
-    this.type = ElementType.PATH;
+    this._type = ElementType.PATH;
     this.svgElement.id = this.id;
 
     this._path = path;
@@ -139,12 +140,10 @@ export class PathView extends PointedView {
         max.y = commands[i].position.y
     }
 
-    this._size = {
+    return {
       width: max.x - min.x,
       height: max.y - min.y
     };
-
-    return this._size;
   }
   public override setSize(rect: Rect) { //FIXME
     let dw = 1;

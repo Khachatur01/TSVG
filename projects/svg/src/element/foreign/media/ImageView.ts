@@ -1,5 +1,5 @@
-import {ElementView} from "../../ElementView";
-import {PathView} from "../../shape/pointed/polyline/PathView";
+import {ElementCursor, ElementView} from "../../ElementView";
+import {PathView} from "../../shape/pointed/PathView";
 import {Size} from "../../../model/Size";
 import {Rect} from "../../../model/Rect";
 import {Point} from "../../../model/Point";
@@ -7,12 +7,20 @@ import {TSVG} from "../../../TSVG";
 import {ForeignView} from "../../type/ForeignView";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../dataSource/constant/ElementType";
+import {Cursor} from "../../../dataSource/constant/Cursor";
+
+export class ImageCursor extends ElementCursor {
+  constructor() {
+    super();
+    this.cursor[Cursor.EDIT] = "default";
+  }
+}
 
 export class ImageView extends ForeignView implements MoveDrawable {
   public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement = document.createElementNS(ElementView.svgURI, "image");
-    this.type = ElementType.IMAGE;
+    this._type = ElementType.IMAGE;
     this.svgElement.id = this.id;
 
     this.svgElement.ondragstart = function () {
@@ -110,7 +118,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
     return this.calculateBoundingBox(points);
   }
   public get visibleBoundingRect(): Rect {
-    let points = this.rotatedPoints;
+    let points = this.visiblePoints;
     return this.calculateBoundingBox(points);
   }
 

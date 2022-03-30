@@ -3,6 +3,7 @@ import {TSVG} from "../../../TSVG";
 import {Callback} from "../../../dataSource/constant/Callback";
 import {ElementView} from "../../../element/ElementView";
 import {Point} from "../../../model/Point";
+import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class PointerTool extends Tool {
   private readonly _cursorSVG: SVGElement;
@@ -13,7 +14,7 @@ export class PointerTool extends Tool {
     super(container);
     this._cursorSVG = document.createElementNS(ElementView.svgURI, "image");
     this._cursorSVG.setAttribute("href", URI);
-    this.hideCursor();
+    this.hide();
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {}
@@ -46,7 +47,7 @@ export class PointerTool extends Tool {
     this.makeMouseMove(movePosition);
   }
 
-  private hideCursor(): void {
+  private hide(): void {
     this._cursorSVG.setAttribute("x", "-40");
     this._cursorSVG.setAttribute("y", "-60");
     this._cursorSVG.setAttribute("width", "40");
@@ -60,12 +61,12 @@ export class PointerTool extends Tool {
   protected _on(call: boolean = true): void {
     document.addEventListener("touchmove", this._move);
     document.addEventListener("mousemove", this._move);
-    this._container.HTML.style.cursor = "none";
     this._isOn = true;
     this._container.blur();
+    this.hide();
 
-    this.hideCursor();
 
+    this._container.style.changeCursor(Cursor.POINTER);
     if (call) {
       this._container.call(Callback.POINTER_TOOl_ON);
     }
@@ -75,8 +76,7 @@ export class PointerTool extends Tool {
     document.removeEventListener("mousemove", this._move);
     this._container.HTML.style.cursor = "default";
     this._isOn = false;
-
-    this.hideCursor();
+    this.hide();
 
     if (call) {
       this._container.call(Callback.POINTER_TOOl_OFF);

@@ -1,7 +1,4 @@
-import {Callback} from "../../dataSource/constant/Callback";
-
 export class Style {
-  protected _styleCallBacks: Map<Callback, Function[]> = new Map<Callback, Function[]>();
   protected style: Map<string, string> = new Map<string, string>();
 
   public get strokeWidth(): string {

@@ -17,6 +17,7 @@ import {BoxView} from "../../../../element/shape/BoxView";
 import {Size} from "../../../../model/Size";
 import {Focus} from "../Focus";
 import {Compass} from "../../../../dataSource/constant/Compass";
+import {Cursor} from "../../../../dataSource/constant/Cursor";
 
 export class BoundingBox extends BoxView {
   private _grips: Grip[] = [];
@@ -39,6 +40,7 @@ export class BoundingBox extends BoxView {
     this.style.strokeWidth = "1";
     this.style.strokeDashArray = "2 2";
 
+    this.svgElement.style.cursor = this._container.style.cursor[Cursor.BOUNDING_BOX];
     this.svgElement.style.display = "none";
     this.removeOverEvent();
 

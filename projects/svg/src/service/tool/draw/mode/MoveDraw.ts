@@ -1,16 +1,14 @@
-import {Drawable} from "../Drawable";
+import {Drawer} from "../Drawer";
 import {ElementView} from "../../../../element/ElementView";
 import {TSVG} from "../../../../TSVG";
 import {Point} from "../../../../model/Point";
 import {MoveDrawable} from "../type/MoveDrawable";
 import {Callback} from "../../../../dataSource/constant/Callback";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
-import {DrawTool} from "../DrawTool";
 
-export abstract class MoveDraw implements Drawable {
+export abstract class MoveDraw extends Drawer {
   protected container: TSVG;
   protected startPos: Point = {x: 0, y: 0};
-  public drawTool: DrawTool | null = null;
 
   private _drawStart = this.drawStart.bind(this);
   private _draw = this.draw.bind(this);
@@ -19,6 +17,7 @@ export abstract class MoveDraw implements Drawable {
   protected _drawableElement: ElementView | null = null;
 
   public constructor(container: TSVG) {
+    super();
     this.container = container;
   }
 
@@ -29,6 +28,7 @@ export abstract class MoveDraw implements Drawable {
     this.startPos = this.container.grid.getSnapPoint(this.startPos);
 
     this._drawableElement = this.createDrawableElement(this.startPos);
+
     this.container.add(this._drawableElement);
     this.container.drawTool.drawing();
     if (call) {
@@ -102,8 +102,8 @@ export abstract class MoveDraw implements Drawable {
     }
   }
 
-  public abstract _new(): MoveDraw;
-  public abstract get type(): ElementType;
+  public abstract override _new(): MoveDraw;
+  public abstract override get type(): ElementType;
   public get drawableElement(): ElementView | null {
     return this._drawableElement;
   }

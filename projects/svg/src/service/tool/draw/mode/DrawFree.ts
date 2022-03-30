@@ -1,4 +1,4 @@
-import {Drawable} from "../Drawable";
+import {Drawer} from "../Drawer";
 import {FreeView} from "../../../../element/shape/pointed/polyline/FreeView";
 import {TSVG} from "../../../../TSVG";
 import {Point} from "../../../../model/Point";
@@ -8,19 +8,21 @@ import {MoveTo} from "../../../../model/path/point/MoveTo";
 import {Callback} from "../../../../dataSource/constant/Callback";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../../element/ElementView";
-import {DrawTool} from "../DrawTool";
+import {Cursor} from "../../../../dataSource/constant/Cursor";
 
-export class DrawFree implements Drawable {
+export class DrawFree extends Drawer {
   private readonly container: TSVG;
   private _drawableElement: FreeView | null = null;
-  public drawTool: DrawTool | null = null;
+  public snappable: boolean = false;
 
   private _drawStart = this.drawStart.bind(this);
   private _draw = this.draw.bind(this);
   private _drawEnd = this.drawEnd.bind(this);
 
   public constructor(container: TSVG) {
+    super();
     this.container = container;
+    this.cursor = Cursor.DRAW_FREE;
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
@@ -44,7 +46,7 @@ export class DrawFree implements Drawable {
         d: additional.path
       });
     } else {
-      if (this.container.grid.isSnap()) {
+      if (this.snappable && this.container.grid.isSnap()) {
         position = this.container.grid.getSnapPoint(position);
         this._drawableElement.pushPoint(position);
       } else if (this.drawTool?.perfect) {

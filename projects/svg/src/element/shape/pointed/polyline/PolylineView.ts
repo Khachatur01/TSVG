@@ -1,7 +1,9 @@
-import {ElementView} from "../../../ElementView";
+import {ElementCursor, ElementView} from "../../../ElementView";
 import {Point} from "../../../../model/Point";
 import {PointedView} from "../PointedView";
 import {TSVG} from "../../../../TSVG";
+
+export class PolylineCursor extends ElementCursor {}
 
 export class PolylineView extends PointedView {
   public constructor(container: TSVG, points: Point[] = [], ownerId?: string, index?: number) {
