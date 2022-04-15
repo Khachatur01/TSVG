@@ -1,7 +1,7 @@
 /*
  * Public API Surface of svg
  */
-export * from './TSVG'
+export * from './Container'
 
 export * from './colorPicker/ColorPicker';
 
@@ -16,9 +16,9 @@ export * from './element/foreign/media/VideoView';
 export * from './element/foreign/text/TextBoxView';
 export * from './element/group/GroupView';
 export * from './element/shape/BoxView';
-export * from './element/shape/EllipseView';
+export * from './element/shape/circluar/EllipseView';
 export * from './element/shape/pointed/LineView';
-export * from './element/shape/pointed/PathView';
+export * from './element/shape/PathView';
 export * from './element/shape/pointed/PointedView';
 export * from './element/shape/pointed/polygon/PolygonView';
 export * from './element/shape/pointed/polygon/rectangle/RectangleView';
@@ -35,7 +35,6 @@ export * from './model/Rect';
 export * from './model/Point';
 export * from './model/path/Path';
 export * from './model/path/PathCommand';
-export * from './model/path/close/Close';
 export * from './model/path/curve/arc/Arc';
 export * from './model/path/curve/bezier/cubic/SCBezier';
 export * from './model/path/curve/bezier/cubic/CBezier';
@@ -70,8 +69,8 @@ export * from './service/tool/drag/Draggable';
 export * from './service/tool/drag/DragTool';
 export * from './service/tool/draw/Drawer';
 export * from './service/tool/draw/DrawTool';
-export * from './service/tool/draw/element/figure/line/DrawLine';
-export * from './service/tool/draw/element/figure/line/DrawPolyline';
+export * from './service/tool/draw/element/shape/pointed/DrawLine';
+export * from './service/tool/draw/element/shape/pointed/polyline/DrawPolyline';
 export * from './service/tool/draw/element/foreign/DrawAsset';
 export * from './service/tool/draw/element/foreign/DrawGraphic';
 export * from './service/tool/draw/element/foreign/DrawImage';

@@ -1,6 +1,6 @@
 import {Drawer} from "../Drawer";
 import {FreeView} from "../../../../element/shape/pointed/polyline/FreeView";
-import {TSVG} from "../../../../TSVG";
+import {Container} from "../../../../Container";
 import {Point} from "../../../../model/Point";
 import {Angle} from "../../../math/Angle";
 import {Path} from "../../../../model/path/Path";
@@ -11,7 +11,7 @@ import {ElementView} from "../../../../element/ElementView";
 import {Cursor} from "../../../../dataSource/constant/Cursor";
 
 export class DrawFree extends Drawer {
-  private readonly container: TSVG;
+  private readonly container: Container;
   private _drawableElement: FreeView | null = null;
   public snappable: boolean = false;
 
@@ -19,7 +19,7 @@ export class DrawFree extends Drawer {
   private _draw = this.draw.bind(this);
   private _drawEnd = this.drawEnd.bind(this);
 
-  public constructor(container: TSVG) {
+  public constructor(container: Container) {
     super();
     this.container = container;
     this.cursor = Cursor.DRAW_FREE;
@@ -68,13 +68,14 @@ export class DrawFree extends Drawer {
   }
   public makeMouseUp(position: Point, call: boolean = true, additional?: any) {
     if (!this._drawableElement) return;
+
     if (additional) {
       this._drawableElement.path.fromString(additional.path);
       this._drawableElement.setAttr({
         d: additional.path
       });
     }
-    if (this._drawableElement.getAttr("points").split(" ").length == 2) {
+    if (!this._drawableElement.isComplete()) {
       this.container.remove(this._drawableElement);
     } else {
       this._drawableElement.refPoint = this._drawableElement.center;
@@ -82,6 +83,7 @@ export class DrawFree extends Drawer {
 
     if (call) {
       this.container.call(Callback.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
+      this.container.call(Callback.ELEMENT_CREATED, {position: position, element: this._drawableElement});
     }
   }
 
@@ -102,7 +104,7 @@ export class DrawFree extends Drawer {
     document.addEventListener('touchend', this._drawEnd);
 
     let containerRect = this.container.HTML.getBoundingClientRect();
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     this.makeMouseDown({
@@ -113,7 +115,7 @@ export class DrawFree extends Drawer {
   private draw(event: MouseEvent | TouchEvent): void {
     let containerRect = this.container.HTML.getBoundingClientRect();
 
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     this.makeMouseMove({
@@ -129,6 +131,8 @@ export class DrawFree extends Drawer {
 
     this.makeMouseUp({x: 0, y: 0});
   }
+
+  public override stopDrawing(call?: boolean) {}
 
   public start(call: boolean = true): void {
     this.container.HTML.addEventListener('mousedown', this._drawStart);

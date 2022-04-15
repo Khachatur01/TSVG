@@ -1,15 +1,15 @@
 import {Point} from "../model/Point";
-import {Size} from "../model/Size";
 import {Resizeable} from "../service/edit/resize/Resizeable";
 import {Rect} from "../model/Rect";
 import {Draggable} from "../service/tool/drag/Draggable";
 import {Matrix} from "../service/math/Matrix";
-import {TSVG} from "../TSVG";
-import {PathView} from "./shape/pointed/PathView";
+import {Container} from "../Container";
+import {PathView} from "./shape/PathView";
 import {GroupView} from "./group/GroupView";
 import {Style} from "../service/style/Style";
 import {ElementType} from "../dataSource/constant/ElementType";
 import {Cursor} from "../dataSource/constant/Cursor";
+import {ForeignObjectView} from "./foreign/ForeignObjectView";
 
 export class ElementCursor {
   public cursor: any = {};
@@ -20,7 +20,7 @@ export class ElementCursor {
 }
 
 export class ElementStyle extends Style {
-  private element: ElementView;
+  protected element: ElementView;
 
   public constructor(element: ElementView) {
     super();
@@ -77,22 +77,19 @@ export class ElementStyle extends Style {
   }
   public override set fontColor(color: string) {
     super.fontColor = color;
-
     this.element.HTML.style.color = color;
   }
 
   public override get backgroundColor(): string {
     return super.backgroundColor;
   }
-  public override set backgroundColor(color: string) {
+  public override set backgroundColor(color: string)  {
     super.backgroundColor = color;
-
     this.element.HTML.style.backgroundColor = color;
   }
 
   public setDefaultStyle(): void {
     let style = this.element.container.style;
-
     this.strokeWidth = style.strokeWidth;
     this.strokeColor = style.strokeColor;
     this.fillColor = style.fillColor;
@@ -104,41 +101,63 @@ export class ElementStyle extends Style {
 
 export abstract class ElementView implements Resizeable, Draggable {
   public static readonly svgURI: "http://www.w3.org/2000/svg" = "http://www.w3.org/2000/svg";
-  protected svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "rect"); // default element
-  protected _type: ElementType = ElementType.RECTANGLE;
-
-  public readonly style: ElementStyle;
+  protected abstract svgElement: SVGElement;
   public readonly rotatable: boolean = true;
 
+  /* Model */
+  protected abstract _type: ElementType;
+  public readonly style: ElementStyle;
   protected _ownerId: string;
   protected _index: number;
-
-  protected _container: TSVG;
-  protected _lastPosition: Point = {x: 0, y: 0};
-  protected _lastSize: Size = {width: 0, height: 0};
-  protected _lastAngle: number = 0;
+  private _group: GroupView | null = null;
+  protected _container: Container;
+  protected _rect: Rect = {x: 0, y: 0, width: 0, height: 0};
   protected _angle: number = 0;
   protected _refPoint: Point = {x: 0, y: 0};
+  protected _lastRect: Rect = {x: 0, y: 0, width: 0, height: 0};
+  protected _lastAngle: number = 0;
+  /* Model */
 
-  private _group: GroupView | null = null;
   private _highlight = this.highlight.bind(this);
   private _lowlight = this.lowlight.bind(this);
 
-  public abstract get size(): Size;
-  public abstract setSize(rect: Rect, delta: Point | null): void; /* if delta set, calculate rect width and height by delta */
-  public abstract isComplete(): boolean;
-  public abstract get position(): Point;
-  public abstract set position(delta: Point);
-  public abstract get points(): Point[];
-  public abstract get boundingRect(): Rect;
-  public abstract get visibleBoundingRect(): Rect;
+  public translate(delta: Point) {
+    this.svgElement.style.transform =
+      "translate(" + delta.x + "px, " + delta.y + "px) rotate(" + this._angle + "deg)";
+  }
+  public abstract drag(delta: Point): void;
+  public getVisibleRect(): Rect {
+    return ElementView.calculateRect(this.visiblePoints);
+  };
+  public getRect(): Rect {
+    return this._rect;
+  };
+  public abstract setRect(rect: Rect, delta?: Point): void; /* if delta set, calculate rect width and height by delta */
+
+  protected abstract updateView(): void;
+  public get visiblePoints(): Point[] {
+    return Matrix.rotate(
+      this.points,
+      this._refPoint,
+      -this._angle
+    );
+  }
+  public get points(): Point[] {
+    return [
+      {x: this._rect.x, y: this._rect.y},
+      {x: this._rect.x + this._rect.width, y: this._rect.y},
+      {x: this._rect.x + this._rect.width, y: this._rect.y + this._rect.height},
+      {x: this._rect.x, y: this._rect.y + this._rect.height}
+    ];
+  };
   public abstract toPath(): PathView;
   public abstract get copy(): ElementView;
+  public abstract isComplete(): boolean;
 
   public abstract onFocus(): void;
   public abstract onBlur(): void;
 
-  public constructor(container: TSVG, ownerId?: string, index?: number) {
+  public constructor(container: Container, ownerId?: string, index?: number) {
     this._container = container;
     this.style = new ElementStyle(this);
 
@@ -183,15 +202,14 @@ export abstract class ElementView implements Resizeable, Draggable {
     this.svgElement.id = this.id;
   }
 
-  public get container(): TSVG {
+  public get container(): Container {
     return this._container;
   }
-  public set container(container: TSVG) {
+  public set container(container: Container) {
     this._container = container;
   }
 
-  public correct(refPoint: Point, lastRefPoint: Point): void {
-  };
+  public abstract correct(refPoint: Point, lastRefPoint: Point): void;
 
   public getCorrectionDelta(refPoint: Point, lastRefPoint: Point) {
     /* calculate delta */
@@ -200,19 +218,11 @@ export abstract class ElementView implements Resizeable, Draggable {
       {x: refPoint.x, y: refPoint.y},
       this.angle
     )[0];
-    /* correct by delta */
+    /* correction by delta */
     return {
       x: Math.round(rotatedRefPoint.x - lastRefPoint.x),
       y: Math.round(rotatedRefPoint.y - lastRefPoint.y)
     };
-  }
-
-  public get visiblePoints(): Point[] {
-    return Matrix.rotate(
-      this.points,
-      this._refPoint,
-      -this._angle
-    );
   }
 
   public get group(): GroupView | null {
@@ -222,7 +232,8 @@ export abstract class ElementView implements Resizeable, Draggable {
     this._group = group;
   }
 
-  protected calculateBoundingBox(points: Point[]): Rect {
+  public static calculateRect(points: Point[]): Rect {
+    if (points.length === 0) return {x: 0, y: 0, width: 0, height: 0};
     let minX = points[0].x;
     let minY = points[0].y;
     let maxX = points[0].x;
@@ -247,13 +258,38 @@ export abstract class ElementView implements Resizeable, Draggable {
       height: maxY - minY
     };
   }
+  protected calculateRectByNewPoint(point: Point): Rect {
+    let position = this._rect;
+    let size = this._rect;
+
+    if (point.x < position.x) {
+      position.width += position.x - point.x;
+      position.x = point.x;
+    }
+    else if (point.x > position.x + size.width) {
+      size.width = point.x - position.x;
+    }
+
+    if (point.y < position.y) {
+      position.height += position.y - point.y;
+      position.y = point.y;
+    }
+    else if (point.y > position.y + size.height) {
+      size.height = point.y - position.y;
+    }
+
+    return {
+      x: position.x,
+      y: position.y,
+      width: size.width,
+      height: size.height
+    }
+  }
 
   public get center(): Point {
-    let rect = this.boundingRect;
-
     let center = {
-      x: rect.x + rect.width / 2,
-      y: rect.y + rect.height / 2
+      x: this._rect.x + this._rect.width / 2,
+      y: this._rect.y + this._rect.height / 2
     }
     if (this._angle == 0) {
       return center;
@@ -275,8 +311,8 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
   public centerRefPoint() {
     this.refPoint = {
-      x: this._lastPosition.x + this._lastSize.width / 2,
-      y: this._lastPosition.y + this._lastSize.height / 2
+      x: this._lastRect.x + this._lastRect.width / 2,
+      y: this._lastRect.y + this._lastRect.height / 2
     };
   }
 
@@ -329,28 +365,45 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
 
   public fixRect(): void {
-    this._lastPosition = this.position;
-    this._lastSize = this.size;
-  }
-  public fixPosition(): void {
-    this._lastPosition = this.position;
-  }
-  public fixSize(): void {
-    this._lastSize = this.size;
+    this._lastRect = Object.assign({}, this._rect);
   }
   public fixAngle(): void {
     this._lastAngle = this._angle;
   }
 
   public get lastRect(): Rect {
-    return {
-      x: this._lastPosition.x,
-      y: this._lastPosition.y,
-      width: this._lastSize.width,
-      height: this._lastSize.height
-    }
+    return this._lastRect;
   }
   public get lastAngle(): number {
     return this._lastAngle;
   }
+
+  public toJSON(): any {
+    return {
+      type: this._type,
+      style: this.style.toJSON(),
+      ownerId: this._ownerId,
+      index: this._index,
+      group: {
+        ownerId: this._group?._ownerId,
+        index: this._group?._index
+      },
+      containerId: this._container.id,
+      rect: this._rect,
+      angle: this._angle,
+      refPoint: this._refPoint,
+    }
+  }
+  public fromJSON(json: any) {
+    this.style.set = json.style;
+    this.setId(json.ownerId, json.index);
+    if (this._group) {
+      this._group._ownerId = json.group.ownerId;
+      this._group._index = json.group.index;
+    }
+    this.fixRect();
+    this.setRect(json.rect);
+    this.rotate(json.angle);
+    this.refPoint = json.refPoint;
+  };
 }

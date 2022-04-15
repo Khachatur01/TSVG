@@ -1,12 +1,10 @@
 import {Tool} from "../Tool";
-import {TSVG} from "../../../TSVG";
+import {Container} from "../../../Container";
 import {RectangleView} from "../../../element/shape/pointed/polygon/rectangle/RectangleView";
 import {Point} from "../../../model/Point";
 import {DragTool} from "../drag/DragTool";
 import {Callback} from "../../../dataSource/constant/Callback";
 import {Focus} from "../../edit/group/Focus";
-import {elementAt} from "rxjs";
-import {ElementView} from "../../../element/ElementView";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class SelectTool extends Tool {
@@ -19,7 +17,7 @@ export class SelectTool extends Tool {
   private _select = this.select.bind(this);
   private _end = this.end.bind(this);
 
-  public constructor(container: TSVG, focus: Focus) {
+  public constructor(container: Container, focus: Focus) {
     super(container);
     this.boundingBox = new RectangleView(container);
     this.dragTool = new DragTool(container, focus);
@@ -35,7 +33,7 @@ export class SelectTool extends Tool {
 
   public makeMouseDown(position: Point, call: boolean = true) {
     this.position = position;
-    this.boundingBox.setSize({
+    this.boundingBox.setRect({
       x: position.x,
       y: position.y,
       width: 1,
@@ -45,7 +43,7 @@ export class SelectTool extends Tool {
     this._container.HTML.appendChild(this.boundingBox.SVG);
 
     if (call) {
-      this._container.call(Callback.SELECT_AREA_START, {position: position});
+      this._container.call(Callback.SELECT_AREA_MOUSE_DOWN, {position: position});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
@@ -60,15 +58,15 @@ export class SelectTool extends Tool {
     });
 
     if (call) {
-      this._container.call(Callback.SELECT_AREA, {position: position});
+      this._container.call(Callback.SELECT_AREA_MOUSE_MOVE, {position: position});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
     let width = position.x - this.position.x;
 
     this._container.HTML.removeChild(this.boundingBox.SVG);
-    let boxPos = this.boundingBox.position;
-    let boxSize = this.boundingBox.size;
+    let boxPos = this.boundingBox.getRect();
+    let boxSize = this.boundingBox.getRect();
     let boxPoints: any = {
       topLeft: boxPos,
       bottomRight: {
@@ -106,7 +104,7 @@ export class SelectTool extends Tool {
     this._container.singleSelect();
 
     if (call) {
-      this._container.call(Callback.SELECT_AREA_END, {position: position});
+      this._container.call(Callback.SELECT_AREA_MOUSE_UP, {position: position});
     }
   }
 
@@ -116,7 +114,7 @@ export class SelectTool extends Tool {
     this._container.HTML.addEventListener("touchmove", this._select);
     document.addEventListener("mouseup", this._end);
     document.addEventListener("touchend", this._end);
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
 
@@ -127,7 +125,7 @@ export class SelectTool extends Tool {
     this.makeMouseDown(startPosition);
   }
   private select(event: MouseEvent | TouchEvent): void {
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
     let movePosition = {
@@ -137,7 +135,7 @@ export class SelectTool extends Tool {
     this.makeMouseMove(movePosition);
   }
   private end(event: MouseEvent | TouchEvent): void {
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
     let endPosition = {

@@ -1,9 +1,9 @@
-import {ClickDraw} from "../../../mode/ClickDraw";
-import {PointedView} from "../../../../../../element/shape/pointed/PointedView";
-import {Point} from "../../../../../../model/Point";
-import {Callback} from "../../../../../../dataSource/constant/Callback";
-import {PolygonView} from "../../../../../../element/shape/pointed/polygon/PolygonView";
-import {ElementType} from "../../../../../../dataSource/constant/ElementType";
+import {ClickDraw} from "../../../../mode/ClickDraw";
+import {PointedView} from "../../../../../../../element/shape/pointed/PointedView";
+import {Point} from "../../../../../../../model/Point";
+import {Callback} from "../../../../../../../dataSource/constant/Callback";
+import {PolygonView} from "../../../../../../../element/shape/pointed/polygon/PolygonView";
+import {ElementType} from "../../../../../../../dataSource/constant/ElementType";
 
 export class DrawPolygon extends ClickDraw {
   protected createDrawableElement(position: Point): PointedView {

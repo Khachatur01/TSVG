@@ -3,7 +3,7 @@ import {LineView} from "../../../../../../element/shape/pointed/LineView";
 import {Point} from "../../../../../../model/Point";
 import {Angle} from "../../../../../math/Angle";
 import {ElementView} from "../../../../../../element/ElementView";
-import {TSVG} from "../../../../../../TSVG";
+import {Container} from "../../../../../../Container";
 import {Callback} from "../../../../../../dataSource/constant/Callback";
 import {PointedView} from "../../../../../../element/shape/pointed/PointedView";
 import {ElementType} from "../../../../../../dataSource/constant/ElementType";
@@ -11,7 +11,7 @@ import {ElementType} from "../../../../../../dataSource/constant/ElementType";
 export class DrawLine extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
     let element = new LineView(this.container, position, position);
-    element.fixPosition();
+    element.fixRect();
     return element;
   }
 
@@ -35,7 +35,7 @@ export class DrawLine extends MoveDraw {
   protected override draw(event: MouseEvent | TouchEvent) {
     if (!this.container || !this._drawableElement) return;
 
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let containerRect = this.container.HTML.getBoundingClientRect();

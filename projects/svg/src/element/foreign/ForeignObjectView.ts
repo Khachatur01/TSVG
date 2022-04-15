@@ -1,9 +1,8 @@
 import {ElementCursor, ElementView} from "../ElementView";
-import {TSVG} from "../../TSVG";
+import {Container} from "../../Container";
 import {Point} from "../../model/Point";
-import {Size} from "../../model/Size";
 import {Rect} from "../../model/Rect";
-import {PathView} from "../shape/pointed/PathView";
+import {PathView} from "../shape/PathView";
 import {Callback} from "../../dataSource/constant/Callback";
 import {ForeignView} from "../type/ForeignView";
 import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
@@ -18,23 +17,24 @@ export class ForeignObjectCursor extends ElementCursor {
 }
 
 export class ForeignObjectView extends ForeignView implements MoveDrawable {
+  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "foreignObject");
+  protected override _type: ElementType = ElementType.FOREIGN_OBJECT;
+
+  /* Model */
   protected _content: HTMLElement | null = null;
   public readonly outline: string = "thin solid #999";
+  /* Model */
 
-  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, ownerId?: string, index?: number) {
+  public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
-    this.svgElement = document.createElementNS(ElementView.svgURI, "foreignObject");
-    this._type = ElementType.FOREIGN_OBJECT;
     this.svgElement.id = this.id;
     this.svgElement.style.outline = "none";
     this.svgElement.style.border = "none";
+    this.style.fontSize = this.style.fontSize;
+    this.style.fontColor = this.style.fontColor;
+    this.style.backgroundColor = this.style.backgroundColor;
 
-    this.position = position;
-
-    this.setSize({
-      x: position.x, y: position.y,
-      width: size.width, height: size.height
-    });
+    this.setRect(rect);
     this.setOverEvent();
 
     this.setAttr({
@@ -46,38 +46,25 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
         this._content.style.userSelect = "none";
       }
     });
-
     this._container.addCallBack(Callback.EDIT_TOOl_ON, () => {
       if (this._content) {
         this._content.style.userSelect = "unset";
       }
     });
+    try {
+      this.style.setDefaultStyle();
+    } catch (error: any) {
+    }
 
     this.addEditCallBack();
   }
 
-  public override get HTML(): SVGElement | HTMLElement {
-    if (this._content)
-      return this._content;
-
-    return this.svgElement
-  }
-
   public get copy(): ForeignObjectView {
-    let position = this.position;
-    let size = this.size;
-
     let foreignObject: ForeignObjectView = new ForeignObjectView(this._container);
     if (this._content)
       foreignObject.setContent(this._content.cloneNode(true) as HTMLElement);
 
-    foreignObject.position = position;
-    foreignObject.setSize({
-      x: position.x,
-      y: position.y,
-      width: size.width,
-      height: size.height
-    });
+    foreignObject.setRect(this._rect);
     foreignObject.fixRect();
 
     foreignObject.refPoint = Object.assign({}, this.refPoint);
@@ -88,40 +75,12 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     return foreignObject;
   }
 
-  public get position(): Point {
-    return {
-      x: parseInt(this.getAttr("x")),
-      y: parseInt(this.getAttr("y"))
-    };
+  public drag(delta: Point): void {
+    this._rect.x = this._lastRect.x + delta.x;
+    this._rect.y = this._lastRect.y + delta.y;
+    this.updateView();
   }
-  public set position(delta: Point) {
-    this.setAttr({
-      x: this._lastPosition.x + delta.x,
-      y: this._lastPosition.y + delta.y
-    });
-  }
-
-  public override correct(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
-    let position = this.position;
-
-    this.setAttr({
-      x: position.x + delta.x,
-      y: position.y + delta.y
-    });
-  }
-
-  public get size(): Size {
-    return {
-      width: parseInt(this.getAttr("width")),
-      height: parseInt(this.getAttr("height"))
-    };
-  }
-  public drawSize(rect: Rect) {
-    this.setSize(rect);
-  }
-  public setSize(rect: Rect): void {
+  public setRect(rect: Rect, delta?: Point): void {
     if (rect.width < 0) {
       rect.width = -rect.width;
       rect.x -= rect.width;
@@ -130,13 +89,30 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       rect.height = -rect.height;
       rect.y -= rect.height;
     }
-
+    this._rect = rect;
+    this.updateView();
+  }
+  protected updateView(): void {
     this.setAttr({
-      x: rect.x + "",
-      y: rect.y + "",
-      width: rect.width + "",
-      height: rect.height + ""
+      x: this._rect.x + "",
+      y: this._rect.y + "",
+      width: this._rect.width + "",
+      height: this._rect.height + ""
     });
+  }
+
+  public override correct(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
+    if (delta.x == 0 && delta.y == 0) return;
+
+    this._rect.x = this._rect.x + delta.x;
+    this._rect.y = this._rect.y + delta.y;
+
+    this.updateView();
+  }
+
+  public drawSize(rect: Rect) {
+    this.setRect(rect);
   }
 
   protected addEditCallBack() {
@@ -145,11 +121,20 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     });
   }
 
-  public override onFocus() {
-    this.svgElement.style.outline = this.outline;
+  public override onFocus(force: boolean = false) {
+    if (force || this._container.editTool.isOn()) {
+      this.svgElement.style.outline = this.outline;
+    }
   }
   public override onBlur() {
     this.svgElement.style.outline = "unset";
+  }
+
+  public override get HTML(): HTMLElement | SVGElement {
+    if (this._content) {
+      return this._content;
+    }
+    return this.svgElement;
   }
 
   public get content(): HTMLElement | null {
@@ -177,18 +162,32 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
   public get boundingRect(): Rect {
     let points = this.points;
-    return this.calculateBoundingBox(points);
+    return ElementView.calculateRect(points);
   }
   public get visibleBoundingRect(): Rect {
     let points = this.visiblePoints;
-    return this.calculateBoundingBox(points);
+    return ElementView.calculateRect(points);
   }
 
   public isComplete(): boolean {
-    let size = this.size;
-    return size.width > 0 && size.height > 0;
+    return this._rect.width > 0 && this._rect.height > 0;
   }
   public toPath(): PathView {
     return new PathView(this._container);
   }
+
+  public override toJSON(): any {
+    let json = super.toJSON();
+    json["content"] = this._content?.outerHTML;
+    return json;
+  }
+  public override fromJSON(json: any) {
+    super.fromJSON(json);
+    if (json.content) {
+      let content = document.createElement("div");
+      this.setContent(content);
+      content.outerHTML = json.content;
+      this._content = content;
+    }
+  };
 }

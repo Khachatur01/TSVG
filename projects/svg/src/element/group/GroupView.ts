@@ -1,21 +1,34 @@
 import {ElementCursor, ElementView} from "../ElementView";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
-import {Size} from "../../model/Size";
-import {PathView} from "../shape/pointed/PathView";
-import {TSVG} from "../../TSVG";
+import {PathView} from "../shape/PathView";
+import {Container} from "../../Container";
 import {ElementType} from "../../dataSource/constant/ElementType";
 
 export class GroupCursor extends ElementCursor {}
 
 export class GroupView extends ElementView {
-  private _elements: ElementView[] = [];
+  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "g");
+  protected override _type: ElementType = ElementType.GROUP;
 
-  public constructor(container: TSVG, ownerId?: string, index?: number) {
+  /* Model */
+  private _elements: Set<ElementView> = new Set<ElementView>()
+  /* Model */
+
+  public constructor(container: Container, ownerId?: string, index?: number) {
     super(container, ownerId, index);
-    this.svgElement = document.createElementNS(ElementView.svgURI, "g");
-    this._type = ElementType.GROUP;
     this.svgElement.id = this.id;
+  }
+
+  public getElementById(ownerId: string, index: number): ElementView | undefined {
+    for (let element of this._elements) {
+      if (element instanceof GroupView) {
+        return element.getElementById(ownerId, index);
+      } else if (element.ownerId === ownerId && element.index === index) {
+        return element;
+      }
+    }
+    return undefined;
   }
 
   public get copy(): GroupView {
@@ -34,19 +47,36 @@ export class GroupView extends ElementView {
     return group;
   }
 
-  public get elements(): ElementView[] {
+  public get elements(): Set<ElementView> {
     return this._elements;
   }
   public addElement(element: ElementView) {
-    this._elements.push(element);
+    this._elements.add(element);
     this.svgElement.appendChild(element.SVG);
+    this.recalculateRect();
   }
   public removeElement(element: ElementView) {
-    this._elements.splice(this._elements.indexOf(element), 1);
+    this._elements.delete(element);
     this.svgElement.removeChild(element.SVG);
+    this.recalculateRect();
+  }
+  public setElements(elements: Set<ElementView>) {
+    this._elements = elements;
+    this.svgElement.innerHTML = "";
+    elements.forEach((element: ElementView) => {
+      this.svgElement.appendChild(element.SVG);
+    });
+    this.recalculateRect();
+  }
+  public removeElements() {
+    this._elements.clear();
+    this.svgElement.innerHTML = "";
+
+    this._rect.width = 0;
+    this._rect.height = 0;
   }
 
-  public get points(): Point[] {
+  public override get points(): Point[] {
     let points: Point[] = [];
     this._elements.forEach((element: ElementView) => {
       element.points.forEach((point: Point) => {
@@ -58,79 +88,49 @@ export class GroupView extends ElementView {
   public override get visiblePoints(): Point[] {
     let points: Point[] = [];
     this._elements.forEach((element: ElementView) => {
-      let elementPoints = element.visiblePoints;
-      elementPoints.forEach((point: Point) => {
+      element.visiblePoints.forEach((point: Point) => {
         points.push(Object.assign({}, point));
       });
     });
     return points;
   }
-
-  public get position(): Point {
-    let boundingRect = this.visibleBoundingRect;
-
-    return {
-      x: boundingRect.x,
-      y: boundingRect.y
-    };
-  }
-  public set position(delta: Point) {
-    this._elements.forEach((element: ElementView) => {
-      element.position = delta;
-    });
-  }
   public override correct(refPoint: Point, lastRefPoint: Point) {
     this._elements.forEach((child: ElementView) => {
       child.correct(refPoint, lastRefPoint)
     });
+
+    let correctionDelta = this.getCorrectionDelta(refPoint, lastRefPoint);
+    this._rect.x += correctionDelta.x;
+    this._rect.y += correctionDelta.y;
   }
 
-  public get size(): Size {
-    let boundingRect = this.visibleBoundingRect;
-
-    return {
-      width: boundingRect.width,
-      height: boundingRect.height
-    };
+  public override translate(delta: Point) {
+    this.svgElement.style.transform =
+      "translate(" + delta.x + "px, " + delta.y + "px)";
   }
-  public setSize(rect: Rect): void {
-    let delta = {
-      x: rect.width / this._lastSize.width,
-      y: rect.height / this._lastSize.height
-    }
+  drag(delta: Point): void {
     this._elements.forEach((element: ElementView) => {
-      element.setSize(rect, delta);
+      element.drag(delta);
     });
+
+    this._rect.x += delta.x;
+    this._rect.y += delta.y;
   }
 
-  public override get center(): Point {
-    let rect = this.boundingRect;
-
-    return {
-      x: rect.x + rect.width / 2,
-      y: rect.y + rect.height / 2
-    }
+  setRect(rect: Rect, delta?: Point): void {
   }
 
-  public get boundingRect(): Rect {
-    return this.visibleBoundingRect;
-  }
-  public get visibleBoundingRect(): Rect {
+  protected recalculateRect() {
     let minX, minY;
     let maxX, maxY;
 
     let children = Array.from(this._elements);
     if (children.length < 1)
-      return {
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0
-      };
+      return
 
     let firstChild = children[0];
 
-    let firstBoundingRect = firstChild.visibleBoundingRect;
+    let firstBoundingRect = firstChild.getVisibleRect();
 
     minX = firstBoundingRect.x;
     minY = firstBoundingRect.y;
@@ -138,7 +138,7 @@ export class GroupView extends ElementView {
     maxY = firstBoundingRect.height + minY;
 
     for (let i = 1; i < children.length; i++) {
-      let boundingRect = children[i].visibleBoundingRect;
+      let boundingRect = children[i].getVisibleRect();
       if (boundingRect.x < minX)
         minX = boundingRect.x;
       if (boundingRect.y < minY)
@@ -149,8 +149,7 @@ export class GroupView extends ElementView {
         maxY = boundingRect.height + boundingRect.y;
     }
 
-    this._angle = 0;
-    return {
+    this._rect = {
       x: minX,
       y: minY,
       width: maxX - minX,
@@ -159,7 +158,8 @@ export class GroupView extends ElementView {
   }
 
   public override getAttr(attribute: string): string {
-    let value = this._elements[0].SVG.getAttribute(attribute);
+    let [firstElement] = this._elements;
+    let value = firstElement.SVG.getAttribute(attribute);
     if (!value)
       return "0";
     return value;
@@ -175,7 +175,7 @@ export class GroupView extends ElementView {
     return super.refPoint;
   }
   public override set refPoint(point: Point) {
-    super.refPoint = point;
+    this._refPoint = point;
     this._elements.forEach(child => child.refPoint = point);
   }
 
@@ -188,21 +188,12 @@ export class GroupView extends ElementView {
 
   public override fixRect(): void {
     super.fixRect();
-    this._elements.forEach((element: ElementView) => element.fixRect());
-  }
-  public override fixPosition(): void {
-    super.fixPosition();
-    this._elements.forEach((element: ElementView) => element.fixPosition());
-  }
-  public override fixSize(): void {
-    super.fixSize();
-    this._elements.forEach((element: ElementView) => element.fixSize());
+    this._elements.forEach(child => child.fixRect());
   }
   public override fixAngle(): void {
     super.fixAngle();
-    this._elements.forEach((element: ElementView) => element.fixAngle());
+    this._elements.forEach(child => child.fixAngle());
   }
-
   public override onFocus() {
   }
   public override onBlur() {
@@ -215,4 +206,23 @@ export class GroupView extends ElementView {
   public isComplete(): boolean {
     return true;
   }
+
+  protected updateView(): void {
+  }
+
+  public override toJSON(): any {
+    let json =  super.toJSON();
+    json["elements"] = [];
+    for (let element of this._elements) {
+      json["elements"].push(element.toJSON());
+    }
+    return json;
+  }
+  public override fromJSON(json: any) {
+    super.fromJSON(json);
+    this.removeElements();
+    json.elements.forEach((element: any) => {
+      this.addElement(element);
+    });
+  };
 }

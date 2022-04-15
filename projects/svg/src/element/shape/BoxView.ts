@@ -1,41 +1,38 @@
 import {ElementCursor, ElementView} from "../ElementView";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
-import {Size} from "../../model/Size";
-import {TSVG} from "../../TSVG";
-import {PathView} from "./pointed/PathView";
+import {Container} from "../../Container";
+import {PathView} from "./PathView";
 import {ShapeView} from "../type/ShapeView";
 import {ElementType} from "../../dataSource/constant/ElementType";
 
 export class BoxCursor extends ElementCursor {}
 
 export class BoxView extends ShapeView {
-  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, ownerId?: string, index?: number) {
+  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "rect");
+  protected override _type: ElementType = ElementType.BOX;
+
+  public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
-    this.svgElement = document.createElementNS(ElementView.svgURI, "rect");
-    this._type = ElementType.BOX;
     this.svgElement.id = this.id;
 
-    this.position = position;
-    this.setSize({
-      x: position.x, y: position.y,
-      width: size.width, height: size.height
-    });
+    this._rect = rect;
+    this.updateView();
 
     this.setOverEvent();
   }
+  protected updateView(): void {
+    this.setAttr({
+      x: this._rect.x + "",
+      y: this._rect.y + "",
+      width: this._rect.width + "",
+      height: this._rect.height + ""
+    });
+  }
 
   public get copy(): BoxView {
-    let position = this.position;
-    let size = this.size;
     let box: BoxView = new BoxView(this._container);
-    box.position = position;
-    box.setSize({
-      x: position.x,
-      y: position.y,
-      width: size.width,
-      height: size.height
-    });
+    box.setRect(this._rect);
     box.style.set = this.style;
 
     box.refPoint = Object.assign({}, this.refPoint);
@@ -44,38 +41,13 @@ export class BoxView extends ShapeView {
     return box;
   }
 
-  public get points(): Point[] {
-    let position: Point = this.position;
-    let size: Size = this.size;
-
-    return [
-      position,
-      {x: position.x, y: position.y + size.height},
-      {x: position.x + size.width, y: position.y + size.height},
-      {x: position.x + size.width, y: position.y},
-    ];
+  correct(refPoint: Point, lastRefPoint: Point): void {}
+  public drag(delta: Point): void {
+    this._rect.x = this._lastRect.x + delta.x;
+    this._rect.y = this._lastRect.y + delta.y;
+    this.updateView();
   }
-
-  public get position(): Point {
-    return {
-      x: parseInt(this.getAttr("x")),
-      y: parseInt(this.getAttr("y"))
-    };
-  }
-  public set position(delta: Point) {
-    this.setAttr({
-      x: this._lastPosition.x + delta.x + "",
-      y: this._lastPosition.y + delta.y + ""
-    });
-  }
-
-  public get size(): Size {
-    return {
-      width: parseInt(this.getAttr("width")),
-      height: parseInt(this.getAttr("height"))
-    };
-  }
-  public setSize(rect: Rect): void {
+  public setRect(rect: Rect): void {
     if (rect.width < 0) {
       rect.width = -rect.width;
       rect.x -= rect.width;
@@ -85,29 +57,16 @@ export class BoxView extends ShapeView {
       rect.y -= rect.height;
     }
 
-    this.setAttr({
-      x: rect.x + "",
-      y: rect.y + "",
-      width: rect.width + "",
-      height: rect.height + ""
-    });
-  }
-
-  public get boundingRect(): Rect {
-    let points = this.points;
-    return this.calculateBoundingBox(points);
-  }
-  public get visibleBoundingRect(): Rect {
-    let points = this.visiblePoints;
-    return this.calculateBoundingBox(points);
+    this._rect = rect;
+    this.updateView();
   }
 
   public override isComplete(): boolean {
-    let size = this.size;
-    return size.width != 0 && size.height != 0;
+    return this._rect.width != 0 && this._rect.height != 0;
   }
 
   public override toPath(): PathView {
     return new PathView(this._container);
   }
+
 }

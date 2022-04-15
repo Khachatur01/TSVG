@@ -1,13 +1,9 @@
 import {Point} from "../../../model/Point";
 
 export interface Draggable {
-  get position(): Point;
-
-  set position(position: Point);
+  drag(position: Point): void;
 
   get SVG(): SVGElement;
 
   fixRect(): void;
-
-  fixPosition(): void;
 }

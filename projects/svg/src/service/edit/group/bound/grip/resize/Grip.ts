@@ -1,11 +1,11 @@
 import {Point} from "../../../../../../model/Point";
-import {TSVG} from "../../../../../../TSVG";
+import {Container} from "../../../../../../Container";
 import {Rect} from "../../../../../../model/Rect";
 import {BoxView} from "../../../../../../element/shape/BoxView";
 import {Matrix} from "../../../../../math/Matrix";
-import {Callback} from "../../../../../../dataSource/constant/Callback";
 import {Focus} from "../../../Focus";
 import {Cursor} from "../../../../../../dataSource/constant/Cursor";
+import {Callback} from "../../../../../../dataSource/constant/Callback";
 
 export abstract class Grip extends BoxView {
   protected _lastResize: Rect = {x: 0, y: 0, width: 0, height: 0};
@@ -17,8 +17,8 @@ export abstract class Grip extends BoxView {
   protected halfSide: number = 5;
   protected focus: Focus;
 
-  public constructor(container: TSVG, focus: Focus) {
-    super(container, {x: 0, y: 0}, {width: 10, height: 10});
+  public constructor(container: Container, focus: Focus) {
+    super(container, {x: 0, y: 0, width: 10, height: 10});
     this.svgElement.style.cursor = this._container.style.cursor[Cursor.GRIP];
     this.setAttr({
       fill: "white",
@@ -38,8 +38,11 @@ export abstract class Grip extends BoxView {
 
   }
   public makeMouseUp(position: Point, call: boolean = true): void {
-    this.focus.fixRect();
     this.makeMouseMove(position, false);
+    this.focus.fixRect();
+    if (call) {
+      this._container.call(Callback.ELEMENTS_RESIZED, {elements: this.focus.children, rect: this._lastResize});
+    }
   }
 
   public override highlight() {
@@ -71,7 +74,7 @@ export abstract class Grip extends BoxView {
     this._container.activeTool.off();
 
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let client: Point = Matrix.rotate(
@@ -84,7 +87,7 @@ export abstract class Grip extends BoxView {
   }
   private move(event: MouseEvent | TouchEvent) {
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let client: Point = Matrix.rotate(
@@ -102,7 +105,7 @@ export abstract class Grip extends BoxView {
     document.removeEventListener("touchend", this._end);
 
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let client: Point = Matrix.rotate(

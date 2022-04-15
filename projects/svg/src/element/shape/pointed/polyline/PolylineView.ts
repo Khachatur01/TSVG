@@ -1,20 +1,32 @@
 import {ElementCursor, ElementView} from "../../../ElementView";
 import {Point} from "../../../../model/Point";
 import {PointedView} from "../PointedView";
-import {TSVG} from "../../../../TSVG";
+import {Container} from "../../../../Container";
+import {ElementType} from "../../../../dataSource/constant/ElementType";
 
 export class PolylineCursor extends ElementCursor {}
 
 export class PolylineView extends PointedView {
-  public constructor(container: TSVG, points: Point[] = [], ownerId?: string, index?: number) {
+  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "polyline");
+  protected override _type: ElementType = ElementType.POLYLINE;
+
+  public constructor(container: Container, points: Point[] = [], ownerId?: string, index?: number) {
     super(container, ownerId, index);
-    this.svgElement = document.createElementNS(ElementView.svgURI, "polyline");
     this.svgElement.id = this.id;
 
     this.points = points;
     this.style.setDefaultStyle();
 
     this.setOverEvent();
+  }
+
+  protected override updateView() {
+    let string = "";
+    this._points.forEach((point: Point) => {
+      string += point.x + " " + point.y + " ";
+    });
+    string.trimEnd();
+    this.setAttr({points: string});
   }
 
   public get copy(): PolylineView {
@@ -30,62 +42,8 @@ export class PolylineView extends PointedView {
     return polyline;
   }
 
-  // TODO fix coordinate fetching
-  public override get points(): Point[] {
-    let points: string[] = this.getAttr("points").split(" ");
-    let pointsArray: Point[] = [];
-
-    for (let i = 0; i < points.length; i += 2) {
-      pointsArray.push({
-        x: parseInt(points[i]),
-        y: parseInt(points[i + 1])
-      });
-    }
-
-    return pointsArray;
-  }
-  public override set points(points: Point[]) {
-    let pointsString: string = "";
-    for (let point of points) {
-      pointsString += point.x + " " + point.y + " "
-    }
-    pointsString = pointsString.trimEnd();
-    this.setAttr({points: pointsString})
-  }
-
-  public override getPoint(index: number): Point {
-    let points = this.points;
-    if (index < 0)
-      index = points.length + index;
-    return points[index];
-  }
-  public override pushPoint(point: Point) {
-    this.setAttr({
-      "points": this.getAttr("points") + " " + point.x + " " + point.y
-    });
-  }
-  public override replacePoint(index: number, point: Point) {
-    let points = this.points;
-    if (index < 0)
-      index = points.length + index;
-    points[index] = point;
-
-    this.points = points;
-  }
-  public override removePoint(index: number): void {
-    let pointsArr = this.getAttr("points").split(" ");
-    if (index < 0)
-      index = pointsArr.length / 2 + index;
-
-    pointsArr.splice(index * 2, 2)
-
-    this.setAttr({
-      "points": pointsArr.join(" ")
-    });
-  }
-
   public override isComplete(): boolean {
-    let pointsArr = this.getAttr("points").split(" ", 6);
-    return pointsArr.length >= 6;
+    return this._points.length >= 3;
   }
+
 }

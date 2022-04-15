@@ -1,5 +1,5 @@
 import {Tool} from "../Tool";
-import {TSVG} from "../../../TSVG";
+import {Container} from "../../../Container";
 import {Callback} from "../../../dataSource/constant/Callback";
 import {ElementView} from "../../../element/ElementView";
 import {Point} from "../../../model/Point";
@@ -10,7 +10,7 @@ export class PointerTool extends Tool {
 
   private _move = this.move.bind(this);
 
-  public constructor(container: TSVG, URI: string) {
+  public constructor(container: Container, URI: string) {
     super(container);
     this._cursorSVG = document.createElementNS(ElementView.svgURI, "image");
     this._cursorSVG.setAttribute("href", URI);
@@ -37,7 +37,7 @@ export class PointerTool extends Tool {
   }
   private move(event: TouchEvent | MouseEvent): void {
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let movePosition = {

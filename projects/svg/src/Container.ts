@@ -1,5 +1,5 @@
 import {DrawTool} from "./service/tool/draw/DrawTool";
-import {ElementCursor, ElementView} from "./element/ElementView";
+import {ElementView} from "./element/ElementView";
 import {Focus} from "./service/edit/group/Focus";
 import {SelectTool} from "./service/tool/select/SelectTool";
 import {Tool} from "./service/tool/Tool";
@@ -13,15 +13,15 @@ import {Style} from "./service/style/Style";
 import {HighlightTool} from "./service/tool/highlighter/HighlightTool";
 import {PointerTool} from "./service/tool/pointer/PointerTool";
 import {Point} from "./model/Point";
-import {TextBoxCursor, TextBoxView} from "./element/foreign/text/TextBoxView";
+import {TextBoxCursor} from "./element/foreign/text/TextBoxView";
 import {Cursor} from "./dataSource/constant/Cursor";
 import {ForeignObjectCursor, ForeignObjectView} from "./element/foreign/ForeignObjectView";
 import {ElementType} from "./dataSource/constant/ElementType";
-import {EllipseCursor} from "./element/shape/EllipseView";
+import {EllipseCursor} from "./element/shape/circluar/EllipseView";
 import {BoxCursor} from "./element/shape/BoxView";
-import {PathCursor} from "./element/shape/pointed/PathView";
+import {PathCursor} from "./element/shape/PathView";
 import {LineCursor} from "./element/shape/pointed/LineView";
-import {FreeCursor} from "./element/shape/pointed/polyline/FreeView";
+import {FreeCursor, FreeView} from "./element/shape/pointed/polyline/FreeView";
 import {PolylineCursor} from "./element/shape/pointed/polyline/PolylineView";
 import {PolygonCursor} from "./element/shape/pointed/polygon/PolygonView";
 import {TriangleCursor} from "./element/shape/pointed/polygon/triangle/TriangleView";
@@ -31,16 +31,17 @@ import {RectangleCursor} from "./element/shape/pointed/polygon/rectangle/Rectang
 import {ImageCursor} from "./element/foreign/media/ImageView";
 import {VideoCursor} from "./element/foreign/media/VideoView";
 import {GraphicCursor} from "./element/foreign/graphic/GraphicView";
+import {CircleCursor} from "./element/shape/circluar/CircleView";
 
 class GlobalStyle extends Style {
   private readonly default: Style;
-  private container: TSVG;
+  private container: Container;
 
   public readonly cursor: any = {
     element: {}
   };
 
-  public constructor(container: TSVG) {
+  public constructor(container: Container) {
     super();
     this.container = container;
     this.default = new Style();
@@ -58,6 +59,7 @@ class GlobalStyle extends Style {
     this.cursor[Cursor.NODE] = "move";
 
     this.cursor.element[ElementType.ELLIPSE] = new EllipseCursor();
+    this.cursor.element[ElementType.CIRCLE] = new CircleCursor();
     this.cursor.element[ElementType.BOX] = new BoxCursor();
     this.cursor.element[ElementType.PATH] = new PathCursor();
     this.cursor.element[ElementType.LINE] = new LineCursor();
@@ -234,8 +236,15 @@ class Clipboard {
   }
 }
 
-export class TSVG {
+export class Container {
+  private static allContainers: Container[] = [];
+  private static nextContainerId = 0;
+
   private readonly container: HTMLElement;
+  public readonly elementsGroup: SVGGElement;
+
+  /* Model */
+  public readonly id: number;
   private readonly _focus: Focus;
   private _elements: Set<ElementView> = new Set<ElementView>();
   private _callBacks: Map<Callback, Function[]> = new Map<Callback, Function[]>();
@@ -245,8 +254,6 @@ export class TSVG {
   public readonly idPrefix: string;
   public readonly ownerId: string;
   private elementIndex: number;
-
-  public readonly elementsGroup: SVGGElement;
 
   /* tools */
   public readonly selectTool: SelectTool;
@@ -262,6 +269,7 @@ export class TSVG {
   public activeTool: Tool;
 
   public clipboard: Clipboard = new Clipboard();
+  /* Model */
 
   public constructor(containerId: string, ownerId: string, idPrefix: string = "", elementIndex: number = 0) {
     this.idPrefix = idPrefix;
@@ -307,23 +315,27 @@ export class TSVG {
     this.container.appendChild(this.editTool.SVG); /* editing nodes */
     this.container.appendChild(this._focus.SVG); /* bounding box, grips, rotation and reference point */
     this.container.appendChild(this.pointerTool.SVG); /* pointer image */
+
+    this.id = Container.nextContainerId
+    Container.allContainers[Container.nextContainerId] = this;
+    Container.nextContainerId++;
+  }
+
+  public static getById(id: number): Container {
+    return Container.allContainers[id];
   }
 
   public get nextElementIndex(): number {
     return this.elementIndex++;
   }
-  public getElementsByOwnerId(ownerId: string): ElementView[] {
-    let elements: ElementView[] = [];
-    this._elements.forEach((element: ElementView) => {
-      if (element.ownerId === ownerId) {
-        elements.push(element);
-      }
-    });
-    return elements;
-  }
-  public getElementById(ownerId: string, index: number): ElementView | undefined {
+  /*
+    @param deep for searching also in group
+  * */
+  public getElementById(ownerId: string, index: number, deep: boolean = false): ElementView | undefined {
     for (let element of this._elements) {
-      if (element.ownerId === ownerId && element.index === index) {
+      if (deep && element instanceof GroupView) {
+        return element.getElementById(ownerId, index);
+      } else if (element.ownerId === ownerId && element.index === index) {
         return element;
       }
     }
@@ -355,10 +367,7 @@ export class TSVG {
       return;
 
     if (this.editTool.isOn()) {
-      this.editTool.removeEditableElement();
-      if (element instanceof PointedView || element instanceof ForeignObjectView) {
-        this.editTool.editableElement = element;
-      }
+      this.editTool.editableElement = element;
     } else {
       if (element.group) /* if element has grouped, then select group */
         element = element.group;
@@ -395,8 +404,9 @@ export class TSVG {
     element.group = null;
     this.elementsGroup.appendChild(element.SVG);
     this._elements.add(element);
-    if(setElementActivity)
+    if(setElementActivity) {
       this.setElementActivity(element);
+    }
   }
   public remove(element: ElementView, force: boolean = false, call: boolean = true) {
     if (force || this.selectTool.isOn()) { /* if force don't check if select tool is on */
@@ -404,7 +414,7 @@ export class TSVG {
       element.remove();
 
       if (call) {
-        this.call(Callback.ELEMENT_DELETED, {elements: new Set<ElementView>([element])});
+        this.call(Callback.ELEMENTS_DELETED, {elements: new Set<ElementView>([element])});
       }
     }
   }

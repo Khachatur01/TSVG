@@ -1,98 +1,91 @@
 import {Point} from "../../../model/Point";
-import {Size} from "../../../model/Size";
 import {Rect} from "../../../model/Rect";
-import {PathView} from "./PathView";
+import {PathView} from "../PathView";
 import {Path} from "../../../model/path/Path";
 import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
 import {ShapeView} from "../../type/ShapeView";
+import {Matrix} from "../../../service/math/Matrix";
+import {ElementView} from "../../ElementView";
 
 export abstract class PointedView extends ShapeView {
+  /* Model */
+  protected _points: Point[] = [];
   protected _lastPoints: Point[] = [];
+  /* Model */
 
-  public set points(points: Point[]) {};
+  public override get points(): Point[] {
+    return this._points;
+  };
+  public override set points(points: Point[]) {
+    this._points = points;
 
-  public abstract getPoint(index: number): Point;
-  public abstract pushPoint(point: Point): void;
-  public abstract removePoint(index: number): void;
-  public abstract replacePoint(index: number, point: Point): void;
+    this._rect = ElementView.calculateRect(points);
+
+    this.updateView();
+  };
+  public getPoint(index: number): Point {
+    if (index < 0)
+      index = this._points.length + index;
+    return this._points[index];
+  };
+  public pushPoint(point: Point): void {
+    this._points.push(point);
+    this._rect = this.calculateRectByNewPoint(point);
+    this.updateView();
+  };
+  public removePoint(index: number): void {
+    if (index < 0)
+      index = this._points.length + index;
+    this._points.splice(index, 1);
+
+    this._rect = ElementView.calculateRect(this._points);
+
+    this.updateView();
+  };
+  public replacePoint(index: number, point: Point): void {
+    if (index < 0)
+      index = this._points.length + index;
+
+    this._points[index] = point;
+    this._rect = ElementView.calculateRect(this._points);
+    this.updateView();
+  };
   public override fixRect() {
     super.fixRect();
-    this.fixPoints();
-  }
-  public override fixPosition() {
-    super.fixPosition();
-    this.fixPoints();
-  }
-  public fixPoints() {
-    this._lastPoints = this.points.slice();
+    this._lastPoints = [];
+    this._points.forEach((point: Point) => {
+      this._lastPoints.push(Object.assign({}, point));
+    });
   }
 
-  public get position(): Point {
-    let points = this.points;
-    let leftTop: Point = points[0];
-
-    for (let i = 1; i < points.length; i++) {
-      if (points[i].x < leftTop.x)
-        leftTop.x = points[i].x;
-      if (points[i].y < leftTop.y)
-        leftTop.y = points[i].y;
-    }
-    return leftTop;
-  }
-  public set position(delta: Point) {
-    let points = this.points;
-
-    for (let i = 0; i < points.length; i++) {
+  public override drag(delta: Point) {
+    for (let i = 0; i < this._points.length; i++) {
       if (!this._lastPoints[i])
-        this._lastPoints[i] = {x: points[i].x, y: points[i].y};
+        this._lastPoints[i] = {x: this._points[i].x, y: this._points[i].y};
 
-      points[i].x = (delta.x + this._lastPoints[i].x);
-      points[i].y = (delta.y + this._lastPoints[i].y);
+      this._points[i].x = (delta.x + this._lastPoints[i].x);
+      this._points[i].y = (delta.y + this._lastPoints[i].y);
     }
 
-    this.points = points;
+    this._rect = ElementView.calculateRect(this._points);
+
+    this.updateView();
   }
   public override correct(refPoint: Point, lastRefPoint: Point) {
     let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
 
-    let points = this.points;
+    for (let i = 0; i < this._points.length; i++) {
+      this._lastPoints[i] = {x: this._points[i].x, y: this._points[i].y};
 
-    for (let i = 0; i < points.length; i++) {
-      this._lastPoints[i] = {x: points[i].x, y: points[i].y};
-
-      points[i].x = (delta.x + this._lastPoints[i].x);
-      points[i].y = (delta.y + this._lastPoints[i].y);
+      this._points[i].x = (delta.x + this._lastPoints[i].x);
+      this._points[i].y = (delta.y + this._lastPoints[i].y);
     }
-
-    this.points = points;
+    this._rect = ElementView.calculateRect(this._points);
+    this.updateView();
   }
-
-  public get size(): Size {
-    let points = this.points
-    let maxX = points[0].x;
-    let maxY = points[0].y;
-    let minX = points[0].x;
-    let minY = points[0].y;
-
-    for (let i = 1; i < points.length; i++) {
-      if (points[i].x > maxX)
-        maxX = points[i].x;
-      if (points[i].y > maxY)
-        maxY = points[i].y;
-      if (points[i].x < minX)
-        minX = points[i].x;
-      if (points[i].y < minY)
-        minY = points[i].y;
-    }
-
-    return {
-      width: maxX - minX,
-      height: maxY - minY
-    };
-  }
-  public setSize(rect: Rect, delta: Point | null = null): void {
+  public override setRect(rect: Rect, delta?: Point): void {
     let dw = 1;
     let dh = 1;
 
@@ -100,41 +93,43 @@ export abstract class PointedView extends ShapeView {
       dw = delta.x;
       dh = delta.y;
     } else {
-      if (this._lastSize.width != 0)
-        dw = rect.width / this._lastSize.width;
-      if (this._lastSize.height != 0)
-        dh = rect.height / this._lastSize.height;
+      if (this._lastRect.width != 0)
+        dw = rect.width / this._lastRect.width;
+      if (this._lastRect.height != 0)
+        dh = rect.height / this._lastRect.height;
     }
 
-    let points = this.points;
-    for (let i = 0; i < points.length; i++) {
+    for (let i = 0; i < this._points.length; i++) {
       /* points may not be fixed, and this._lastPoints[i] may be undefined */
       if (!this._lastPoints[i]) this._lastPoints[i] = {x: 0, y: 0};
 
-      points[i].x = rect.x + Math.abs(this._lastPoints[i].x - rect.x) * dw;
-      points[i].y = rect.y + Math.abs(this._lastPoints[i].y - rect.y) * dh;
+      this._points[i].x = rect.x + Math.abs(this._lastPoints[i].x - rect.x) * dw;
+      this._points[i].y = rect.y + Math.abs(this._lastPoints[i].y - rect.y) * dh;
     }
 
-    this.points = points;
-  }
+    this._rect = ElementView.calculateRect(this._points);
 
-  public get boundingRect(): Rect {
-    let points = this.points;
-    return this.calculateBoundingBox(points);
-  }
-  public get visibleBoundingRect(): Rect {
-    let points = this.visiblePoints;
-    return this.calculateBoundingBox(points);
+    this.updateView();
   }
 
   public override toPath(): PathView {
-    let rotatedPoints = this.visiblePoints;
+    let visiblePoints = this.visiblePoints;
     let path = new Path();
 
-    path.add(new MoveTo(rotatedPoints[0]));
-    for (let i = 1; i < rotatedPoints.length; i++)
-      path.add(new LineTo(rotatedPoints[i]));
+    path.add(new MoveTo(visiblePoints[0]));
+    for (let i = 1; i < visiblePoints.length; i++)
+      path.add(new LineTo(visiblePoints[i]));
 
     return new PathView(this._container, path);
   }
+
+  public override toJSON(): any {
+    let json = super.toJSON();
+    json["points"] = this._points;
+    return json;
+  }
+  public override fromJSON(json: any) {
+    super.fromJSON(json);
+    this.points = json.points;
+  };
 }

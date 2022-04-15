@@ -2,8 +2,8 @@ import {PathCommand} from "../PathCommand";
 import {Point} from "../../Point";
 
 export class LineTo extends PathCommand {
-  public get command(): string {
-    return "L " + this._point.x + " " + this._point.y;
+  public get string(): string {
+    return "L " + this._point.x + " " + this._point.y + (this.close ? " Z" : "");
   }
 
   public override get position(): Point {

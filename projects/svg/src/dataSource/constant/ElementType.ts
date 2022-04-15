@@ -1,5 +1,6 @@
 export enum ElementType {
   ELLIPSE,
+  CIRCLE,
   BOX,
   PATH,
   LINE,

@@ -1,7 +1,7 @@
 import {Tool} from "../Tool";
-import {TSVG} from "../../../TSVG";
+import {Container} from "../../../Container";
 import {Callback} from "../../../dataSource/constant/Callback";
-import {PathView} from "../../../element/shape/pointed/PathView";
+import {PathView} from "../../../element/shape/PathView";
 import {Path} from "../../../model/path/Path";
 import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
@@ -13,15 +13,17 @@ export class HighlightTool extends Tool {
   private _timeout: number = 3000;
   private _color: string = "#7efca0AA";
   private _width: string = "20";
-  private path: PathView | null = null;
+  private path: PathView;
   private group: SVGGElement;
 
-  private _start = this.start.bind(this);
-  private _highlight = this.highlight.bind(this);
-  private _end = this.end.bind(this);
+  private _highlightStart = this.highlightStart.bind(this);
+  private _highlightMove = this.highlightMove.bind(this);
+  private _highlightEnd = this.highlightEnd.bind(this);
 
-  public constructor(container: TSVG, group?: SVGGElement) {
+  public constructor(container: Container, group?: SVGGElement) {
     super(container);
+
+    this.path = new PathView(container);
 
     if (group) {
       this.group = group;
@@ -53,7 +55,7 @@ export class HighlightTool extends Tool {
     this.group.appendChild(this.path.SVG);
 
     if (call) {
-      this._container.call(Callback.HIGHLIGHT_START, {position: position, element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
+      this._container.call(Callback.HIGHLIGHT_MOUSE_DOWN, {position: position, element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true, path?: string) {
@@ -66,7 +68,7 @@ export class HighlightTool extends Tool {
     }
 
     if (call) {
-      this._container.call(Callback.HIGHLIGHT, {position: position, element: this.path});
+      this._container.call(Callback.HIGHLIGHT_MOUSE_MOVE, {position: position, element: this.path});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true, path?: string) {
@@ -82,14 +84,36 @@ export class HighlightTool extends Tool {
     }
 
     let pathView = this.path;
-
     setTimeout(() => {
       if (pathView) this.group.removeChild(pathView.SVG)
     }, this._timeout);
 
     if (call) {
-      this._container.call(Callback.HIGHLIGHT_END, {position: position, element: this.path});
+      this._container.call(Callback.HIGHLIGHT_MOUSE_UP, {position: position, element: this.path});
+      this._container.call(Callback.HIGHLIGHTED, {element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
     }
+  }
+  public highlight(path: Path | string) {
+    this.path = new PathView(this._container);
+    this.path.removeOverEvent();
+
+    if (path instanceof Path) {
+      this.path.path = path;
+    } else {
+      this.path.setAttr({d: path});
+    }
+
+    this.path.style.strokeWidth = this._width;
+    this.path.style.strokeColor = this._color;
+    this.path.style.fillColor = "none";
+    this.path.SVG.style.pointerEvents = "none";
+
+    this.group.appendChild(this.path.SVG);
+
+    let pathView = this.path;
+    setTimeout(() => {
+      if (pathView) this.group.removeChild(pathView.SVG)
+    }, this._timeout);
   }
 
   public set timeout(milliseconds: number) {
@@ -109,14 +133,14 @@ export class HighlightTool extends Tool {
     this.group = group;
   }
 
-  private start(event: MouseEvent | TouchEvent): void {
-    this._container.HTML.addEventListener("mousemove", this._highlight);
-    this._container.HTML.addEventListener("touchmove", this._highlight);
-    document.addEventListener("mouseup", this._end);
-    document.addEventListener("touchend", this._end);
+  private highlightStart(event: MouseEvent | TouchEvent): void {
+    this._container.HTML.addEventListener("mousemove", this._highlightMove);
+    this._container.HTML.addEventListener("touchmove", this._highlightMove);
+    document.addEventListener("mouseup", this._highlightEnd);
+    document.addEventListener("touchend", this._highlightEnd);
 
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let startPosition = {
@@ -126,9 +150,9 @@ export class HighlightTool extends Tool {
 
     this.makeMouseDown(startPosition);
   }
-  private highlight(event: MouseEvent | TouchEvent): void {
+  private highlightMove(event: MouseEvent | TouchEvent): void {
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let movePosition = {
@@ -138,14 +162,14 @@ export class HighlightTool extends Tool {
 
     this.makeMouseMove(movePosition);
   }
-  private end(event: MouseEvent | TouchEvent): void {
-    this._container.HTML.removeEventListener("mousemove", this._highlight);
-    this._container.HTML.removeEventListener("touchmove", this._highlight);
-    document.removeEventListener("mouseup", this._end);
-    document.removeEventListener("touchend", this._end);
+  private highlightEnd(event: MouseEvent | TouchEvent): void {
+    this._container.HTML.removeEventListener("mousemove", this._highlightMove);
+    this._container.HTML.removeEventListener("touchmove", this._highlightMove);
+    document.removeEventListener("mouseup", this._highlightEnd);
+    document.removeEventListener("touchend", this._highlightEnd);
 
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let position = {
@@ -156,8 +180,8 @@ export class HighlightTool extends Tool {
   }
 
   protected _on(call: boolean = true): void {
-    this._container.HTML.addEventListener("mousedown", this._start);
-    this._container.HTML.addEventListener("touchstart", this._start);
+    this._container.HTML.addEventListener("mousedown", this._highlightStart);
+    this._container.HTML.addEventListener("touchstart", this._highlightStart);
     this._isOn = true;
     this._container.blur();
 
@@ -167,8 +191,8 @@ export class HighlightTool extends Tool {
     }
   }
   public off(call: boolean = true): void {
-    this._container.HTML.removeEventListener("mousedown", this._start);
-    this._container.HTML.removeEventListener("touchstart", this._start);
+    this._container.HTML.removeEventListener("mousedown", this._highlightStart);
+    this._container.HTML.removeEventListener("touchstart", this._highlightStart);
     this._isOn = false;
 
     if (call) {

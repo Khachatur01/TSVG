@@ -11,11 +11,11 @@ export class CBezier extends PathCommand {
     this._cPoint1 = cPoint1;
   }
 
-  public get command(): string {
+  public get string(): string {
     return "C " +
       this._cPoint0.x + " " + this._cPoint0.y + ", " +
       this._cPoint1.x + " " + this._cPoint1.y + ", " +
-      this._point.x + " " + this._point.y;
+      this._point.x + " " + this._point.y + (this.close ? " Z" : "");
   }
 
   public get cPoint0(): Point {

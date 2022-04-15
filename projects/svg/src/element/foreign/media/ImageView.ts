@@ -1,9 +1,9 @@
 import {ElementCursor, ElementView} from "../../ElementView";
-import {PathView} from "../../shape/pointed/PathView";
+import {PathView} from "../../shape/PathView";
 import {Size} from "../../../model/Size";
 import {Rect} from "../../../model/Rect";
 import {Point} from "../../../model/Point";
-import {TSVG} from "../../../TSVG";
+import {Container} from "../../../Container";
 import {ForeignView} from "../../type/ForeignView";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../dataSource/constant/ElementType";
@@ -17,22 +17,24 @@ export class ImageCursor extends ElementCursor {
 }
 
 export class ImageView extends ForeignView implements MoveDrawable {
-  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, ownerId?: string, index?: number) {
+  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "image");
+  protected override _type: ElementType = ElementType.IMAGE;
+
+  /* Model */
+  private _src: string = "";
+  /* Model */
+
+  public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, src: string, ownerId?: string, index?: number) {
     super(container, ownerId, index);
-    this.svgElement = document.createElementNS(ElementView.svgURI, "image");
-    this._type = ElementType.IMAGE;
     this.svgElement.id = this.id;
 
     this.svgElement.ondragstart = function () {
       return false;
     }
 
-    this.position = position;
+    this.setRect(rect);
+    this.src = src;
 
-    this.setSize({
-      x: position.x, y: position.y,
-      width: size.width, height: size.height
-    });
     this.setOverEvent();
 
     this.setAttr({
@@ -40,19 +42,17 @@ export class ImageView extends ForeignView implements MoveDrawable {
     });
   }
 
-  public get copy(): ImageView {
-    let position = this.position;
-    let size = this.size;
-
-    let image: ImageView = new ImageView(this._container);
-    image.src = this.src;
-    image.position = position;
-    image.setSize({
-      x: position.x,
-      y: position.y,
-      width: size.width,
-      height: size.height
+  protected updateView(): void {
+    this.setAttr({
+      x: this._rect.x + "",
+      y: this._rect.y + "",
+      width: this._rect.width + "",
+      height: this._rect.height + ""
     });
+
+  }
+  public get copy(): ImageView {
+    let image: ImageView = new ImageView(this._container, this._rect, this._src);
 
     image.refPoint = Object.assign({}, this.refPoint);
     image.rotate(this._angle);
@@ -61,29 +61,20 @@ export class ImageView extends ForeignView implements MoveDrawable {
 
     return image;
   }
-
-  public get position(): Point {
-    return {
-      x: parseInt(this.getAttr("x")),
-      y: parseInt(this.getAttr("y"))
-    };
-  }
-  public set position(delta: Point) {
-    this.setAttr({
-      x: this._lastPosition.x + delta.x,
-      y: this._lastPosition.y + delta.y
-    });
+  public drag(delta: Point): void {
+    this._rect.x = this._lastRect.x + delta.x;
+    this._rect.y = this._lastRect.y + delta.y;
+    this.updateView();
   }
 
   public override correct(refPoint: Point, lastRefPoint: Point) {
     let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
-    let position = this.position;
 
-    this.setAttr({
-      x: position.x + delta.x,
-      y: position.y + delta.y
-    });
+    this._rect.x = this._rect.x + delta.x;
+    this._rect.y = this._rect.y + delta.y;
+
+    this.updateView();
   }
 
   public get size(): Size {
@@ -93,9 +84,9 @@ export class ImageView extends ForeignView implements MoveDrawable {
     };
   }
   public drawSize(rect: Rect) {
-    this.setSize(rect);
+    this.setRect(rect);
   }
-  public setSize(rect: Rect): void {
+  public setRect(rect: Rect): void {
     if (rect.width < 0) {
       rect.width = -rect.width;
       rect.x -= rect.width;
@@ -105,28 +96,16 @@ export class ImageView extends ForeignView implements MoveDrawable {
       rect.y -= rect.height;
     }
 
-    this.setAttr({
-      x: rect.x + "",
-      y: rect.y + "",
-      width: rect.width + "",
-      height: rect.height + ""
-    });
-  }
-
-  public get boundingRect(): Rect {
-    let points = this.points;
-    return this.calculateBoundingBox(points);
-  }
-  public get visibleBoundingRect(): Rect {
-    let points = this.visiblePoints;
-    return this.calculateBoundingBox(points);
+    this._rect = rect;
+    this.updateView();
   }
 
   public get src(): string {
-    return this.getAttr("href");
+    return this._src;
   }
   public set src(URI: string) {
     this.setAttr({href: URI});
+    this._src = URI;
   }
 
   public isComplete(): boolean {
@@ -137,4 +116,15 @@ export class ImageView extends ForeignView implements MoveDrawable {
   public toPath(): PathView {
     return new PathView(this._container);
   }
+
+  public override toJSON(): any {
+    let json = super.toJSON();
+    json["src"] = this._src;
+    json["content"] = undefined;
+    return json;
+  }
+  public override fromJSON(json: any) {
+    super.fromJSON(json);
+    this.src = json.src;
+  };
 }

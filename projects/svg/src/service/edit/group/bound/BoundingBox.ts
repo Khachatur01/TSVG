@@ -9,7 +9,7 @@ import {SGrip} from "./grip/resize/side/SGrip";
 import {SWGrip} from "./grip/resize/corner/SWGrip";
 import {WGrip} from "./grip/resize/side/WGrip";
 import {Point} from "../../../../model/Point";
-import {TSVG} from "../../../../TSVG";
+import {Container} from "../../../../Container";
 import {RefPoint} from "./grip/reference/RefPoint";
 import {RotatePoint} from "./grip/rotate/RotatePoint";
 import {ElementView} from "../../../../element/ElementView";
@@ -26,15 +26,9 @@ export class BoundingBox extends BoxView {
   private readonly _boundingBoxGroup: SVGGElement;
   private readonly _refPointGroup: SVGGElement;
   private readonly focus: Focus;
-  private _boundingRect: Rect = {
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0
-  };
 
-  public constructor(container: TSVG, focus: Focus, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}) {
-    super(container, position, size);
+  public constructor(container: Container, focus: Focus, rect: Rect = {x: 0, y: 0, width: 0, height: 0}) {
+    super(container, rect);
     this.style.fillColor = "transparent";
     this.style.strokeColor = "#002fff";
     this.style.strokeWidth = "1";
@@ -89,16 +83,29 @@ export class BoundingBox extends BoxView {
     this.referencePoint.fixPosition();
   }
   public set lastRefPoint(refPoint: Point) {
-    this.referencePoint.lastRefPoint = refPoint;
+    this.referencePoint.lastPosition = refPoint;
   }
   public get lastRefPoint(): Point {
-    return this.referencePoint.lastRefPoint;
+    return this.referencePoint.lastPosition;
   }
 
   public singleFocus(rotatable: boolean = true) {
     this.svgElement.style.display = "block";
     for (let grip of this._grips)
       grip.show();
+
+    if (rotatable) {
+      this.referencePoint.show();
+      this.rotatePoint.show();
+    } else {
+      this.referencePoint.hide();
+      this.rotatePoint.hide();
+    }
+  }
+  public onlyCircleFocus(rotatable: boolean = true) {
+    this.svgElement.style.display = "block";
+    for (let i = 0; i < this._grips.length; i += 2)
+      this._grips[i].show();
 
     if (rotatable) {
       this.referencePoint.show();
@@ -128,7 +135,10 @@ export class BoundingBox extends BoxView {
       this.rotatePoint.hide();
     }
   }
+
+
   public blur() {
+    this.rotate(0);
     this.svgElement.style.display = "none";
     for (let grip of this._grips)
       grip.hide();
@@ -137,54 +147,27 @@ export class BoundingBox extends BoxView {
     this.rotatePoint.hide();
   }
 
-  public override get boundingRect(): Rect {
-    return this._boundingRect;
-  }
-  public override set boundingRect(value: Rect) {
-    this._boundingRect = value;
+  public override get points(): Point[] {
+    return super.points;
   }
 
   public positionGrips() {
-    let points: Point[] = this.points;
-    let rect = this._boundingRect;
+    this._rect.width = Math.abs(this._rect.width);
+    this._rect.height = Math.abs(this._rect.height);
 
-    rect.width = Math.abs(rect.width);
-    rect.height = Math.abs(rect.height);
-
-    points[0].x = rect.x;
-    points[0].y = rect.y;
-
-    points[1].x = rect.x + rect.width;
-    points[1].y = rect.y;
-
-    points[2].x = rect.x + rect.width;
-    points[2].y = rect.y + rect.height;
-
-    points[3].x = rect.x;
-    points[3].y = rect.y + rect.height;
-
-    if (!points || !this._grips) return
+    let points = this.points;
+    if (/*!points || */!this._grips) return
     for (let grip of this._grips)
       grip.setPosition(points);
 
-    this.rotatePoint.position = {
+    this.rotatePoint.setPosition({
       x: (points[0].x + points[1].x) / 2,
       y: (points[0].y + points[1].y) / 2,
-    }
+    });
   }
 
   public correctByDelta(delta: Point) {
-    this.position = delta;
-    let position = this.position;
-    let size = this.size;
-
-    this._boundingRect = {
-      x: position.x,
-      y: position.y,
-      width: size.width,
-      height: size.height
-    }
-
+    this.drag(delta);
     this.positionGrips();
   }
 
@@ -202,7 +185,7 @@ export class BoundingBox extends BoxView {
   }
 
   public set refPointView(refPoint: Point) {
-    this.referencePoint.position = refPoint;
+    this.referencePoint.setPosition(refPoint);
     this._refPointGroup.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
   }
 

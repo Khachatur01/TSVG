@@ -1,13 +1,13 @@
-import {MoveDraw} from "../../../../mode/MoveDraw";
-import {ElementView} from "../../../../../../../element/ElementView";
-import {Point} from "../../../../../../../model/Point";
-import {IsoscelesTriangleView} from "../../../../../../../element/shape/pointed/polygon/triangle/IsoscelesTriangleView";
-import {Callback} from "../../../../../../../dataSource/constant/Callback";
-import {ElementType} from "../../../../../../../dataSource/constant/ElementType";
+import {MoveDraw} from "../../../../../mode/MoveDraw";
+import {ElementView} from "../../../../../../../../element/ElementView";
+import {Point} from "../../../../../../../../model/Point";
+import {IsoscelesTriangleView} from "../../../../../../../../element/shape/pointed/polygon/triangle/IsoscelesTriangleView";
+import {Callback} from "../../../../../../../../dataSource/constant/Callback";
+import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
 
 export class DrawIsoscelesTriangle extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
-    return new IsoscelesTriangleView(this.container);
+    return new IsoscelesTriangleView(this.container, {x: 0, y: 0, width: 0, height: 0});
   }
 
   public override start(call: boolean = true) {

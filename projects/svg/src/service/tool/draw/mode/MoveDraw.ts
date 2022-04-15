@@ -1,13 +1,14 @@
 import {Drawer} from "../Drawer";
 import {ElementView} from "../../../../element/ElementView";
-import {TSVG} from "../../../../TSVG";
+import {Container} from "../../../../Container";
 import {Point} from "../../../../model/Point";
 import {MoveDrawable} from "../type/MoveDrawable";
 import {Callback} from "../../../../dataSource/constant/Callback";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
+import {DrawTool} from "../DrawTool";
 
 export abstract class MoveDraw extends Drawer {
-  protected container: TSVG;
+  protected container: Container;
   protected startPos: Point = {x: 0, y: 0};
 
   private _drawStart = this.drawStart.bind(this);
@@ -16,7 +17,7 @@ export abstract class MoveDraw extends Drawer {
 
   protected _drawableElement: ElementView | null = null;
 
-  public constructor(container: TSVG) {
+  public constructor(container: Container) {
     super();
     this.container = container;
   }
@@ -81,13 +82,17 @@ export abstract class MoveDraw extends Drawer {
     if (this._drawableElement.isComplete()) {
       this._drawableElement.refPoint = this._drawableElement.center;
 
-      if (this.drawTool?.turnOnSelectToolOnDrawEnd) {
+      if (this.drawTool?.toolAfterDrawing) {
         this.container.blur();
         this.container.focused.lastRefPoint = this._drawableElement.refPoint;
 
         this.container.focus(this._drawableElement);
         this.container.focused.fixRect();
-        this.container.selectTool.on();
+
+        if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
+          this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
+        }
+        this.drawTool.toolAfterDrawing.on();
       }
     } else {
       this.onIsNotComplete(call);
@@ -95,10 +100,10 @@ export abstract class MoveDraw extends Drawer {
 
     this.onEnd(call);
     this.container.drawTool.drawingEnd();
-    this._drawableElement = null;
 
     if (call) {
       this.container.call(Callback.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
+      this.container.call(Callback.ELEMENT_CREATED, {element: this._drawableElement});
     }
   }
 
@@ -115,7 +120,7 @@ export abstract class MoveDraw extends Drawer {
     this.container.HTML.addEventListener('touchmove', this._draw);
     document.addEventListener('mouseup', this._drawEnd);
     document.addEventListener('touchend', this._drawEnd);
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let containerRect = this.container.HTML.getBoundingClientRect();
@@ -127,7 +132,7 @@ export abstract class MoveDraw extends Drawer {
   }
   protected draw(event: MouseEvent | TouchEvent) {
     if (!this._drawableElement) return;
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let containerRect = this.container.HTML.getBoundingClientRect();
@@ -142,7 +147,7 @@ export abstract class MoveDraw extends Drawer {
     this.container.HTML.removeEventListener('touchmove', this._draw);
     document.removeEventListener('mouseup', this._drawEnd);
     document.removeEventListener('touchend', this._drawEnd);
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     let containerRect = this.container.HTML.getBoundingClientRect();
@@ -158,6 +163,8 @@ export abstract class MoveDraw extends Drawer {
     if (this._drawableElement)
       this.container.remove(this._drawableElement);
   }
+
+  public override stopDrawing(call?: boolean) {}
 
   public start(call: boolean = true): void {
     this.container.HTML.addEventListener('mousedown', this._drawStart);

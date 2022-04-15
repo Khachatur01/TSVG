@@ -11,6 +11,7 @@ export abstract class Drawer {
   public abstract _new(): Drawer;
   public abstract start(call?: boolean): void;
   public abstract stop(call?: boolean): void;
+  public abstract stopDrawing(call?: boolean): void;
 
   public abstract makeMouseDown(position: Point, call?: boolean, parameter?: any): void;
   public abstract makeMouseMove(position: Point, call?: boolean, parameter?: any): void;

@@ -17,13 +17,13 @@ export class Arc extends PathCommand {
     this._sweep_flag = sweepFlag;
   }
 
-  public get command(): string {
+  public get string(): string {
     return "A " +
       this._rx + " " + this._ry + " " +
       this._x_axis_rotation + " " +
       this._large_arc_flag + " " +
       this._sweep_flag + " " +
-      this._point.x + " " + this._point.y;
+      this._point.x + " " + this._point.y + (this.close ? " Z" : "");
   }
 
   public get rx(): number {

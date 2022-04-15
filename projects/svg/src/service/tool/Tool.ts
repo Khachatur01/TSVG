@@ -1,11 +1,11 @@
-import {TSVG} from "../../TSVG";
+import {Container} from "../../Container";
 import {Point} from "../../model/Point";
 
 export abstract class Tool {
-  protected readonly _container: TSVG;
+  protected readonly _container: Container;
   protected _isOn: boolean = false;
 
-  protected constructor(container: TSVG) {
+  protected constructor(container: Container) {
     this._container = container;
   }
 

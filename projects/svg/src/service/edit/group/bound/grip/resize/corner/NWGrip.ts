@@ -6,10 +6,10 @@ import {Compass} from "../../../../../../../dataSource/constant/Compass";
 
 export class NWGrip extends Grip {
   public setPosition(points: Point[]) {
-    this.position = {
+    this.drag({
       x: points[0].x - this.halfSide,
       y: points[0].y - this.halfSide
-    }
+    });
   }
 
   public override makeMouseDown(client: Point, call: boolean = true): void {
@@ -28,7 +28,7 @@ export class NWGrip extends Grip {
     );
 
     if (call) {
-      this._container.call(Callback.RESIZE_START, {position: client, compass: Compass.NW, elements: this.focus.children});
+      this._container.call(Callback.RESIZE_MOUSE_DOWN, {position: client, compass: Compass.NW, elements: this.focus.children});
     }
   }
   public override makeMouseMove(client: Point, call: boolean = true): void {
@@ -64,17 +64,17 @@ export class NWGrip extends Grip {
       width: width,
       height: height
     };
-    this.focus.setSize(this._lastResize);
+    this.focus.setRect(this._lastResize);
 
     if (call) {
-      this._container.call(Callback.RESIZE, {position: client, compass: Compass.NW});
+      this._container.call(Callback.RESIZE_MOUSE_MOVE, {position: client, compass: Compass.NW});
     }
   }
   public override makeMouseUp(client: Point, call: boolean = true): void {
     super.makeMouseUp(client, call);
 
     if (call) {
-      this._container.call(Callback.RESIZE_END, {position: client, compass: Compass.NW});
+      this._container.call(Callback.RESIZE_MOUSE_UP, {position: client, compass: Compass.NW});
     }
   }
 }

@@ -9,31 +9,24 @@ import {SCBezier} from "./curve/bezier/cubic/SCBezier";
 import {QBezier} from "./curve/bezier/quadratic/QBezier";
 import {SQBezier} from "./curve/bezier/quadratic/SQBezier";
 import {Arc} from "./curve/arc/Arc";
-import {Close} from "./close/Close";
 
 export class Path {
   private commands: PathCommand[] = [];
 
   public get copy(): Path {
     let path: Path = new Path();
-    this.commands.forEach(
-      (command: PathCommand) => path.add(command.copy)
+    this.commands.forEach((command: PathCommand) =>
+      path.add(command.copy)
     );
     return path;
   }
 
   public get points(): Point[] {
     let points: Point[] = [];
-    for (let command of this.commands)
+    for (let command of this.commands) {
       points.push(command.position);
+    }
     return points;
-  }
-
-  public get pointedCommands(): PathCommand[] {
-    let commands: PathCommand[] = [];
-    for (let command of this.commands)
-      commands.push(command);
-    return commands;
   }
 
   public getAll(): PathCommand[] {
@@ -60,20 +53,18 @@ export class Path {
     this.commands.push(command);
   }
   public remove(index: number) {
-    let pointedCommands = this.pointedCommands;
     if (index < 0)
-      index = pointedCommands.length + index;
+      index = this.commands.length + index;
 
-    let command = pointedCommands[index];
+    let command = this.commands[index];
     this.commands = this.commands.splice(this.commands.indexOf(command), 1);
   }
 
   public replace(index: number, point: Point) {
-    let pointedCommands = this.pointedCommands;
     if (index < 0)
-      index = pointedCommands.length + index;
+      index = this.commands.length + index;
 
-    this.pointedCommands[index].position = point;
+    this.commands[index].position = point;
   }
   public replaceCommand(index: number, command: PathCommand) {
     if (index < 0)
@@ -85,7 +76,7 @@ export class Path {
   public toString(close: boolean = false): string {
     let result = "";
     for (let command of this.commands) {
-      result += command.command + " ";
+      result += command.string + " ";
     }
     if (close)
       return result + "Z";
@@ -203,8 +194,7 @@ export class Path {
 
         case "Z":
         case "z":
-          let close = new Close();
-          this.add(close);
+          this.commands[this.commands.length - 1].close = true;
           break;
       }
     }

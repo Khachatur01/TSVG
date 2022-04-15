@@ -1,4 +1,4 @@
-import {TSVG} from "../../TSVG";
+import {Container} from "../../Container";
 import {ElementView} from "../../element/ElementView";
 import {Point} from "../../model/Point";
 import {Path} from "../../model/path/Path";
@@ -7,7 +7,7 @@ import {LineTo} from "../../model/path/line/LineTo";
 import {Callback} from "../../dataSource/constant/Callback";
 
 export class Grid {
-  private readonly container: TSVG;
+  private readonly container: Container;
   private readonly _group: SVGGElement;
   private squareSide: number = 20; /* default */
   private strokeWidth: number = 1; /* default */
@@ -15,7 +15,7 @@ export class Grid {
   private _isGrid: boolean = false;
   private _isSnap: boolean = false;
 
-  public constructor(container: TSVG) {
+  public constructor(container: Container) {
     this.container = container;
     this._group = document.createElementNS(ElementView.svgURI, "g");
     this._group.id = "grid";

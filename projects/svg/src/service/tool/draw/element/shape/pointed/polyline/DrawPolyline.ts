@@ -1,9 +1,9 @@
-import {ClickDraw} from "../../../mode/ClickDraw";
-import {PolylineView} from "../../../../../../element/shape/pointed/polyline/PolylineView";
-import {PointedView} from "../../../../../../element/shape/pointed/PointedView";
-import {Point} from "../../../../../../model/Point";
-import {Callback} from "../../../../../../dataSource/constant/Callback";
-import {ElementType} from "../../../../../../dataSource/constant/ElementType";
+import {ClickDraw} from "../../../../mode/ClickDraw";
+import {PolylineView} from "../../../../../../../element/shape/pointed/polyline/PolylineView";
+import {PointedView} from "../../../../../../../element/shape/pointed/PointedView";
+import {Point} from "../../../../../../../model/Point";
+import {Callback} from "../../../../../../../dataSource/constant/Callback";
+import {ElementType} from "../../../../../../../dataSource/constant/ElementType";
 
 export class DrawPolyline extends ClickDraw {
   protected createDrawableElement(position: Point): PointedView {

@@ -1,14 +1,14 @@
 import {MoveDraw} from "../../../mode/MoveDraw";
 import {ElementView} from "../../../../../../element/ElementView";
-import {EllipseView} from "../../../../../../element/shape/EllipseView";
+import {EllipseView} from "../../../../../../element/shape/circluar/EllipseView";
 import {Point} from "../../../../../../model/Point";
 import {Callback} from "../../../../../../dataSource/constant/Callback";
 import {ElementType} from "../../../../../../dataSource/constant/ElementType";
 
 export class DrawEllipse extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
-    let element = new EllipseView(this.container, position);
-    element.fixPosition();
+    let element = new EllipseView(this.container, {x: position.x, y: position.y, width: 0, height: 0});
+    element.fixRect();
     return element;
   }
 
@@ -16,14 +16,14 @@ export class DrawEllipse extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.call(Callback.CIRCLE_TOOL_ON);
+      this.container.call(Callback.ELLIPSE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.call(Callback.CIRCLE_TOOL_OFF);
+      this.container.call(Callback.ELLIPSE_TOOL_OFF);
     }
   }
 

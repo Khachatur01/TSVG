@@ -1,4 +1,4 @@
-import {TSVG} from "../../../TSVG";
+import {Container} from "../../../Container";
 import {Point} from "../../../model/Point";
 import {ElementView} from "../../../element/ElementView";
 import {Tool} from "../Tool";
@@ -14,20 +14,17 @@ export class DragTool extends Tool {
   private _drag = this.drag.bind(this);
   private _dragEnd = this.dragEnd.bind(this);
 
-  constructor(container: TSVG, focus: Focus) {
+  constructor(container: Container, focus: Focus) {
     super(container);
     this.focus = focus;
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
     this.mouseStartPos = position;
-    this.focus.fixPosition();
+    this.focus.fixRect();
     this.focus.fixRefPoint();
     this.elementStartPos = this.focus.lastRect;
 
-    this.focus.children.forEach((child: ElementView) => {
-      child.fixRect();
-    });
     this.focus.highlight();
 
     if (call) {
@@ -35,28 +32,30 @@ export class DragTool extends Tool {
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
-    this.focus.translate = {
+    this.focus.translate({
       x: position.x - this.mouseStartPos.x,
       y: position.y - this.mouseStartPos.y
-    };
+    });
 
     if (call) {
       this._container.call(Callback.DRAG_MOUSE_MOVE, {position: position});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
-    this.focus.translate = {
+    this.focus.translate({
       x: 0,
       y: 0
-    };
-    this.focus.position = { /* delta */
+    });
+    let delta = {
       x: position.x - this.mouseStartPos.x,
       y: position.y - this.mouseStartPos.y
     };
+    this.focus.drag(delta);
     this.focus.lowlight();
 
     if (call) {
       this._container.call(Callback.DRAG_MOUSE_UP, {position: position});
+      this._container.call(Callback.NUDGE, {elements: this.focus.children, delta: delta});
     }
   }
 
@@ -67,12 +66,12 @@ export class DragTool extends Tool {
     document.addEventListener("mouseup", this._dragEnd);
     document.addEventListener("touchend", this._dragEnd);
 
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
     this.makeMouseDown(eventPosition);
   }
   private drag(event: MouseEvent | TouchEvent) {
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
     this.makeMouseMove(eventPosition);
   }
@@ -82,7 +81,7 @@ export class DragTool extends Tool {
     document.removeEventListener("mouseup", this._dragEnd);
     document.removeEventListener("touchend", this._dragEnd);
 
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
     this.makeMouseUp(eventPosition);
   }

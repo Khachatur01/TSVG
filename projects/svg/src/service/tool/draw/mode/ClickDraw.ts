@@ -1,20 +1,21 @@
 import {Drawer} from "../Drawer";
-import {TSVG} from "../../../../TSVG";
+import {Container} from "../../../../Container";
 import {PointedView} from "../../../../element/shape/pointed/PointedView";
 import {Point} from "../../../../model/Point";
 import {Angle} from "../../../math/Angle";
 import {Callback} from "../../../../dataSource/constant/Callback";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../../element/ElementView";
+import {DrawTool} from "../DrawTool";
 
 export abstract class ClickDraw extends Drawer {
-  protected container: TSVG;
+  protected container: Container;
   protected _drawableElement: PointedView | null = null;
 
   private _click = this.click.bind(this);
   private _move = this.move.bind(this);
 
-  public constructor(container: TSVG) {
+  public constructor(container: Container) {
     super();
     this.container = container;
   }
@@ -62,7 +63,7 @@ export abstract class ClickDraw extends Drawer {
     this.container.drawTool.drawing();
     let containerRect = this.container?.HTML.getBoundingClientRect();
 
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
 
     this.makeMouseDown({
@@ -74,12 +75,24 @@ export abstract class ClickDraw extends Drawer {
     let containerRect = this.container?.HTML.getBoundingClientRect();
     if (!containerRect) return;
 
-    let eventPosition = TSVG.eventToPosition(event);
+    let eventPosition = Container.eventToPosition(event);
     event.preventDefault();
     this.makeMouseMove({
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     });
+  }
+
+  public stopDrawing(call: boolean = true) {
+    if (this.drawTool?.toolAfterDrawing) {
+      if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
+        this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
+      }
+      this.drawTool.toolAfterDrawing.on();
+    }
+    if (call) {
+      this.container.call(Callback.STOP_CLICK_DRAWING);
+    }
   }
 
   public start(call: boolean = true): void {
@@ -99,18 +112,17 @@ export abstract class ClickDraw extends Drawer {
       this._drawableElement.removePoint(-1);
       this.container.drawTool.drawingEnd();
       this._drawableElement.refPoint = this._drawableElement.center;
+      this.container.blur();
+      this.container.focus(this._drawableElement);
+      this.container.focused.fixRect();
 
-      if (this.drawTool?.turnOnSelectToolOnDrawEnd) {
-        this.container.blur();
-        this.container.focus(this._drawableElement);
-        this.container.focused.fixRect();
-      }
     } else {
       this.container.remove(this._drawableElement);
     }
-    this._drawableElement = null;
     if (call) {
-      this.container.call(Callback.STOP_CLICK_DRAWING);
+      this.container.call(Callback.ELEMENT_CREATED, {element: this._drawableElement});
     }
+
+    this._drawableElement = null;
   }
 }

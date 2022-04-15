@@ -9,10 +9,10 @@ export class SCBezier extends PathCommand {
     this._cPoint1 = cPoint1;
   }
 
-  public get command(): string {
+  public get string(): string {
     return "S " +
       this._cPoint1.x + " " + this._cPoint1.y + ", " +
-      this._point.x + " " + this._point.y;
+      this._point.x + " " + this._point.y + (this.close ? " Z" : "");
   }
 
   public get cPoint1(): Point {

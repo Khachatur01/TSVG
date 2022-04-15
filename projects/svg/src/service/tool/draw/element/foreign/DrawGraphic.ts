@@ -19,12 +19,12 @@ export class DrawGraphic extends MoveDraw {
 
   protected override onIsNotComplete(call: boolean) {
     if (!this._drawableElement) return;
-    this._drawableElement.setSize({
+    this._drawableElement.setRect({
       x: this.startPos.x - 150,
       y: this.startPos.y - 100,
       width: 300,
       height: 200
-    }, null);
+    });
     this._drawableElement.refPoint = this._drawableElement.center;
   }
 

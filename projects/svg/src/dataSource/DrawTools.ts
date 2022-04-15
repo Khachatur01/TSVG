@@ -1,12 +1,12 @@
-import {DrawRectangle} from "../service/tool/draw/element/figure/shape/DrawRectangle";
-import {DrawLine} from "../service/tool/draw/element/figure/line/DrawLine";
-import {DrawPolyline} from "../service/tool/draw/element/figure/line/DrawPolyline";
-import {DrawEllipse} from "../service/tool/draw/element/figure/shape/DrawEllipse";
-import {DrawPolygon} from "../service/tool/draw/element/figure/shape/DrawPolygon";
+import {DrawRectangle} from "../service/tool/draw/element/shape/pointed/polygon/rectangle/DrawRectangle";
+import {DrawLine} from "../service/tool/draw/element/shape/pointed/DrawLine";
+import {DrawPolyline} from "../service/tool/draw/element/shape/pointed/polyline/DrawPolyline";
+import {DrawEllipse} from "../service/tool/draw/element/shape/circular/DrawEllipse";
+import {DrawPolygon} from "../service/tool/draw/element/shape/pointed/polygon/DrawPolygon";
 import {DrawFree} from "../service/tool/draw/mode/DrawFree";
-import {TSVG} from "../TSVG";
-import {DrawIsoscelesTriangle} from "../service/tool/draw/element/figure/shape/triangle/DrawIsoscelesTriangle";
-import {DrawRightTriangle} from "../service/tool/draw/element/figure/shape/triangle/DrawRightTriangle";
+import {Container} from "../Container";
+import {DrawIsoscelesTriangle} from "../service/tool/draw/element/shape/pointed/polygon/triangle/DrawIsoscelesTriangle";
+import {DrawRightTriangle} from "../service/tool/draw/element/shape/pointed/polygon/triangle/DrawRightTriangle";
 import {DrawTextBox} from "../service/tool/draw/element/foreign/DrawTextBox";
 import {DrawGraphic} from "../service/tool/draw/element/foreign/DrawGraphic";
 import {DrawVideo} from "../service/tool/draw/element/foreign/DrawVideo";
@@ -14,13 +14,15 @@ import {DrawImage} from "../service/tool/draw/element/foreign/DrawImage";
 import {DrawAsset} from "../service/tool/draw/element/foreign/DrawAsset";
 import {ElementType} from "./constant/ElementType";
 import {Drawer} from "../service/tool/draw/Drawer";
+import {DrawCircle} from "../service/tool/draw/element/shape/circular/DrawCircle";
 
 export class DrawTools {
-  private readonly container: TSVG;
+  private readonly container: Container;
   private readonly _free: DrawFree;
   private readonly _line: DrawLine;
   private readonly _polyline: DrawPolyline;
   private readonly _ellipse: DrawEllipse;
+  private readonly _circle: DrawCircle;
   private readonly _polygon: DrawPolygon;
   private readonly _rectangle: DrawRectangle;
   private readonly _isoscelesTriangle: DrawIsoscelesTriangle;
@@ -31,13 +33,14 @@ export class DrawTools {
   private readonly _asset: DrawAsset;
   private readonly _graphic: DrawGraphic;
 
-  public constructor(container: TSVG) {
+  public constructor(container: Container) {
     this.container = container;
 
     this._free = new DrawFree(container);
     this._line = new DrawLine(container);
     this._polyline = new DrawPolyline(container);
     this._ellipse = new DrawEllipse(container);
+    this._circle = new DrawCircle(container);
     this._polygon = new DrawPolygon(container);
     this._rectangle = new DrawRectangle(container);
     this._isoscelesTriangle = new DrawIsoscelesTriangle(container);
@@ -60,6 +63,9 @@ export class DrawTools {
   }
   public get ellipse(): DrawEllipse {
     return this._ellipse;
+  }
+  public get circle(): DrawCircle {
+    return this._circle;
   }
   public get polygon(): DrawPolygon {
     return this._polygon;
@@ -93,6 +99,8 @@ export class DrawTools {
     switch (type) {
       case ElementType.ELLIPSE:
         return this._ellipse;
+      case ElementType.CIRCLE:
+        return this._circle;
       // case ElementType.BOX:
       //   return this._box;
       // case ElementType.PATH:

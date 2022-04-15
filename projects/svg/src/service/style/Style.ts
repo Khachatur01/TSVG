@@ -14,7 +14,7 @@ export class Style {
   public get strokeColor(): string {
     let color = this.style.get("stroke");
     if (!color)
-      color = "#000";
+      color = "#000000";
 
     return color;
   }
@@ -103,4 +103,8 @@ export class Style {
       backgroundColor: this.backgroundColor
     }
   }
+  public toJSON(): any {
+    return this.object;
+  }
+
 }

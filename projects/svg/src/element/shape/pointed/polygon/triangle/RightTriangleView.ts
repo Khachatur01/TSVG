@@ -1,7 +1,6 @@
 import {TriangleView} from "./TriangleView";
-import {TSVG} from "../../../../../TSVG";
+import {Container} from "../../../../../Container";
 import {Rect} from "../../../../../model/Rect";
-import {Point} from "../../../../../model/Point";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
 import {ElementCursor} from "../../../../ElementView";
@@ -9,16 +8,14 @@ import {ElementCursor} from "../../../../ElementView";
 export class RightTriangleCursor extends ElementCursor {}
 
 export class RightTriangleView extends TriangleView implements MoveDrawable {
-  public constructor(container: TSVG, rect: Rect | null = null, ownerId?: string, index?: number) {
-    if (rect) {
-      let pointA: Point = {x: rect.x, y: rect.y};
-      let pointB: Point = {x: rect.x, y: rect.y + rect.width};
-      let pointC: Point = {x: rect.x, y: rect.y};
-      super(container, pointA, pointB, pointC, ownerId, index);
-    } else {
-      super(container, null, null, null, ownerId, index);
-    }
-    this._type = ElementType.RIGHT_TRIANGLE;
+  protected override _type: ElementType = ElementType.RIGHT_TRIANGLE;
+
+  public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+    super(container,
+      {x: rect.x, y: rect.y}, /* PointA */
+      {x: rect.x, y: rect.y + rect.width},  /* PointB */
+      {x: rect.x, y: rect.y},  /* PointC */
+      ownerId, index);
   }
 
   public override get copy(): RightTriangleView {
@@ -26,20 +23,21 @@ export class RightTriangleView extends TriangleView implements MoveDrawable {
   }
 
   public drawSize(rect: Rect) {
-    let points: Point[] = [];
-    points.push({ /* A */
+    this._points = [];
+    this._points.push({ /* A */
       x: rect.x,
       y: rect.y
     });
-    points.push({ /* B */
+    this._points.push({ /* B */
       x: rect.x,
       y: rect.y + rect.height
     });
-    points.push({ /* C */
+    this._points.push({ /* C */
       x: rect.x + rect.width,
       y: rect.y + rect.height
     });
+    this._rect = rect;
 
-    this.points = points;
+    this.updateView();
   }
 }

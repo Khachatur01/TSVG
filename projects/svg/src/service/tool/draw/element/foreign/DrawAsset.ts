@@ -9,19 +9,19 @@ export class DrawAsset extends MoveDraw {
   public content: HTMLDivElement = document.createElement("div");
 
   protected createDrawableElement(position: Point): ElementView {
-    let videoView = new ForeignObjectView(this.container, position);
+    let videoView = new ForeignObjectView(this.container, {x: position.x, y: position.y, width: 0, height: 0});
     videoView.setContent(this.content);
     return videoView;
   }
 
   protected override onIsNotComplete(call: boolean) {
     if (!this._drawableElement) return;
-    this._drawableElement.setSize({
+    this._drawableElement.setRect({
       x: this.startPos.x - 300,
       y: this.startPos.y - 100,
       width: 600,
       height: 200
-    }, null);
+    });
     this._drawableElement.refPoint = this._drawableElement?.center;
   }
   protected override onEnd(call: boolean) {

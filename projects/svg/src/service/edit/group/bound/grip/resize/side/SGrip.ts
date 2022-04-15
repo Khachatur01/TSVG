@@ -7,17 +7,17 @@ export class SGrip extends Grip {
   public setPosition(points: Point[]): void {
     let x = (points[3].x + points[2].x) / 2;
     let y = (points[3].y + points[2].y) / 2;
-    this.position = {
+    this.drag({
       x: x - this.halfSide,
       y: y - this.halfSide
-    }
+    });
   }
 
   public override makeMouseDown(client: Point, call: boolean = true): void {
     super.makeMouseDown(client, call);
 
     if (call) {
-      this._container.call(Callback.RESIZE_START, {position: client, compass: Compass.S, elements: this.focus.children});
+      this._container.call(Callback.RESIZE_MOUSE_DOWN, {position: client, compass: Compass.S, elements: this.focus.children});
     }
   }
   public override makeMouseMove(client: Point, call: boolean = true): void {
@@ -31,17 +31,17 @@ export class SGrip extends Grip {
       width: elementRect.width,
       height: height
     };
-    this.focus.setSize(this._lastResize);
+    this.focus.setRect(this._lastResize);
 
     if (call) {
-      this._container.call(Callback.RESIZE, {position: client, compass: Compass.S});
+      this._container.call(Callback.RESIZE_MOUSE_MOVE, {position: client, compass: Compass.S});
     }
   }
   public override makeMouseUp(client: Point, call: boolean = true): void {
     super.makeMouseUp(client, call);
 
     if (call) {
-      this._container.call(Callback.RESIZE_END, {position: client, compass: Compass.S});
+      this._container.call(Callback.RESIZE_MOUSE_UP, {position: client, compass: Compass.S});
     }
   }
 }

@@ -1,15 +1,12 @@
-import {Size} from "../../../model/Size";
 import {Rect} from "../../../model/Rect";
 import {Point} from "../../../model/Point";
 
 export interface Resizeable {
   get lastRect(): Rect;
 
-  get size(): Size;
+  getRect(): Rect;
 
-  setSize(rect: Rect, delta: Point | null): void;
+  setRect(rect: Rect, delta?: Point): void;
 
   fixRect(): void;
-
-  fixSize(): void;
 }

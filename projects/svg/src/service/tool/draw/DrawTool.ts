@@ -1,5 +1,5 @@
 import {Drawer} from "./Drawer";
-import {TSVG} from "../../../TSVG";
+import {Container} from "../../../Container";
 import {Tool} from "../Tool";
 import {Point} from "../../../model/Point";
 import {ElementType} from "../../../dataSource/constant/ElementType";
@@ -8,12 +8,13 @@ import {ElementView} from "../../../element/ElementView";
 export class DrawTool extends Tool {
   private _drawer: Drawer;
   private _isDrawing: boolean = false;
-  public turnOnSelectToolOnDrawEnd: boolean = true;
+  public toolAfterDrawing: Tool | null;
   public perfect: boolean = false;
 
-  public constructor(container: TSVG) {
+  public constructor(container: Container) {
     super(container);
     this._drawer = container.drawTools.free; /* set default drawer */
+    this.toolAfterDrawing = this;
   }
 
   public makeMouseDown(position: Point, call: boolean = true, parameter?: any) {
@@ -54,6 +55,9 @@ export class DrawTool extends Tool {
   }
   public drawingEnd() {
     this._isDrawing = false;
+  }
+  public stopDrawing(call: boolean = true) { /* for click drawing */
+    this._drawer.stopDrawing(call);
   }
 
   public get type(): ElementType | undefined {

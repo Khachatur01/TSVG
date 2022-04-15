@@ -7,19 +7,19 @@ import {ElementType} from "../../../../../dataSource/constant/ElementType";
 
 export class DrawTextBox extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
-    let textBox = new TextBoxView(this.container, position);
-    textBox.onFocus();
+    let textBox = new TextBoxView(this.container, {x: position.x, y: position.y, width: 0, height: 0});
+    textBox.onFocus(true);
     return textBox;
   }
 
   protected override onIsNotComplete(call: boolean) {
     if (!this._drawableElement) return;
-    this._drawableElement.setSize({
+    this._drawableElement.setRect({
       x: this.startPos.x,
       y: this.startPos.y,
       width: 200,
       height: 100
-    }, null);
+    });
     this._drawableElement.refPoint = this._drawableElement?.center;
   }
   protected override onEnd(call: boolean) {
@@ -30,7 +30,7 @@ export class DrawTextBox extends MoveDraw {
         this.container.editTool.editableElement = this._drawableElement as TextBoxView;
         let textBox = (this._drawableElement as TextBoxView);
         textBox.content?.focus();
-        textBox.onFocus();
+        textBox.onFocus(true);
       }
     }
   }

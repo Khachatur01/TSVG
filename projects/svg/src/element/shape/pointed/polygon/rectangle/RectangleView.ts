@@ -1,11 +1,9 @@
-import {Size} from "../../../../../model/Size";
 import {PolygonView} from "../PolygonView";
 import {Rect} from "../../../../../model/Rect";
-import {Point} from "../../../../../model/Point";
-import {TSVG} from "../../../../../TSVG";
+import {Container} from "../../../../../Container";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {ElementCursor} from "../../../../ElementView";
+import {ElementCursor, ElementView} from "../../../../ElementView";
 
 export class RectangleCursor extends ElementCursor {}
 
@@ -16,56 +14,48 @@ export class RectangleCursor extends ElementCursor {}
 * */
 
 export class RectangleView extends PolygonView implements MoveDrawable {
-  public constructor(container: TSVG, position: Point = {x: 0, y: 0}, size: Size = {width: 0, height: 0}, ownerId?: string, index?: number) {
+  protected override _type: ElementType = ElementType.RECTANGLE;
+
+  public constructor(container: Container, rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, [
       /* 0 */                                                                                        /* 1 */
-      {x: position.x, y: position.y},                            {x: size.width + position.x, y: position.y},
-      {x: size.width + position.x, y: size.height + position.y}, {x: position.x, y: size.height + position.y}
+      {x: rect.x, y: rect.y},                            {x: rect.width + rect.x, y: rect.y},
+      {x: rect.width + rect.x, y: rect.height + rect.y}, {x: rect.x, y: rect.height + rect.y}
       /* 2 */                                                                                        /* 3 */
     ], ownerId, index);
 
     this.setOverEvent();
     this.style.setDefaultStyle();
-    this._type = ElementType.RECTANGLE;
   }
 
   public override get copy(): RectangleView {
     return super.copy as RectangleView;
   }
 
-  public override get size(): Size {
-    return super.size;
-  }
-
-  /*
-      This function sets size on drawing.
-      Elements, which draw by moving,
-      that elements must set size different on drawing
-  */
   public drawSize(rect: Rect) {
-    let points: Point[] = [];
-    points.push({ /* 0 */
+    this._points = [];
+    this._points.push({ /* 0 */
       x: rect.x,
       y: rect.y
     });
-    points.push({ /* 1 */
+    this._points.push({ /* 1 */
       x: rect.x + rect.width,
       y: rect.y
     });
-    points.push({ /* 2 */
+    this._points.push({ /* 2 */
       x: rect.x + rect.width,
       y: rect.y + rect.height
     });
-    points.push({ /* 3 */
+    this._points.push({ /* 3 */
       x: rect.x,
       y: rect.y + rect.height
     });
+    this._rect = ElementView.calculateRect(this._points);
 
-    this.points = points;
+    this.updateView();
   }
 
   public override isComplete(): boolean {
-    let size = this.size;
-    return size.width != 0 && size.height != 0;
+    return this._rect.width != 0 && this._rect.height != 0;
   }
 }

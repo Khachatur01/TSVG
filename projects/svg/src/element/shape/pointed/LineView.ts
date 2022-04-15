@@ -1,7 +1,7 @@
 import {ElementCursor, ElementView} from "../../ElementView";
 import {PointedView} from "./PointedView";
 import {Point} from "../../../model/Point";
-import {TSVG} from "../../../TSVG";
+import {Container} from "../../../Container";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {Rect} from "../../../model/Rect";
@@ -9,20 +9,26 @@ import {Rect} from "../../../model/Rect";
 export class LineCursor extends ElementCursor {}
 
 export class LineView extends PointedView implements MoveDrawable {
-  public constructor(container: TSVG, startPoint: Point = {x: 0, y: 0}, endPoint: Point = {x: 0, y: 0}, ownerId?: string, index?: number) {
+  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "line");
+  protected override _type: ElementType = ElementType.LINE;
+
+  public constructor(container: Container, startPoint: Point = {x: 0, y: 0}, endPoint: Point = {x: 0, y: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
-    this.svgElement = document.createElementNS(ElementView.svgURI, "line");
-    this._type = ElementType.LINE;
     this.svgElement.id = this.id;
 
-    this.setAttr({
-      x1: startPoint.x,
-      y1: startPoint.y,
-      x2: endPoint.x,
-      y2: endPoint.y
-    });
+    this.points = [startPoint, endPoint];
+
     this.setOverEvent();
     this.style.setDefaultStyle();
+  }
+
+  protected updateView(): void {
+    this.setAttr({
+      x1: this._points[0].x,
+      y1: this._points[0].y,
+      x2: this._points[1].x,
+      y2: this._points[1].y
+    });
   }
 
   public get copy(): LineView {
@@ -38,47 +44,17 @@ export class LineView extends PointedView implements MoveDrawable {
   }
 
   public drawSize(rect: Rect) {
-    this.setSize(rect);
+    this.setRect(rect);
   }
 
-  public override get points(): Point[] {
-    return [
-      {x: parseFloat(this.getAttr("x1")), y: parseFloat(this.getAttr("y1"))},
-      {x: parseFloat(this.getAttr("x2")), y: parseFloat(this.getAttr("y2"))}
-    ];
-  }
-  public override set points(points: Point[]) {
-    this.setAttr({
-      x1: points[0].x,
-      y1: points[0].y,
-      x2: points[1].x,
-      y2: points[1].y
-    });
-  }
-
-  public override getPoint(index: number): Point {
-    return {
-      x: parseFloat(this.getAttr("x2")),
-      y: parseFloat(this.getAttr("y2"))
-    };
-  }
   public override pushPoint(point: Point): void {
-  }
-  public override replacePoint(index: number, point: Point) {
-    if (index == 0) {
-      this.setAttr({x1: point.x});
-      this.setAttr({y1: point.y});
-    }
-    if (index == 1) {
-      this.setAttr({x2: point.x});
-      this.setAttr({y2: point.y});
-    }
   }
   public override removePoint(index: number): void {
   }
 
   public override isComplete(): boolean {
-    return this.getAttr("x1") != this.getAttr("x2") ||
-      this.getAttr("y1") != this.getAttr("y2")
+    return this._points[0].x !== this._points[1].x ||
+      this._points[0].y !== this._points[1].y;
   }
+
 }

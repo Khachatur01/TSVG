@@ -9,10 +9,10 @@ export class QBezier extends PathCommand {
     this._cPoint = cPoint;
   }
 
-  public get command(): string {
+  public get string(): string {
     return "Q " +
       this._cPoint.x + " " + this._cPoint.y + ", " +
-      this._point.x + " " + this._point.y;
+      this._point.x + " " + this._point.y + (this.close ? " Z" : "");
   }
 
   public get cPoint(): Point {
