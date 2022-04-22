@@ -4,7 +4,7 @@ export class Style {
   public get strokeWidth(): string {
     let width = this.style.get("stroke-width");
     if (!width)
-      width = "5";
+      width = "4";
     return width;
   }
   public set strokeWidth(width: string) {
@@ -36,7 +36,7 @@ export class Style {
   public get fillColor(): string {
     let color = this.style.get("fill");
     if(!color)
-      color = "#FFFFFF00";
+      color = "none";
 
     return color;
   }
@@ -58,7 +58,7 @@ export class Style {
   public get fontColor(): string {
     let color = this.style.get("color");
     if (!color)
-      color = "#000";
+      color = "#000000";
 
     return color;
   }

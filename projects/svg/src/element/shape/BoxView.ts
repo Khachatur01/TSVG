@@ -17,11 +17,11 @@ export class BoxView extends ShapeView {
     this.svgElement.id = this.id;
 
     this._rect = rect;
-    this.updateView();
+    this.__updateView__();
 
     this.setOverEvent();
   }
-  protected updateView(): void {
+  protected __updateView__(): void {
     this.setAttr({
       x: this._rect.x + "",
       y: this._rect.y + "",
@@ -32,22 +32,22 @@ export class BoxView extends ShapeView {
 
   public get copy(): BoxView {
     let box: BoxView = new BoxView(this._container);
-    box.setRect(this._rect);
+    box.__setRect__(this._rect);
     box.style.set = this.style;
 
-    box.refPoint = Object.assign({}, this.refPoint);
-    box.rotate(this._angle);
+    box.__refPoint__ = Object.assign({}, this.__refPoint__);
+    box.__rotate__(this._angle);
 
     return box;
   }
 
-  correct(refPoint: Point, lastRefPoint: Point): void {}
-  public drag(delta: Point): void {
+  __correct__(refPoint: Point, lastRefPoint: Point): void {}
+  public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
-    this.updateView();
+    this.__updateView__();
   }
-  public setRect(rect: Rect): void {
+  public __setRect__(rect: Rect): void {
     if (rect.width < 0) {
       rect.width = -rect.width;
       rect.x -= rect.width;
@@ -58,7 +58,7 @@ export class BoxView extends ShapeView {
     }
 
     this._rect = rect;
-    this.updateView();
+    this.__updateView__();
   }
 
   public override isComplete(): boolean {

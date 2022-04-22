@@ -3,7 +3,7 @@ import {Container} from "../../../../Container";
 import {PointedView} from "../../../../element/shape/pointed/PointedView";
 import {Point} from "../../../../model/Point";
 import {Angle} from "../../../math/Angle";
-import {Callback} from "../../../../dataSource/constant/Callback";
+import {Event} from "../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../../element/ElementView";
 import {DrawTool} from "../DrawTool";
@@ -30,7 +30,7 @@ export abstract class ClickDraw extends Drawer {
       this._drawableElement?.pushPoint(position);
     }
     if (call) {
-      this.container.call(Callback.DRAW_MOUSE_DOWN, {position: position, element: this._drawableElement});
+      this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: position, element: this._drawableElement});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
@@ -46,7 +46,7 @@ export abstract class ClickDraw extends Drawer {
     this._drawableElement.replacePoint(-1, position);
 
     if (call) {
-      this.container.call(Callback.DRAW_MOUSE_MOVE, {position: position, element: this._drawableElement});
+      this.container.__call__(Event.DRAW_MOUSE_MOVE, {position: position, element: this._drawableElement});
     }
   }
   public makeMouseUp(position: Point) {}
@@ -60,10 +60,10 @@ export abstract class ClickDraw extends Drawer {
   protected abstract createDrawableElement(position: Point, ownerId?: string, index?: number): PointedView;
 
   protected click(event: MouseEvent | TouchEvent) {
-    this.container.drawTool.drawing();
+    this.container.drawTool.__drawing__();
     let containerRect = this.container?.HTML.getBoundingClientRect();
 
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     this.makeMouseDown({
@@ -75,7 +75,7 @@ export abstract class ClickDraw extends Drawer {
     let containerRect = this.container?.HTML.getBoundingClientRect();
     if (!containerRect) return;
 
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     this.makeMouseMove({
       x: eventPosition.x - containerRect.left,
@@ -84,6 +84,9 @@ export abstract class ClickDraw extends Drawer {
   }
 
   public stopDrawing(call: boolean = true) {
+    if (this._drawableElement && !this._drawableElement.isComplete()) {
+      this.container.remove(this._drawableElement, true, false);
+    }
     if (this.drawTool?.toolAfterDrawing) {
       if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
         this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
@@ -91,7 +94,7 @@ export abstract class ClickDraw extends Drawer {
       this.drawTool.toolAfterDrawing.on();
     }
     if (call) {
-      this.container.call(Callback.STOP_CLICK_DRAWING);
+      this.container.__call__(Event.STOP_CLICK_DRAWING);
     }
   }
 
@@ -110,17 +113,13 @@ export abstract class ClickDraw extends Drawer {
 
     if (this._drawableElement.isComplete()) {
       this._drawableElement.removePoint(-1);
-      this.container.drawTool.drawingEnd();
-      this._drawableElement.refPoint = this._drawableElement.center;
-      this.container.blur();
-      this.container.focus(this._drawableElement);
-      this.container.focused.fixRect();
-
+      this.container.drawTool.__drawingEnd__();
+      this._drawableElement.__refPoint__ = this._drawableElement.center;
     } else {
       this.container.remove(this._drawableElement);
     }
     if (call) {
-      this.container.call(Callback.ELEMENT_CREATED, {element: this._drawableElement});
+      this.container.__call__(Event.ELEMENT_CREATED, {element: this._drawableElement});
     }
 
     this._drawableElement = null;

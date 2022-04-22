@@ -21,7 +21,7 @@ export class PolygonView extends PointedView {
     this.style.setDefaultStyle();
   }
 
-  protected override updateView() {
+  protected override __updateView__() {
     let string = "";
     this._points.forEach((point: Point) => {
       string += point.x + "," + point.y + " ";
@@ -33,10 +33,10 @@ export class PolygonView extends PointedView {
   public get copy(): PolygonView {
     let polygon: PolygonView = new PolygonView(this._container);
     polygon.points = this.points;
-    polygon.fixRect();
+    polygon.__fixRect__();
 
-    polygon.refPoint = Object.assign({}, this.refPoint);
-    polygon.rotate(this._angle);
+    polygon.__refPoint__ = Object.assign({}, this.__refPoint__);
+    polygon.__rotate__(this._angle);
 
     polygon.style.set = this.style;
 

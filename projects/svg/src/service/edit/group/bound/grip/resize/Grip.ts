@@ -5,7 +5,7 @@ import {BoxView} from "../../../../../../element/shape/BoxView";
 import {Matrix} from "../../../../../math/Matrix";
 import {Focus} from "../../../Focus";
 import {Cursor} from "../../../../../../dataSource/constant/Cursor";
-import {Callback} from "../../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../../dataSource/constant/Event";
 
 export abstract class Grip extends BoxView {
   protected _lastResize: Rect = {x: 0, y: 0, width: 0, height: 0};
@@ -31,39 +31,39 @@ export abstract class Grip extends BoxView {
   }
 
   public makeMouseDown(position: Point, call: boolean = true): void {
-    this.focus.fixRect();
-    this.focus.fixRefPoint();
+    this.focus.__fixRect__();
+    this.focus.__fixRefPoint__();
   }
   public makeMouseMove(position: Point, call: boolean = true): void {
 
   }
   public makeMouseUp(position: Point, call: boolean = true): void {
     this.makeMouseMove(position, false);
-    this.focus.fixRect();
+    this.focus.__fixRect__();
     if (call) {
-      this._container.call(Callback.ELEMENTS_RESIZED, {elements: this.focus.children, rect: this._lastResize});
+      this._container.__call__(Event.ELEMENTS_RESIZED, {elements: this.focus.children, rect: this._lastResize});
     }
   }
 
-  public override highlight() {
+  public override __highlight__() {
     this.setAttr({
       stroke: "#00ff00"
     });
   }
-  public override lowlight() {
+  public override __lowlight__() {
     this.setAttr({
       stroke: "#002fff"
     });
   }
 
-  public show() {
+  public __show__() {
     this.svgElement.style.display = "block";
   }
-  public hide() {
+  public __hide__() {
     this.svgElement.style.display = "none";
   }
 
-  public abstract setPosition(points: Point[]): void;
+  public abstract __setPosition__(points: Point[]): void;
 
   private start(event: MouseEvent | TouchEvent) {
     this._container.HTML.addEventListener("mousemove", this._move);
@@ -74,12 +74,12 @@ export abstract class Grip extends BoxView {
     this._container.activeTool.off();
 
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let client: Point = Matrix.rotate(
       [{x: eventPosition.x - containerRect.x, y: eventPosition.y - containerRect.y}],
-      this.focus.refPoint,
+      this.focus.__refPoint__,
       this.focus.angle
     )[0];
 
@@ -87,12 +87,12 @@ export abstract class Grip extends BoxView {
   }
   private move(event: MouseEvent | TouchEvent) {
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let client: Point = Matrix.rotate(
       [{x: eventPosition.x - containerRect.x, y: eventPosition.y - containerRect.y}],
-      this.focus.refPoint,
+      this.focus.__refPoint__,
       this.focus.angle
     )[0];
 
@@ -105,12 +105,12 @@ export abstract class Grip extends BoxView {
     document.removeEventListener("touchend", this._end);
 
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let client: Point = Matrix.rotate(
       [{x: eventPosition.x - containerRect.x, y: eventPosition.y - containerRect.y}],
-      this.focus.refPoint,
+      this.focus.__refPoint__,
       this.focus.angle
     )[0];
 
@@ -119,11 +119,11 @@ export abstract class Grip extends BoxView {
     this.makeMouseUp(client);
   }
 
-  public on() {
+  public __on__() {
     this.svgElement.addEventListener("mousedown", this._start);
     this.svgElement.addEventListener("touchstart", this._start);
   }
-  public off() {
+  public __off__() {
     this.svgElement.removeEventListener("mousedown", this._start);
     this.svgElement.removeEventListener("touchstart", this._start);
   }

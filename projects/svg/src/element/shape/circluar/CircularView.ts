@@ -10,7 +10,7 @@ import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 export abstract class CircularView extends ShapeView implements MoveDrawable{
   protected abstract override svgElement: SVGGeometryElement;
 
-  protected updateView(): void {
+  protected __updateView__(): void {
     this.setAttr({
       cx: this._rect.x + this._rect.width / 2,
       cy: this._rect.y + this._rect.height / 2,
@@ -28,24 +28,24 @@ export abstract class CircularView extends ShapeView implements MoveDrawable{
     ];
   }
 
-  public drag(delta: Point): void {
+  public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
-    this.updateView();
+    this.__updateView__();
   }
-  public override correct(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
+  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
 
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
 
-    this.updateView();
+    this.__updateView__();
   }
-  public drawSize(rect: Rect) {
-    this.setRect(rect);
+  public __drawSize__(rect: Rect) {
+    this.__setRect__(rect);
   }
-  public setRect(rect: Rect, delta: Point | null = null): void {
+  public __setRect__(rect: Rect, delta: Point | null = null): void {
     if (delta) {
       rect.width = this._lastRect.width * delta.x;
       rect.height = this._lastRect.height * delta.y;
@@ -61,7 +61,7 @@ export abstract class CircularView extends ShapeView implements MoveDrawable{
     }
     this._rect = rect;
 
-    this.updateView();
+    this.__updateView__();
   }
 
   public override getVisibleRect(): Rect {

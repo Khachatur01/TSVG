@@ -1,7 +1,7 @@
 import {MoveDraw} from "../../mode/MoveDraw";
 import {Point} from "../../../../../model/Point";
 import {ElementView} from "../../../../../element/ElementView";
-import {Callback} from "../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../dataSource/constant/Event";
 import {VideoView} from "../../../../../element/foreign/media/VideoView";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
 
@@ -13,13 +13,13 @@ export class DrawVideo extends MoveDraw {
 
   protected override onIsNotComplete(call: boolean) {
     if (!this._drawableElement) return;
-    this._drawableElement.setRect({
+    this._drawableElement.__setRect__({
       x: this.startPos.x - 150,
       y: this.startPos.y - 100,
       width: 300,
       height: 200
     });
-    this._drawableElement.refPoint = this._drawableElement?.center;
+    this._drawableElement.__refPoint__ = this._drawableElement?.center;
   }
   protected override onEnd(call: boolean) {
     if (call) {
@@ -33,14 +33,14 @@ export class DrawVideo extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.call(Callback.VIDEO_TOOL_ON);
+      this.container.__call__(Event.VIDEO_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.container.call(Callback.VIDEO_TOOL_OFF);
+      this.container.__call__(Event.VIDEO_TOOL_OFF);
     }
   }
 

@@ -32,7 +32,7 @@ export class RectangleView extends PolygonView implements MoveDrawable {
     return super.copy as RectangleView;
   }
 
-  public drawSize(rect: Rect) {
+  public __drawSize__(rect: Rect) {
     this._points = [];
     this._points.push({ /* 0 */
       x: rect.x,
@@ -52,7 +52,7 @@ export class RectangleView extends PolygonView implements MoveDrawable {
     });
     this._rect = ElementView.calculateRect(this._points);
 
-    this.updateView();
+    this.__updateView__();
   }
 
   public override isComplete(): boolean {

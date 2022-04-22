@@ -1,6 +1,6 @@
 import {Tool} from "../Tool";
 import {Container} from "../../../Container";
-import {Callback} from "../../../dataSource/constant/Callback";
+import {Event} from "../../../dataSource/constant/Event";
 import {PathView} from "../../../element/shape/PathView";
 import {Path} from "../../../model/path/Path";
 import {MoveTo} from "../../../model/path/point/MoveTo";
@@ -55,7 +55,7 @@ export class HighlightTool extends Tool {
     this.group.appendChild(this.path.SVG);
 
     if (call) {
-      this._container.call(Callback.HIGHLIGHT_MOUSE_DOWN, {position: position, element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
+      this._container.__call__(Event.HIGHLIGHT_MOUSE_DOWN, {position: position, element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true, path?: string) {
@@ -68,7 +68,7 @@ export class HighlightTool extends Tool {
     }
 
     if (call) {
-      this._container.call(Callback.HIGHLIGHT_MOUSE_MOVE, {position: position, element: this.path});
+      this._container.__call__(Event.HIGHLIGHT_MOUSE_MOVE, {position: position, element: this.path});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true, path?: string) {
@@ -89,8 +89,8 @@ export class HighlightTool extends Tool {
     }, this._timeout);
 
     if (call) {
-      this._container.call(Callback.HIGHLIGHT_MOUSE_UP, {position: position, element: this.path});
-      this._container.call(Callback.HIGHLIGHTED, {element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
+      this._container.__call__(Event.HIGHLIGHT_MOUSE_UP, {position: position, element: this.path});
+      this._container.__call__(Event.HIGHLIGHTED, {element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
     }
   }
   public highlight(path: Path | string) {
@@ -140,7 +140,7 @@ export class HighlightTool extends Tool {
     document.addEventListener("touchend", this._highlightEnd);
 
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let startPosition = {
@@ -152,7 +152,7 @@ export class HighlightTool extends Tool {
   }
   private highlightMove(event: MouseEvent | TouchEvent): void {
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let movePosition = {
@@ -169,7 +169,7 @@ export class HighlightTool extends Tool {
     document.removeEventListener("touchend", this._highlightEnd);
 
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let position = {
@@ -187,7 +187,7 @@ export class HighlightTool extends Tool {
 
     this._container.style.changeCursor(Cursor.HIGHLIGHTER);
     if (call) {
-      this._container.call(Callback.HIGHLIGHT_TOOl_ON);
+      this._container.__call__(Event.HIGHLIGHT_TOOl_ON);
     }
   }
   public off(call: boolean = true): void {
@@ -196,7 +196,7 @@ export class HighlightTool extends Tool {
     this._isOn = false;
 
     if (call) {
-      this._container.call(Callback.HIGHLIGHT_TOOl_OFF);
+      this._container.__call__(Event.HIGHLIGHT_TOOl_OFF);
     }
   }
 }

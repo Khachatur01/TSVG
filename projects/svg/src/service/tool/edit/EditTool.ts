@@ -4,7 +4,7 @@ import {PointedView} from "../../../element/shape/pointed/PointedView";
 import {ElementView} from "../../../element/ElementView";
 import {Point} from "../../../model/Point";
 import {Node} from "./Node";
-import {Callback} from "../../../dataSource/constant/Callback";
+import {Event} from "../../../dataSource/constant/Event";
 import {Focus} from "../../edit/group/Focus";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 import {ForeignObjectView} from "../../../element/foreign/ForeignObjectView";
@@ -33,10 +33,10 @@ export class EditTool extends Tool {
     this.nodes[order].makeMouseUp(position, call);
   }
 
-  public set refPoint(refPoint: Point) {
+  private set refPoint(refPoint: Point) {
     this.nodesGroup.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
   }
-  public rotate(angle: number) {
+  private rotate(angle: number) {
     this.nodesGroup.style.transform = "rotate(" + angle + "deg)";
   }
 
@@ -65,19 +65,19 @@ export class EditTool extends Tool {
 
     this.focus.appendChild(editableElement, false, false);
     this._editableElement = editableElement;
-    this._editableElement.onFocus();
+    this._editableElement.__onFocus__();
 
     if (editableElement instanceof PointedView) {
       let order = 0;
       let points = editableElement.points;
       for (let point of points) {
         let node: Node = new Node(this._container, this, point, order++);
-        node.on();
+        node.__on__();
         this.nodes.push(node);
         this.nodesGroup.appendChild(node.SVG);
       }
 
-      this.refPoint = editableElement.refPoint;
+      this.refPoint = editableElement.__refPoint__;
       this.rotate(editableElement.angle);
     }
   }
@@ -92,17 +92,15 @@ export class EditTool extends Tool {
 
   protected _on(call: boolean = true): void {
     this._isOn = true;
-    for (let child of this.focus.children) {
-        this.editableElement = child;
-        break;
-    }
+    let [firstChild] = this.focus.children;
+    this.editableElement = firstChild;
     this._container.blur();
     if (this._editableElement)
       this._container.focus(this._editableElement, false);
 
     this._container.style.changeCursor(Cursor.EDIT);
     if (call) {
-      this._container.call(Callback.EDIT_TOOl_ON);
+      this._container.__call__(Event.EDIT_TOOl_ON);
     }
   }
   public off(call: boolean = true): void {
@@ -111,7 +109,7 @@ export class EditTool extends Tool {
     this.removeEditableElement();
 
     if (call) {
-      this._container.call(Callback.EDIT_TOOl_OFF);
+      this._container.__call__(Event.EDIT_TOOl_OFF);
     }
   }
 }

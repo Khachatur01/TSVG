@@ -22,7 +22,7 @@ export class RightTriangleView extends TriangleView implements MoveDrawable {
     return super.copy as RightTriangleView;
   }
 
-  public drawSize(rect: Rect) {
+  public __drawSize__(rect: Rect) {
     this._points = [];
     this._points.push({ /* A */
       x: rect.x,
@@ -38,6 +38,6 @@ export class RightTriangleView extends TriangleView implements MoveDrawable {
     });
     this._rect = rect;
 
-    this.updateView();
+    this.__updateView__();
   }
 }

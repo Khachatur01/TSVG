@@ -1,6 +1,6 @@
 import {ElementView} from "../ElementView";
 
 export abstract class ShapeView extends ElementView {
-  override onFocus() {}
-  override onBlur() {}
+  override __onFocus__() {}
+  override __onBlur__() {}
 }

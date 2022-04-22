@@ -2,11 +2,11 @@ import {Rect} from "../../../model/Rect";
 import {Point} from "../../../model/Point";
 
 export interface Resizeable {
-  get lastRect(): Rect;
+  get __lastRect__(): Rect;
 
   getRect(): Rect;
 
-  setRect(rect: Rect, delta?: Point): void;
+  __setRect__(rect: Rect, delta?: Point): void;
 
-  fixRect(): void;
+  __fixRect__(): void;
 }

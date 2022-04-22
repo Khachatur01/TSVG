@@ -35,14 +35,6 @@ export class ElementStyle extends Style {
     this.element.setAttr({"stroke-width": width});
   }
 
-  public override get strokeColor(): string {
-    return super.strokeColor;
-  }
-  public override set strokeColor(color: string) {
-    super.strokeColor = color;
-    this.element.setAttr({"stroke": color});
-  }
-
   public override get strokeDashArray(): string {
     return super.strokeDashArray;
   }
@@ -51,16 +43,19 @@ export class ElementStyle extends Style {
     this.element.setAttr({"stroke-dasharray": array});
   }
 
+  public override get strokeColor(): string {
+    return super.strokeColor;
+  }
+  public override set strokeColor(color: string) {
+    super.strokeColor = color;
+    this.element.setAttr({"stroke": color});
+  }
+
   public override get fillColor(): string {
-    let color = super.fillColor;
-    if(!color || color == "none" || color == "transparent")
-      color = "#FFFFFF00";
-    return color;
+    return super.fillColor;
   }
   public override set fillColor(color: string) {
     super.fillColor = color;
-    if(color.length == 9 && color.slice(-2) === "00")
-      color = "none";
     this.element.setAttr({"fill": color});
   }
 
@@ -113,32 +108,32 @@ export abstract class ElementView implements Resizeable, Draggable {
   protected _container: Container;
   protected _rect: Rect = {x: 0, y: 0, width: 0, height: 0};
   protected _angle: number = 0;
-  protected _refPoint: Point = {x: 0, y: 0};
+  protected ___refPoint__: Point = {x: 0, y: 0};
   protected _lastRect: Rect = {x: 0, y: 0, width: 0, height: 0};
-  protected _lastAngle: number = 0;
+  protected ___lastAngle__: number = 0;
   /* Model */
 
-  private _highlight = this.highlight.bind(this);
-  private _lowlight = this.lowlight.bind(this);
+  private _highlight = this.__highlight__.bind(this);
+  private _lowlight = this.__lowlight__.bind(this);
 
-  public translate(delta: Point) {
+  public __translate__(delta: Point) {
     this.svgElement.style.transform =
       "translate(" + delta.x + "px, " + delta.y + "px) rotate(" + this._angle + "deg)";
   }
-  public abstract drag(delta: Point): void;
+  public abstract __drag__(delta: Point): void;
   public getVisibleRect(): Rect {
     return ElementView.calculateRect(this.visiblePoints);
   };
   public getRect(): Rect {
     return this._rect;
   };
-  public abstract setRect(rect: Rect, delta?: Point): void; /* if delta set, calculate rect width and height by delta */
+  public abstract __setRect__(rect: Rect, delta?: Point): void; /* if delta set, calculate rect width and height by delta */
 
-  protected abstract updateView(): void;
+  protected abstract __updateView__(): void;
   public get visiblePoints(): Point[] {
     return Matrix.rotate(
       this.points,
-      this._refPoint,
+      this.___refPoint__,
       -this._angle
     );
   }
@@ -154,8 +149,8 @@ export abstract class ElementView implements Resizeable, Draggable {
   public abstract get copy(): ElementView;
   public abstract isComplete(): boolean;
 
-  public abstract onFocus(): void;
-  public abstract onBlur(): void;
+  public abstract __onFocus__(): void;
+  public abstract __onBlur__(): void;
 
   public constructor(container: Container, ownerId?: string, index?: number) {
     this._container = container;
@@ -209,9 +204,9 @@ export abstract class ElementView implements Resizeable, Draggable {
     this._container = container;
   }
 
-  public abstract correct(refPoint: Point, lastRefPoint: Point): void;
+  public abstract __correct__(refPoint: Point, lastRefPoint: Point): void;
 
-  public getCorrectionDelta(refPoint: Point, lastRefPoint: Point) {
+  public __getCorrectionDelta__(refPoint: Point, lastRefPoint: Point) {
     /* calculate delta */
     let rotatedRefPoint = Matrix.rotate(
       [{x: lastRefPoint.x, y: lastRefPoint.y}],
@@ -296,30 +291,24 @@ export abstract class ElementView implements Resizeable, Draggable {
     } else {
       return Matrix.rotate(
         [center],
-        this._refPoint,
+        this.___refPoint__,
         -this._angle
       )[0];
     }
   }
 
-  public get refPoint(): Point {
-    return this._refPoint;
+  public get __refPoint__(): Point {
+    return this.___refPoint__;
   }
-  public set refPoint(refPoint: Point) {
+  public set __refPoint__(refPoint: Point) {
     this.svgElement.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
-    this._refPoint = refPoint;
-  }
-  public centerRefPoint() {
-    this.refPoint = {
-      x: this._lastRect.x + this._lastRect.width / 2,
-      y: this._lastRect.y + this._lastRect.height / 2
-    };
+    this.___refPoint__ = refPoint;
   }
 
   public get angle(): number {
     return this._angle;
   }
-  public rotate(angle: number): void {
+  public __rotate__(angle: number): void {
     this.svgElement.style.transform = "rotate(" + angle + "deg)";
     this._angle = angle;
   }
@@ -352,30 +341,30 @@ export abstract class ElementView implements Resizeable, Draggable {
     this.svgElement.removeEventListener("mouseout", this._lowlight);
   }
 
-  public remove() {
+  public __remove__() {
     this.svgElement.parentElement?.removeChild(this.svgElement);
   }
 
-  public highlight(): void {
+  public __highlight__(): void {
     if (this._container.selectTool.isOn())
       this.svgElement.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 0.7))";
   }
-  public lowlight(): void {
+  public __lowlight__(): void {
     this.svgElement.style.filter = "unset";
   }
 
-  public fixRect(): void {
+  public __fixRect__(): void {
     this._lastRect = Object.assign({}, this._rect);
   }
-  public fixAngle(): void {
-    this._lastAngle = this._angle;
+  public __fixAngle__(): void {
+    this.___lastAngle__ = this._angle;
   }
 
-  public get lastRect(): Rect {
+  public get __lastRect__(): Rect {
     return this._lastRect;
   }
-  public get lastAngle(): number {
-    return this._lastAngle;
+  public get __lastAngle__(): number {
+    return this.___lastAngle__;
   }
 
   public toJSON(): any {
@@ -391,7 +380,7 @@ export abstract class ElementView implements Resizeable, Draggable {
       containerId: this._container.id,
       rect: this._rect,
       angle: this._angle,
-      refPoint: this._refPoint,
+      refPoint: this.___refPoint__,
     }
   }
   public fromJSON(json: any) {
@@ -401,9 +390,9 @@ export abstract class ElementView implements Resizeable, Draggable {
       this._group._ownerId = json.group.ownerId;
       this._group._index = json.group.index;
     }
-    this.fixRect();
-    this.setRect(json.rect);
-    this.rotate(json.angle);
-    this.refPoint = json.refPoint;
+    this.__fixRect__();
+    this.__setRect__(json.rect);
+    this.__rotate__(json.angle);
+    this.__refPoint__ = json.refPoint;
   };
 }

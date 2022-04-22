@@ -5,7 +5,6 @@ import {Path} from "../../../model/path/Path";
 import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
 import {ShapeView} from "../../type/ShapeView";
-import {Matrix} from "../../../service/math/Matrix";
 import {ElementView} from "../../ElementView";
 
 export abstract class PointedView extends ShapeView {
@@ -22,7 +21,7 @@ export abstract class PointedView extends ShapeView {
 
     this._rect = ElementView.calculateRect(points);
 
-    this.updateView();
+    this.__updateView__();
   };
   public getPoint(index: number): Point {
     if (index < 0)
@@ -32,7 +31,7 @@ export abstract class PointedView extends ShapeView {
   public pushPoint(point: Point): void {
     this._points.push(point);
     this._rect = this.calculateRectByNewPoint(point);
-    this.updateView();
+    this.__updateView__();
   };
   public removePoint(index: number): void {
     if (index < 0)
@@ -41,7 +40,7 @@ export abstract class PointedView extends ShapeView {
 
     this._rect = ElementView.calculateRect(this._points);
 
-    this.updateView();
+    this.__updateView__();
   };
   public replacePoint(index: number, point: Point): void {
     if (index < 0)
@@ -49,17 +48,17 @@ export abstract class PointedView extends ShapeView {
 
     this._points[index] = point;
     this._rect = ElementView.calculateRect(this._points);
-    this.updateView();
+    this.__updateView__();
   };
-  public override fixRect() {
-    super.fixRect();
+  public override __fixRect__() {
+    super.__fixRect__();
     this._lastPoints = [];
     this._points.forEach((point: Point) => {
       this._lastPoints.push(Object.assign({}, point));
     });
   }
 
-  public override drag(delta: Point) {
+  public override __drag__(delta: Point) {
     for (let i = 0; i < this._points.length; i++) {
       if (!this._lastPoints[i])
         this._lastPoints[i] = {x: this._points[i].x, y: this._points[i].y};
@@ -70,10 +69,10 @@ export abstract class PointedView extends ShapeView {
 
     this._rect = ElementView.calculateRect(this._points);
 
-    this.updateView();
+    this.__updateView__();
   }
-  public override correct(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
+  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
 
     for (let i = 0; i < this._points.length; i++) {
@@ -83,9 +82,9 @@ export abstract class PointedView extends ShapeView {
       this._points[i].y = (delta.y + this._lastPoints[i].y);
     }
     this._rect = ElementView.calculateRect(this._points);
-    this.updateView();
+    this.__updateView__();
   }
-  public override setRect(rect: Rect, delta?: Point): void {
+  public override __setRect__(rect: Rect, delta?: Point): void {
     let dw = 1;
     let dh = 1;
 
@@ -109,7 +108,7 @@ export abstract class PointedView extends ShapeView {
 
     this._rect = ElementView.calculateRect(this._points);
 
-    this.updateView();
+    this.__updateView__();
   }
 
   public override toPath(): PathView {

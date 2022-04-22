@@ -1,12 +1,12 @@
 import {Grip} from "../Grip";
 import {Point} from "../../../../../../../model/Point";
 import {Angle} from "../../../../../../math/Angle";
-import {Callback} from "../../../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../../../dataSource/constant/Event";
 import {Compass} from "../../../../../../../dataSource/constant/Compass";
 
 export class SEGrip extends Grip {
-  public setPosition(points: Point[]): void {
-    this.drag({
+  public __setPosition__(points: Point[]): void {
+    this.__drag__({
       x: points[2].x - this.halfSide,
       y: points[2].y - this.halfSide
     });
@@ -14,22 +14,22 @@ export class SEGrip extends Grip {
 
   public override makeMouseDown(client: Point, call: boolean = true): void {
     super.makeMouseDown(client, call);
-    this._lastAngle = Angle.fromPoints(
-      this.focus.lastRect,
+    this.___lastAngle__ = Angle.fromPoints(
+      this.focus.__lastRect__,
       client,
       {x: 0, y: client.y}
     );
 
     if (call) {
-      this._container.call(Callback.RESIZE_MOUSE_DOWN, {position: client, compass: Compass.SE, elements: this.focus.children});
+      this._container.__call__(Event.RESIZE_MOUSE_DOWN, {position: client, compass: Compass.SE, elements: this.focus.children});
     }
   }
   public override makeMouseMove(client: Point, call: boolean = true): void {
     super.makeMouseMove(client, call);
-    let position = this.focus.lastRect;
+    let position = this.focus.__lastRect__;
 
     if (this._container.perfect) {
-      let angle = this._lastAngle;
+      let angle = this.___lastAngle__;
       if (client.x < position.x && client.y < position.y) /* II */
         angle = 180 - (360 - angle);
       else if (client.x < position.x) /* III */
@@ -38,7 +38,7 @@ export class SEGrip extends Grip {
         angle = 360 - angle;
 
       client = Angle.lineFromVector(
-        this.focus.lastRect,
+        this.focus.__lastRect__,
         angle,
         Angle.lineLength(position, client)
       );
@@ -52,17 +52,17 @@ export class SEGrip extends Grip {
       width: width,
       height: height
     };
-    this.focus.setRect(this._lastResize);
+    this.focus.__setRect__(this._lastResize);
 
     if (call) {
-      this._container.call(Callback.RESIZE_MOUSE_MOVE, {position: client, compass: Compass.SE});
+      this._container.__call__(Event.RESIZE_MOUSE_MOVE, {position: client, compass: Compass.SE});
     }
   }
   public override makeMouseUp(client: Point, call: boolean = true): void {
     super.makeMouseUp(client, call);
 
     if (call) {
-      this._container.call(Callback.RESIZE_MOUSE_UP, {position: client, compass: Compass.SE});
+      this._container.__call__(Event.RESIZE_MOUSE_UP, {position: client, compass: Compass.SE});
     }
   }
 }

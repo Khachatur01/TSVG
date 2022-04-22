@@ -1,6 +1,6 @@
 import {Tool} from "../Tool";
 import {Container} from "../../../Container";
-import {Callback} from "../../../dataSource/constant/Callback";
+import {Event} from "../../../dataSource/constant/Event";
 import {ElementView} from "../../../element/ElementView";
 import {Point} from "../../../model/Point";
 import {Cursor} from "../../../dataSource/constant/Cursor";
@@ -23,7 +23,7 @@ export class PointerTool extends Tool {
     this._cursorSVG.setAttribute("y", position.y + "");
 
     if (call) {
-      this._container.call(Callback.POINTER_MOVE, {position: position});
+      this._container.__call__(Event.POINTER_MOVE, {position: position});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {}
@@ -32,12 +32,12 @@ export class PointerTool extends Tool {
     this._cursorSVG.setAttribute("href", URI);
 
     if (call) {
-      this._container.call(Callback.POINTER_CHANGE, {URI: URI});
+      this._container.__call__(Event.POINTER_CHANGE, {URI: URI});
     }
   }
   private move(event: TouchEvent | MouseEvent): void {
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let movePosition = {
@@ -68,7 +68,7 @@ export class PointerTool extends Tool {
 
     this._container.style.changeCursor(Cursor.POINTER);
     if (call) {
-      this._container.call(Callback.POINTER_TOOl_ON);
+      this._container.__call__(Event.POINTER_TOOl_ON);
     }
   }
   public off(call: boolean = true): void {
@@ -79,7 +79,7 @@ export class PointerTool extends Tool {
     this.hide();
 
     if (call) {
-      this._container.call(Callback.POINTER_TOOl_OFF);
+      this._container.__call__(Event.POINTER_TOOl_OFF);
     }
   }
 }

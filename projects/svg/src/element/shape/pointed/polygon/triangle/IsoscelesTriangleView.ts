@@ -22,7 +22,7 @@ export class IsoscelesTriangleView extends TriangleView implements MoveDrawable 
     return super.copy as IsoscelesTriangleView;
   }
 
-  public drawSize(rect: Rect): void {
+  public __drawSize__(rect: Rect): void {
     this._points = [];
     this._points.push({ /* A */
       x: rect.x,
@@ -43,6 +43,6 @@ export class IsoscelesTriangleView extends TriangleView implements MoveDrawable 
       height: rect.height
     };
 
-    this.updateView();
+    this.__updateView__();
   }
 }

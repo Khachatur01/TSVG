@@ -3,10 +3,7 @@
  */
 export * from './Container'
 
-export * from './colorPicker/ColorPicker';
-
-export * from './dataSource/constant/Callback';
-export * from './dataSource/DemoAsset';
+export * from './dataSource/constant/Event';
 export * from './dataSource/DrawTools';
 
 export * from './element/foreign/ForeignObjectView';

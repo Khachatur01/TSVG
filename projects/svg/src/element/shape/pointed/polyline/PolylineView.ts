@@ -20,7 +20,7 @@ export class PolylineView extends PointedView {
     this.setOverEvent();
   }
 
-  protected override updateView() {
+  protected override __updateView__() {
     let string = "";
     this._points.forEach((point: Point) => {
       string += point.x + " " + point.y + " ";
@@ -32,10 +32,10 @@ export class PolylineView extends PointedView {
   public get copy(): PolylineView {
     let polyline: PolylineView = new PolylineView(this._container);
     polyline.points = this.points;
-    polyline.fixRect();
+    polyline.__fixRect__();
 
-    polyline.refPoint = Object.assign({}, this.refPoint);
-    polyline.rotate(this._angle);
+    polyline.__refPoint__ = Object.assign({}, this.__refPoint__);
+    polyline.__rotate__(this._angle);
 
     polyline.style.set = this.style;
 

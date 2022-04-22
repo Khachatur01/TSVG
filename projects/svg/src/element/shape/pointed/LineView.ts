@@ -22,7 +22,7 @@ export class LineView extends PointedView implements MoveDrawable {
     this.style.setDefaultStyle();
   }
 
-  protected updateView(): void {
+  protected __updateView__(): void {
     this.setAttr({
       x1: this._points[0].x,
       y1: this._points[0].y,
@@ -35,22 +35,24 @@ export class LineView extends PointedView implements MoveDrawable {
     let line: LineView = new LineView(this._container);
     line.points = this.points;
 
-    line.refPoint = Object.assign({}, this.refPoint);
-    line.rotate(this._angle);
+    line.__refPoint__ = Object.assign({}, this.__refPoint__);
+    line.__rotate__(this._angle);
 
     line.style.set = this.style;
 
     return line;
   }
 
-  public drawSize(rect: Rect) {
-    this.setRect(rect);
+  public __drawSize__(rect: Rect) {
+    this.__setRect__(rect);
   }
 
   public override pushPoint(point: Point): void {
+    this._points[1] = point;
+    this._rect = ElementView.calculateRect(this._points);
+    this.__updateView__();
   }
-  public override removePoint(index: number): void {
-  }
+  public override removePoint(index: number): void {}
 
   public override isComplete(): boolean {
     return this._points[0].x !== this._points[1].x ||

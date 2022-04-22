@@ -6,7 +6,7 @@ import {MoveTo} from "../../../../../../model/path/point/MoveTo";
 import {Arc} from "../../../../../../model/path/curve/arc/Arc";
 import {LineTo} from "../../../../../../model/path/line/LineTo";
 import {ElementView} from "../../../../../../element/ElementView";
-import {Callback} from "../../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../../dataSource/constant/Event";
 import {Focus} from "../../../Focus";
 import {Cursor} from "../../../../../../dataSource/constant/Cursor";
 import {Path} from "../../../../../../model/path/Path";
@@ -40,45 +40,45 @@ export class RotatePoint extends PathView {
 
   public makeMouseDown(position: Point, call: boolean = true) {
     this.dAngle = Angle.fromPoints(
-      {x: 0, y: this.focus.refPoint.y},
-      this.focus.refPoint,
+      {x: 0, y: this.focus.__refPoint__.y},
+      this.focus.__refPoint__,
       position
     ) - this.focus.angle;
 
     this.focus.children.forEach((child: ElementView) => {
-      child.fixAngle();
+      child.__fixAngle__();
     });
-    this.focus.lastAngle = this.getAngle(position);
+    this.focus.__lastAngle__ = this.getAngle(position);
 
     if (call) {
-      this._container.call(Callback.ROTATE_MOUSE_DOWN, {position: position, refPoint: this.focus.refPoint, elements: this.focus.children});
+      this._container.__call__(Event.ROTATE_MOUSE_DOWN, {position: position, refPoint: this.focus.__refPoint__, elements: this.focus.children});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
     let angle = this.getAngle(position);
-    if (this._container.perfect)
+    if (this.focus.boundingBox.perfect)
       angle = Math.round(angle / this.SNAP_ANGLE) * this.SNAP_ANGLE;
-    this.focus.rotate(angle);
+    this.focus.__rotate__(angle);
 
     if (call) {
-      this._container.call(Callback.ROTATE_MOUSE_MOVE, {angle: angle, position: position});
+      this._container.__call__(Event.ROTATE_MOUSE_MOVE, {angle: angle, position: position});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
     this.makeMouseMove(position, false);
     let angle = this.getAngle(position);
-    if (this._container.perfect)
+    if (this.focus.boundingBox.perfect)
       angle = Math.round(angle / this.SNAP_ANGLE) * this.SNAP_ANGLE;
 
     if (call) {
-      this._container.call(Callback.ROTATE_MOUSE_UP, {position: position});
-      this._container.call(Callback.ELEMENTS_ROTATED, {newAngle: angle, oldAngle: this.focus.lastAngle, refPoint: this.focus.refPoint, elements: this.focus.children});
+      this._container.__call__(Event.ROTATE_MOUSE_UP, {position: position});
+      this._container.__call__(Event.ELEMENTS_ROTATED, {newAngle: angle, oldAngle: this.focus.__lastAngle__, refPoint: this.focus.__refPoint__, elements: this.focus.children});
     }
   }
 
-  public setPosition(position: Point): void {
-    this.fixRect();
-    super.drag({
+  public __setPosition__(position: Point): void {
+    this.__fixRect__();
+    super.__drag__({
       x: position.x - this._position.x,
       y: position.y - this._position.y
     });
@@ -98,17 +98,17 @@ export class RotatePoint extends PathView {
     this.path = path;
   }
 
-  public show() {
+  public __show__() {
     this.svgElement.style.display = "block";
   }
-  public hide() {
+  public __hide__() {
     this.svgElement.style.display = "none";
   }
 
-  public getAngle(position: Point): number {
+  private getAngle(position: Point): number {
     let angle = Angle.fromPoints(
-      {x: 0, y: this.focus.refPoint.y},
-      this.focus.refPoint,
+      {x: 0, y: this.focus.__refPoint__.y},
+      this.focus.__refPoint__,
       position
     );
 
@@ -127,7 +127,7 @@ export class RotatePoint extends PathView {
     document.addEventListener("mouseup", this._end);
     document.addEventListener("touchend", this._end);
 
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
     let position = {
@@ -138,7 +138,7 @@ export class RotatePoint extends PathView {
     this.makeMouseDown(position);
   }
   private move(event: MouseEvent | TouchEvent) {
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
     let position = {
@@ -155,7 +155,7 @@ export class RotatePoint extends PathView {
     document.removeEventListener("mouseup", this._end);
     document.removeEventListener("touchend", this._end);
 
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
     let position = {
@@ -166,11 +166,11 @@ export class RotatePoint extends PathView {
     this.makeMouseUp(position);
   }
 
-  public on() {
+  public __on__() {
     this.svgElement.addEventListener("mousedown", this._start);
     this.svgElement.addEventListener("touchstart", this._start);
   }
-  public off() {
+  public __off__() {
     this.svgElement.removeEventListener("mousedown", this._start);
     this.svgElement.removeEventListener("touchstart", this._start);
   }

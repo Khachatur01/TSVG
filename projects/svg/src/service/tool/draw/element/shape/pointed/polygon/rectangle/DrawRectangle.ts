@@ -2,7 +2,7 @@ import {MoveDraw} from "../../../../../mode/MoveDraw";
 import {ElementView} from "../../../../../../../../element/ElementView";
 import {RectangleView} from "../../../../../../../../element/shape/pointed/polygon/rectangle/RectangleView";
 import {Point} from "../../../../../../../../model/Point";
-import {Callback} from "../../../../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
 
 export class DrawRectangle extends MoveDraw {
@@ -14,14 +14,14 @@ export class DrawRectangle extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.call(Callback.RECTANGLE_TOOL_ON);
+      this.container.__call__(Event.RECTANGLE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.call(Callback.RECTANGLE_TOOL_OFF);
+      this.container.__call__(Event.RECTANGLE_TOOL_OFF);
     }
   }
 

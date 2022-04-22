@@ -2,7 +2,7 @@ import {MoveDraw} from "../../../../../mode/MoveDraw";
 import {ElementView} from "../../../../../../../../element/ElementView";
 import {Point} from "../../../../../../../../model/Point";
 import {IsoscelesTriangleView} from "../../../../../../../../element/shape/pointed/polygon/triangle/IsoscelesTriangleView";
-import {Callback} from "../../../../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
 
 export class DrawIsoscelesTriangle extends MoveDraw {
@@ -14,14 +14,14 @@ export class DrawIsoscelesTriangle extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.call(Callback.ISOSCELES_TRIANGLE_TOOL_ON);
+      this.container.__call__(Event.ISOSCELES_TRIANGLE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.call(Callback.ISOSCELES_TRIANGLE_TOOL_OFF);
+      this.container.__call__(Event.ISOSCELES_TRIANGLE_TOOL_OFF);
     }
   }
 

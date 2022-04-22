@@ -70,7 +70,7 @@ export class GraphicView extends ForeignView implements MoveDrawable {
     // this.setRect();
     // this.drawAxis();
   }
-  protected updateView(): void {
+  protected __updateView__(): void {
     this.setAttr({
       x: this._rect.x,
       y: this._rect.y,
@@ -249,10 +249,10 @@ export class GraphicView extends ForeignView implements MoveDrawable {
     return points;
   }
 
-  drag(delta: Point): void {
+  __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
-    this.updateView();
+    this.__updateView__();
   }
   // public set position(delta: Point) {
   //   this._center.x += delta.x;
@@ -271,10 +271,10 @@ export class GraphicView extends ForeignView implements MoveDrawable {
   // public get size(): Size {
   //   return this._size;
   // }
-  public drawSize(rect: Rect) {
-    this.setRect(rect);
+  public __drawSize__(rect: Rect) {
+    this.__setRect__(rect);
   }
-  public setRect(rect: Rect): void {
+  public __setRect__(rect: Rect): void {
     if (rect.width < 0) {
       rect.width = -rect.width;
       rect.x -= rect.width;
@@ -289,15 +289,15 @@ export class GraphicView extends ForeignView implements MoveDrawable {
     this._center.x = rect.x + rect.width / 2;
     this._center.y = rect.y + rect.height / 2;
 
-    this.updateView();
+    this.__updateView__();
 
     this.recreateGraphic();
   }
 
-  public override correct(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
+  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
-    this.drag(delta);
+    this.__drag__(delta);
   }
 
   // public get boundingRect(): Rect {

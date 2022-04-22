@@ -2,11 +2,11 @@ import {MoveDraw} from "../../mode/MoveDraw";
 import {Point} from "../../../../../model/Point";
 import {ElementView} from "../../../../../element/ElementView";
 import {ForeignObjectView} from "../../../../../element/foreign/ForeignObjectView";
-import {Callback} from "../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
 
 export class DrawAsset extends MoveDraw {
-  public content: HTMLDivElement = document.createElement("div");
+  public content: string = "";
 
   protected createDrawableElement(position: Point): ElementView {
     let videoView = new ForeignObjectView(this.container, {x: position.x, y: position.y, width: 0, height: 0});
@@ -16,13 +16,13 @@ export class DrawAsset extends MoveDraw {
 
   protected override onIsNotComplete(call: boolean) {
     if (!this._drawableElement) return;
-    this._drawableElement.setRect({
+    this._drawableElement.__setRect__({
       x: this.startPos.x - 300,
       y: this.startPos.y - 100,
       width: 600,
       height: 200
     });
-    this._drawableElement.refPoint = this._drawableElement?.center;
+    this._drawableElement.__refPoint__ = this._drawableElement?.center;
   }
   protected override onEnd(call: boolean) {
     if (call) {
@@ -36,14 +36,14 @@ export class DrawAsset extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.call(Callback.ASSET_TOOL_ON);
+      this.container.__call__(Event.ASSET_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.container.call(Callback.ASSET_TOOL_OFF);
+      this.container.__call__(Event.ASSET_TOOL_OFF);
     }
   }
 

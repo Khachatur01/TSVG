@@ -50,10 +50,10 @@ export class DrawTool extends Tool {
     this._drawer?.stop(call);
   }
 
-  public drawing() {
+  public __drawing__() {
     this._isDrawing = true;
   }
-  public drawingEnd() {
+  public __drawingEnd__() {
     this._isDrawing = false;
   }
   public stopDrawing(call: boolean = true) { /* for click drawing */

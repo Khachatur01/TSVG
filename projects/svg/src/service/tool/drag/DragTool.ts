@@ -1,8 +1,7 @@
 import {Container} from "../../../Container";
 import {Point} from "../../../model/Point";
-import {ElementView} from "../../../element/ElementView";
 import {Tool} from "../Tool";
-import {Callback} from "../../../dataSource/constant/Callback";
+import {Event} from "../../../dataSource/constant/Event";
 import {Focus} from "../../edit/group/Focus";
 
 export class DragTool extends Tool {
@@ -21,28 +20,28 @@ export class DragTool extends Tool {
 
   public makeMouseDown(position: Point, call: boolean = true) {
     this.mouseStartPos = position;
-    this.focus.fixRect();
-    this.focus.fixRefPoint();
-    this.elementStartPos = this.focus.lastRect;
+    this.focus.__fixRect__();
+    this.focus.__fixRefPoint__();
+    this.elementStartPos = this.focus.__lastRect__;
 
     this.focus.highlight();
 
     if (call) {
-      this._container.call(Callback.DRAG_MOUSE_DOWN, {position: position, elements: this.focus.children});
+      this._container.__call__(Event.DRAG_MOUSE_DOWN, {position: position, elements: this.focus.children});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
-    this.focus.translate({
+    this.focus.__translate__({
       x: position.x - this.mouseStartPos.x,
       y: position.y - this.mouseStartPos.y
     });
 
     if (call) {
-      this._container.call(Callback.DRAG_MOUSE_MOVE, {position: position});
+      this._container.__call__(Event.DRAG_MOUSE_MOVE, {position: position});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
-    this.focus.translate({
+    this.focus.__translate__({
       x: 0,
       y: 0
     });
@@ -50,12 +49,12 @@ export class DragTool extends Tool {
       x: position.x - this.mouseStartPos.x,
       y: position.y - this.mouseStartPos.y
     };
-    this.focus.drag(delta);
+    this.focus.__drag__(delta);
     this.focus.lowlight();
 
     if (call) {
-      this._container.call(Callback.DRAG_MOUSE_UP, {position: position});
-      this._container.call(Callback.NUDGE, {elements: this.focus.children, delta: delta});
+      this._container.__call__(Event.DRAG_MOUSE_UP, {position: position});
+      this._container.__call__(Event.ELEMENTS_DRAGGED, {elements: this.focus.children, delta: delta});
     }
   }
 
@@ -66,12 +65,12 @@ export class DragTool extends Tool {
     document.addEventListener("mouseup", this._dragEnd);
     document.addEventListener("touchend", this._dragEnd);
 
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     this.makeMouseDown(eventPosition);
   }
   private drag(event: MouseEvent | TouchEvent) {
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     this.makeMouseMove(eventPosition);
   }
@@ -81,7 +80,7 @@ export class DragTool extends Tool {
     document.removeEventListener("mouseup", this._dragEnd);
     document.removeEventListener("touchend", this._dragEnd);
 
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     this.makeMouseUp(eventPosition);
   }
@@ -97,7 +96,7 @@ export class DragTool extends Tool {
     this._isOn = true;
 
     if (call) {
-      this._container.call(Callback.DRAG_TOOL_ON);
+      this._container.__call__(Event.DRAG_TOOL_ON);
     }
   }
   public off(call: boolean = true): void {
@@ -106,7 +105,7 @@ export class DragTool extends Tool {
     this._isOn = false;
 
     if (call) {
-      this._container.call(Callback.DRAG_TOOL_OFF);
+      this._container.__call__(Event.DRAG_TOOL_OFF);
     }
   }
 }

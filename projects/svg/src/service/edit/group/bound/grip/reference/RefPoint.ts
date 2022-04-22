@@ -4,7 +4,7 @@ import {Arc} from "../../../../../../model/path/curve/arc/Arc";
 import {LineTo} from "../../../../../../model/path/line/LineTo";
 import {PathView} from "../../../../../../element/shape/PathView";
 import {Point} from "../../../../../../model/Point";
-import {Callback} from "../../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../../dataSource/constant/Event";
 import {Focus} from "../../../Focus";
 import {Cursor} from "../../../../../../dataSource/constant/Cursor";
 
@@ -35,46 +35,46 @@ export class RefPoint extends PathView {
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
-    this.focus.fixRect();
-    this.focus.fixRefPoint();
+    this.focus.__fixRect__();
+    this.focus.__fixRefPoint__();
     this._lastRect = Object.assign({}, this._rect);
 
     position = this._container.grid.getSnapPoint(position);
-    this.focus.refPointView = Object.assign({}, position);
+    this.focus.__refPointView__ = Object.assign({}, position);
 
     if (call) {
-      this._container.call(Callback.REF_POINT_VIEW_MOUSE_DOWN, {position: position, elements: this.focus.children});
+      this._container.__call__(Event.REF_POINT_VIEW_MOUSE_DOWN, {position: position, elements: this.focus.children});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
     position = this._container.grid.getSnapPoint(position);
-    this.focus.refPointView = Object.assign({}, position);
+    this.focus.__refPointView__ = Object.assign({}, position);
 
     if (call) {
-      this._container.call(Callback.REF_POINT_VIEW_MOUSE_MOVE, {position: position});
+      this._container.__call__(Event.REF_POINT_VIEW_MOUSE_MOVE, {position: position});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
     this.makeMouseMove(position);
     let refPoint = this._container.grid.getSnapPoint(position);
-    this.focus.refPoint = refPoint;
-    this.focus.correct(refPoint);
+    this.focus.__refPoint__ = refPoint;
+    this.focus.__correct__(refPoint);
     if (call) {
-      this._container.call(Callback.REF_POINT_VIEW_MOUSE_UP, {position: position});
-      this._container.call(Callback.REF_POINT_CHANGED, {newRefPoint: refPoint, oldRefPoint: this.focus.lastRefPoint, elements: this.focus.children});
+      this._container.__call__(Event.REF_POINT_VIEW_MOUSE_UP, {position: position});
+      this._container.__call__(Event.REF_POINT_CHANGED, {newRefPoint: refPoint, oldRefPoint: this.focus.__lastRefPoint__, elements: this.focus.children});
     }
   }
 
-  public fixPosition() {
+  public __fixPosition__() {
     this._lastCenter = this._center;
   }
-  public get lastPosition(): Point {
+  public get __lastPosition__(): Point {
     return this._lastCenter;
   }
-  public set lastPosition(refPoint: Point) {
+  public set __lastPosition__(refPoint: Point) {
     this._lastCenter = refPoint;
   }
-  public setPosition(position: Point) {
+  public __setPosition__(position: Point) {
     this._center = position;
     this.drawPoint(position);
   }
@@ -100,10 +100,10 @@ export class RefPoint extends PathView {
     });
   }
 
-  public show() {
+  public __show__() {
     this.svgElement.style.display = "block";
   }
-  public hide() {
+  public __hide__() {
     this.svgElement.style.display = "none";
   }
 
@@ -115,7 +115,7 @@ export class RefPoint extends PathView {
     this.moving = true;
     this._container.activeTool.off();
 
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let containerRect = this._container.HTML.getBoundingClientRect();
@@ -126,7 +126,7 @@ export class RefPoint extends PathView {
     this.makeMouseDown(position);
   }
   private move(event: MouseEvent | TouchEvent) {
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let containerRect = this._container.HTML.getBoundingClientRect();
@@ -146,7 +146,7 @@ export class RefPoint extends PathView {
     this._container.activeTool.on();
     this.moving = false;
 
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
     let position = {
@@ -156,11 +156,11 @@ export class RefPoint extends PathView {
     this.makeMouseUp(position);
   }
 
-  public on() {
+  public __on__() {
     this.svgElement.addEventListener("mousedown", this._start);
     this.svgElement.addEventListener("touchstart", this._start);
   }
-  public off() {
+  public __off__() {
     this.svgElement.removeEventListener("mousedown", this._start);
     this.svgElement.removeEventListener("touchstart", this._start);
   }

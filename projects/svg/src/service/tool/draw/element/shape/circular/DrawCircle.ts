@@ -1,15 +1,14 @@
 import {MoveDraw} from "../../../mode/MoveDraw";
 import {ElementView} from "../../../../../../element/ElementView";
-import {EllipseView} from "../../../../../../element/shape/circluar/EllipseView";
 import {Point} from "../../../../../../model/Point";
-import {Callback} from "../../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../../dataSource/constant/ElementType";
 import {CircleView} from "../../../../../../element/shape/circluar/CircleView";
 
 export class DrawCircle extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
     let element = new CircleView(this.container, {x: position.x, y: position.y, width: 0, height: 0});
-    element.fixRect();
+    element.__fixRect__();
     return element;
   }
 
@@ -17,14 +16,14 @@ export class DrawCircle extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.call(Callback.CIRCLE_TOOL_ON);
+      this.container.__call__(Event.CIRCLE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.call(Callback.CIRCLE_TOOL_OFF);
+      this.container.__call__(Event.CIRCLE_TOOL_OFF);
     }
   }
 

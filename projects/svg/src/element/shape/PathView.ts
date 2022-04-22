@@ -24,7 +24,7 @@ export class PathView extends ShapeView {
     this.svgElement.id = this.id;
 
     this.path = path;
-    this.fixRect();
+    this.__fixRect__();
 
     this.setOverEvent();
     try {
@@ -33,7 +33,7 @@ export class PathView extends ShapeView {
     }
   }
 
-  protected override updateView() {
+  protected override __updateView__() {
     this.setAttr({
       d: this._path.toString()
     });
@@ -46,24 +46,28 @@ export class PathView extends ShapeView {
     this._path = path;
 
     this._rect = ElementView.calculateRect(path.points);
-    this.updateView();
+    this.__updateView__();
+  }
+  public set pathString(path: string) {
+    this._path.fromString(path);
+    this._rect = ElementView.calculateRect(this._path.points);
   }
 
   public get copy(): PathView {
     let path: PathView = new PathView(this._container);
     path.path = this._path.copy;
-    path.fixRect();
+    path.__fixRect__();
 
-    path.refPoint = Object.assign({}, this.refPoint);
-    path.rotate(this._angle);
+    path.__refPoint__ = Object.assign({}, this.__refPoint__);
+    path.__rotate__(this._angle);
 
     path.style.set = this.style;
 
     return path;
   }
 
-  public override fixRect() {
-    super.fixRect();
+  public override __fixRect__() {
+    super.__fixRect__();
     this._lastPath = this._path.copy;
   }
 
@@ -81,26 +85,26 @@ export class PathView extends ShapeView {
     }
 
     this._rect = ElementView.calculateRect(points);
-    this.updateView();
+    this.__updateView__();
   }
 
-  public add(path: PathView) {
+  public addPath(path: PathView) {
     path.commands.forEach((command: PathCommand) => {
       this._path.add(command);
     });
 
     this._rect = ElementView.calculateRect(path.points);
-    this.updateView();
+    this.__updateView__();
   }
   public addCommand(command: PathCommand) {
     this._path.add(command);
     this._rect = this.calculateRectByNewPoint(command.position);
 
-    this.updateView();
+    this.__updateView__();
   }
 
-  public override correct(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
+  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
 
     let commands = this._path.getAll();
@@ -113,9 +117,9 @@ export class PathView extends ShapeView {
     }
     this._path.setAll(commands);
     this._rect = ElementView.calculateRect(this._path.points);
-    this.updateView();
+    this.__updateView__();
   }
-  public override drag(delta: Point) {
+  public override __drag__(delta: Point) {
     let lastCommands = this._lastPath.getAll();
     let thisCommands = this._path.getAll();
 
@@ -128,9 +132,9 @@ export class PathView extends ShapeView {
 
     this._path.setAll(thisCommands);
     this._rect = ElementView.calculateRect(this._path.points);
-    this.updateView();
+    this.__updateView__();
   }
-  public override setRect(rect: Rect, delta?: Point): void {
+  public override __setRect__(rect: Rect, delta?: Point): void {
     let dw = 1;
     let dh = 1;
 
@@ -156,7 +160,7 @@ export class PathView extends ShapeView {
     this._path = new Path();
     this._path.setAll(commands);
     this._rect = ElementView.calculateRect(this._path.points);
-    this.updateView();
+    this.__updateView__();
   }
 
   public getPoint(index: number): Point {
@@ -165,17 +169,17 @@ export class PathView extends ShapeView {
   public pushPoint(point: Point): void {
     this._path.add(new LineTo(point));
     this._rect = ElementView.calculateRect(this._path.points);
-    this.updateView();
+    this.__updateView__();
   }
   public replacePoint(index: number, point: Point): void {
     this._path.replace(index, point);
     this._rect = ElementView.calculateRect(this._path.points);
-    this.updateView();
+    this.__updateView__();
   }
   public removePoint(index: number): void {
     this._path.remove(index);
     this._rect = ElementView.calculateRect(this._path.points);
-    this.updateView();
+    this.__updateView__();
   }
 
   public override toPath(): PathView {

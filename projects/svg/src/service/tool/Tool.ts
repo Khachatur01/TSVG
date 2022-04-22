@@ -9,6 +9,10 @@ export abstract class Tool {
     this._container = container;
   }
 
+  abstract makeMouseDown(position: Point, call?: boolean, parameter?: any): void;
+  abstract makeMouseMove(position: Point, call?: boolean, parameter?: any): void;
+  abstract makeMouseUp(position: Point, call?: boolean, parameter?: any): void;
+
   public get container() {
     return this._container;
   }
@@ -19,14 +23,9 @@ export abstract class Tool {
     this._container.activeTool = this;
     this._on(call);
   }
-
-  abstract off(call?: boolean): void;
+  public abstract off(call?: boolean): void;
 
   public isOn(): boolean {
     return this._isOn;
   }
-
-  abstract makeMouseDown(position: Point, call?: boolean, parameter?: any): void;
-  abstract makeMouseMove(position: Point, call?: boolean, parameter?: any): void;
-  abstract makeMouseUp(position: Point, call?: boolean, parameter?: any): void;
 }

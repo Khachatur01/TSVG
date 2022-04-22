@@ -20,6 +20,22 @@ export class GroupView extends ElementView {
     this.svgElement.id = this.id;
   }
 
+  public get copy(): GroupView {
+    let group: GroupView = new GroupView(this._container);
+    this._elements.forEach((element: ElementView) => {
+      let copy = element.copy;
+      copy.group = group;
+      group.addElement(copy);
+    });
+
+    group.__refPoint__ = Object.assign({}, this.__refPoint__);
+    group._angle = (this._angle);
+
+    group.style.set = this.style;
+
+    return group;
+  }
+
   public getElementById(ownerId: string, index: number): ElementView | undefined {
     for (let element of this._elements) {
       if (element instanceof GroupView) {
@@ -30,23 +46,6 @@ export class GroupView extends ElementView {
     }
     return undefined;
   }
-
-  public get copy(): GroupView {
-    let group: GroupView = new GroupView(this._container);
-    this._elements.forEach((element: ElementView) => {
-      let copy = element.copy;
-      copy.group = group;
-      group.addElement(copy);
-    });
-
-    group.refPoint = Object.assign({}, this.refPoint);
-    group._angle = (this._angle);
-
-    group.style.set = this.style;
-
-    return group;
-  }
-
   public get elements(): Set<ElementView> {
     return this._elements;
   }
@@ -94,30 +93,30 @@ export class GroupView extends ElementView {
     });
     return points;
   }
-  public override correct(refPoint: Point, lastRefPoint: Point) {
+  public override __correct__(refPoint: Point, lastRefPoint: Point) {
     this._elements.forEach((child: ElementView) => {
-      child.correct(refPoint, lastRefPoint)
+      child.__correct__(refPoint, lastRefPoint)
     });
 
-    let correctionDelta = this.getCorrectionDelta(refPoint, lastRefPoint);
+    let correctionDelta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     this._rect.x += correctionDelta.x;
     this._rect.y += correctionDelta.y;
   }
 
-  public override translate(delta: Point) {
+  public override __translate__(delta: Point) {
     this.svgElement.style.transform =
       "translate(" + delta.x + "px, " + delta.y + "px)";
   }
-  drag(delta: Point): void {
+  public __drag__(delta: Point): void {
     this._elements.forEach((element: ElementView) => {
-      element.drag(delta);
+      element.__drag__(delta);
     });
 
     this._rect.x += delta.x;
     this._rect.y += delta.y;
   }
 
-  setRect(rect: Rect, delta?: Point): void {
+  public __setRect__(rect: Rect, delta?: Point): void {
   }
 
   protected recalculateRect() {
@@ -171,32 +170,32 @@ export class GroupView extends ElementView {
           element.SVG.setAttribute(key, "" + value);
   }
 
-  public override get refPoint(): Point {
-    return super.refPoint;
+  public override get __refPoint__(): Point {
+    return super.__refPoint__;
   }
-  public override set refPoint(point: Point) {
-    this._refPoint = point;
-    this._elements.forEach(child => child.refPoint = point);
+  public override set __refPoint__(point: Point) {
+    this.___refPoint__ = point;
+    this._elements.forEach(child => child.__refPoint__ = point);
   }
 
-  public override rotate(angle: number) {
+  public override __rotate__(angle: number) {
     this._angle = angle;
     this._elements.forEach(child =>
-      child.rotate((angle + child.lastAngle - this._lastAngle) % 360)
+      child.__rotate__((angle + child.__lastAngle__ - this.___lastAngle__) % 360)
     );
   }
 
-  public override fixRect(): void {
-    super.fixRect();
-    this._elements.forEach(child => child.fixRect());
+  public override __fixRect__(): void {
+    super.__fixRect__();
+    this._elements.forEach(child => child.__fixRect__());
   }
-  public override fixAngle(): void {
-    super.fixAngle();
-    this._elements.forEach(child => child.fixAngle());
+  public override __fixAngle__(): void {
+    super.__fixAngle__();
+    this._elements.forEach(child => child.__fixAngle__());
   }
-  public override onFocus() {
+  public override __onFocus__() {
   }
-  public override onBlur() {
+  public override __onBlur__() {
   }
 
   public toPath(): PathView {
@@ -207,7 +206,7 @@ export class GroupView extends ElementView {
     return true;
   }
 
-  protected updateView(): void {
+  protected __updateView__(): void {
   }
 
   public override toJSON(): any {

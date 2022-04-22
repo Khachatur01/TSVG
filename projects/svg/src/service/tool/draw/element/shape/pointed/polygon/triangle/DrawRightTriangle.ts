@@ -2,7 +2,7 @@ import {Point} from "../../../../../../../../model/Point";
 import {ElementView} from "../../../../../../../../element/ElementView";
 import {MoveDraw} from "../../../../../mode/MoveDraw";
 import {RightTriangleView} from "../../../../../../../../element/shape/pointed/polygon/triangle/RightTriangleView";
-import {Callback} from "../../../../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
 
 export class DrawRightTriangle extends MoveDraw {
@@ -14,14 +14,14 @@ export class DrawRightTriangle extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.call(Callback.RIGHT_TRIANGLE_TOOL_ON);
+      this.container.__call__(Event.RIGHT_TRIANGLE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.call(Callback.RIGHT_TRIANGLE_TOOL_OFF);
+      this.container.__call__(Event.RIGHT_TRIANGLE_TOOL_OFF);
     }
   }
 

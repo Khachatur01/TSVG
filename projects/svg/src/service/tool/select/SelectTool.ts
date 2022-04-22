@@ -3,7 +3,7 @@ import {Container} from "../../../Container";
 import {RectangleView} from "../../../element/shape/pointed/polygon/rectangle/RectangleView";
 import {Point} from "../../../model/Point";
 import {DragTool} from "../drag/DragTool";
-import {Callback} from "../../../dataSource/constant/Callback";
+import {Event} from "../../../dataSource/constant/Event";
 import {Focus} from "../../edit/group/Focus";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 
@@ -33,7 +33,7 @@ export class SelectTool extends Tool {
 
   public makeMouseDown(position: Point, call: boolean = true) {
     this.position = position;
-    this.boundingBox.setRect({
+    this.boundingBox.__setRect__({
       x: position.x,
       y: position.y,
       width: 1,
@@ -43,14 +43,14 @@ export class SelectTool extends Tool {
     this._container.HTML.appendChild(this.boundingBox.SVG);
 
     if (call) {
-      this._container.call(Callback.SELECT_AREA_MOUSE_DOWN, {position: position});
+      this._container.__call__(Event.SELECT_AREA_MOUSE_DOWN, {position: position});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
     let width = position.x - this.position.x;
     let height = position.y - this.position.y;
 
-    this.boundingBox.drawSize({
+    this.boundingBox.__drawSize__({
       x: this.position.x,
       y: this.position.y,
       width: width,
@@ -58,7 +58,7 @@ export class SelectTool extends Tool {
     });
 
     if (call) {
-      this._container.call(Callback.SELECT_AREA_MOUSE_MOVE, {position: position});
+      this._container.__call__(Event.SELECT_AREA_MOUSE_MOVE, {position: position});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
@@ -104,7 +104,7 @@ export class SelectTool extends Tool {
     this._container.singleSelect();
 
     if (call) {
-      this._container.call(Callback.SELECT_AREA_MOUSE_UP, {position: position});
+      this._container.__call__(Event.SELECT_AREA_MOUSE_UP, {position: position});
     }
   }
 
@@ -114,7 +114,7 @@ export class SelectTool extends Tool {
     this._container.HTML.addEventListener("touchmove", this._select);
     document.addEventListener("mouseup", this._end);
     document.addEventListener("touchend", this._end);
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
 
@@ -125,7 +125,7 @@ export class SelectTool extends Tool {
     this.makeMouseDown(startPosition);
   }
   private select(event: MouseEvent | TouchEvent): void {
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
     let movePosition = {
@@ -135,7 +135,7 @@ export class SelectTool extends Tool {
     this.makeMouseMove(movePosition);
   }
   private end(event: MouseEvent | TouchEvent): void {
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
     let endPosition = {
@@ -159,7 +159,7 @@ export class SelectTool extends Tool {
 
     this._container.style.changeCursor(Cursor.SELECT);
     if (call) {
-      this._container.call(Callback.SELECT_TOOl_ON);
+      this._container.__call__(Event.SELECT_TOOl_ON);
     }
   }
   public off(call: boolean = true): void {
@@ -169,7 +169,7 @@ export class SelectTool extends Tool {
     this.dragTool.off(call);
 
     if (call) {
-      this._container.call(Callback.SELECT_TOOl_OFF);
+      this._container.__call__(Event.SELECT_TOOl_OFF);
     }
   }
 }

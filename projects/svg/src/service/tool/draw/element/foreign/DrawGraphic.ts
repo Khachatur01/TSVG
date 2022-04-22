@@ -2,7 +2,7 @@ import {Point} from "../../../../../model/Point";
 import {GraphicView} from "../../../../../element/foreign/graphic/GraphicView";
 import {ElementView} from "../../../../../element/ElementView";
 import {MoveDraw} from "../../mode/MoveDraw";
-import {Callback} from "../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
 
 export class DrawGraphic extends MoveDraw {
@@ -19,27 +19,27 @@ export class DrawGraphic extends MoveDraw {
 
   protected override onIsNotComplete(call: boolean) {
     if (!this._drawableElement) return;
-    this._drawableElement.setRect({
+    this._drawableElement.__setRect__({
       x: this.startPos.x - 150,
       y: this.startPos.y - 100,
       width: 300,
       height: 200
     });
-    this._drawableElement.refPoint = this._drawableElement.center;
+    this._drawableElement.__refPoint__ = this._drawableElement.center;
   }
 
   public override start(call: boolean) {
     super.start(call);
 
     if (call) {
-      this.container.call(Callback.GRAPHIC_TOOL_ON);
+      this.container.__call__(Event.GRAPHIC_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.container.call(Callback.GRAPHIC_TOOL_OFF);
+      this.container.__call__(Event.GRAPHIC_TOOL_OFF);
     }
   }
 

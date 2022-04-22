@@ -4,7 +4,7 @@ import {EditTool} from "./EditTool";
 import {Rect} from "../../../model/Rect";
 import {Matrix} from "../../math/Matrix";
 import {Container} from "../../../Container";
-import {Callback} from "../../../dataSource/constant/Callback";
+import {Event} from "../../../dataSource/constant/Event";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class Node extends EllipseView {
@@ -26,28 +26,28 @@ export class Node extends EllipseView {
     this.order = order;
   }
 
-  public override drag(delta: Point) {
-    super.drag({x: delta.x - 8, y: delta.y - 8});
+  public override __drag__(delta: Point) {
+    super.__drag__({x: delta.x - 8, y: delta.y - 8});
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
     if (call) {
-      this._container.call(Callback.NODE_EDIT_MOUSE_DOWN, {order: this.order, position: position, element: this.editTool.nodeEditableElement});
+      this._container.__call__(Event.NODE_EDIT_MOUSE_DOWN, {order: this.order, position: position, element: this.editTool.nodeEditableElement});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
     if (!this.editTool.nodeEditableElement) return;
     let rotatedPosition = Matrix.rotate(
       [position],
-      this.editTool.nodeEditableElement.refPoint,
+      this.editTool.nodeEditableElement.__refPoint__,
       this.editTool.nodeEditableElement.angle
     )[0];
 
     this.editTool.nodeEditableElement.replacePoint(this.order, rotatedPosition);
-    this.drag(rotatedPosition);
+    this.__drag__(rotatedPosition);
 
     if (call) {
-      this._container.call(Callback.NODE_EDIT_MOUSE_MOVE, {order: this.order, position: position, element: this.editTool.nodeEditableElement});
+      this._container.__call__(Event.NODE_EDIT_MOUSE_MOVE, {order: this.order, position: position, element: this.editTool.nodeEditableElement});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
@@ -55,13 +55,13 @@ export class Node extends EllipseView {
     if (!this.editTool.nodeEditableElement) return;
     let rotatedPosition = Matrix.rotate(
       [position],
-      this.editTool.nodeEditableElement.refPoint,
+      this.editTool.nodeEditableElement.__refPoint__,
       this.editTool.nodeEditableElement.angle
     )[0];
 
     if (call) {
-      this._container.call(Callback.NODE_EDIT_MOUSE_UP, {order: this.order, position: position, element: this.editTool.nodeEditableElement});
-      this._container.call(Callback.NODE_EDITED, {order: this.order, position: rotatedPosition, element: this.editTool.nodeEditableElement});
+      this._container.__call__(Event.NODE_EDIT_MOUSE_UP, {order: this.order, position: position, element: this.editTool.nodeEditableElement});
+      this._container.__call__(Event.NODE_EDITED, {order: this.order, position: rotatedPosition, element: this.editTool.nodeEditableElement});
     }
   }
 
@@ -72,7 +72,7 @@ export class Node extends EllipseView {
     document.addEventListener("touchend", this._end);
 
     let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let position = this._container.grid.getSnapPoint({
@@ -83,7 +83,7 @@ export class Node extends EllipseView {
   };
   protected onMove(event: MouseEvent | TouchEvent): void {
     let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let position = this._container.grid.getSnapPoint({
@@ -100,7 +100,7 @@ export class Node extends EllipseView {
     document.removeEventListener("touchend", this._end);
 
     let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let position = this._container.grid.getSnapPoint({
@@ -110,8 +110,12 @@ export class Node extends EllipseView {
     this.makeMouseUp(position);
   };
 
-  public on() {
+  public __on__() {
     this.svgElement.addEventListener("mousedown", this._start);
     this.svgElement.addEventListener("touchstart", this._start);
+  }
+  public __off__() {
+    this.svgElement.removeEventListener("mousedown", this._start);
+    this.svgElement.removeEventListener("touchstart", this._start);
   }
 }

@@ -1,7 +1,7 @@
 import {ClickDraw} from "../../../../mode/ClickDraw";
 import {PointedView} from "../../../../../../../element/shape/pointed/PointedView";
 import {Point} from "../../../../../../../model/Point";
-import {Callback} from "../../../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../../../dataSource/constant/Event";
 import {PolygonView} from "../../../../../../../element/shape/pointed/polygon/PolygonView";
 import {ElementType} from "../../../../../../../dataSource/constant/ElementType";
 
@@ -16,14 +16,14 @@ export class DrawPolygon extends ClickDraw {
     super.start(call);
 
     if (call) {
-      this.container.call(Callback.POLYGON_TOOL_ON);
+      this.container.__call__(Event.POLYGON_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.call(Callback.POLYGON_TOOL_OFF);
+      this.container.__call__(Event.POLYGON_TOOL_OFF);
     }
   }
 

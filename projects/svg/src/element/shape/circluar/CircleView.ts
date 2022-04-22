@@ -2,17 +2,16 @@ import {Point} from "../../../model/Point";
 import {Rect} from "../../../model/Rect";
 import {ElementCursor, ElementView} from "../../ElementView";
 import {Container} from "../../../Container";
-import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
-import {PathView} from "../PathView";
-import {Path} from "../../../model/path/Path";
-import {Arc} from "../../../model/path/curve/arc/Arc";
-import {MoveTo} from "../../../model/path/point/MoveTo";
-import {ShapeView} from "../../type/ShapeView";
 import {ElementType} from "../../../dataSource/constant/ElementType";
-import {EllipseView} from "./EllipseView";
 import {CircularView} from "./CircularView";
+import {Cursor} from "../../../dataSource/constant/Cursor";
 
-export class CircleCursor extends ElementCursor {}
+export class CircleCursor extends ElementCursor {
+  constructor() {
+    super();
+    this.cursor[Cursor.EDIT] = "auto";
+  }
+}
 
 export class CircleView extends CircularView {
   protected override svgElement: SVGCircleElement = document.createElementNS(ElementView.svgURI, "circle");
@@ -22,13 +21,13 @@ export class CircleView extends CircularView {
     super(container, ownerId, index);
     this.svgElement.id = this.id;
 
-    this.setRect(rect);
+    this.__setRect__(rect);
 
     this.setOverEvent();
     this.style.setDefaultStyle();
   }
 
-  protected override updateView(): void {
+  protected override __updateView__(): void {
     this.setAttr({
       cx: this._rect.x + this._rect.width / 2,
       cy: this._rect.y + this._rect.height / 2,
@@ -38,15 +37,15 @@ export class CircleView extends CircularView {
 
   public override get copy(): CircleView {
     let ellipse: CircleView = new CircleView(this._container, this._rect);
-    ellipse.refPoint = Object.assign({}, this.refPoint);
-    ellipse.rotate(this._angle);
+    ellipse.__refPoint__ = Object.assign({}, this.__refPoint__);
+    ellipse.__rotate__(this._angle);
 
     ellipse.style.set = this.style;
 
     return ellipse;
   }
 
-  public override setRect(rect: Rect, delta: Point | null = null): void {
+  public override __setRect__(rect: Rect, delta: Point | null = null): void {
     if (delta) {
       let deltaXSign = delta.x < 0 ? -1 : 1;
       let deltaYSign = delta.y < 0 ? -1 : 1;
@@ -61,7 +60,7 @@ export class CircleView extends CircularView {
     rect.width *= widthSign;
     rect.height *= heightSign;
 
-    super.setRect(rect, delta);
+    super.__setRect__(rect, delta);
   }
 
   public override getVisibleRect(): Rect {

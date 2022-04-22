@@ -3,7 +3,7 @@ import {ElementView} from "../../../../element/ElementView";
 import {Container} from "../../../../Container";
 import {Point} from "../../../../model/Point";
 import {MoveDrawable} from "../type/MoveDrawable";
-import {Callback} from "../../../../dataSource/constant/Callback";
+import {Event} from "../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {DrawTool} from "../DrawTool";
 
@@ -31,9 +31,9 @@ export abstract class MoveDraw extends Drawer {
     this._drawableElement = this.createDrawableElement(this.startPos);
 
     this.container.add(this._drawableElement);
-    this.container.drawTool.drawing();
+    this.container.drawTool.__drawing__();
     if (call) {
-      this.container.call(Callback.DRAW_MOUSE_DOWN, {position: this.startPos, element: this._drawableElement});
+      this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: this.startPos, element: this._drawableElement});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
@@ -62,7 +62,7 @@ export abstract class MoveDraw extends Drawer {
     }
 
     /* if _drawableElement instance of MoveDrawable, set drawSize */
-    (this._drawableElement as unknown as MoveDrawable)?.drawSize({
+    (this._drawableElement as unknown as MoveDrawable)?.__drawSize__({
       x: this.startPos.x,
       y: this.startPos.y,
       width: width,
@@ -70,7 +70,7 @@ export abstract class MoveDraw extends Drawer {
     });
 
     if (call) {
-      this.container.call(Callback.DRAW_MOUSE_MOVE, {position: position, element: this._drawableElement});
+      this.container.__call__(Event.DRAW_MOUSE_MOVE, {position: position, element: this._drawableElement});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
@@ -80,14 +80,14 @@ export abstract class MoveDraw extends Drawer {
 
     /* if element is drawn */
     if (this._drawableElement.isComplete()) {
-      this._drawableElement.refPoint = this._drawableElement.center;
+      this._drawableElement.__refPoint__ = this._drawableElement.center;
 
       if (this.drawTool?.toolAfterDrawing) {
         this.container.blur();
-        this.container.focused.lastRefPoint = this._drawableElement.refPoint;
+        this.container.focused.__lastRefPoint__ = this._drawableElement.__refPoint__;
 
         this.container.focus(this._drawableElement);
-        this.container.focused.fixRect();
+        this.container.focused.__fixRect__();
 
         if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
           this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
@@ -99,11 +99,11 @@ export abstract class MoveDraw extends Drawer {
     }
 
     this.onEnd(call);
-    this.container.drawTool.drawingEnd();
+    this.container.drawTool.__drawingEnd__();
 
     if (call) {
-      this.container.call(Callback.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
-      this.container.call(Callback.ELEMENT_CREATED, {element: this._drawableElement});
+      this.container.__call__(Event.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
+      this.container.__call__(Event.ELEMENT_CREATED, {element: this._drawableElement});
     }
   }
 
@@ -120,7 +120,7 @@ export abstract class MoveDraw extends Drawer {
     this.container.HTML.addEventListener('touchmove', this._draw);
     document.addEventListener('mouseup', this._drawEnd);
     document.addEventListener('touchend', this._drawEnd);
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let containerRect = this.container.HTML.getBoundingClientRect();
@@ -132,7 +132,7 @@ export abstract class MoveDraw extends Drawer {
   }
   protected draw(event: MouseEvent | TouchEvent) {
     if (!this._drawableElement) return;
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let containerRect = this.container.HTML.getBoundingClientRect();
@@ -147,7 +147,7 @@ export abstract class MoveDraw extends Drawer {
     this.container.HTML.removeEventListener('touchmove', this._draw);
     document.removeEventListener('mouseup', this._drawEnd);
     document.removeEventListener('touchend', this._drawEnd);
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     let containerRect = this.container.HTML.getBoundingClientRect();
@@ -161,7 +161,7 @@ export abstract class MoveDraw extends Drawer {
   protected onEnd(call: boolean) {}
   protected onIsNotComplete(call: boolean) {
     if (this._drawableElement)
-      this.container.remove(this._drawableElement);
+      this.container.remove(this._drawableElement, true, false);
   }
 
   public override stopDrawing(call?: boolean) {}

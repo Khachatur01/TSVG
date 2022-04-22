@@ -24,8 +24,9 @@ export class BoundingBox extends BoxView {
   private referencePoint: RefPoint;
   private rotatePoint: RotatePoint;
   private readonly _boundingBoxGroup: SVGGElement;
-  private readonly _refPointGroup: SVGGElement;
+  private readonly ___refPointGroup__: SVGGElement;
   private readonly focus: Focus;
+  public perfect: boolean = false; /* for rotate point */
 
   public constructor(container: Container, focus: Focus, rect: Rect = {x: 0, y: 0, width: 0, height: 0}) {
     super(container, rect);
@@ -63,59 +64,59 @@ export class BoundingBox extends BoxView {
       this._boundingBoxGroup.appendChild(grip.SVG);
     }
 
-    this._refPointGroup = document.createElementNS(ElementView.svgURI, "g");
-    this._refPointGroup.id = "reference-point";
-    this._refPointGroup.appendChild(this.referencePoint.SVG);
+    this.___refPointGroup__ = document.createElementNS(ElementView.svgURI, "g");
+    this.___refPointGroup__.id = "reference-point";
+    this.___refPointGroup__.appendChild(this.referencePoint.SVG);
   }
 
-  public set transparentClick(transparent: boolean) {
+  public set __transparentClick__(transparent: boolean) {
     this.style.fillColor = transparent ? "none" : "transparent";
   }
 
-  public get svgGroup(): SVGGElement {
+  public get __svgGroup__(): SVGGElement {
     return this._boundingBoxGroup;
   }
-  public get refPointGroup(): SVGGElement {
-    return this._refPointGroup;
+  public get __refPointGroup__(): SVGGElement {
+    return this.___refPointGroup__;
   }
 
-  public fixRefPoint() {
-    this.referencePoint.fixPosition();
+  public __fixRefPoint__() {
+    this.referencePoint.__fixPosition__();
   }
-  public set lastRefPoint(refPoint: Point) {
-    this.referencePoint.lastPosition = refPoint;
+  public set __lastRefPoint__(refPoint: Point) {
+    this.referencePoint.__lastPosition__ = refPoint;
   }
-  public get lastRefPoint(): Point {
-    return this.referencePoint.lastPosition;
+  public get __lastRefPoint__(): Point {
+    return this.referencePoint.__lastPosition__;
   }
 
-  public singleFocus(rotatable: boolean = true) {
+  public __singleFocus__(rotatable: boolean = true) {
     this.svgElement.style.display = "block";
     for (let grip of this._grips)
-      grip.show();
+      grip.__show__();
 
     if (rotatable) {
-      this.referencePoint.show();
-      this.rotatePoint.show();
+      this.referencePoint.__show__();
+      this.rotatePoint.__show__();
     } else {
-      this.referencePoint.hide();
-      this.rotatePoint.hide();
+      this.referencePoint.__hide__();
+      this.rotatePoint.__hide__();
     }
   }
-  public onlyCircleFocus(rotatable: boolean = true) {
+  public __onlyCircleFocus__(rotatable: boolean = true) {
     this.svgElement.style.display = "block";
     for (let i = 0; i < this._grips.length; i += 2)
-      this._grips[i].show();
+      this._grips[i].__show__();
 
     if (rotatable) {
-      this.referencePoint.show();
-      this.rotatePoint.show();
+      this.referencePoint.__show__();
+      this.rotatePoint.__show__();
     } else {
-      this.referencePoint.hide();
-      this.rotatePoint.hide();
+      this.referencePoint.__hide__();
+      this.rotatePoint.__hide__();
     }
   }
-  public multipleFocus(rotatable: boolean = true) {
+  public __multipleFocus__(rotatable: boolean = true) {
     this.svgElement.style.display = "block";
     /* more effective than with one loop and condition */
     // for(let i = 0; i < this._grips.length; i += 2) {
@@ -125,73 +126,72 @@ export class BoundingBox extends BoxView {
     //   this._grips[i].hide();
     // }
     for (let grip of this._grips)
-      grip.hide();
+      grip.__hide__();
 
     if (rotatable) {
-      this.referencePoint.show();
-      this.rotatePoint.show();
+      this.referencePoint.__show__();
+      this.rotatePoint.__show__();
     } else {
-      this.referencePoint.hide();
-      this.rotatePoint.hide();
+      this.referencePoint.__hide__();
+      this.rotatePoint.__hide__();
     }
   }
 
-
-  public blur() {
-    this.rotate(0);
+  public __blur__() {
+    this.__rotate__(0);
     this.svgElement.style.display = "none";
     for (let grip of this._grips)
-      grip.hide();
+      grip.__hide__();
 
-    this.referencePoint.hide();
-    this.rotatePoint.hide();
+    this.referencePoint.__hide__();
+    this.rotatePoint.__hide__();
   }
 
   public override get points(): Point[] {
     return super.points;
   }
 
-  public positionGrips() {
+  public __positionGrips__() {
     this._rect.width = Math.abs(this._rect.width);
     this._rect.height = Math.abs(this._rect.height);
 
     let points = this.points;
     if (/*!points || */!this._grips) return
     for (let grip of this._grips)
-      grip.setPosition(points);
+      grip.__setPosition__(points);
 
-    this.rotatePoint.setPosition({
+    this.rotatePoint.__setPosition__({
       x: (points[0].x + points[1].x) / 2,
       y: (points[0].y + points[1].y) / 2,
     });
   }
 
-  public correctByDelta(delta: Point) {
-    this.drag(delta);
-    this.positionGrips();
+  public __correctByDelta__(delta: Point) {
+    this.__drag__(delta);
+    this.__positionGrips__();
   }
 
-  public override correct(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
-    this.correctByDelta(delta);
+  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    this.__correctByDelta__(delta);
   }
 
-  public override get refPoint(): Point {
-    return this._refPoint;
+  public override get __refPoint__(): Point {
+    return this.___refPoint__;
   }
-  public override set refPoint(refPoint: Point) {
+  public override set __refPoint__(refPoint: Point) {
     this._boundingBoxGroup.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
-    this._refPoint = refPoint;
+    this.___refPoint__ = refPoint;
   }
 
-  public set refPointView(refPoint: Point) {
-    this.referencePoint.setPosition(refPoint);
-    this._refPointGroup.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
+  public set __refPointView__(refPoint: Point) {
+    this.referencePoint.__setPosition__(refPoint);
+    this.___refPointGroup__.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
   }
 
-  public override rotate(angle: number): void {
+  public override __rotate__(angle: number): void {
     this._boundingBoxGroup.style.transform = "rotate(" + angle + "deg)";
-    this._refPointGroup.style.transform = "rotate(" + angle + "deg)";
+    this.___refPointGroup__.style.transform = "rotate(" + angle + "deg)";
 
     this._angle = angle;
   }
@@ -226,18 +226,18 @@ export class BoundingBox extends BoxView {
     this.rotatePoint.makeMouseUp(position, call);
   }
 
-  public on() {
-    this.rotatePoint.on();
-    this.referencePoint.on();
+  public __on__() {
+    this.rotatePoint.__on__();
+    this.referencePoint.__on__();
     this._grips.forEach((grip: Grip) => {
-      grip.on();
+      grip.__on__();
     });
   }
-  public off() {
-    this.rotatePoint.off();
-    this.referencePoint.off();
+  public __off__() {
+    this.rotatePoint.__off__();
+    this.referencePoint.__off__();
     this._grips.forEach((grip: Grip) => {
-      grip.off();
+      grip.__off__();
     });
   }
 }

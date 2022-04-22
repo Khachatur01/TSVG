@@ -2,7 +2,7 @@ import {ClickDraw} from "../../../../mode/ClickDraw";
 import {PolylineView} from "../../../../../../../element/shape/pointed/polyline/PolylineView";
 import {PointedView} from "../../../../../../../element/shape/pointed/PointedView";
 import {Point} from "../../../../../../../model/Point";
-import {Callback} from "../../../../../../../dataSource/constant/Callback";
+import {Event} from "../../../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../../../dataSource/constant/ElementType";
 
 export class DrawPolyline extends ClickDraw {
@@ -16,14 +16,14 @@ export class DrawPolyline extends ClickDraw {
     super.start(call);
 
     if (call) {
-      this.container.call(Callback.POLYLINE_TOOL_ON);
+      this.container.__call__(Event.POLYLINE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.call(Callback.POLYLINE_TOOL_OFF);
+      this.container.__call__(Event.POLYLINE_TOOL_OFF);
     }
   }
 

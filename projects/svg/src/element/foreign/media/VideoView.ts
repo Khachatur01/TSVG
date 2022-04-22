@@ -37,7 +37,7 @@ export class VideoView extends ForeignObjectView {
     this.source = document.createElement("source");
     this._video.appendChild(this.source);
     this.src = src;
-    this.setContent(this._video, false);
+    this.setContent(this._video.outerHTML, false);
   }
 
   public override get copy(): VideoView {

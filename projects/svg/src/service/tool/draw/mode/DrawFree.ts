@@ -5,10 +5,11 @@ import {Point} from "../../../../model/Point";
 import {Angle} from "../../../math/Angle";
 import {Path} from "../../../../model/path/Path";
 import {MoveTo} from "../../../../model/path/point/MoveTo";
-import {Callback} from "../../../../dataSource/constant/Callback";
+import {Event} from "../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../../element/ElementView";
 import {Cursor} from "../../../../dataSource/constant/Cursor";
+import {LineTo} from "../../../../model/path/line/LineTo";
 
 export class DrawFree extends Drawer {
   private readonly container: Container;
@@ -35,7 +36,7 @@ export class DrawFree extends Drawer {
     this.container.add(this._drawableElement);
 
     if (call) {
-      this.container.call(Callback.DRAW_MOUSE_DOWN, {position: position, element: this._drawableElement});
+      this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: position, element: this._drawableElement});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true, additional?: any) {
@@ -51,7 +52,7 @@ export class DrawFree extends Drawer {
         this._drawableElement.pushPoint(position);
       } else if (this.drawTool?.perfect) {
         try {
-          let lastPoint: Point = this._drawableElement.getPoint(-2);
+          let lastPoint: Point = this._drawableElement.getPoint(-1);
           position = Angle.snapLineEnd(lastPoint, position) as Point;
           this._drawableElement.replacePoint(-1, position);
         } catch (typeError) {
@@ -63,27 +64,27 @@ export class DrawFree extends Drawer {
     }
 
     if (call) {
-      this.container.call(Callback.DRAW_MOUSE_MOVE, {position: position, element: this._drawableElement});
+      this.container.__call__(Event.DRAW_MOUSE_MOVE, {position: position, element: this._drawableElement});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true, additional?: any) {
     if (!this._drawableElement) return;
 
     if (additional) {
-      this._drawableElement.path.fromString(additional.path);
+      this._drawableElement.pathString = additional.path;
       this._drawableElement.setAttr({
         d: additional.path
       });
     }
     if (!this._drawableElement.isComplete()) {
-      this.container.remove(this._drawableElement);
+      this.container.remove(this._drawableElement, true, false);
     } else {
-      this._drawableElement.refPoint = this._drawableElement.center;
+      this._drawableElement.__refPoint__ = this._drawableElement.center;
     }
 
     if (call) {
-      this.container.call(Callback.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
-      this.container.call(Callback.ELEMENT_CREATED, {position: position, element: this._drawableElement});
+      this.container.__call__(Event.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
+      this.container.__call__(Event.ELEMENT_CREATED, {position: position, element: this._drawableElement});
     }
   }
 
@@ -104,7 +105,7 @@ export class DrawFree extends Drawer {
     document.addEventListener('touchend', this._drawEnd);
 
     let containerRect = this.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     this.makeMouseDown({
@@ -115,7 +116,7 @@ export class DrawFree extends Drawer {
   private draw(event: MouseEvent | TouchEvent): void {
     let containerRect = this.container.HTML.getBoundingClientRect();
 
-    let eventPosition = Container.eventToPosition(event);
+    let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
     this.makeMouseMove({
@@ -139,7 +140,7 @@ export class DrawFree extends Drawer {
     this.container.HTML.addEventListener('touchstart', this._drawStart);
 
     if (call) {
-      this.container.call(Callback.FREE_HAND_TOOL_ON);
+      this.container.__call__(Event.FREE_HAND_TOOL_ON);
     }
   }
   public stop(call: boolean = true): void {
@@ -147,7 +148,7 @@ export class DrawFree extends Drawer {
     this.container.HTML.removeEventListener('touchstart', this._drawStart);
 
     if (call) {
-      this.container.call(Callback.FREE_HAND_TOOL_OFF);
+      this.container.__call__(Event.FREE_HAND_TOOL_OFF);
     }
   }
 }

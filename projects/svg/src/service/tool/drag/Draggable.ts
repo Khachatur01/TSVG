@@ -1,9 +1,9 @@
 import {Point} from "../../../model/Point";
 
 export interface Draggable {
-  drag(position: Point): void;
+  __drag__(position: Point): void;
 
   get SVG(): SVGElement;
 
-  fixRect(): void;
+  __fixRect__(): void;
 }

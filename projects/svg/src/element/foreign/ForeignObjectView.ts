@@ -1,9 +1,9 @@
-import {ElementCursor, ElementView} from "../ElementView";
+import {ElementCursor, ElementStyle, ElementView} from "../ElementView";
 import {Container} from "../../Container";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
 import {PathView} from "../shape/PathView";
-import {Callback} from "../../dataSource/constant/Callback";
+import {Event} from "../../dataSource/constant/Event";
 import {ForeignView} from "../type/ForeignView";
 import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../dataSource/constant/ElementType";
@@ -16,12 +16,77 @@ export class ForeignObjectCursor extends ElementCursor {
   }
 }
 
+class ForeignObjectStyle extends ElementStyle {
+  protected override element: ForeignObjectView;
+
+  public constructor(element: ForeignObjectView) {
+    super(element);
+    this.element = element;
+  }
+
+  public override get strokeWidth(): string {
+    return super.strokeWidth;
+  }
+  public override set strokeWidth(width: string) {
+    // super.strokeWidth = width;
+  }
+
+  public override get strokeDashArray(): string {
+    return super.strokeDashArray;
+  }
+  public override set strokeDashArray(array: string) {
+    // super.strokeDashArray = array;
+  }
+
+  public override get strokeColor(): string {
+    return super.strokeColor;
+  }
+  public override set strokeColor(color: string) {
+    // super.strokeColor = color;
+  }
+
+  public override get fillColor(): string {
+    return super.fillColor;
+  }
+  public override set fillColor(color: string) {
+    // super.fillColor = color;
+  }
+
+  public override get fontSize(): string {
+    return super.fontSize;
+  }
+  public override set fontSize(size: string) {
+    super.fontSize = size;
+    this.element.HTML.style.fontSize = size + "px";
+    this.element.content.style.fontSize = size + "px";
+  }
+
+  public override get fontColor(): string {
+    return super.fontColor;
+  }
+  public override set fontColor(color: string) {
+    super.fontColor = color;
+    this.element.HTML.style.color = color;
+    this.element.content.style.color = color;
+  }
+
+  public override get backgroundColor(): string {
+    return super.backgroundColor;
+  }
+  public override set backgroundColor(color: string)  {
+    super.backgroundColor = color;
+    this.element.HTML.style.backgroundColor = color;
+    this.element.content.style.backgroundColor = color;
+  }
+}
+
 export class ForeignObjectView extends ForeignView implements MoveDrawable {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "foreignObject");
   protected override _type: ElementType = ElementType.FOREIGN_OBJECT;
 
   /* Model */
-  protected _content: HTMLElement | null = null;
+  public override readonly style: ForeignObjectStyle;
+  protected _content: HTMLElement;
   public readonly outline: string = "thin solid #999";
   /* Model */
 
@@ -30,23 +95,23 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.svgElement.id = this.id;
     this.svgElement.style.outline = "none";
     this.svgElement.style.border = "none";
-    this.style.fontSize = this.style.fontSize;
-    this.style.fontColor = this.style.fontColor;
-    this.style.backgroundColor = this.style.backgroundColor;
+    this.style = new ForeignObjectStyle(this);
+    this._content = document.createElement('div');
+    this._content.contentEditable = "true";
 
-    this.setRect(rect);
+    this.__setRect__(rect);
     this.setOverEvent();
 
     this.setAttr({
       preserveAspectRatio: "none"
     });
 
-    this._container.addCallBack(Callback.EDIT_TOOl_OFF, () => {
+    this._container.addCallBack(Event.EDIT_TOOl_OFF, () => {
       if (this._content) {
         this._content.style.userSelect = "none";
       }
     });
-    this._container.addCallBack(Callback.EDIT_TOOl_ON, () => {
+    this._container.addCallBack(Event.EDIT_TOOl_ON, () => {
       if (this._content) {
         this._content.style.userSelect = "unset";
       }
@@ -55,32 +120,29 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       this.style.setDefaultStyle();
     } catch (error: any) {
     }
-
-    this.addEditCallBack();
   }
 
   public get copy(): ForeignObjectView {
     let foreignObject: ForeignObjectView = new ForeignObjectView(this._container);
-    if (this._content)
-      foreignObject.setContent(this._content.cloneNode(true) as HTMLElement);
+    foreignObject.setContent(this._content.innerHTML);
 
-    foreignObject.setRect(this._rect);
-    foreignObject.fixRect();
+    foreignObject.__setRect__(this._rect);
+    foreignObject.__fixRect__();
 
-    foreignObject.refPoint = Object.assign({}, this.refPoint);
-    foreignObject.rotate(this._angle);
+    foreignObject.__refPoint__ = Object.assign({}, this.__refPoint__);
+    foreignObject.__rotate__(this._angle);
 
     foreignObject.style.set = this.style;
 
     return foreignObject;
   }
 
-  public drag(delta: Point): void {
+  public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
-    this.updateView();
+    this.__updateView__();
   }
-  public setRect(rect: Rect, delta?: Point): void {
+  public __setRect__(rect: Rect, delta?: Point): void {
     if (rect.width < 0) {
       rect.width = -rect.width;
       rect.x -= rect.width;
@@ -90,9 +152,9 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       rect.y -= rect.height;
     }
     this._rect = rect;
-    this.updateView();
+    this.__updateView__();
   }
-  protected updateView(): void {
+  protected __updateView__(): void {
     this.setAttr({
       x: this._rect.x + "",
       y: this._rect.y + "",
@@ -101,32 +163,35 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     });
   }
 
-  public override correct(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
+  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
 
     this._rect.x = this._rect.x + delta.x;
     this._rect.y = this._rect.y + delta.y;
 
-    this.updateView();
+    this.__updateView__();
   }
 
-  public drawSize(rect: Rect) {
-    this.setRect(rect);
+  public __drawSize__(rect: Rect) {
+    this.__setRect__(rect);
   }
 
   protected addEditCallBack() {
     this._content?.addEventListener("input", () => {
-      this._container.call(Callback.ASSET_EDIT, {content: this._content});
+      this._container.__call__(Event.ASSET_EDIT, {element: this});
+    });
+    this._content?.addEventListener("blur", () => {
+      this._container.__call__(Event.ASSET_EDIT_COMMIT, {element: this});
     });
   }
 
-  public override onFocus(force: boolean = false) {
+  public override __onFocus__(force: boolean = false) {
     if (force || this._container.editTool.isOn()) {
       this.svgElement.style.outline = this.outline;
     }
   }
-  public override onBlur() {
+  public override __onBlur__() {
     this.svgElement.style.outline = "unset";
   }
 
@@ -137,23 +202,22 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     return this.svgElement;
   }
 
-  public get content(): HTMLElement | null {
+  public get content(): HTMLElement {
     return this._content;
   }
-  public setContent(content: HTMLElement, setListeners: boolean = true): void {
-    this._content = content;
-    content.style.userSelect = "none";
-    content.style.border = "none";
-    content.style.outline = "none";
-    content.contentEditable = "true";
-    this.svgElement.appendChild(content);
+  public setContent(content: string, setListeners: boolean = true): void {
+    this._content.innerHTML = content;
+    this._content.style.userSelect = "none";
+    this._content.style.border = "none";
+    this._content.style.outline = "none";
+    this.svgElement.appendChild(this._content);
 
     if (setListeners) {
-      content.addEventListener("focus", () => {
+      this._content.addEventListener("focus", () => {
         if (this._container.editTool.isOn()) {
-          content.focus();
+          this._content.focus();
         } else {
-          content.blur();
+          this._content.blur();
         }
       });
       this.addEditCallBack();
@@ -178,16 +242,11 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
   public override toJSON(): any {
     let json = super.toJSON();
-    json["content"] = this._content?.outerHTML;
+    json["content"] = encodeURIComponent(this._content.innerHTML);
     return json;
   }
   public override fromJSON(json: any) {
     super.fromJSON(json);
-    if (json.content) {
-      let content = document.createElement("div");
-      this.setContent(content);
-      content.outerHTML = json.content;
-      this._content = content;
-    }
+    this.setContent(decodeURIComponent(json.content));
   };
 }

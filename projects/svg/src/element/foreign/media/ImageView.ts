@@ -32,7 +32,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
       return false;
     }
 
-    this.setRect(rect);
+    this.__setRect__(rect);
     this.src = src;
 
     this.setOverEvent();
@@ -42,7 +42,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
     });
   }
 
-  protected updateView(): void {
+  protected __updateView__(): void {
     this.setAttr({
       x: this._rect.x + "",
       y: this._rect.y + "",
@@ -54,27 +54,27 @@ export class ImageView extends ForeignView implements MoveDrawable {
   public get copy(): ImageView {
     let image: ImageView = new ImageView(this._container, this._rect, this._src);
 
-    image.refPoint = Object.assign({}, this.refPoint);
-    image.rotate(this._angle);
+    image.__refPoint__ = Object.assign({}, this.__refPoint__);
+    image.__rotate__(this._angle);
 
     image.style.set = this.style;
 
     return image;
   }
-  public drag(delta: Point): void {
+  public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
-    this.updateView();
+    this.__updateView__();
   }
 
-  public override correct(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.getCorrectionDelta(refPoint, lastRefPoint);
+  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
 
     this._rect.x = this._rect.x + delta.x;
     this._rect.y = this._rect.y + delta.y;
 
-    this.updateView();
+    this.__updateView__();
   }
 
   public get size(): Size {
@@ -83,10 +83,10 @@ export class ImageView extends ForeignView implements MoveDrawable {
       height: parseInt(this.getAttr("height"))
     };
   }
-  public drawSize(rect: Rect) {
-    this.setRect(rect);
+  public __drawSize__(rect: Rect) {
+    this.__setRect__(rect);
   }
-  public setRect(rect: Rect): void {
+  public __setRect__(rect: Rect): void {
     if (rect.width < 0) {
       rect.width = -rect.width;
       rect.x -= rect.width;
@@ -97,7 +97,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
     }
 
     this._rect = rect;
-    this.updateView();
+    this.__updateView__();
   }
 
   public get src(): string {
