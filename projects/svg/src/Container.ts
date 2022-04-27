@@ -46,6 +46,7 @@ class GlobalStyle extends Style {
     this.container = container;
     this.default = new Style();
 
+    this.cursor[Cursor.NO_TOOL] = "default";
     this.cursor[Cursor.DRAW] = "crosshair";
     this.cursor[Cursor.DRAW_FREE] = "crosshair";
     this.cursor[Cursor.SELECT] = "default";

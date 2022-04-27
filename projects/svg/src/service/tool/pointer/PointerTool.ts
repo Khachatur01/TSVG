@@ -58,7 +58,8 @@ export class PointerTool extends Tool {
     return this._cursorSVG;
   }
 
-  protected _on(call: boolean = true): void {
+  public override on(call: boolean = true): void {
+    super.on();
     document.addEventListener("touchmove", this._move);
     document.addEventListener("mousemove", this._move);
     this._isOn = true;
@@ -71,7 +72,8 @@ export class PointerTool extends Tool {
       this._container.__call__(Event.POINTER_TOOl_ON);
     }
   }
-  public off(call: boolean = true): void {
+  public override off(call: boolean = true): void {
+    super.off();
     document.removeEventListener("touchstart", this._move);
     document.removeEventListener("mousemove", this._move);
     this._container.HTML.style.cursor = "default";

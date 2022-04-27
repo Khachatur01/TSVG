@@ -58,5 +58,4 @@ export class LineView extends PointedView implements MoveDrawable {
     return this._points[0].x !== this._points[1].x ||
       this._points[0].y !== this._points[1].y;
   }
-
 }

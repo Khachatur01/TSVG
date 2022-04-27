@@ -1,4 +1,5 @@
 export enum Cursor {
+  NO_TOOL,
   SELECT,
   EDIT,
   DRAW,

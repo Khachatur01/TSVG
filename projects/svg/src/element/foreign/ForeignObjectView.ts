@@ -57,7 +57,6 @@ class ForeignObjectStyle extends ElementStyle {
   }
   public override set fontSize(size: string) {
     super.fontSize = size;
-    this.element.HTML.style.fontSize = size + "px";
     this.element.content.style.fontSize = size + "px";
   }
 
@@ -66,7 +65,6 @@ class ForeignObjectStyle extends ElementStyle {
   }
   public override set fontColor(color: string) {
     super.fontColor = color;
-    this.element.HTML.style.color = color;
     this.element.content.style.color = color;
   }
 
@@ -75,7 +73,6 @@ class ForeignObjectStyle extends ElementStyle {
   }
   public override set backgroundColor(color: string)  {
     super.backgroundColor = color;
-    this.element.HTML.style.backgroundColor = color;
     this.element.content.style.backgroundColor = color;
   }
 }
@@ -98,6 +95,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.style = new ForeignObjectStyle(this);
     this._content = document.createElement('div');
     this._content.contentEditable = "true";
+    this._content.style.height = "100%";
 
     this.__setRect__(rect);
     this.setOverEvent();
@@ -210,6 +208,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content.style.userSelect = "none";
     this._content.style.border = "none";
     this._content.style.outline = "none";
+    this.svgElement.innerHTML = "";
     this.svgElement.appendChild(this._content);
 
     if (setListeners) {

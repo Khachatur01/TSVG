@@ -18,7 +18,7 @@ export class VideoCursor extends ElementCursor {
 export class VideoView extends ForeignObjectView {
   protected override _type: ElementType = ElementType.VIDEO;
   private readonly source: HTMLSourceElement;
-  private readonly _video: HTMLVideoElement;
+  protected override readonly _content: HTMLVideoElement;
 
   /* Model */
   private _src: string = "";
@@ -26,18 +26,19 @@ export class VideoView extends ForeignObjectView {
 
   public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, src: string, ownerId?: string, index?: number) {
     super(container, rect, ownerId, index);
-    this._video = document.createElement("video");
-    this._video.style.width = "calc(100% - 20px)";
-    this._video.style.height = "calc(100% - 20px)";
-    this._video.style.marginLeft = "10px";
-    this._video.style.marginTop = "10px";
-    this._video.style.height = "calc(100% - 20px)";
-    this._video.style.cursor = "pointer";
-    this._video.controls = true;
+    this._content = document.createElement("video");
+    this._content.style.width = "calc(100% - 20px)";
+    this._content.style.height = "calc(100% - 20px)";
+    this._content.style.marginLeft = "10px";
+    this._content.style.marginTop = "10px";
+    this._content.style.height = "calc(100% - 20px)";
+    this._content.style.cursor = "pointer";
+    this._content.controls = true;
     this.source = document.createElement("source");
-    this._video.appendChild(this.source);
+    this._content.appendChild(this.source);
     this.src = src;
-    this.setContent(this._video.outerHTML, false);
+    this.svgElement.innerHTML = "";
+    this.svgElement.appendChild(this._content);
   }
 
   public override get copy(): VideoView {
@@ -53,7 +54,7 @@ export class VideoView extends ForeignObjectView {
   }
 
   public get video(): HTMLVideoElement {
-    return this._video;
+    return this._content;
   }
 
   public override isComplete(): boolean {

@@ -14,51 +14,54 @@ export class TextBoxCursor extends ElementCursor {
 }
 export class TextBoxView extends ForeignObjectView {
   protected override _type: ElementType = ElementType.TEXT_BOX;
-  protected _textElement: HTMLTextAreaElement;
+  protected override _content: HTMLTextAreaElement;
 
   public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, removeOnEmpty: boolean = true, ownerId?: string, index?: number) {
     super(container, rect, ownerId, index);
 
-    this._textElement = document.createElement("textarea");
-    this._textElement.style.width = "100%";
-    this._textElement.style.height = "100%";
-    this._textElement.style.resize = "none";
-    this._textElement.style.border = "none";
-    this._textElement.style.overflow = "hidden";
-    this._textElement.spellcheck = false;
-    this.setContent(this._textElement.outerHTML);
+    this._content = document.createElement("textarea");
+    this._content.style.width = "100%";
+    this._content.style.height = "100%";
+    this._content.style.resize = "none";
+    this._content.style.overflow = "hidden";
+    this._content.style.border = "none";
+    this._content.style.outline = "none";
+    this._content.spellcheck = false;
+    this.svgElement.innerHTML = "";
+    this.svgElement.appendChild(this._content);
 
     if (removeOnEmpty) {
       this._container.addCallBack(Event.EDIT_TOOl_OFF, () => {
-        if (this._textElement.value == "")
+        if (this._content.value == "")
           this._container.remove(this);
       });
     }
 
     this.style.setDefaultStyle();
+    this.addEditCallBack();
   }
 
   public get text(): string {
-    return this._textElement.value;
+    return this._content.value;
   }
   public set text(text: string) {
-    this._textElement.value = text;
+    this._content.value = text;
   }
 
   public override addEditCallBack() {
     this._content.addEventListener("input", () => {
-      this._container.__call__(Event.TEXT_TYPING, {text: this._textElement.value, element: this}
+      this._container.__call__(Event.TEXT_TYPING, {text: this._content.value, element: this}
       );
     });
 
     this._content.addEventListener('blur', () => {
-      if (this._textElement.value == "") {
+      if (this._content.value == "") {
         this._container.remove(this, true);
         this._container.selectTool.on();
       }
       if (this._container.editTool.isOn()) {
         this._container.__call__(Event.TEXT_TYPING_COMMIT, {
-          text: this._textElement.value,
+          text: this._content.value,
           element: this
         });
       }
@@ -75,7 +78,7 @@ export class TextBoxView extends ForeignObjectView {
 
   public override toJSON(): any {
     let json = super.toJSON();
-    json["text"] = this._textElement.value;
+    json["text"] = this._content.value;
     json["content"] = undefined;
     return json;
   }

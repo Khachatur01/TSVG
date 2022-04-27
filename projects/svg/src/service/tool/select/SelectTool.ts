@@ -151,7 +151,8 @@ export class SelectTool extends Tool {
     document.removeEventListener("touchend", this._end);
   }
 
-  protected _on(call: boolean = true): void {
+  public override on(call: boolean = true): void {
+    super.on(call);
     this._container.HTML.addEventListener("mousedown", this._start);
     this._container.HTML.addEventListener("touchstart", this._start);
     this._isOn = true;
@@ -162,7 +163,8 @@ export class SelectTool extends Tool {
       this._container.__call__(Event.SELECT_TOOl_ON);
     }
   }
-  public off(call: boolean = true): void {
+  public override off(call: boolean = true): void {
+    super.off(call);
     this._container.HTML.removeEventListener("mousedown", this._start);
     this._container.HTML.removeEventListener("touchstart", this._start);
     this._isOn = false;

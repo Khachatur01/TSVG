@@ -108,12 +108,12 @@ export class RefPoint extends PathView {
   }
 
   private start(event: MouseEvent | TouchEvent) {
+    this._container.activeTool.off();
     this._container.HTML.addEventListener("mousemove", this._move);
     this._container.HTML.addEventListener("touchmove", this._move);
     document.addEventListener("mouseup", this._end);
     document.addEventListener("touchend", this._end);
     this.moving = true;
-    this._container.activeTool.off();
 
     let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
@@ -137,13 +137,13 @@ export class RefPoint extends PathView {
     this.makeMouseMove(position);
   }
   private end(event: MouseEvent | TouchEvent) {
+    this._container.activeTool.on();
     if (!this.moving) return;
 
     this._container.HTML.removeEventListener("mousemove", this._move);
     this._container.HTML.removeEventListener("touchmove", this._move);
     document.removeEventListener("mouseup", this._end);
     document.removeEventListener("touchend", this._end);
-    this._container.activeTool.on();
     this.moving = false;
 
     let eventPosition = Container.__eventToPosition__(event);

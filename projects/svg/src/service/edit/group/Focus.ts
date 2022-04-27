@@ -174,11 +174,11 @@ export class Focus implements Draggable, Resizeable {
       element.group = group;
       children.add(element);
     });
-    group.setElements(children);
 
     this._children.clear();
     this.container.add(group);
     this._children.add(group);
+    group.setElements(children);
 
     let lastRefPoint = this.__refPoint__;
     let refPoint = Object.assign({}, group.center);

@@ -37,7 +37,8 @@ export class DrawTool extends Tool {
     this._drawer = drawer;
   }
 
-  protected _on(call: boolean = true) {
+  public override on(call: boolean = true) {
+    super.on(call);
     this._isOn = true;
     this._drawer?.start(call);
 
@@ -45,7 +46,8 @@ export class DrawTool extends Tool {
 
     this._container.style.changeCursor(this._drawer.cursor);
   }
-  public off(call: boolean = true) {
+  public override off(call: boolean = true) {
+    super.off(call);
     this._isOn = false;
     this._drawer?.stop(call);
   }

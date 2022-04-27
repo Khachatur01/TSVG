@@ -179,7 +179,8 @@ export class HighlightTool extends Tool {
     this.makeMouseUp(position);
   }
 
-  protected _on(call: boolean = true): void {
+  public override on(call: boolean = true): void {
+    super.on();
     this._container.HTML.addEventListener("mousedown", this._highlightStart);
     this._container.HTML.addEventListener("touchstart", this._highlightStart);
     this._isOn = true;
@@ -190,7 +191,8 @@ export class HighlightTool extends Tool {
       this._container.__call__(Event.HIGHLIGHT_TOOl_ON);
     }
   }
-  public off(call: boolean = true): void {
+  public override off(call: boolean = true): void {
+    super.off();
     this._container.HTML.removeEventListener("mousedown", this._highlightStart);
     this._container.HTML.removeEventListener("touchstart", this._highlightStart);
     this._isOn = false;

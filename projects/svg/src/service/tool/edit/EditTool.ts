@@ -90,7 +90,8 @@ export class EditTool extends Tool {
     this._editableElement = null;
   }
 
-  protected _on(call: boolean = true): void {
+  public override on(call: boolean = true): void {
+    super.on();
     this._isOn = true;
     let [firstChild] = this.focus.children;
     this.editableElement = firstChild;
@@ -103,7 +104,8 @@ export class EditTool extends Tool {
       this._container.__call__(Event.EDIT_TOOl_ON);
     }
   }
-  public off(call: boolean = true): void {
+  public override off(call: boolean = true): void {
+    super.off();
     this._isOn = false;
     this.focus.clear();
     this.removeEditableElement();

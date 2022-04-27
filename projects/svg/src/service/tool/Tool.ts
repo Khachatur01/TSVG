@@ -1,5 +1,6 @@
 import {Container} from "../../Container";
 import {Point} from "../../model/Point";
+import {Cursor} from "../../dataSource/constant/Cursor";
 
 export abstract class Tool {
   protected readonly _container: Container;
@@ -17,13 +18,13 @@ export abstract class Tool {
     return this._container;
   }
 
-  protected abstract _on(call?: boolean): void; /* setMouseEvents: boolean = true */
   public on(call: boolean = true): void {
     this._container.activeTool.off(call);
     this._container.activeTool = this;
-    this._on(call);
   }
-  public abstract off(call?: boolean): void;
+  public off(call?: boolean): void {
+    this._container.style.changeCursor(Cursor.NO_TOOL);
+  }
 
   public isOn(): boolean {
     return this._isOn;
