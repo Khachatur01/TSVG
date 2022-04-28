@@ -83,12 +83,6 @@ export abstract class MoveDraw extends Drawer {
       this._drawableElement.__refPoint__ = this._drawableElement.center;
 
       if (this.drawTool?.toolAfterDrawing) {
-        this.container.blur();
-        this.container.focused.__lastRefPoint__ = this._drawableElement.__refPoint__;
-
-        this.container.focus(this._drawableElement);
-        this.container.focused.__fixRect__();
-
         if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
           this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
         }

@@ -51,14 +51,18 @@ export class Focus implements Draggable, Resizeable {
     if (this._children.size == 1) {
       this.__refPointView__ = Object.assign({}, element.__refPoint__);
       this.__refPoint__ = Object.assign({}, element.__refPoint__);
-      this.container.style.__fixGlobalStyle__();
-      this.container.style.__setGlobalStyle__(element.style);
+      if (showBounding) {
+        this.container.style.__fixGlobalStyle__();
+        this.container.style.__setGlobalStyle__(element.style);
+      }
     } else { /* more than one element */
       let elementRefPoint = Object.assign({}, element.__refPoint__);
       let refPoint = Object.assign({}, this.__refPoint__);
       element.__refPoint__ = refPoint;
       element.__correct__(refPoint, elementRefPoint);
-      this.container.style.__recoverGlobalStyle__();
+      if (showBounding) {
+        this.container.style.__recoverGlobalStyle__();
+      }
     }
 
     this.__fit__();
