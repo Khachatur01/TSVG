@@ -353,8 +353,9 @@ export class Container {
   }
 
   private clickEvent(element: ElementView) {
-    if (!this.selectTool.isOn() && !this.editTool.isOn())
+    if (!element.selectable || (!this.selectTool.isOn() && !this.editTool.isOn())) {
       return;
+    }
 
     if (this.editTool.isOn()) {
       this.editTool.editableElement = element;
@@ -421,11 +422,15 @@ export class Container {
   public focusAll(showBounding: boolean = true) {
     this.selectTool.on();
     this._elements.forEach((element: ElementView) => {
-      this.focus(element, showBounding);
+      if (element.selectable) {
+        this.focus(element, showBounding);
+      }
     });
   }
   public focus(element: ElementView, showBounding: boolean = true, call: boolean = true) {
-    this._focus.appendChild(element, showBounding, call);
+    if (element.selectable) {
+      this._focus.appendChild(element, showBounding, call);
+    }
   }
   public blur(element?: ElementView) {
     if (element)

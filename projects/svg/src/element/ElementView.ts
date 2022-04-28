@@ -111,6 +111,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   protected ___refPoint__: Point = {x: 0, y: 0};
   protected _lastRect: Rect = {x: 0, y: 0, width: 0, height: 0};
   protected ___lastAngle__: number = 0;
+  public selectable: boolean = true;
   /* Model */
 
   private _highlight = this.__highlight__.bind(this);
