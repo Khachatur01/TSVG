@@ -1,4 +1,4 @@
-import {ElementCursor, ElementView} from "../ElementView";
+import {ElementCursor, ElementStyle, ElementView} from "../ElementView";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
 import {PathView} from "../shape/PathView";
@@ -6,6 +6,92 @@ import {Container} from "../../Container";
 import {ElementType} from "../../dataSource/constant/ElementType";
 
 export class GroupCursor extends ElementCursor {}
+
+export class GroupStyle extends ElementStyle {
+  protected override element: GroupView;
+
+  public constructor(element: GroupView) {
+    super(element);
+    this.element = element;
+  }
+
+  public override get strokeWidth(): string {
+    return super.strokeWidth;
+  }
+  public override set strokeWidth(width: string) {
+    super.strokeWidth = width;
+    this.element.elements.forEach((child: ElementView) => {
+      child.style.strokeWidth = width;
+    });
+    this.element.setAttr({"stroke-width": width});
+  }
+
+  public override get strokeDashArray(): string {
+    return super.strokeDashArray;
+  }
+  public override set strokeDashArray(array: string) {
+    super.strokeDashArray = array;
+    this.element.elements.forEach((child: ElementView) => {
+      child.style.strokeDashArray = array;
+    });
+    this.element.setAttr({"stroke-dasharray": array});
+  }
+
+  public override get strokeColor(): string {
+    return super.strokeColor;
+  }
+  public override set strokeColor(color: string) {
+    super.strokeColor = color;
+    this.element.elements.forEach((child: ElementView) => {
+      child.style.strokeColor = color;
+    });
+    this.element.setAttr({"stroke": color});
+  }
+
+  public override get fillColor(): string {
+    return super.fillColor;
+  }
+  public override set fillColor(color: string) {
+    super.fillColor = color;
+    this.element.elements.forEach((child: ElementView) => {
+      child.style.fillColor = color;
+    });
+    this.element.setAttr({"fill": color});
+  }
+
+  public override get fontSize(): string {
+    return super.fontSize;
+  }
+  public override set fontSize(size: string) {
+    super.fontSize = size;
+    this.element.elements.forEach((child: ElementView) => {
+      child.style.fontSize = size;
+    });
+    this.element.HTML.style.fontSize = size + "px";
+  }
+
+  public override get fontColor(): string {
+    return super.fontColor;
+  }
+  public override set fontColor(color: string) {
+    super.fontColor = color;
+    this.element.elements.forEach((child: ElementView) => {
+      child.style.fontColor = color;
+    });
+    this.element.HTML.style.color = color;
+  }
+
+  public override get backgroundColor(): string {
+    return super.backgroundColor;
+  }
+  public override set backgroundColor(color: string)  {
+    super.backgroundColor = color;
+    this.element.elements.forEach((child: ElementView) => {
+      child.style.backgroundColor = color;
+    });
+    this.element.HTML.style.backgroundColor = color;
+  }
+}
 
 export class GroupView extends ElementView {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "g");
