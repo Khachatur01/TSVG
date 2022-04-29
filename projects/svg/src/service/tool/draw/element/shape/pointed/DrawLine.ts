@@ -14,12 +14,11 @@ export class DrawLine extends ClickDraw {
     return element;
   }
   public override makeMouseDown(position: Point, call: boolean = true) {
+    super.makeMouseDown(position, call);
     this.clicksCount++;
     if (this.clicksCount === 2) {
       this.stopDrawing(call);
       this.clicksCount = 0;
-    } else {
-      super.makeMouseDown(position, call);
     }
   }
 
