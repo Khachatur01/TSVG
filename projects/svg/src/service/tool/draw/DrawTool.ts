@@ -6,14 +6,13 @@ import {ElementType} from "../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../element/ElementView";
 
 export class DrawTool extends Tool {
-  private _drawer: Drawer;
+  private _drawer: Drawer | null = null;
   private _isDrawing: boolean = false;
   public toolAfterDrawing: Tool | null;
   public perfect: boolean = false;
 
   public constructor(container: Container) {
     super(container);
-    this._drawer = container.drawTools.free; /* set default drawer */
     this.toolAfterDrawing = this;
   }
 
@@ -38,13 +37,13 @@ export class DrawTool extends Tool {
   }
 
   public override on(call: boolean = true) {
+    if (!this._drawer) return;
     super.on(call);
     this._isOn = true;
-    this._drawer?.start(call);
+    this._drawer.start(call);
+    this._container.style.changeCursor(this._drawer.cursor);
 
     this._container.blur();
-
-    this._container.style.changeCursor(this._drawer.cursor);
   }
   public override off(call: boolean = true) {
     super.off(call);
@@ -59,7 +58,7 @@ export class DrawTool extends Tool {
     this._isDrawing = false;
   }
   public stopDrawing(call: boolean = true) { /* for click drawing */
-    this._drawer.stopDrawing(call);
+    this._drawer?.stopDrawing(call);
   }
 
   public get type(): ElementType | undefined {

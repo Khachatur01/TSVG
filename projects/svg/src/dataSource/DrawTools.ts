@@ -11,7 +11,7 @@ import {DrawTextBox} from "../service/tool/draw/element/foreign/DrawTextBox";
 import {DrawGraphic} from "../service/tool/draw/element/foreign/DrawGraphic";
 import {DrawVideo} from "../service/tool/draw/element/foreign/DrawVideo";
 import {DrawImage} from "../service/tool/draw/element/foreign/DrawImage";
-import {DrawAsset} from "../service/tool/draw/element/foreign/DrawAsset";
+import {DrawForeignObject} from "../service/tool/draw/element/foreign/DrawForeignObject";
 import {ElementType} from "./constant/ElementType";
 import {Drawer} from "../service/tool/draw/Drawer";
 import {DrawCircle} from "../service/tool/draw/element/shape/circular/DrawCircle";
@@ -30,7 +30,7 @@ export class DrawTools {
   private readonly _textBox: DrawTextBox;
   private readonly _video: DrawVideo;
   private readonly _image: DrawImage;
-  private readonly _asset: DrawAsset;
+  private readonly _foreignObject: DrawForeignObject;
   private readonly _graphic: DrawGraphic;
 
   public constructor(container: Container) {
@@ -48,7 +48,7 @@ export class DrawTools {
     this._textBox = new DrawTextBox(container);
     this._video = new DrawVideo(container);
     this._image = new DrawImage(container);
-    this._asset = new DrawAsset(container);
+    this._foreignObject = new DrawForeignObject(container);
     this._graphic = new DrawGraphic(container);
   }
 
@@ -88,8 +88,8 @@ export class DrawTools {
   public get image(): DrawImage {
     return this._image;
   }
-  public get asset(): DrawAsset {
-    return this._asset;
+  public get foreignObject(): DrawForeignObject {
+    return this._foreignObject;
   }
   public get graphic(): DrawGraphic {
     return this._graphic;
@@ -124,7 +124,7 @@ export class DrawTools {
       // case ElementType.GROUP:
       //   return this._group;
       case ElementType.FOREIGN_OBJECT:
-        return this._asset;
+        return this._foreignObject;
       case ElementType.TEXT_BOX:
         return this._textBox;
       case ElementType.IMAGE:

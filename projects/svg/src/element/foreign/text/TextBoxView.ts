@@ -55,6 +55,7 @@ export class TextBoxView extends ForeignObjectView {
     });
 
     this._content.addEventListener('blur', () => {
+      this._content.scrollTop = 0;
       if (this._content.value == "") {
         this._container.remove(this, true);
         this._container.selectTool.on();
@@ -69,7 +70,9 @@ export class TextBoxView extends ForeignObjectView {
   }
 
   public override get copy(): TextBoxView {
-    return super.copy as TextBoxView;
+    let copy = super.copy as TextBoxView;
+    copy.text = this.text;
+    return copy;
   }
 
   public override isComplete(): boolean {

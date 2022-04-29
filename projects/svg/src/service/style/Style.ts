@@ -92,6 +92,10 @@ export class Style {
       this.backgroundColor = style.backgroundColor;
   }
 
+  public clear(): void {
+    this.style.clear();
+  }
+
   public get object() {
     return {
       strokeWidth: this.strokeWidth,

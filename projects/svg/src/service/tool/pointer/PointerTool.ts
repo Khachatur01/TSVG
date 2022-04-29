@@ -59,7 +59,7 @@ export class PointerTool extends Tool {
   }
 
   public override on(call: boolean = true): void {
-    super.on();
+    super.on(call);
     document.addEventListener("touchmove", this._move);
     document.addEventListener("mousemove", this._move);
     this._isOn = true;

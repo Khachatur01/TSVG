@@ -24,7 +24,7 @@ export class DrawLine extends ClickDraw {
   }
 
   public override stopDrawing(call: boolean = true) {
-    if (this.clicksCount !== 2 && this._drawableElement) {
+    if (this.clicksCount === 1 && this._drawableElement) {
       this.container.remove(this._drawableElement, true, false);
     }
     if (this.drawTool?.toolAfterDrawing) {

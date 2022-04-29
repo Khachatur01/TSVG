@@ -138,6 +138,8 @@ export class Focus implements Draggable, Resizeable {
   public orderTop(call: boolean = true): void {
     this._children.forEach((child: ElementView) => {
       this.container.elementsGroup.appendChild(child.SVG);
+      this.container.elements.delete(child);
+      this.container.elements.add(child);
     });
 
     if (call) {
@@ -147,10 +149,20 @@ export class Focus implements Draggable, Resizeable {
   public orderUp(call: boolean = true): void {}
   public orderDown(call: boolean = true): void {}
   public orderBottom(call: boolean = true): void {
+    let newElements = new Set<ElementView>();
+
     let firstChild = this.container.elementsGroup.firstChild;
     this._children.forEach((child: ElementView) => {
       this.container.elementsGroup.insertBefore(child.SVG, firstChild);
+      this.container.elements.delete(child);
+      newElements.add(child);
     });
+
+    this.container.elements.forEach((child: ElementView) => {
+      newElements.add(child);
+    });
+
+    this.container.elements = newElements;
 
     if (call) {
       this.container.__call__(Event.TO_BOTTOM, {elements: this._children});

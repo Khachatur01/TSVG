@@ -184,6 +184,14 @@ class GlobalStyle extends Style {
     this.container.__call__(Event.FONT_BACKGROUND_CHANGE, {backgroundColor: color});
   }
 
+  public resetToDefault(call: boolean = true): void {
+    this.style.clear();
+    this.default.clear();
+    if (call) {
+      this.container.__call__(Event.STYLE_CHANGE, {});
+    }
+  }
+
   public __recoverGlobalStyle__(call: boolean = true) {
     this.__setGlobalStyle__(this.default, call);
   }
@@ -258,7 +266,7 @@ export class Container {
   public readonly grid: Grid;
   public readonly style: GlobalStyle = new GlobalStyle(this);
   public readonly drawTools: DrawTools = new DrawTools(this);
-  public activeTool: Tool;
+  public activeTool: Tool | null;
   /* Model */
 
   public constructor(containerId: string, ownerId: string, idPrefix: string = "", elementIndex: number = 0) {
@@ -389,6 +397,9 @@ export class Container {
   public get elements(): Set<ElementView> {
     return this._elements;
   }
+  public set elements(elements: Set<ElementView>) {
+    this._elements = elements;
+  }
 
   public add(element: ElementView, setElementActivity: boolean = true) {
     if (!element) return;
@@ -401,7 +412,7 @@ export class Container {
   }
   public remove(element: ElementView, force: boolean = false, call: boolean = true) {
     if (force || this.selectTool.isOn()) { /* if force don't check if select tool is on */
-      element.__remove__();
+      element?.__remove__();
       this._elements.delete(element);
 
       if (call) {
@@ -413,6 +424,7 @@ export class Container {
     this._focus.clear();
     this._elements.clear();
     this.elementsGroup.innerHTML = "";
+    this.selectTool.on();
   }
 
   public get HTML(): HTMLElement {

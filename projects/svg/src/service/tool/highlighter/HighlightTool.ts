@@ -180,7 +180,7 @@ export class HighlightTool extends Tool {
   }
 
   public override on(call: boolean = true): void {
-    super.on();
+    super.on(call);
     this._container.HTML.addEventListener("mousedown", this._highlightStart);
     this._container.HTML.addEventListener("touchstart", this._highlightStart);
     this._isOn = true;

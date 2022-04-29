@@ -68,7 +68,7 @@ export * from './service/tool/draw/Drawer';
 export * from './service/tool/draw/DrawTool';
 export * from './service/tool/draw/element/shape/pointed/DrawLine';
 export * from './service/tool/draw/element/shape/pointed/polyline/DrawPolyline';
-export * from './service/tool/draw/element/foreign/DrawAsset';
+export * from './service/tool/draw/element/foreign/DrawForeignObject';
 export * from './service/tool/draw/element/foreign/DrawGraphic';
 export * from './service/tool/draw/element/foreign/DrawImage';
 export * from './service/tool/draw/element/foreign/DrawTextBox';

@@ -90,8 +90,8 @@ export class EditTool extends Tool {
     this._editableElement = null;
   }
 
-  public override on(call: boolean = true): void {
-    super.on();
+  public override on(changeActiveTool: boolean = true, call: boolean = true): void {
+    super.on(changeActiveTool);
     this._isOn = true;
     let [firstChild] = this.focus.children;
     this.editableElement = firstChild;

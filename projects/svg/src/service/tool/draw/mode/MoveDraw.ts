@@ -79,17 +79,17 @@ export abstract class MoveDraw extends Drawer {
     this.makeMouseMove(position, false);
 
     /* if element is drawn */
-    if (this._drawableElement.isComplete()) {
-      this._drawableElement.__refPoint__ = this._drawableElement.center;
-
-      if (this.drawTool?.toolAfterDrawing) {
-        if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
-          this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
-        }
-        this.drawTool.toolAfterDrawing.on();
-      }
-    } else {
+    if (!this._drawableElement.isComplete()) {
       this.onIsNotComplete(call);
+    }
+
+    this._drawableElement.__refPoint__ = this._drawableElement.center;
+
+    if (this.drawTool?.toolAfterDrawing) {
+      if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
+        this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
+      }
+      this.drawTool.toolAfterDrawing.on();
     }
 
     this.onEnd(call);

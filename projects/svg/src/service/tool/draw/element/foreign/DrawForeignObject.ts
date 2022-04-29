@@ -5,7 +5,7 @@ import {ForeignObjectView} from "../../../../../element/foreign/ForeignObjectVie
 import {Event} from "../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
 
-export class DrawAsset extends MoveDraw {
+export class DrawForeignObject extends MoveDraw {
   public content: string = "";
 
   protected createDrawableElement(position: Point): ElementView {
@@ -17,19 +17,15 @@ export class DrawAsset extends MoveDraw {
   protected override onIsNotComplete(call: boolean) {
     if (!this._drawableElement) return;
     this._drawableElement.__setRect__({
-      x: this.startPos.x - 300,
-      y: this.startPos.y - 100,
+      x: this.startPos.x,
+      y: this.startPos.y,
       width: 600,
       height: 200
     });
     this._drawableElement.__refPoint__ = this._drawableElement?.center;
   }
   protected override onEnd(call: boolean) {
-    if (call) {
-      this.container.selectTool.on();
-      if (this._drawableElement)
-        this.container.focus(this._drawableElement);
-    }
+
   }
 
   public override start(call: boolean) {
@@ -47,8 +43,8 @@ export class DrawAsset extends MoveDraw {
     }
   }
 
-  public _new(): DrawAsset {
-    return new DrawAsset(this.container);
+  public _new(): DrawForeignObject {
+    return new DrawForeignObject(this.container);
   }
   public get type(): ElementType {
     return ElementType.FOREIGN_OBJECT;

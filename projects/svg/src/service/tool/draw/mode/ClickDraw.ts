@@ -86,7 +86,7 @@ export abstract class ClickDraw extends Drawer {
   public stopDrawing(call: boolean = true) {
     if (!this._drawableElement) return;
 
-    if (!this._drawableElement.isComplete()){
+    if (!this._drawableElement.isComplete()) {
       this.container.remove(this._drawableElement, true, false);
     } else {
       this._drawableElement.__refPoint__ = this._drawableElement.center;
