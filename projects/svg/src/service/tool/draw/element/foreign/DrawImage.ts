@@ -19,14 +19,9 @@ export class DrawImage extends MoveDraw {
       width: 300,
       height: 200
     });
-    this._drawableElement.__refPoint__ = this._drawableElement?.center;
+    this._drawableElement.refPoint = this._drawableElement?.center;
   }
   protected override onEnd(call: boolean) {
-    if (call) {
-      this.container.selectTool.on();
-      if (this._drawableElement)
-        this.container.focus(this._drawableElement);
-    }
   }
 
   public override start(call: boolean) {

@@ -114,7 +114,7 @@ export class GroupView extends ElementView {
       group.addElement(copy);
     });
 
-    group.__refPoint__ = Object.assign({}, this.__refPoint__);
+    group.refPoint = Object.assign({}, this.refPoint);
     group._angle = (this._angle);
 
     group.style.set = this.style;
@@ -256,12 +256,12 @@ export class GroupView extends ElementView {
           element.SVG.setAttribute(key, "" + value);
   }
 
-  public override get __refPoint__(): Point {
-    return super.__refPoint__;
+  public override get refPoint(): Point {
+    return super.refPoint;
   }
-  public override set __refPoint__(point: Point) {
-    this.___refPoint__ = point;
-    this._elements.forEach(child => child.__refPoint__ = point);
+  public override set refPoint(point: Point) {
+    this._refPoint = point;
+    this._elements.forEach(child => child.refPoint = point);
   }
 
   public override __rotate__(angle: number) {

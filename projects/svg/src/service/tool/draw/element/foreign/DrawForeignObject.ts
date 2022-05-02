@@ -22,7 +22,7 @@ export class DrawForeignObject extends MoveDraw {
       width: 600,
       height: 200
     });
-    this._drawableElement.__refPoint__ = this._drawableElement?.center;
+    this._drawableElement.refPoint = this._drawableElement?.center;
   }
   protected override onEnd(call: boolean) {
 

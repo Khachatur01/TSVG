@@ -34,7 +34,7 @@ export class PolylineView extends PointedView {
     polyline.points = this.points;
     polyline.__fixRect__();
 
-    polyline.__refPoint__ = Object.assign({}, this.__refPoint__);
+    polyline.refPoint = Object.assign({}, this.refPoint);
     polyline.__rotate__(this._angle);
 
     polyline.style.set = this.style;

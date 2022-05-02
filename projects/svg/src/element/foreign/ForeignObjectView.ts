@@ -127,7 +127,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     foreignObject.__setRect__(this._rect);
     foreignObject.__fixRect__();
 
-    foreignObject.__refPoint__ = Object.assign({}, this.__refPoint__);
+    foreignObject.refPoint = Object.assign({}, this.refPoint);
     foreignObject.__rotate__(this._angle);
 
     foreignObject.style.set = this.style;
@@ -213,7 +213,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
     if (setListeners) {
       this._content.addEventListener("focus", () => {
-        if (this._container.editTool.isOn()) {
+        if (this._container.editTool.isOn() && this.selectable) {
           this._content.focus();
         } else {
           this._content.blur();

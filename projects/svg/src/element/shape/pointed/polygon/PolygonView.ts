@@ -35,7 +35,7 @@ export class PolygonView extends PointedView {
     polygon.points = this.points;
     polygon.__fixRect__();
 
-    polygon.__refPoint__ = Object.assign({}, this.__refPoint__);
+    polygon.refPoint = Object.assign({}, this.refPoint);
     polygon.__rotate__(this._angle);
 
     polygon.style.set = this.style;

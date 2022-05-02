@@ -49,16 +49,16 @@ export class Focus implements Draggable, Resizeable {
     this._children.add(element);
 
     if (this._children.size == 1) {
-      this.__refPointView__ = Object.assign({}, element.__refPoint__);
-      this.__refPoint__ = Object.assign({}, element.__refPoint__);
+      this.__refPointView__ = Object.assign({}, element.refPoint);
+      this.__refPoint__ = Object.assign({}, element.refPoint);
       if (showBounding) {
         this.container.style.__fixGlobalStyle__();
         this.container.style.__setGlobalStyle__(element.style);
       }
     } else { /* more than one element */
-      let elementRefPoint = Object.assign({}, element.__refPoint__);
+      let elementRefPoint = Object.assign({}, element.refPoint);
       let refPoint = Object.assign({}, this.__refPoint__);
-      element.__refPoint__ = refPoint;
+      element.refPoint = refPoint;
       element.__correct__(refPoint, elementRefPoint);
       if (showBounding) {
         this.container.style.__recoverGlobalStyle__();
@@ -422,11 +422,11 @@ export class Focus implements Draggable, Resizeable {
     }
   }
   public get __refPoint__(): Point {
-    return this.boundingBox.__refPoint__;
+    return this.boundingBox.refPoint;
   }
   public set __refPoint__(point: Point) {
-    this._children.forEach(child => child.__refPoint__ = point);
-    this.boundingBox.__refPoint__ = point;
+    this._children.forEach(child => child.refPoint = point);
+    this.boundingBox.refPoint = point;
     this.boundingBox.__refPointView__ = point;
   }
   public set refPoint(point: Point) {
@@ -551,7 +551,7 @@ export class Focus implements Draggable, Resizeable {
 
     this.clear(false);
     this.elementsClipboard.forEach((element: ElementView) => {
-      element = element.copy; /* may past many times */
+      element = element.copy; /* may paste many times */
       newElements.push(element);
 
       element.container = this.container;

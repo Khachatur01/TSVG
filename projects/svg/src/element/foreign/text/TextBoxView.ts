@@ -12,6 +12,7 @@ export class TextBoxCursor extends ElementCursor {
     this.cursor[Cursor.EDIT] = "auto"; /* fixme on select tool cursor is text */
   }
 }
+
 export class TextBoxView extends ForeignObjectView {
   protected override _type: ElementType = ElementType.TEXT_BOX;
   protected override _content: HTMLTextAreaElement;

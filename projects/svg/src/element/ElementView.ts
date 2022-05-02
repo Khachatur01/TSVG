@@ -108,7 +108,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   protected _container: Container;
   protected _rect: Rect = {x: 0, y: 0, width: 0, height: 0};
   protected _angle: number = 0;
-  protected ___refPoint__: Point = {x: 0, y: 0};
+  protected _refPoint: Point = {x: 0, y: 0};
   protected _lastRect: Rect = {x: 0, y: 0, width: 0, height: 0};
   protected ___lastAngle__: number = 0;
   public selectable: boolean = true;
@@ -134,7 +134,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   public get visiblePoints(): Point[] {
     return Matrix.rotate(
       this.points,
-      this.___refPoint__,
+      this._refPoint,
       -this._angle
     );
   }
@@ -292,18 +292,18 @@ export abstract class ElementView implements Resizeable, Draggable {
     } else {
       return Matrix.rotate(
         [center],
-        this.___refPoint__,
+        this._refPoint,
         -this._angle
       )[0];
     }
   }
 
-  public get __refPoint__(): Point {
-    return this.___refPoint__;
+  public get refPoint(): Point {
+    return this._refPoint;
   }
-  public set __refPoint__(refPoint: Point) {
+  public set refPoint(refPoint: Point) {
     this.svgElement.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
-    this.___refPoint__ = refPoint;
+    this._refPoint = refPoint;
   }
 
   public get angle(): number {
@@ -381,7 +381,7 @@ export abstract class ElementView implements Resizeable, Draggable {
       containerId: this._container.id,
       rect: this._rect,
       angle: this._angle,
-      refPoint: this.___refPoint__,
+      refPoint: this._refPoint,
     }
   }
   public fromJSON(json: any) {
@@ -394,6 +394,6 @@ export abstract class ElementView implements Resizeable, Draggable {
     this.__fixRect__();
     this.__setRect__(json.rect);
     this.__rotate__(json.angle);
-    this.__refPoint__ = json.refPoint;
+    this.refPoint = json.refPoint;
   };
 }

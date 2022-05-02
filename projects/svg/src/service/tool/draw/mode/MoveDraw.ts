@@ -83,7 +83,7 @@ export abstract class MoveDraw extends Drawer {
       this.onIsNotComplete(call);
     }
 
-    this._drawableElement.__refPoint__ = this._drawableElement.center;
+    this._drawableElement.refPoint = this._drawableElement.center;
 
     if (this.drawTool?.toolAfterDrawing) {
       if (this.drawTool.toolAfterDrawing instanceof DrawTool) {

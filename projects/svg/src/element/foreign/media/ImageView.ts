@@ -54,7 +54,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
   public get copy(): ImageView {
     let image: ImageView = new ImageView(this._container, this._rect, this._src);
 
-    image.__refPoint__ = Object.assign({}, this.__refPoint__);
+    image.refPoint = Object.assign({}, this.refPoint);
     image.__rotate__(this._angle);
 
     image.style.set = this.style;

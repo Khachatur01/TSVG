@@ -79,7 +79,7 @@ export class DrawFree extends Drawer {
     if (!this._drawableElement.isComplete()) {
       this.container.remove(this._drawableElement, true, false);
     } else {
-      this._drawableElement.__refPoint__ = this._drawableElement.center;
+      this._drawableElement.refPoint = this._drawableElement.center;
     }
 
     if (call) {

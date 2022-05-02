@@ -8,7 +8,6 @@ import {Event} from "../../../dataSource/constant/Event";
 import {Focus} from "../../edit/group/Focus";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 import {ForeignObjectView} from "../../../element/foreign/ForeignObjectView";
-import {FreeView} from "../../../element/shape/pointed/polyline/FreeView";
 
 export class EditTool extends Tool {
   private readonly nodesGroup: SVGGElement;
@@ -77,7 +76,7 @@ export class EditTool extends Tool {
         this.nodesGroup.appendChild(node.SVG);
       }
 
-      this.refPoint = editableElement.__refPoint__;
+      this.refPoint = editableElement.refPoint;
       this.rotate(editableElement.angle);
     }
   }
@@ -90,8 +89,8 @@ export class EditTool extends Tool {
     this._editableElement = null;
   }
 
-  public override on(changeActiveTool: boolean = true, call: boolean = true): void {
-    super.on(changeActiveTool);
+  public override on(call: boolean = true): void {
+    super.on(call);
     this._isOn = true;
     let [firstChild] = this.focus.children;
     this.editableElement = firstChild;

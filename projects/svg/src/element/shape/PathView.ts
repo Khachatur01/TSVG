@@ -58,7 +58,7 @@ export class PathView extends ShapeView {
     path.path = this._path.copy;
     path.__fixRect__();
 
-    path.__refPoint__ = Object.assign({}, this.__refPoint__);
+    path.refPoint = Object.assign({}, this.refPoint);
     path.__rotate__(this._angle);
 
     path.style.set = this.style;

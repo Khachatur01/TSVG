@@ -38,7 +38,7 @@ export class PointerTool extends Tool {
   private move(event: TouchEvent | MouseEvent): void {
     let containerRect = this._container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
+    event.stopImmediatePropagation();
 
     let movePosition = {
       x: eventPosition.x - containerRect.left - 60,
@@ -66,7 +66,6 @@ export class PointerTool extends Tool {
     this._container.blur();
     this.hide();
 
-
     this._container.style.changeCursor(Cursor.POINTER);
     if (call) {
       this._container.__call__(Event.POINTER_TOOl_ON);
@@ -74,7 +73,7 @@ export class PointerTool extends Tool {
   }
   public override off(call: boolean = true): void {
     super.off();
-    document.removeEventListener("touchstart", this._move);
+    document.removeEventListener("touchmove", this._move);
     document.removeEventListener("mousemove", this._move);
     this._container.HTML.style.cursor = "default";
     this._isOn = false;

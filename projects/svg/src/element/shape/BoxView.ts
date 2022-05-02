@@ -35,7 +35,7 @@ export class BoxView extends ShapeView {
     box.__setRect__(this._rect);
     box.style.set = this.style;
 
-    box.__refPoint__ = Object.assign({}, this.__refPoint__);
+    box.refPoint = Object.assign({}, this.refPoint);
     box.__rotate__(this._angle);
 
     return box;

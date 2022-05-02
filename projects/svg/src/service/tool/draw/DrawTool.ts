@@ -36,7 +36,7 @@ export class DrawTool extends Tool {
     this._drawer = drawer;
   }
 
-  public override on(call: boolean = true) {
+  public override on(call: boolean = true): void {
     if (!this._drawer) return;
     super.on(call);
     this._isOn = true;

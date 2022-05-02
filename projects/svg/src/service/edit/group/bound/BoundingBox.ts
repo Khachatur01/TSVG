@@ -176,12 +176,12 @@ export class BoundingBox extends BoxView {
     this.__correctByDelta__(delta);
   }
 
-  public override get __refPoint__(): Point {
-    return this.___refPoint__;
+  public override get refPoint(): Point {
+    return this._refPoint;
   }
-  public override set __refPoint__(refPoint: Point) {
+  public override set refPoint(refPoint: Point) {
     this._boundingBoxGroup.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
-    this.___refPoint__ = refPoint;
+    this._refPoint = refPoint;
   }
 
   public set __refPointView__(refPoint: Point) {

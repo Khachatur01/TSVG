@@ -297,7 +297,7 @@ export class Container {
         this.editTool.removeEditableElement();
       }
     });
-    this.container.addEventListener("touchmove", event => {
+    this.container.addEventListener("touchstart", event => {
       if (event.target == this.container) {
         this.blur();
         this.editTool.removeEditableElement();

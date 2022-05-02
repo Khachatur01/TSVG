@@ -25,7 +25,7 @@ export class DrawGraphic extends MoveDraw {
       width: 300,
       height: 200
     });
-    this._drawableElement.__refPoint__ = this._drawableElement.center;
+    this._drawableElement.refPoint = this._drawableElement.center;
   }
 
   public override start(call: boolean) {

@@ -89,7 +89,7 @@ export abstract class ClickDraw extends Drawer {
     if (!this._drawableElement.isComplete()) {
       this.container.remove(this._drawableElement, true, false);
     } else {
-      this._drawableElement.__refPoint__ = this._drawableElement.center;
+      this._drawableElement.refPoint = this._drawableElement.center;
     }
 
     if (this.drawTool?.toolAfterDrawing) {
@@ -119,7 +119,7 @@ export abstract class ClickDraw extends Drawer {
     if (this._drawableElement.isComplete()) {
       this._drawableElement.removePoint(-1);
       this.container.drawTool.__drawingEnd__();
-      this._drawableElement.__refPoint__ = this._drawableElement.center;
+      this._drawableElement.refPoint = this._drawableElement.center;
     } else {
       this.container.remove(this._drawableElement);
     }

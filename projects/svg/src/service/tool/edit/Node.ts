@@ -39,7 +39,7 @@ export class Node extends EllipseView {
     if (!this.editTool.nodeEditableElement) return;
     let rotatedPosition = Matrix.rotate(
       [position],
-      this.editTool.nodeEditableElement.__refPoint__,
+      this.editTool.nodeEditableElement.refPoint,
       this.editTool.nodeEditableElement.angle
     )[0];
 
@@ -55,7 +55,7 @@ export class Node extends EllipseView {
     if (!this.editTool.nodeEditableElement) return;
     let rotatedPosition = Matrix.rotate(
       [position],
-      this.editTool.nodeEditableElement.__refPoint__,
+      this.editTool.nodeEditableElement.refPoint,
       this.editTool.nodeEditableElement.angle
     )[0];
 
