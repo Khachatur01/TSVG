@@ -41,8 +41,8 @@ export class PointerTool extends Tool {
     event.stopImmediatePropagation();
 
     let movePosition = {
-      x: eventPosition.x - containerRect.left - 60,
-      y: eventPosition.y - containerRect.top - 60
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
     };
     this.makeMouseMove(movePosition);
   }

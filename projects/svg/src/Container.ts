@@ -32,6 +32,7 @@ import {ImageCursor} from "./element/foreign/media/ImageView";
 import {VideoCursor} from "./element/foreign/media/VideoView";
 import {GraphicCursor} from "./element/foreign/graphic/GraphicView";
 import {CircleCursor} from "./element/shape/circluar/CircleView";
+import {DrawTextBox} from "./service/tool/draw/element/foreign/DrawTextBox";
 
 class GlobalStyle extends Style {
   private readonly default: Style;

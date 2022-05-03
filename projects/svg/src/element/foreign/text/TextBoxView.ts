@@ -9,7 +9,7 @@ import {Rect} from "../../../model/Rect";
 export class TextBoxCursor extends ElementCursor {
   constructor() {
     super();
-    this.cursor[Cursor.EDIT] = "auto"; /* fixme on select tool cursor is text */
+    this.cursor[Cursor.EDIT] = "text";
   }
 }
 

@@ -4,6 +4,7 @@ import {ElementView} from "../../../../../element/ElementView";
 import {TextBoxView} from "../../../../../element/foreign/text/TextBoxView";
 import {Event} from "../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
+import {ForeignObjectView} from "../../../../../element/foreign/ForeignObjectView";
 
 export class DrawTextBox extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
@@ -22,6 +23,7 @@ export class DrawTextBox extends MoveDraw {
     });
     this._drawableElement.refPoint = this._drawableElement?.center;
   }
+
   protected override onEnd(call: boolean) {
     if (call) {
       this.container.editTool.on();
@@ -29,7 +31,7 @@ export class DrawTextBox extends MoveDraw {
         this.container.focus(this._drawableElement, false, false);
         this.container.editTool.editableElement = this._drawableElement as TextBoxView;
         let textBox = (this._drawableElement as TextBoxView);
-        textBox.content?.focus();
+        textBox.content.focus();
         textBox.__onFocus__(true);
       }
     }
