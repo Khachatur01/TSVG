@@ -11,9 +11,9 @@ export abstract class MoveDraw extends Drawer {
   protected container: Container;
   protected startPos: Point = {x: 0, y: 0};
 
-  private _drawStart = this.drawStart.bind(this);
-  private _draw = this.draw.bind(this);
-  private _drawEnd = this.drawEnd.bind(this);
+  protected _drawStart = this.drawStart.bind(this);
+  protected _draw = this.draw.bind(this);
+  protected _drawEnd = this.drawEnd.bind(this);
 
   protected _drawableElement: ElementView | null = null;
 
@@ -85,12 +85,7 @@ export abstract class MoveDraw extends Drawer {
 
     this._drawableElement.refPoint = this._drawableElement.center;
 
-    if (this.drawTool?.toolAfterDrawing) {
-      if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
-        this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
-      }
-      this.drawTool.toolAfterDrawing.on();
-    }
+    this.turnOnToolAfterDrawing();
 
     this.onEnd(call);
     this.container.drawTool.__drawingEnd__();
@@ -108,6 +103,14 @@ export abstract class MoveDraw extends Drawer {
   }
 
   protected abstract createDrawableElement(position: Point): ElementView;
+  protected turnOnToolAfterDrawing(): void {
+    if (this.drawTool?.toolAfterDrawing) {
+      if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
+        this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
+      }
+      this.drawTool.toolAfterDrawing.on();
+    }
+  }
 
   protected drawStart(event: MouseEvent | TouchEvent) {
     this.container.HTML.addEventListener('mousemove', this._draw);

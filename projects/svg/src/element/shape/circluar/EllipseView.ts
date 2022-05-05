@@ -8,7 +8,6 @@ import {Cursor} from "../../../dataSource/constant/Cursor";
 export class EllipseCursor extends ElementCursor {
   constructor() {
     super();
-    this.cursor[Cursor.EDIT] = "auto";
   }
 }
 
@@ -27,7 +26,7 @@ export class EllipseView extends CircularView {
   }
 
   public get copy(): EllipseView {
-    let ellipse: EllipseView = new EllipseView(this._container, this._rect);
+    let ellipse: EllipseView = new EllipseView(this._container, Object.assign({}, this._rect));
     ellipse.refPoint = Object.assign({}, this.refPoint);
     ellipse.__rotate__(this._angle);
 

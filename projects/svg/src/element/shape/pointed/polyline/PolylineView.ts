@@ -31,7 +31,7 @@ export class PolylineView extends PointedView {
 
   public get copy(): PolylineView {
     let polyline: PolylineView = new PolylineView(this._container);
-    polyline.points = this.points;
+    polyline.points = this._points.map(point => Object.assign({}, point)); /* copy points array */;
     polyline.__fixRect__();
 
     polyline.refPoint = Object.assign({}, this.refPoint);

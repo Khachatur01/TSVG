@@ -32,7 +32,7 @@ export class PolygonView extends PointedView {
 
   public get copy(): PolygonView {
     let polygon: PolygonView = new PolygonView(this._container);
-    polygon.points = this.points;
+    polygon.points = this._points.map(point => Object.assign({}, point)); /* copy points array */
     polygon.__fixRect__();
 
     polygon.refPoint = Object.assign({}, this.refPoint);

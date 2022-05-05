@@ -13,7 +13,7 @@ import {Style} from "./service/style/Style";
 import {HighlightTool} from "./service/tool/highlighter/HighlightTool";
 import {PointerTool} from "./service/tool/pointer/PointerTool";
 import {Point} from "./model/Point";
-import {TextBoxCursor} from "./element/foreign/text/TextBoxView";
+import {TextBoxCursor, TextBoxView} from "./element/foreign/text/TextBoxView";
 import {Cursor} from "./dataSource/constant/Cursor";
 import {ForeignObjectCursor, ForeignObjectView} from "./element/foreign/ForeignObjectView";
 import {ElementType} from "./dataSource/constant/ElementType";
@@ -217,22 +217,11 @@ class GlobalStyle extends Style {
     }
   }
 
-  public changeCursor(tool: Cursor) {
-    this.container.HTML.style.cursor = this.container.style.cursor[tool];
+  public changeCursor(cursorType: Cursor) {
+    this.container.HTML.style.cursor = this.container.style.cursor[cursorType];
 
     this.container.elements.forEach((element: ElementView) => {
-      let cursor;
-
-      if (this.cursor.element[element.type].cursor[tool]) {
-        cursor = this.cursor.element[element.type].cursor[tool];
-      } else { /* set container cursor if element cursor is not defined */
-        cursor = this.container.HTML.style.cursor;
-      }
-
-      element.SVG.style.cursor = cursor;
-      if (element instanceof ForeignObjectView && element.content) { /* is element is foreign object and has content, set cursor also for content */
-        element.content.style.cursor = cursor;
-      }
+      this.container.__setElementCursor__(element, cursorType);
     });
   }
 }
@@ -295,13 +284,19 @@ export class Container {
     this.container.addEventListener("mousedown", event => {
       if (event.target == this.container) {
         this.blur();
-        this.editTool.removeEditableElement();
+        if (this.editTool.isOn()) {
+          this.drawTool.tool = this.drawTools.free;
+          this.drawTool.on();
+        }
       }
     });
     this.container.addEventListener("touchstart", event => {
       if (event.target == this.container) {
         this.blur();
-        this.editTool.removeEditableElement();
+        if (this.editTool.isOn()) {
+          this.drawTool.tool = this.drawTools.free;
+          this.drawTool.on();
+        }
       }
     });
 
@@ -327,9 +322,11 @@ export class Container {
   public get nextElementIndex(): number {
     return this.elementIndex++;
   }
-  /*
-    @param deep for searching also in group
-  * */
+  /**
+   @param ownerId
+   @param index
+   @param deep for searching also in group
+   */
   public getElementById(ownerId: string, index: number, deep: boolean = false): ElementView | undefined {
     for (let element of this._elements) {
       if (deep && element instanceof GroupView) {
@@ -362,27 +359,31 @@ export class Container {
   }
 
   private clickEvent(element: ElementView) {
-    if (!element.selectable || (!this.selectTool.isOn() && !this.editTool.isOn())) {
+    if (this.editTool.isOn() && this.editTool.editableElement != element) {
+      this.blur();
+      if (this.editTool.isOn()) {
+        this.drawTool.tool = this.drawTools.free;
+        this.drawTool.on();
+      }
+      return;
+    }
+    if (!this.selectTool.isOn()) {
       return;
     }
 
-    if (this.editTool.isOn()) {
-      this.editTool.editableElement = element;
+    if (element.group) /* if element has grouped, then select group */
+      element = element.group;
+
+    let hasChild = this._focus.hasChild(element);
+    if (!this._multiSelect && hasChild) return;
+
+    if (!this._multiSelect && !hasChild) {
+      this.blur();
+      this.focus(element);
+    } else if (hasChild) {
+      this.blur(element);
     } else {
-      if (element.group) /* if element has grouped, then select group */
-        element = element.group;
-
-      let hasChild = this._focus.hasChild(element);
-      if (!this._multiSelect && hasChild) return;
-
-      if (!this._multiSelect && !hasChild) {
-        this.blur();
-        this.focus(element);
-      } else if (hasChild) {
-        this.blur(element);
-      } else {
-        this.focus(element);
-      }
+      this.focus(element);
     }
   }
   public __setElementActivity__(element: ElementView) {
@@ -402,6 +403,32 @@ export class Container {
     this._elements = elements;
   }
 
+  public __setElementCursor__(element: ElementView, cursorType?: Cursor): void {
+    let cursor;
+    if (!cursorType) {
+      cursorType = Cursor.NO_TOOL;
+    }
+
+    if (this.style.cursor.element[element.type].cursor[cursorType]) {
+      cursor = this.style.cursor.element[element.type].cursor[cursorType];
+    } else { /* set container cursor if element cursor is not defined */
+      cursor = this.HTML.style.cursor;
+    }
+
+    if (element instanceof ForeignObjectView && element.content) { /* is element is foreign object and has content, set cursor also for content */
+      if (this.drawTool.isOn() && this.drawTool.tool instanceof DrawTextBox) {
+        /* todo make this shit better (all foreign objects cursor is text) */
+        element.SVG.style.cursor = "text";
+        element.content.style.cursor = "text";
+      } else {
+        element.SVG.style.cursor = cursor;
+        element.content.style.cursor = cursor;
+      }
+    } else {
+      element.SVG.style.cursor = cursor;
+    }
+  }
+
   public add(element: ElementView, setElementActivity: boolean = true) {
     if (!element) return;
     element.group = null;
@@ -410,6 +437,8 @@ export class Container {
     if(setElementActivity) {
       this.__setElementActivity__(element);
     }
+
+    this.__setElementCursor__(element, this.activeTool?.cursor);
   }
   public remove(element: ElementView, force: boolean = false, call: boolean = true) {
     if (force || this.selectTool.isOn()) { /* if force don't check if select tool is on */
@@ -440,9 +469,9 @@ export class Container {
       }
     });
   }
-  public focus(element: ElementView, showBounding: boolean = true, call: boolean = true) {
+  public focus(element: ElementView, showBounding: boolean = true, changeGlobalStyle: boolean = true, call: boolean = true) {
     if (element.selectable) {
-      this._focus.appendChild(element, showBounding, call);
+      this._focus.appendChild(element, showBounding, changeGlobalStyle, call);
     }
   }
   public blur(element?: ElementView) {

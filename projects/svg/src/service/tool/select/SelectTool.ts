@@ -8,6 +8,7 @@ import {Focus} from "../../edit/group/Focus";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class SelectTool extends Tool {
+  protected override _cursor: Cursor = Cursor.SELECT;
   private readonly boundingBox: RectangleView;
   private position: Point = {x: 0, y: 0};
   public readonly dragTool: DragTool;
@@ -89,14 +90,14 @@ export class SelectTool extends Tool {
             )
               continue elementsLoop;
 
-          this._container.focus(element, true, false);
+          this._container.focus(element, true, undefined, false);
         } else {/* if select box drawn from left to right */
           for (let point of elementPoints)
             if (/* one point match */
               point.x > boxPoints.topLeft.x && point.x < boxPoints.bottomRight.x &&
               point.y > boxPoints.topLeft.y && point.y < boxPoints.bottomRight.y
             ) {
-              this._container.focus(element, true, false);
+              this._container.focus(element, true, undefined, false);
               break;
             }
         }
@@ -158,7 +159,7 @@ export class SelectTool extends Tool {
     this._isOn = true;
     this.dragTool.on(call);
 
-    this._container.style.changeCursor(Cursor.SELECT);
+    this._container.style.changeCursor(this.cursor);
     if (call) {
       this._container.__call__(Event.SELECT_TOOl_ON);
     }

@@ -32,36 +32,36 @@ export class Node extends EllipseView {
 
   public makeMouseDown(position: Point, call: boolean = true) {
     if (call) {
-      this._container.__call__(Event.NODE_EDIT_MOUSE_DOWN, {order: this.order, position: position, element: this.editTool.nodeEditableElement});
+      this._container.__call__(Event.NODE_EDIT_MOUSE_DOWN, {order: this.order, position: position, element: this.editTool.editableElement});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
-    if (!this.editTool.nodeEditableElement) return;
+    if (!this.editTool.editableElement) return;
     let rotatedPosition = Matrix.rotate(
       [position],
-      this.editTool.nodeEditableElement.refPoint,
-      this.editTool.nodeEditableElement.angle
+      this.editTool.editableElement.refPoint,
+      this.editTool.editableElement.angle
     )[0];
 
-    this.editTool.nodeEditableElement.replacePoint(this.order, rotatedPosition);
+    this.editTool.editableElement.replacePoint(this.order, rotatedPosition);
     this.__drag__(rotatedPosition);
 
     if (call) {
-      this._container.__call__(Event.NODE_EDIT_MOUSE_MOVE, {order: this.order, position: position, element: this.editTool.nodeEditableElement});
+      this._container.__call__(Event.NODE_EDIT_MOUSE_MOVE, {order: this.order, position: position, element: this.editTool.editableElement});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
     this.makeMouseMove(position, false);
-    if (!this.editTool.nodeEditableElement) return;
+    if (!this.editTool.editableElement) return;
     let rotatedPosition = Matrix.rotate(
       [position],
-      this.editTool.nodeEditableElement.refPoint,
-      this.editTool.nodeEditableElement.angle
+      this.editTool.editableElement.refPoint,
+      this.editTool.editableElement.angle
     )[0];
 
     if (call) {
-      this._container.__call__(Event.NODE_EDIT_MOUSE_UP, {order: this.order, position: position, element: this.editTool.nodeEditableElement});
-      this._container.__call__(Event.NODE_EDITED, {order: this.order, position: rotatedPosition, element: this.editTool.nodeEditableElement});
+      this._container.__call__(Event.NODE_EDIT_MOUSE_UP, {order: this.order, position: position, element: this.editTool.editableElement});
+      this._container.__call__(Event.NODE_EDITED, {order: this.order, position: rotatedPosition, element: this.editTool.editableElement});
     }
   }
 

@@ -9,7 +9,6 @@ import {Rect} from "../../../model/Rect";
 export class TextBoxCursor extends ElementCursor {
   constructor() {
     super();
-    this.cursor[Cursor.EDIT] = "text";
   }
 }
 
@@ -31,6 +30,8 @@ export class TextBoxView extends ForeignObjectView {
     this.svgElement.innerHTML = "";
     this.svgElement.appendChild(this._content);
 
+    this.addFocusListener();
+    this.addEditCallBack();
     if (removeOnEmpty) {
       this._container.addCallBack(Event.EDIT_TOOl_OFF, () => {
         if (this._content.value == "")
@@ -39,7 +40,6 @@ export class TextBoxView extends ForeignObjectView {
     }
 
     this.style.setDefaultStyle();
-    this.addEditCallBack();
   }
 
   public get text(): string {
@@ -49,6 +49,9 @@ export class TextBoxView extends ForeignObjectView {
     this._content.value = text;
   }
 
+  public override get content(): HTMLTextAreaElement {
+    return this._content;
+  }
   public override addEditCallBack() {
     this._content.addEventListener("input", () => {
       this._container.__call__(Event.TEXT_TYPING, {text: this._content.value, element: this}
@@ -61,7 +64,7 @@ export class TextBoxView extends ForeignObjectView {
         this._container.remove(this, true);
         this._container.selectTool.on();
       }
-      if (this._container.editTool.isOn()) {
+      if (this._container.drawTool.isOn() && this._container.drawTool.tool == this._container.drawTools.textBox) {
         this._container.__call__(Event.TEXT_TYPING_COMMIT, {
           text: this._content.value,
           element: this

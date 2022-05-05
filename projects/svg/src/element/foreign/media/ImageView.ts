@@ -12,7 +12,6 @@ import {Cursor} from "../../../dataSource/constant/Cursor";
 export class ImageCursor extends ElementCursor {
   constructor() {
     super();
-    this.cursor[Cursor.EDIT] = "default";
   }
 }
 

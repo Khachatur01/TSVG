@@ -4,9 +4,10 @@ import {Tool} from "../Tool";
 import {Point} from "../../../model/Point";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../element/ElementView";
+import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class DrawTool extends Tool {
-  private _drawer: Drawer | null = null;
+  private _drawer: Drawer = this._container.drawTools.free;
   private _isDrawing: boolean = false;
   public toolAfterDrawing: Tool | null;
   public perfect: boolean = false;
@@ -26,12 +27,16 @@ export class DrawTool extends Tool {
     this._drawer?.makeMouseUp(position, call, parameter);
   }
 
-  public get tool(): Drawer | null {
+  public override get cursor(): Cursor {
+    return this._drawer.cursor;
+  }
+
+  public get tool(): Drawer {
     return this._drawer;
   }
-  public set tool(drawer: Drawer | null) {
+  public set tool(drawer: Drawer) {
     if (!drawer) return;
-    this._drawer?.stop();
+    this._drawer.stop();
     drawer.drawTool = this;
     this._drawer = drawer;
   }
@@ -41,7 +46,7 @@ export class DrawTool extends Tool {
     super.on(call);
     this._isOn = true;
     this._drawer.start(call);
-    this._container.style.changeCursor(this._drawer.cursor);
+    this._container.style.changeCursor(this.cursor /* use getter */);
 
     this._container.blur();
   }
@@ -49,6 +54,8 @@ export class DrawTool extends Tool {
     super.off(call);
     this._isOn = false;
     this._drawer?.stop(call);
+
+    this._container.blur();
   }
 
   public __drawing__() {

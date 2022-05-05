@@ -9,11 +9,11 @@ import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../dataSource/constant/ElementType";
 import {Cursor} from "../../dataSource/constant/Cursor";
 import {DrawTextBox} from "../../service/tool/draw/element/foreign/DrawTextBox";
+import {DrawForeignObject} from "../../service/tool/draw/element/foreign/DrawForeignObject";
 
 export class ForeignObjectCursor extends ElementCursor {
   constructor() {
     super();
-    this.cursor[Cursor.EDIT] = "auto";
   }
 }
 
@@ -98,6 +98,19 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content.contentEditable = "true";
     this._content.style.height = "100%";
 
+    this._content.addEventListener("focus", () => {
+      if (this._container.drawTool.isOn() && this._container.drawTool.tool == this._container.drawTools.textBox) {
+        this._container.blur();
+        this._container.focus(this, false);
+        this._content.focus();
+        this.__onFocus__();
+      } else {
+        this._content.blur();
+        this.__onBlur__();
+      }
+    });
+    this.addEditCallBack();
+
     this.__setRect__(rect);
     this.setOverEvent();
 
@@ -105,16 +118,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       preserveAspectRatio: "none"
     });
 
-    this._container.addCallBack(Event.EDIT_TOOl_OFF, () => {
-      if (this._content) {
-        this._content.style.userSelect = "none";
-      }
-    });
-    this._container.addCallBack(Event.EDIT_TOOl_ON, () => {
-      if (this._content) {
-        this._content.style.userSelect = "unset";
-      }
-    });
     try {
       this.style.setDefaultStyle();
     } catch (error: any) {
@@ -125,7 +128,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     let foreignObject: ForeignObjectView = new ForeignObjectView(this._container);
     foreignObject.setContent(this._content.innerHTML);
 
-    foreignObject.__setRect__(this._rect);
+    foreignObject.__setRect__(Object.assign({}, this._rect));
     foreignObject.__fixRect__();
 
     foreignObject.refPoint = Object.assign({}, this.refPoint);
@@ -186,9 +189,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   }
 
   public override __onFocus__(force: boolean = false) {
-    if (force || this._container.editTool.isOn()) {
-      this.svgElement.style.outline = this.outline;
-    }
+    this.svgElement.style.outline = this.outline;
   }
   public override __onBlur__() {
     this.svgElement.style.outline = "unset";
@@ -204,7 +205,21 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   public get content(): HTMLElement {
     return this._content;
   }
-  public setContent(content: string, setListeners: boolean = true): void {
+
+  protected addFocusListener(): void {
+    this._content.addEventListener("focus", () => {
+      if (this.selectable && this._container.drawTool.isOn() && this._container.drawTool.tool == this._container.drawTools.textBox) {
+        this._container.blur();
+        this._container.focus(this, false);
+        this._content.focus();
+        this.__onFocus__();
+      } else {
+        this._content.blur();
+        this.__onBlur__();
+      }
+    });
+  }
+  public setContent(content: string): void {
     this._content.innerHTML = content;
     this._content.style.userSelect = "none";
     this._content.style.border = "none";
@@ -212,16 +227,8 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.svgElement.innerHTML = "";
     this.svgElement.appendChild(this._content);
 
-    if (setListeners) {
-      this._content.addEventListener("focus", () => {
-        if (this._container.editTool.isOn() && this.selectable) {
-          this._content.focus();
-        } else {
-          this._content.blur();
-        }
-      });
+      this.addFocusListener();
       this.addEditCallBack();
-    }
   }
 
   public get boundingRect(): Rect {

@@ -10,9 +10,10 @@ import {Cursor} from "../../../dataSource/constant/Cursor";
 import {ForeignObjectView} from "../../../element/foreign/ForeignObjectView";
 
 export class EditTool extends Tool {
+  protected override _cursor: Cursor = Cursor.EDIT;
   private readonly nodesGroup: SVGGElement;
   private nodes: Node[] = [];
-  private _editableElement: ElementView | null = null;
+  private _editableElement: PointedView | null = null;
   public focus: Focus;
 
   public constructor(container: Container, focus: Focus) {
@@ -49,36 +50,28 @@ export class EditTool extends Tool {
     }
     return null;
   }
-  public get editableElement(): ElementView | null {
+  public get editableElement(): PointedView | null {
     return this._editableElement;
   }
-  public set editableElement(editableElement: ElementView | null) {
+  public set editableElement(editableElement: PointedView | null) {
     if (!editableElement) return;
     this.removeEditableElement();
-    if (!(
-        editableElement instanceof PointedView ||
-        editableElement instanceof ForeignObjectView)
-    ) {
-      return;
-    }
 
     this.focus.appendChild(editableElement, false, false);
     this._editableElement = editableElement;
     this._editableElement.__onFocus__();
 
-    if (editableElement instanceof PointedView) {
-      let order = 0;
-      let points = editableElement.points;
-      for (let point of points) {
-        let node: Node = new Node(this._container, this, point, order++);
-        node.__on__();
-        this.nodes.push(node);
-        this.nodesGroup.appendChild(node.SVG);
-      }
-
-      this.refPoint = editableElement.refPoint;
-      this.rotate(editableElement.angle);
+    let order = 0;
+    let points = editableElement.points;
+    for (let point of points) {
+      let node: Node = new Node(this._container, this, point, order++);
+      node.__on__();
+      this.nodes.push(node);
+      this.nodesGroup.appendChild(node.SVG);
     }
+
+    this.refPoint = editableElement.refPoint;
+    this.rotate(editableElement.angle);
   }
   public removeEditableElement() {
     this.nodesGroup.innerHTML = "";
@@ -92,13 +85,16 @@ export class EditTool extends Tool {
   public override on(call: boolean = true): void {
     super.on(call);
     this._isOn = true;
-    let [firstChild] = this.focus.children;
-    this.editableElement = firstChild;
+    this.focus.children.forEach((child: ElementView) => {
+      if (child instanceof PointedView) {
+        this.editableElement = child;
+      }
+    });
     this._container.blur();
     if (this._editableElement)
       this._container.focus(this._editableElement, false);
 
-    this._container.style.changeCursor(Cursor.EDIT);
+    this._container.style.changeCursor(this.cursor);
     if (call) {
       this._container.__call__(Event.EDIT_TOOl_ON);
     }

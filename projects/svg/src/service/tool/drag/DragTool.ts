@@ -3,8 +3,10 @@ import {Point} from "../../../model/Point";
 import {Tool} from "../Tool";
 import {Event} from "../../../dataSource/constant/Event";
 import {Focus} from "../../edit/group/Focus";
+import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class DragTool extends Tool {
+  protected override _cursor: Cursor = Cursor.SELECT;
   private mouseStartPos: Point = {x: 0, y: 0};
   private elementStartPos: Point = {x: 0, y: 0};
   public focus: Focus;

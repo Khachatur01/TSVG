@@ -5,12 +5,25 @@ import {TextBoxView} from "../../../../../element/foreign/text/TextBoxView";
 import {Event} from "../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
 import {ForeignObjectView} from "../../../../../element/foreign/ForeignObjectView";
+import {Container} from "../../../../../Container";
 
 export class DrawTextBox extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
     let textBox = new TextBoxView(this.container, {x: position.x, y: position.y, width: 0, height: 0});
     textBox.__onFocus__(true);
     return textBox;
+  }
+
+  protected override turnOnToolAfterDrawing(): void {}
+
+  protected override drawStart(event: MouseEvent | TouchEvent) {
+    if (event.target instanceof HTMLElement) {
+      if (event.target.parentElement instanceof SVGForeignObjectElement) {
+        console.log("don't draw")
+        return;
+      }
+    }
+    super.drawStart(event);
   }
 
   protected override onIsNotComplete(call: boolean) {
@@ -26,11 +39,9 @@ export class DrawTextBox extends MoveDraw {
 
   protected override onEnd(call: boolean) {
     if (call) {
-      this.container.editTool.on();
       if (this._drawableElement) {
-        this.container.focus(this._drawableElement, false, false);
-        this.container.editTool.editableElement = this._drawableElement as TextBoxView;
         let textBox = (this._drawableElement as TextBoxView);
+        this.container.focus(textBox, false, undefined, false);
         textBox.content.focus();
         textBox.__onFocus__(true);
       }

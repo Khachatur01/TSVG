@@ -15,7 +15,7 @@ export class ElementCursor {
   public cursor: any = {};
   constructor() {
     this.cursor[Cursor.SELECT] = "move";
-    this.cursor[Cursor.EDIT] = "crosshair";
+    this.cursor[Cursor.EDIT] = "default";
   }
 }
 

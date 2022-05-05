@@ -33,7 +33,7 @@ export class LineView extends PointedView implements MoveDrawable {
 
   public get copy(): LineView {
     let line: LineView = new LineView(this._container);
-    line.points = this.points;
+    line.points = this._points.map(point => Object.assign({}, point)); /* copy points array */
 
     line.refPoint = Object.assign({}, this.refPoint);
     line.__rotate__(this._angle);

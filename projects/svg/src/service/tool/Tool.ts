@@ -3,6 +3,7 @@ import {Point} from "../../model/Point";
 import {Cursor} from "../../dataSource/constant/Cursor";
 
 export abstract class Tool {
+  protected _cursor: Cursor = Cursor.NO_TOOL;
   protected readonly _container: Container;
   protected _isOn: boolean = false;
 
@@ -16,6 +17,10 @@ export abstract class Tool {
 
   public get container() {
     return this._container;
+  }
+
+  public get cursor(): Cursor {
+    return this._cursor;
   }
 
   public on(call: boolean = true): void {

@@ -6,6 +6,7 @@ import {Point} from "../../../model/Point";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class PointerTool extends Tool {
+  protected override _cursor: Cursor = Cursor.POINTER;
   private readonly _cursorSVG: SVGElement;
 
   private _move = this.move.bind(this);
@@ -66,7 +67,7 @@ export class PointerTool extends Tool {
     this._container.blur();
     this.hide();
 
-    this._container.style.changeCursor(Cursor.POINTER);
+    this._container.style.changeCursor(this.cursor);
     if (call) {
       this._container.__call__(Event.POINTER_TOOl_ON);
     }

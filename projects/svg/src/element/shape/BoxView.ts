@@ -32,7 +32,7 @@ export class BoxView extends ShapeView {
 
   public get copy(): BoxView {
     let box: BoxView = new BoxView(this._container);
-    box.__setRect__(this._rect);
+    box.__setRect__(Object.assign({}, this._rect));
     box.style.set = this.style;
 
     box.refPoint = Object.assign({}, this.refPoint);

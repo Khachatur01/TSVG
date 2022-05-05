@@ -10,6 +10,7 @@ import {Point} from "../../../model/Point";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class HighlightTool extends Tool {
+  protected override _cursor: Cursor = Cursor.HIGHLIGHTER;
   private _timeout: number = 3000;
   private _color: string = "#7efca0AA";
   private _width: string = "20";
@@ -187,7 +188,7 @@ export class HighlightTool extends Tool {
     this._isOn = true;
     this._container.blur();
 
-    this._container.style.changeCursor(Cursor.HIGHLIGHTER);
+    this._container.style.changeCursor(this.cursor);
     if (call) {
       this._container.__call__(Event.HIGHLIGHT_TOOl_ON);
     }

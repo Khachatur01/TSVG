@@ -93,17 +93,20 @@ export class Grid {
     return {x: x, y: y};
   }
 
-  public set snapSide(squareSide: number) {
+  public getSnapSide(): number {
+    return this._snapSide;
+  }
+
+  public setSnapSide(squareSide: number, call: boolean = true) {
     this._snapSide = squareSide;
     if (this._isGrid) {
       this.gridOff(false); /* not call grid off callback */
       this.gridOn(false); /* not call grid on callback */
     }
-    this.container.__call__(Event.SNAP_SIDE_CHANGE,
-      {snapSide: squareSide}
-    );
-  }
-  public get snapSide(): number {
-    return this._snapSide;
+    if (call) {
+      this.container.__call__(Event.SNAP_SIDE_CHANGE,
+        {snapSide: squareSide}
+      );
+    }
   }
 }

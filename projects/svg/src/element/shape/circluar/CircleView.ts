@@ -36,7 +36,7 @@ export class CircleView extends CircularView {
   }
 
   public override get copy(): CircleView {
-    let ellipse: CircleView = new CircleView(this._container, this._rect);
+    let ellipse: CircleView = new CircleView(this._container, Object.assign({}, this._rect));
     ellipse.refPoint = Object.assign({}, this.refPoint);
     ellipse.__rotate__(this._angle);
 

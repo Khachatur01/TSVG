@@ -11,6 +11,7 @@ import {GroupView} from "../../../element/group/GroupView";
 import {Event} from "../../../dataSource/constant/Event";
 import {Matrix} from "../../math/Matrix";
 import {CircularView} from "../../../element/shape/circluar/CircularView";
+import {PointedView} from "../../../element/shape/pointed/PointedView";
 
 export class Focus implements Draggable, Resizeable {
   private readonly container: Container;
@@ -45,13 +46,13 @@ export class Focus implements Draggable, Resizeable {
     return this.boundingBox.SVG;
   }
 
-  public appendChild(element: ElementView, showBounding: boolean = true, call: boolean = true): void {
+  public appendChild(element: ElementView, showBounding: boolean = true, changeGlobalStyle: boolean = true, call: boolean = true): void {
     this._children.add(element);
 
     if (this._children.size == 1) {
       this.__refPointView__ = Object.assign({}, element.refPoint);
       this.__refPoint__ = Object.assign({}, element.refPoint);
-      if (showBounding) {
+      if (changeGlobalStyle) {
         this.container.style.__fixGlobalStyle__();
         this.container.style.__setGlobalStyle__(element.style);
       }
@@ -67,7 +68,6 @@ export class Focus implements Draggable, Resizeable {
 
     this.__fit__();
     if(showBounding) {
-      element.__onFocus__();
       this.__focus__(element.rotatable);
     }
 
@@ -112,7 +112,6 @@ export class Focus implements Draggable, Resizeable {
     this.__fit__();
   }
   public clear(call: boolean = true): void {
-    // this.boundingBox.rect = {x: 0, y: 0, width: 0, height: 0};
     let thereIsElement = this._children.size > 0;
     this.__blur__(call && thereIsElement); /* call blur callback function only when there is focused element */
     this.container.style.__recoverGlobalStyle__(call && thereIsElement); /* call style change callback function only when there is focused element */
@@ -231,6 +230,15 @@ export class Focus implements Draggable, Resizeable {
 
   public get children(): Set<ElementView> {
     return this._children;
+  }
+
+  public containsPointedElement(): boolean {
+    for (const child of this._children) {
+      if (child instanceof PointedView) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public __translate__(delta: Point) {
