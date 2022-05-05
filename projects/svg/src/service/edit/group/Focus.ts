@@ -531,7 +531,7 @@ export class Focus implements Draggable, Resizeable {
     this.pasteCount = 0;
     this.elementsClipboard.clear();
     this._children.forEach((child: ElementView) => {
-      this.elementsClipboard.add(child.copy);
+      this.elementsClipboard.add(child);
     });
 
     if (call) {

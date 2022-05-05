@@ -19,6 +19,8 @@ export class FreeView extends PathView {
     super(container, path, ownerId, index);
   }
   public override get copy(): FreeView {
-    return super.copy as FreeView;
+    let copy: FreeView = Object.assign(new FreeView(this._container), super.copy);
+    copy._type = ElementType.FREE;
+    return copy;
   }
 }

@@ -19,7 +19,9 @@ export class IsoscelesTriangleView extends TriangleView implements MoveDrawable 
   }
 
   public override get copy(): IsoscelesTriangleView {
-    return super.copy as IsoscelesTriangleView;
+    let copy: IsoscelesTriangleView = Object.assign(new IsoscelesTriangleView(this._container), super.copy);
+    copy._type = ElementType.ISOSCELES_TRIANGLE;
+    return copy;
   }
 
   public __drawSize__(rect: Rect): void {

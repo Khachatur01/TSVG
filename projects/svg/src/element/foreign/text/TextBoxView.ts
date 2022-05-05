@@ -2,7 +2,6 @@ import {ForeignObjectView} from "../ForeignObjectView";
 import {Container} from "../../../Container";
 import {Event} from "../../../dataSource/constant/Event";
 import {ElementType} from "../../../dataSource/constant/ElementType";
-import {Cursor} from "../../../dataSource/constant/Cursor";
 import {ElementCursor} from "../../ElementView";
 import {Rect} from "../../../model/Rect";
 
@@ -74,7 +73,8 @@ export class TextBoxView extends ForeignObjectView {
   }
 
   public override get copy(): TextBoxView {
-    let copy = super.copy as TextBoxView;
+    let copy: TextBoxView = Object.assign(new TextBoxView(this._container), super.copy);
+    copy._type = ElementType.TEXT_BOX;
     copy.text = this.text;
     return copy;
   }
@@ -86,7 +86,6 @@ export class TextBoxView extends ForeignObjectView {
   public override toJSON(): any {
     let json = super.toJSON();
     json["text"] = this._content.value;
-    json["content"] = undefined;
     return json;
   }
   public override fromJSON(json: any) {

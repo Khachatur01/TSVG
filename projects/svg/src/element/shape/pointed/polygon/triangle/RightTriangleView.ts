@@ -19,7 +19,9 @@ export class RightTriangleView extends TriangleView implements MoveDrawable {
   }
 
   public override get copy(): RightTriangleView {
-    return super.copy as RightTriangleView;
+    let copy: RightTriangleView = Object.assign(new RightTriangleView(this._container), super.copy);
+    copy._type = ElementType.RIGHT_TRIANGLE;
+    return copy;
   }
 
   public __drawSize__(rect: Rect) {

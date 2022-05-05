@@ -29,7 +29,9 @@ export class RectangleView extends PolygonView implements MoveDrawable {
   }
 
   public override get copy(): RectangleView {
-    return super.copy as RectangleView;
+    let copy: RectangleView = Object.assign(new RectangleView(this._container), super.copy);
+    copy._type = ElementType.RECTANGLE;
+    return copy;
   }
 
   public __drawSize__(rect: Rect) {
