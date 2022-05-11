@@ -19,9 +19,11 @@ export class DrawTextBox extends MoveDraw {
   protected override drawStart(event: MouseEvent | TouchEvent) {
     if (event.target instanceof HTMLElement) {
       if (event.target.parentElement instanceof SVGForeignObjectElement) {
-        console.log("don't draw")
         return;
       }
+    } else if (this.container.focused.children.size !== 0) {
+      super.turnOnToolAfterDrawing();
+      return;
     }
     super.drawStart(event);
   }
@@ -41,7 +43,7 @@ export class DrawTextBox extends MoveDraw {
     if (call) {
       if (this._drawableElement) {
         let textBox = (this._drawableElement as TextBoxView);
-        this.container.focus(textBox, false, undefined, false);
+        this.container.focus(textBox, false, undefined /* set default */, false);
         textBox.content.focus();
         textBox.__onFocus__(true);
       }

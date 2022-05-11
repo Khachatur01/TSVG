@@ -12,6 +12,7 @@ import {Event} from "../../../dataSource/constant/Event";
 import {Matrix} from "../../math/Matrix";
 import {CircularView} from "../../../element/shape/circluar/CircularView";
 import {PointedView} from "../../../element/shape/pointed/PointedView";
+import {ForeignObjectView} from "../../../element/foreign/ForeignObjectView";
 
 export class Focus implements Draggable, Resizeable {
   private readonly container: Container;
@@ -24,7 +25,10 @@ export class Focus implements Draggable, Resizeable {
   public readonly boundingBox: BoundingBox;
 
   private pasteCount: number = 0;
-  private elementsClipboard: Set<ElementView> = new Set<ElementView>();
+  public __clipboard__: {elements: Set<ElementView>, text: string} = {
+    elements: new Set<ElementView>(),
+    text: ""
+  };
 
   public constructor(container: Container) {
     this.container = container;
@@ -91,9 +95,6 @@ export class Focus implements Draggable, Resizeable {
         this.__rotate__(child.angle);
         this.__focus__(child.rotatable);
       });
-      if (call) {
-        this.container.__call__(Event.ELEMENT_BLURRED, {element: element});
-      }
     } else {
       /* multiple elements */
       let rotatable: boolean = true;
@@ -104,11 +105,11 @@ export class Focus implements Draggable, Resizeable {
         }
       }
       this.__focus__(rotatable);
-      if (call) {
-        this.container.__call__(Event.ELEMENT_BLURRED, {element: element});
-      }
     }
 
+    if (call) {
+      this.container.__call__(Event.ELEMENT_BLURRED, {element: element});
+    }
     this.__fit__();
   }
   public clear(call: boolean = true): void {
@@ -119,6 +120,9 @@ export class Focus implements Draggable, Resizeable {
       child.__onBlur__();
     });
     this._children.clear();
+    if (call) {
+      this.container.__call__(Event.BLURRED);
+    }
   } /* blur all elements */
   public remove(call: boolean = true): void {
     let elements: Set<ElementView> = new Set<ElementView>();
@@ -529,15 +533,16 @@ export class Focus implements Draggable, Resizeable {
 
   public copy(call: boolean = true): void {
     this.pasteCount = 0;
-    this.elementsClipboard.clear();
+    this.__clipboard__.elements.clear();
     this._children.forEach((child: ElementView) => {
-      this.elementsClipboard.add(child);
+      this.__clipboard__.elements.add(child);
     });
 
     if (call) {
       this.container.__call__(Event.COPY, {elements: this._children});
     }
   }
+
   public cut(call: boolean = true): void {
     let childrenCopy: Set<ElementView> = new Set<ElementView>();
     this._children.forEach((child: ElementView) => {
@@ -558,7 +563,7 @@ export class Focus implements Draggable, Resizeable {
     let newElements: ElementView[] = [];
 
     this.clear(false);
-    this.elementsClipboard.forEach((element: ElementView) => {
+    this.__clipboard__.elements.forEach((element: ElementView) => {
       element = element.copy; /* may paste many times */
       newElements.push(element);
 

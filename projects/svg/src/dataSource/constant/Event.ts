@@ -115,6 +115,9 @@ export enum Event {
   COPY,
   CUT,
   PASTE,
+  COPY_TEXT,
+  CUT_TEXT,
+  PASTE_TEXT,
   TO_TOP,
   TO_BOTTOM,
   ELEMENTS_DELETED

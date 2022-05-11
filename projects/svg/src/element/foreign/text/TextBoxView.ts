@@ -29,8 +29,12 @@ export class TextBoxView extends ForeignObjectView {
     this.svgElement.innerHTML = "";
     this.svgElement.appendChild(this._content);
 
-    this.addFocusListener();
     this.addEditCallBack();
+    this.addFocusEvent();
+    this.addCopyEvent();
+    this.addCutEvent();
+    this.addPasteEvent();
+
     if (removeOnEmpty) {
       this._container.addCallBack(Event.EDIT_TOOl_OFF, () => {
         if (this._content.value == "")
@@ -63,13 +67,40 @@ export class TextBoxView extends ForeignObjectView {
         this._container.remove(this, true);
         this._container.selectTool.on();
       }
-      if (this._container.drawTool.isOn() && this._container.drawTool.tool == this._container.drawTools.textBox) {
+      /* tool already changed to draw free */
+      if (this._container.drawTool.isOn()/* && this._container.drawTool.tool == this._container.drawTools.textBox*/) {
         this._container.__call__(Event.TEXT_TYPING_COMMIT, {
           text: this._content.value,
           element: this
         });
       }
     });
+  }
+
+  protected override addCutEvent() {
+    this._content.addEventListener('cut', (event: ClipboardEvent) => {
+      let text = document.getSelection()?.toString();
+      if (text) {
+        this._container.focused.__clipboard__.text = text;
+
+        this.replaceSelected("");
+      }
+      event.preventDefault();
+    });
+  }
+  protected override addPasteEvent() {
+    this._content.addEventListener('paste', (event: ClipboardEvent) => {
+      let paste = this.container.focused.__clipboard__.text;
+
+      this.replaceSelected(paste);
+      event.preventDefault();
+    });
+  }
+
+  public replaceSelected(text: string) {
+    let start = this._content.selectionStart;
+    let end = this._content.selectionEnd;
+    this.text = this.text.substring(0, start) + text + this.text.substring(end);
   }
 
   public override get copy(): TextBoxView {

@@ -282,7 +282,7 @@ export class Container {
     this.style = new GlobalStyle(this);
 
     this.container.addEventListener("mousedown", event => {
-      if (event.target == this.container) {
+      if (event.target == this.container && !this.drawTool.isOn()) {
         this.blur();
         if (this.editTool.isOn()) {
           this.drawTool.tool = this.drawTools.free;
@@ -291,7 +291,7 @@ export class Container {
       }
     });
     this.container.addEventListener("touchstart", event => {
-      if (event.target == this.container) {
+      if (event.target == this.container && !this.drawTool.isOn()) {
         this.blur();
         if (this.editTool.isOn()) {
           this.drawTool.tool = this.drawTools.free;
@@ -417,7 +417,7 @@ export class Container {
 
     if (element instanceof ForeignObjectView && element.content) { /* is element is foreign object and has content, set cursor also for content */
       if (this.drawTool.isOn() && this.drawTool.tool instanceof DrawTextBox) {
-        /* todo make this shit better (all foreign objects cursor is text) */
+        /* todo make this shit better (set all foreign objects cursor is text) */
         element.SVG.style.cursor = "text";
         element.content.style.cursor = "text";
       } else {

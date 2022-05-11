@@ -5,9 +5,10 @@ import {Point} from "../../../model/Point";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../element/ElementView";
 import {Cursor} from "../../../dataSource/constant/Cursor";
+import {DrawFree} from "./mode/DrawFree";
 
 export class DrawTool extends Tool {
-  private _drawer: Drawer = this._container.drawTools.free;
+  private _drawer: Drawer;
   private _isDrawing: boolean = false;
   public toolAfterDrawing: Tool | null;
   public perfect: boolean = false;
@@ -15,6 +16,7 @@ export class DrawTool extends Tool {
   public constructor(container: Container) {
     super(container);
     this.toolAfterDrawing = this;
+    this._drawer = new DrawFree(container);
   }
 
   public makeMouseDown(position: Point, call: boolean = true, parameter?: any) {

@@ -98,22 +98,14 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content.contentEditable = "true";
     this._content.style.height = "100%";
 
-    this._content.addEventListener("focus", () => {
-      if (this._container.drawTool.isOn() && this._container.drawTool.tool == this._container.drawTools.textBox) {
-        this._container.blur();
-        this._container.focus(this, false);
-        this._content.focus();
-        this.__onFocus__();
-      } else {
-        this._content.blur();
-        this.__onBlur__();
-      }
-    });
     this.addEditCallBack();
+    this.addFocusEvent();
+    this.addCopyEvent();
+    this.addCutEvent();
+    this.addPasteEvent();
 
     this.__setRect__(rect);
     this.setOverEvent();
-
     this.setAttr({
       preserveAspectRatio: "none"
     });
@@ -196,6 +188,42 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.svgElement.style.outline = "unset";
   }
 
+  protected addCopyEvent() {
+    this._content.addEventListener('copy', (event: ClipboardEvent) => {
+      let text = document.getSelection()?.toString();
+      if (text) {
+        this._container.focused.__clipboard__.text = text;
+      }
+      event.preventDefault();
+    });
+  }
+  protected addCutEvent() {
+    this._content.addEventListener('cut', (event: ClipboardEvent) => {
+      let text = document.getSelection()?.toString();
+      if (text) {
+        this._container.focused.__clipboard__.text = text;
+        const selection = window.getSelection();
+        if (selection?.rangeCount) {
+          selection.deleteFromDocument();
+        }
+      }
+      event.preventDefault();
+    });
+  }
+  protected addPasteEvent() {
+    this._content.addEventListener('paste', (event: ClipboardEvent) => {
+      let paste = this.container.focused.__clipboard__.text;
+
+      const selection = window.getSelection();
+      if (!selection?.rangeCount || paste === "") return;
+
+      selection.deleteFromDocument();
+      selection.getRangeAt(0).insertNode(document.createTextNode(paste));
+
+      event.preventDefault();
+    });
+  }
+
   public override get HTML(): HTMLElement | SVGElement {
     if (this._content) {
       return this._content;
@@ -207,7 +235,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     return this._content;
   }
 
-  protected addFocusListener(): void {
+  protected addFocusEvent(): void {
     this._content.addEventListener("focus", () => {
       if (this.selectable && this._container.drawTool.isOn() && this._container.drawTool.tool == this._container.drawTools.textBox) {
         this._container.blur();
@@ -228,7 +256,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.svgElement.innerHTML = "";
     this.svgElement.appendChild(this._content);
 
-    this.addFocusListener();
+    this.addFocusEvent();
     this.addEditCallBack();
   }
 
@@ -257,5 +285,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     super.fromJSON(json);
     this.svgElement.innerHTML = decodeURIComponent(json.content);
     this._content = this.svgElement.firstChild as HTMLElement;
+    this.addEditCallBack();
+    this.addFocusEvent();
+    this.addCopyEvent();
+    this.addCutEvent();
+    this.addPasteEvent();
   };
 }
