@@ -23,7 +23,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
   private _src: string = "";
   /* Model */
 
-  public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, src: string, ownerId?: string, index?: number) {
+  public constructor(container: Container, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement.id = this.id;
 
@@ -51,7 +51,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
 
   }
   public get copy(): ImageView {
-    let image: ImageView = new ImageView(this._container, this._rect, this._src);
+    let image: ImageView = new ImageView(this._container, this._src, this._rect);
 
     image.refPoint = Object.assign({}, this.refPoint);
     image.__rotate__(this._angle);

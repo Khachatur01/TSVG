@@ -157,15 +157,18 @@ export abstract class ElementView implements Resizeable, Draggable {
     this._container = container;
     this.style = new ElementStyle(this);
 
-    if (ownerId) {
+    /*
+    * One of ownerId and index arguments can't be undefined.
+    * Both should be defined or both should be undefined
+    * */
+    if (ownerId && index) { /* set defined id to element */
       this._ownerId = ownerId;
-    } else {
-      this._ownerId = container.ownerId;
-    }
-    if (index) {
       this._index = index;
-    } else {
+    } else if (!ownerId && !index) { /* generate id for element */
+      this._ownerId = container.ownerId;
       this._index = container.nextElementIndex;
+    } else {
+      throw Error("Missing id argument: ownerId{ " + ownerId + " }, index{ " + index + " }");
     }
   }
 

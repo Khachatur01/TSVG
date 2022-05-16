@@ -24,7 +24,7 @@ export class VideoView extends ForeignObjectView {
   private _src: string = "";
   /* Model */
 
-  public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, src: string, ownerId?: string, index?: number) {
+  public constructor(container: Container, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, rect, ownerId, index);
     this._content = document.createElement("video");
     this._content.style.width = "calc(100% - 20px)";

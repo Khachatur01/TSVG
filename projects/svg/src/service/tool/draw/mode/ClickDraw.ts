@@ -83,24 +83,29 @@ export abstract class ClickDraw extends Drawer {
     });
   }
 
-  public stopDrawing(call: boolean = true) {
+  public stopDrawing(call: boolean = true, turnOnDefaultTool: boolean = true) {
     if (!this._drawableElement) return;
 
     if (!this._drawableElement.isComplete()) {
-      this.container.remove(this._drawableElement, true, false);
+      this.container.remove(this._drawableElement, true, true);
     } else {
+      this._drawableElement.removePoint(-1);
+      this.container.drawTool.__drawingEnd__();
       this._drawableElement.refPoint = this._drawableElement.center;
     }
 
-    if (this.drawTool?.toolAfterDrawing) {
+    if (turnOnDefaultTool && this.drawTool?.toolAfterDrawing) {
       if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
         this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
       }
       this.drawTool.toolAfterDrawing.on();
     }
+
     if (call) {
       this.container.__call__(Event.STOP_CLICK_DRAWING);
+      this.container.__call__(Event.ELEMENT_CREATED, {element: this._drawableElement});
     }
+    this._drawableElement = null;
   }
 
   public start(call: boolean = true): void {
@@ -114,19 +119,6 @@ export abstract class ClickDraw extends Drawer {
     this.container?.HTML.removeEventListener('touchstart', this._click);
     document.removeEventListener('mousemove', this._move);
     document.removeEventListener('touchmove', this._move);
-    if (!this._drawableElement || !this.container) return;
-
-    if (this._drawableElement.isComplete()) {
-      this._drawableElement.removePoint(-1);
-      this.container.drawTool.__drawingEnd__();
-      this._drawableElement.refPoint = this._drawableElement.center;
-    } else {
-      this.container.remove(this._drawableElement);
-    }
-    if (call) {
-      this.container.__call__(Event.ELEMENT_CREATED, {element: this._drawableElement});
-    }
-
-    this._drawableElement = null;
+    this.stopDrawing(call, false);
   }
 }

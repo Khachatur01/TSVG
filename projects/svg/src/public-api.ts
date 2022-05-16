@@ -3,6 +3,9 @@
  */
 export * from './Container'
 
+export * from './dataSource/constant/Compass';
+export * from './dataSource/constant/Cursor';
+export * from './dataSource/constant/ElementType';
 export * from './dataSource/constant/Event';
 export * from './dataSource/DrawTools';
 
