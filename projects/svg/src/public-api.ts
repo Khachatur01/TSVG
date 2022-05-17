@@ -16,6 +16,8 @@ export * from './element/foreign/media/VideoView';
 export * from './element/foreign/text/TextBoxView';
 export * from './element/group/GroupView';
 export * from './element/shape/BoxView';
+export * from './element/shape/circluar/CircleView';
+export * from './element/shape/circluar/CircularView';
 export * from './element/shape/circluar/EllipseView';
 export * from './element/shape/pointed/LineView';
 export * from './element/shape/PathView';

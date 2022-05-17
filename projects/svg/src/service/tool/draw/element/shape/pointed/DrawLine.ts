@@ -4,10 +4,8 @@ import {Event} from "../../../../../../dataSource/constant/Event";
 import {PointedView} from "../../../../../../element/shape/pointed/PointedView";
 import {ElementType} from "../../../../../../dataSource/constant/ElementType";
 import {ClickDraw} from "../../../mode/ClickDraw";
-import {DrawTool} from "../../../DrawTool";
 
 export class DrawLine extends ClickDraw {
-  private clicksCount: number = 0;
   protected createDrawableElement(position: Point): PointedView {
     let element = new LineView(this.container, position, position);
     element.__fixRect__();
@@ -15,26 +13,24 @@ export class DrawLine extends ClickDraw {
   }
   public override makeMouseDown(position: Point, call: boolean = true) {
     super.makeMouseDown(position, call);
-    this.clicksCount++;
     if (this.clicksCount === 2) {
       this.stopDrawing(call);
-      this.clicksCount = 0;
     }
   }
 
-  public override stopDrawing(call: boolean = true) {
-    if (this.clicksCount === 1 && this._drawableElement) {
+  protected override stopClickDrawing(call: boolean = true) {
+    if (!this._drawableElement) return;
+
+    if (this.clicksCount === 1) {
       this.container.remove(this._drawableElement, true, false);
-    }
-    if (this.drawTool?.toolAfterDrawing) {
-      if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
-        this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
+    } else {
+      if (call) {
+        this.container.__call__(Event.STOP_CLICK_DRAWING);
+        this.container.__call__(Event.ELEMENT_CREATED, {element: this._drawableElement.copy});
       }
-      this.drawTool.toolAfterDrawing.on();
     }
-    if (call) {
-      this.container.__call__(Event.STOP_CLICK_DRAWING);
-    }
+    this._drawableElement = null;
+    this.clicksCount = 0;
   }
 
   public override start(call: boolean = true) {

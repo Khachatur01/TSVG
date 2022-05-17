@@ -5,12 +5,12 @@ import {Point} from "../../../../model/Point";
 import {Angle} from "../../../math/Angle";
 import {Event} from "../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
-import {ElementView} from "../../../../element/ElementView";
 import {DrawTool} from "../DrawTool";
 
 export abstract class ClickDraw extends Drawer {
   protected container: Container;
   protected _drawableElement: PointedView | null = null;
+  protected clicksCount: number = 0;
 
   private _click = this.click.bind(this);
   private _move = this.move.bind(this);
@@ -22,6 +22,7 @@ export abstract class ClickDraw extends Drawer {
 
   public makeMouseDown(position: Point, call: boolean = true) {
     position = this.container.grid.getSnapPoint(position);
+    this.clicksCount++;
 
     if (!this._drawableElement) {
       this._drawableElement = this.createDrawableElement(position);
@@ -53,7 +54,7 @@ export abstract class ClickDraw extends Drawer {
 
   public abstract override _new(): ClickDraw;
   public abstract override get type(): ElementType;
-  public get drawableElement(): ElementView | null {
+  public get drawableElement(): PointedView | null {
     return this._drawableElement;
   }
 
@@ -83,29 +84,34 @@ export abstract class ClickDraw extends Drawer {
     });
   }
 
-  public stopDrawing(call: boolean = true, turnOnDefaultTool: boolean = true) {
+  protected stopClickDrawing(call: boolean = true) {
     if (!this._drawableElement) return;
 
     if (!this._drawableElement.isComplete()) {
       this.container.remove(this._drawableElement, true, true);
     } else {
-      this._drawableElement.removePoint(-1);
+      /* Remove last useless points. Negative number means remove from end. */
+      this._drawableElement.removePoint(this.clicksCount - this._drawableElement.points.length);
       this.container.drawTool.__drawingEnd__();
       this._drawableElement.refPoint = this._drawableElement.center;
-    }
 
-    if (turnOnDefaultTool && this.drawTool?.toolAfterDrawing) {
+      if (call) {
+        this.container.__call__(Event.STOP_CLICK_DRAWING);
+        this.container.__call__(Event.ELEMENT_CREATED, {element: this._drawableElement.copy});
+      }
+    }
+    this._drawableElement = null;
+    this.clicksCount = 0;
+  }
+
+  public stopDrawing(call: boolean = true) {
+    this.stopClickDrawing(call);
+    if (this.drawTool?.toolAfterDrawing) {
       if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
         this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
       }
       this.drawTool.toolAfterDrawing.on();
     }
-
-    if (call) {
-      this.container.__call__(Event.STOP_CLICK_DRAWING);
-      this.container.__call__(Event.ELEMENT_CREATED, {element: this._drawableElement});
-    }
-    this._drawableElement = null;
   }
 
   public start(call: boolean = true): void {
@@ -119,6 +125,6 @@ export abstract class ClickDraw extends Drawer {
     this.container?.HTML.removeEventListener('touchstart', this._click);
     document.removeEventListener('mousemove', this._move);
     document.removeEventListener('touchmove', this._move);
-    this.stopDrawing(call, false);
+    this.stopClickDrawing();
   }
 }

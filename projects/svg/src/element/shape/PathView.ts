@@ -187,7 +187,7 @@ export class PathView extends ShapeView {
   }
 
   public isComplete(): boolean {
-    return this._rect.width != 0 && this._rect.height != 0;
+    return this._path.getAll().length > 1;
   }
 
   public override toJSON(): any {
