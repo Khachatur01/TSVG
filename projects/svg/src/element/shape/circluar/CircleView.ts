@@ -62,18 +62,4 @@ export class CircleView extends CircularView {
 
     super.__setRect__(rect, delta);
   }
-
-  public override getVisibleRect(): Rect {
-    let containerRect: Rect = this._container.HTML.getBoundingClientRect();
-    let rotatedBoundingRect: Rect = this.svgElement.getBoundingClientRect();
-    let stoke = parseInt(this.style.strokeWidth);
-
-    rotatedBoundingRect.x -= containerRect.x;
-    rotatedBoundingRect.y -= containerRect.y;
-    rotatedBoundingRect.width -= stoke / 2;
-    rotatedBoundingRect.height -= stoke / 2;
-
-    return rotatedBoundingRect;
-  }
-
 }

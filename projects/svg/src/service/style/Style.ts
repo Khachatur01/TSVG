@@ -4,7 +4,7 @@ export class Style {
   public get strokeWidth(): string {
     let width = this.style.get("stroke-width");
     if (!width)
-      width = "4";
+      width = "2";
     return width;
   }
   public set strokeWidth(width: string) {

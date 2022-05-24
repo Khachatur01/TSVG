@@ -209,7 +209,6 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
 
   public abstract __correct__(refPoint: Point, lastRefPoint: Point): void;
-
   public __getCorrectionDelta__(refPoint: Point, lastRefPoint: Point) {
     /* calculate delta */
     let rotatedRefPoint = Matrix.rotate(
@@ -350,7 +349,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
 
   public __highlight__(): void {
-    if (this._container.selectTool.isOn())
+    if (this.selectable && this._container.selectTool.isOn())
       this.svgElement.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 0.7))";
   }
   public __lowlight__(): void {

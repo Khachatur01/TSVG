@@ -28,8 +28,10 @@ export abstract class ClickDraw extends Drawer {
       this._drawableElement = this.createDrawableElement(position);
       this.container.add(this._drawableElement);
     } else {
-      this._drawableElement?.pushPoint(position);
+      this.makeMouseMove(position, false);
+      this._drawableElement.pushPoint(position);
     }
+
     if (call) {
       this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: position, element: this._drawableElement});
     }
@@ -37,9 +39,9 @@ export abstract class ClickDraw extends Drawer {
   public makeMouseMove(position: Point, call: boolean = true) {
     if (!this._drawableElement) return;
 
-    if (this.container.grid.isSnap())
+    if (this.container.grid.isSnap()) {
       position = this.container.grid.getSnapPoint(position);
-    else if (this.drawTool?.perfect) {
+    } else if (this.drawTool?.perfect) {
       let lastPoint: Point = this._drawableElement.getPoint(-2);
       position = Angle.snapLineEnd(lastPoint, position) as Point;
     }
@@ -78,6 +80,7 @@ export abstract class ClickDraw extends Drawer {
 
     let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
+
     this.makeMouseMove({
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
@@ -90,14 +93,15 @@ export abstract class ClickDraw extends Drawer {
     if (!this._drawableElement.isComplete()) {
       this.container.remove(this._drawableElement, true, true);
     } else {
-      /* Remove last useless points. Negative number means remove from end. */
-      this._drawableElement.removePoint(this.clicksCount - this._drawableElement.points.length);
+      this._drawableElement.removePoint(-1);
       this.container.drawTool.__drawingEnd__();
       this._drawableElement.refPoint = this._drawableElement.center;
 
       if (call) {
+        let drawableElementCopy = this._drawableElement.copy;
+        drawableElementCopy.index = this._drawableElement.index;
         this.container.__call__(Event.STOP_CLICK_DRAWING);
-        this.container.__call__(Event.ELEMENT_CREATED, {element: this._drawableElement.copy});
+        this.container.__call__(Event.ELEMENT_CREATED, {element: drawableElementCopy});
       }
     }
     this._drawableElement = null;
@@ -117,14 +121,14 @@ export abstract class ClickDraw extends Drawer {
   public start(call: boolean = true): void {
     this.container.HTML.addEventListener('mousedown', this._click);
     this.container.HTML.addEventListener('touchstart', this._click);
-    document.addEventListener("mousemove", this._move);
-    document.addEventListener("touchmove", this._move);
+    this.container.HTML.addEventListener("mousemove", this._move);
+    /* this.container.HTML.addEventListener("touchmove", this._move); */
   }
   public stop(call: boolean = true): void {
-    this.container?.HTML.removeEventListener('mousedown', this._click);
-    this.container?.HTML.removeEventListener('touchstart', this._click);
-    document.removeEventListener('mousemove', this._move);
-    document.removeEventListener('touchmove', this._move);
+    this.container.HTML.removeEventListener('mousedown', this._click);
+    this.container.HTML.removeEventListener('touchstart', this._click);
+    this.container.HTML.removeEventListener('mousemove', this._move);
+    /* this.container.HTML.removeEventListener('touchmove', this._move); */
     this.stopClickDrawing();
   }
 }

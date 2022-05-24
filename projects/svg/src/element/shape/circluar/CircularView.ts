@@ -37,6 +37,7 @@ export abstract class CircularView extends ShapeView implements MoveDrawable{
     let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
 
+    this.__fixRect__();
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
 

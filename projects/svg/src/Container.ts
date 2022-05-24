@@ -409,7 +409,9 @@ export class Container {
       cursorType = Cursor.NO_TOOL;
     }
 
-    if (this.style.cursor.element[element.type].cursor[cursorType]) {
+    if (!element.selectable && this.style.cursor.element[element.type].cursor[cursorType] != "none") {
+      cursor = this.style.cursor[Cursor.NO_TOOL];
+    } else if (this.style.cursor.element[element.type].cursor[cursorType]) {
       cursor = this.style.cursor.element[element.type].cursor[cursorType];
     } else { /* set container cursor if element cursor is not defined */
       cursor = this.HTML.style.cursor;
@@ -454,7 +456,6 @@ export class Container {
     this._focus.clear();
     this._elements.clear();
     this.elementsGroup.innerHTML = "";
-    this.selectTool.on();
   }
 
   public get HTML(): HTMLElement {

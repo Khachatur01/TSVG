@@ -134,7 +134,7 @@ export class HighlightTool extends Tool {
     this.group = group;
   }
 
-  private highlightStart(event: MouseEvent | TouchEvent): void {
+  private highlightStart(event: MouseEvent | TouchEvent): void  {
     this._container.HTML.addEventListener("mousemove", this._highlightMove);
     this._container.HTML.addEventListener("touchmove", this._highlightMove);
     document.addEventListener("mouseup", this._highlightEnd);
