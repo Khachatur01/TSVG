@@ -27,10 +27,10 @@ export class DrawLine extends ClickDraw {
       if (call) {
         let drawableElementCopy = this._drawableElement.copy;
         drawableElementCopy.index = this._drawableElement.index;
-        this.container.__call__(Event.STOP_CLICK_DRAWING);
-        this.container.__call__(Event.ELEMENT_CREATED, {element: this._drawableElement.copy});
+        this.container.__call__(Event.ELEMENT_CREATED, {element: drawableElementCopy});
       }
     }
+    this.container.__call__(Event.STOP_CLICK_DRAWING);
     this._drawableElement = null;
     this.clicksCount = 0;
   }

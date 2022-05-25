@@ -6,6 +6,9 @@ import {Angle} from "../../../math/Angle";
 import {Event} from "../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {DrawTool} from "../DrawTool";
+import {RectangleView} from "../../../../element/shape/pointed/polygon/rectangle/RectangleView";
+import {PathView} from "../../../../element/shape/PathView";
+import {Path} from "../../../../model/path/Path";
 
 export abstract class ClickDraw extends Drawer {
   protected container: Container;
@@ -33,7 +36,7 @@ export abstract class ClickDraw extends Drawer {
     }
 
     if (call) {
-      this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: position, element: this._drawableElement});
+      this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: position, element: this._drawableElement, firstCLick: this.clicksCount === 1});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
@@ -69,10 +72,11 @@ export abstract class ClickDraw extends Drawer {
     let eventPosition = Container.__eventToPosition__(event);
     event.preventDefault();
 
-    this.makeMouseDown({
+    let position = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
-    });
+    }
+    this.makeMouseDown(position);
   }
   protected move(event: MouseEvent | TouchEvent) {
     let containerRect = this.container?.HTML.getBoundingClientRect();
@@ -100,10 +104,10 @@ export abstract class ClickDraw extends Drawer {
       if (call) {
         let drawableElementCopy = this._drawableElement.copy;
         drawableElementCopy.index = this._drawableElement.index;
-        this.container.__call__(Event.STOP_CLICK_DRAWING);
         this.container.__call__(Event.ELEMENT_CREATED, {element: drawableElementCopy});
       }
     }
+    this.container.__call__(Event.STOP_CLICK_DRAWING);
     this._drawableElement = null;
     this.clicksCount = 0;
   }

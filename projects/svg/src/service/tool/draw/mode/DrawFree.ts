@@ -27,7 +27,9 @@ export class DrawFree extends Drawer {
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
-    position = this.container.grid.getSnapPoint(position);
+    if (this.snappable) {
+      position = this.container.grid.getSnapPoint(position);
+    }
 
     let pathObject = new Path();
     pathObject.add(new MoveTo(position));

@@ -118,7 +118,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
   public get copy(): ForeignObjectView {
     let foreignObject: ForeignObjectView = new ForeignObjectView(this._container);
-    foreignObject._content = this._content.cloneNode() as HTMLElement;
+    foreignObject._content = this._content.cloneNode(true) as HTMLElement;
     foreignObject.svgElement.appendChild(foreignObject._content);
 
     foreignObject.__setRect__(Object.assign({}, this._rect));
