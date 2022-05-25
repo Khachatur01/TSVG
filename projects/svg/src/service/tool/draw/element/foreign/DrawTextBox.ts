@@ -31,8 +31,8 @@ export class DrawTextBox extends MoveDraw {
   protected override onIsNotComplete(call: boolean) {
     if (!this._drawableElement) return;
     this._drawableElement.__setRect__({
-      x: this.startPos.x,
-      y: this.startPos.y,
+      x: this.startPosition.x,
+      y: this.startPosition.y,
       width: 200,
       height: 100
     });

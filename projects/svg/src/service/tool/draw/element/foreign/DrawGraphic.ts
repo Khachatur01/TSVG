@@ -20,8 +20,8 @@ export class DrawGraphic extends MoveDraw {
   protected override onIsNotComplete(call: boolean) {
     if (!this._drawableElement) return;
     this._drawableElement.__setRect__({
-      x: this.startPos.x - 150,
-      y: this.startPos.y - 100,
+      x: this.startPosition.x - 150,
+      y: this.startPosition.y - 100,
       width: 300,
       height: 200
     });

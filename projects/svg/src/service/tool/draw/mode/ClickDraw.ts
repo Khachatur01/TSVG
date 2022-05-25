@@ -6,9 +6,6 @@ import {Angle} from "../../../math/Angle";
 import {Event} from "../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {DrawTool} from "../DrawTool";
-import {RectangleView} from "../../../../element/shape/pointed/polygon/rectangle/RectangleView";
-import {PathView} from "../../../../element/shape/PathView";
-import {Path} from "../../../../model/path/Path";
 
 export abstract class ClickDraw extends Drawer {
   protected container: Container;

@@ -456,6 +456,7 @@ export class Container {
     this._focus.clear();
     this._elements.clear();
     this.elementsGroup.innerHTML = "";
+    this.drawTool.stopDrawing();
   }
 
   public get HTML(): HTMLElement {

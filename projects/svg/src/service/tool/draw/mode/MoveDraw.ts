@@ -9,7 +9,8 @@ import {DrawTool} from "../DrawTool";
 
 export abstract class MoveDraw extends Drawer {
   protected container: Container;
-  protected startPos: Point = {x: 0, y: 0};
+  protected startPosition: Point = {x: 0, y: 0};
+  protected currentPosition: Point = {x: 0, y: 0};
 
   protected _drawStart = this.drawStart.bind(this);
   protected _draw = this.draw.bind(this);
@@ -23,22 +24,23 @@ export abstract class MoveDraw extends Drawer {
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
-    this.startPos.x = position.x; //x position within the element.
-    this.startPos.y = position.y; //y position within the element.
+    this.startPosition.x = position.x; //x position within the element.
+    this.startPosition.y = position.y; //y position within the element.
 
-    this.startPos = this.container.grid.getSnapPoint(this.startPos);
+    this.startPosition = this.container.grid.getSnapPoint(this.startPosition);
 
-    this._drawableElement = this.createDrawableElement(this.startPos);
+    this._drawableElement = this.createDrawableElement(this.startPosition);
 
     this.container.add(this._drawableElement);
     this.container.drawTool.__drawing__();
     if (call) {
-      this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: this.startPos, element: this._drawableElement});
+      this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: this.startPosition, element: this._drawableElement});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
-    let width = position.x - this.startPos.x;
-    let height = position.y - this.startPos.y;
+    let width = position.x - this.startPosition.x;
+    let height = position.y - this.startPosition.y;
+    this.currentPosition = Object.assign({}, position);
 
     if (this.drawTool?.perfect) {
       let averageSize = (Math.abs(width) + Math.abs(height)) / 2
@@ -54,17 +56,17 @@ export abstract class MoveDraw extends Drawer {
 
     if (this.container.grid.isSnap()) {
       let snapPoint = this.container.grid.getSnapPoint({
-        x: this.startPos.x + width,
-        y: this.startPos.y + height
+        x: this.startPosition.x + width,
+        y: this.startPosition.y + height
       });
-      width = snapPoint.x - this.startPos.x;
-      height = snapPoint.y - this.startPos.y;
+      width = snapPoint.x - this.startPosition.x;
+      height = snapPoint.y - this.startPosition.y;
     }
 
     /* if _drawableElement instance of MoveDrawable, set drawSize */
     (this._drawableElement as unknown as MoveDrawable)?.__drawSize__({
-      x: this.startPos.x,
-      y: this.startPos.y,
+      x: this.startPosition.x,
+      y: this.startPosition.y,
       width: width,
       height: height
     });
@@ -140,19 +142,7 @@ export abstract class MoveDraw extends Drawer {
     });
   }
   protected drawEnd(event: MouseEvent | TouchEvent) {
-    this.container.HTML.removeEventListener('mousemove', this._draw);
-    this.container.HTML.removeEventListener('touchmove', this._draw);
-    document.removeEventListener('mouseup', this._drawEnd);
-    document.removeEventListener('touchend', this._drawEnd);
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-
-    let containerRect = this.container.HTML.getBoundingClientRect();
-
-    this.makeMouseUp({
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    });
+    this.stopDrawing();
   }
 
   protected onEnd(call: boolean) {}
@@ -161,7 +151,16 @@ export abstract class MoveDraw extends Drawer {
       this.container.remove(this._drawableElement, true, false);
   }
 
-  public override stopDrawing(call?: boolean) {}
+  public override stopDrawing(call?: boolean) {
+    this.container.drawTool.__drawingEnd__();
+
+    this.container.HTML.removeEventListener('mousemove', this._draw);
+    this.container.HTML.removeEventListener('touchmove', this._draw);
+    document.removeEventListener('mouseup', this._drawEnd);
+    document.removeEventListener('touchend', this._drawEnd);
+
+    this.makeMouseUp(this.currentPosition);
+  }
 
   public start(call: boolean = true): void {
     this.container.HTML.addEventListener('mousedown', this._drawStart);
