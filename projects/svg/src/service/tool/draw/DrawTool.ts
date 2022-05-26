@@ -67,7 +67,9 @@ export class DrawTool extends Tool {
     this._isDrawing = false;
   }
   public stopDrawing(call: boolean = true) { /* for click drawing */
-    this._drawer?.stopDrawing(call);
+    if (this._isDrawing) {
+      this._drawer?.stopDrawing(call);
+    }
   }
 
   public get type(): ElementType | undefined {
