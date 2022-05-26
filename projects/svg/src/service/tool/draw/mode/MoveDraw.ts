@@ -159,7 +159,7 @@ export abstract class MoveDraw extends Drawer {
     document.removeEventListener('mouseup', this._drawEnd);
     document.removeEventListener('touchend', this._drawEnd);
 
-    this.makeMouseUp(this.currentPosition);
+    this.makeMouseUp(this.currentPosition, call);
   }
 
   public start(call: boolean = true): void {

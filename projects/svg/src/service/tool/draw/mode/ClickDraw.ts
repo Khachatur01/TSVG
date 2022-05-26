@@ -104,7 +104,10 @@ export abstract class ClickDraw extends Drawer {
         this.container.__call__(Event.ELEMENT_CREATED, {element: drawableElementCopy});
       }
     }
-    this.container.__call__(Event.STOP_CLICK_DRAWING);
+
+    if (call) {
+      this.container.__call__(Event.STOP_CLICK_DRAWING);
+    }
     this._drawableElement = null;
     this.clicksCount = 0;
   }
@@ -130,6 +133,6 @@ export abstract class ClickDraw extends Drawer {
     this.container.HTML.removeEventListener('touchstart', this._click);
     this.container.HTML.removeEventListener('mousemove', this._move);
     /* this.container.HTML.removeEventListener('touchmove', this._move); */
-    this.stopClickDrawing();
+    this.stopClickDrawing(call);
   }
 }
