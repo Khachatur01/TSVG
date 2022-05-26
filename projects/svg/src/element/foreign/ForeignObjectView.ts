@@ -97,12 +97,25 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content = document.createElement('div');
     this._content.contentEditable = "true";
     this._content.style.height = "100%";
+    this.userSelect = false;
 
-    this.addEditCallBack();
-    this.addFocusEvent();
-    this.addCopyEvent();
-    this.addCutEvent();
-    this.addPasteEvent();
+    /* Some of these functions may throw exception, because on some children classes, these functions are overridden */
+    try {
+      this.addEditCallBack();
+    } catch (exception) {}
+    try {
+      this.addFocusEvent();
+    } catch (exception) {}
+    try {
+      this.addCopyEvent();
+    } catch (exception) {}
+    try {
+      this.addCutEvent();
+    } catch (exception) {}
+    try {
+      this.addPasteEvent();
+    } catch (exception) {}
+
 
     this.__setRect__(rect);
     this.setOverEvent();
@@ -173,19 +186,21 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   }
 
   protected addEditCallBack() {
-    this._content?.addEventListener("input", () => {
+    this._content.addEventListener("input", () => {
       this._container.__call__(Event.ASSET_EDIT, {element: this});
     });
-    this._content?.addEventListener("blur", () => {
+    this._content.addEventListener("blur", () => {
       this._container.__call__(Event.ASSET_EDIT_COMMIT, {element: this});
     });
   }
 
   public override __onFocus__(force: boolean = false) {
     this.svgElement.style.outline = this.outline;
+    this.userSelect = true;
   }
   public override __onBlur__() {
     this.svgElement.style.outline = "unset";
+    this.userSelect = false;
   }
 
   protected addCopyEvent() {
@@ -223,20 +238,8 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       event.preventDefault();
     });
   }
-
-  public override get HTML(): HTMLElement | SVGElement {
-    if (this._content) {
-      return this._content;
-    }
-    return this.svgElement;
-  }
-
-  public get content(): HTMLElement {
-    return this._content;
-  }
-
   protected addFocusEvent(): void {
-    this._content.addEventListener("focus", () => {
+    this._content.addEventListener("click", () => {
       if (this.selectable && this._container.drawTool.isOn() && this._container.drawTool.tool == this._container.drawTools.textBox) {
         this._container.blur();
         this._container.focus(this, false);
@@ -248,16 +251,29 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       }
     });
   }
+
+  public override get HTML(): HTMLElement | SVGElement {
+    if (this._content) {
+      return this._content;
+    }
+    return this.svgElement;
+  }
+
+  public get content(): HTMLElement {
+    return this._content;
+  }
   public setContent(content: string): void {
     this._content.innerHTML = content;
-    this._content.style.userSelect = "none";
     this._content.style.border = "none";
     this._content.style.outline = "none";
     this.svgElement.innerHTML = "";
     this.svgElement.appendChild(this._content);
+    this.userSelect = false;
+  }
 
-    this.addFocusEvent();
-    this.addEditCallBack();
+  /** @deprecated */
+  public set userSelect(selectable: boolean) {
+    this._content.style.userSelect = /*selectable ? "text" :*/ "none";
   }
 
   public get boundingRect(): Rect {

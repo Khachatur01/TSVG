@@ -37,8 +37,9 @@ export class TextBoxView extends ForeignObjectView {
 
     if (removeOnEmpty) {
       this._container.addCallBack(Event.EDIT_TOOl_OFF, () => {
-        if (this._content.value == "")
+        if (this._content.value == "") {
           this._container.remove(this);
+        }
       });
     }
 

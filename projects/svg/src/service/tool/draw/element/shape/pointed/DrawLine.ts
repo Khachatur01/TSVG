@@ -24,12 +24,14 @@ export class DrawLine extends ClickDraw {
     if (this.clicksCount === 1) {
       this.container.remove(this._drawableElement, true, false);
     } else {
+      this._drawableElement.refPoint = this._drawableElement.center;
       if (call) {
         let drawableElementCopy = this._drawableElement.copy;
         drawableElementCopy.index = this._drawableElement.index;
         this.container.__call__(Event.ELEMENT_CREATED, {element: drawableElementCopy});
       }
     }
+    this.container.drawTool.__drawingEnd__();
     if (call) {
       this.container.__call__(Event.STOP_CLICK_DRAWING);
     }

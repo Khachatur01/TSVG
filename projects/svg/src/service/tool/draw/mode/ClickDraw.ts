@@ -95,7 +95,6 @@ export abstract class ClickDraw extends Drawer {
       this.container.remove(this._drawableElement, true, true);
     } else {
       this._drawableElement.removePoint(-1);
-      this.container.drawTool.__drawingEnd__();
       this._drawableElement.refPoint = this._drawableElement.center;
 
       if (call) {
@@ -104,6 +103,7 @@ export abstract class ClickDraw extends Drawer {
         this.container.__call__(Event.ELEMENT_CREATED, {element: drawableElementCopy});
       }
     }
+    this.container.drawTool.__drawingEnd__();
 
     if (call) {
       this.container.__call__(Event.STOP_CLICK_DRAWING);

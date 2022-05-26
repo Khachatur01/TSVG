@@ -417,9 +417,9 @@ export class Container {
       cursor = this.HTML.style.cursor;
     }
 
-    if (element instanceof ForeignObjectView && element.content) { /* is element is foreign object and has content, set cursor also for content */
+    if (element instanceof ForeignObjectView) { /* is element is foreign object and has content, set cursor also for content */
       if (this.drawTool.isOn() && this.drawTool.tool instanceof DrawTextBox) {
-        /* todo make this shit better (set all foreign objects cursor is text) */
+        /* todo make this shit better (set all foreign objects cursor to text) */
         element.SVG.style.cursor = "text";
         element.content.style.cursor = "text";
       } else {

@@ -28,6 +28,7 @@ export abstract class MoveDraw extends Drawer {
     this.startPosition.y = position.y; //y position within the element.
 
     this.startPosition = this.container.grid.getSnapPoint(this.startPosition);
+    this.currentPosition = Object.assign({}, this.startPosition);
 
     this._drawableElement = this.createDrawableElement(this.startPosition);
 
