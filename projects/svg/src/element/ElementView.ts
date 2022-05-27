@@ -9,7 +9,6 @@ import {GroupView} from "./group/GroupView";
 import {Style} from "../service/style/Style";
 import {ElementType} from "../dataSource/constant/ElementType";
 import {Cursor} from "../dataSource/constant/Cursor";
-import {ForeignObjectView} from "./foreign/ForeignObjectView";
 
 export class ElementCursor {
   public cursor: any = {};
@@ -111,7 +110,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   protected _refPoint: Point = {x: 0, y: 0};
   protected _lastRect: Rect = {x: 0, y: 0, width: 0, height: 0};
   protected ___lastAngle__: number = 0;
-  public selectable: boolean = true;
+  protected _selectable: boolean = true;
   /* Model */
 
   private _highlight = this.__highlight__.bind(this);
@@ -348,9 +347,22 @@ export abstract class ElementView implements Resizeable, Draggable {
     this.svgElement.parentElement?.removeChild(this.svgElement);
   }
 
+  public get selectable(): boolean {
+    return this._selectable;
+  }
+  public set selectable(selectable: boolean) {
+    this._selectable = selectable;
+    if (selectable) {
+      this._container.__setElementCursor__(this);
+    } else {
+      this._container.__setElementCursor__(this, Cursor.NO_TOOL);
+    }
+  }
+
   public __highlight__(): void {
-    if (this.selectable && this._container.selectTool.isOn())
+    if (this._selectable && this._container.selectTool.isOn()) {
       this.svgElement.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 0.7))";
+    }
   }
   public __lowlight__(): void {
     this.svgElement.style.filter = "unset";

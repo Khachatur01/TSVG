@@ -8,12 +8,11 @@ import {DrawTools} from "./dataSource/DrawTools";
 import {Grid} from "./service/grid/Grid";
 import {Event} from "./dataSource/constant/Event";
 import {GroupCursor, GroupView} from "./element/group/GroupView";
-import {PointedView} from "./element/shape/pointed/PointedView";
 import {Style} from "./service/style/Style";
 import {HighlightTool} from "./service/tool/highlighter/HighlightTool";
 import {PointerTool} from "./service/tool/pointer/PointerTool";
 import {Point} from "./model/Point";
-import {TextBoxCursor, TextBoxView} from "./element/foreign/text/TextBoxView";
+import {TextBoxCursor} from "./element/foreign/text/TextBoxView";
 import {Cursor} from "./dataSource/constant/Cursor";
 import {ForeignObjectCursor, ForeignObjectView} from "./element/foreign/ForeignObjectView";
 import {ElementType} from "./dataSource/constant/ElementType";
@@ -21,7 +20,7 @@ import {EllipseCursor} from "./element/shape/circluar/EllipseView";
 import {BoxCursor} from "./element/shape/BoxView";
 import {PathCursor} from "./element/shape/PathView";
 import {LineCursor} from "./element/shape/pointed/LineView";
-import {FreeCursor, FreeView} from "./element/shape/pointed/polyline/FreeView";
+import {FreeCursor} from "./element/shape/pointed/polyline/FreeView";
 import {PolylineCursor} from "./element/shape/pointed/polyline/PolylineView";
 import {PolygonCursor} from "./element/shape/pointed/polygon/PolygonView";
 import {TriangleCursor} from "./element/shape/pointed/polygon/triangle/TriangleView";
@@ -257,6 +256,7 @@ export class Container {
   public readonly style: GlobalStyle = new GlobalStyle(this);
   public readonly drawTools: DrawTools = new DrawTools(this);
   public activeTool: Tool | null;
+  protected activeCursor: Cursor = Cursor.NO_TOOL;
   /* Model */
 
   public constructor(containerId: string, ownerId: string, idPrefix: string = "", elementIndex: number = 0) {
@@ -406,9 +406,11 @@ export class Container {
   public __setElementCursor__(element: ElementView, cursorType?: Cursor): void {
     let cursor;
     if (!cursorType) {
-      cursorType = Cursor.NO_TOOL;
+      // cursorType = Cursor.NO_TOOL;
+      cursorType = this.activeCursor;
     }
 
+    this.activeCursor = cursorType;
     if (!element.selectable && this.style.cursor.element[element.type].cursor[cursorType] != "none") {
       cursor = this.style.cursor[Cursor.NO_TOOL];
     } else if (this.style.cursor.element[element.type].cursor[cursorType]) {
@@ -418,8 +420,7 @@ export class Container {
     }
 
     if (element instanceof ForeignObjectView) { /* is element is foreign object and has content, set cursor also for content */
-      if (this.drawTool.isOn() && this.drawTool.tool instanceof DrawTextBox) {
-        /* todo make this shit better (set all foreign objects cursor to text) */
+      if (element.selectable && this.drawTool.isOn() && this.drawTool.tool instanceof DrawTextBox) {
         element.SVG.style.cursor = "text";
         element.content.style.cursor = "text";
       } else {
@@ -440,7 +441,7 @@ export class Container {
       this.__setElementActivity__(element);
     }
 
-    this.__setElementCursor__(element, this.activeTool?.cursor);
+    this.__setElementCursor__(element/*, this.activeTool?.cursor*/);
   }
   public remove(element: ElementView, force: boolean = false, call: boolean = true) {
     if (force || this.selectTool.isOn()) { /* if force don't check if select tool is on */
