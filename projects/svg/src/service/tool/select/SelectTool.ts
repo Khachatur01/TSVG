@@ -6,6 +6,7 @@ import {DragTool} from "../drag/DragTool";
 import {Event} from "../../../dataSource/constant/Event";
 import {Focus} from "../../edit/group/Focus";
 import {Cursor} from "../../../dataSource/constant/Cursor";
+import {ElementView} from "../../../element/ElementView";
 
 export class SelectTool extends Tool {
   protected override _cursor: Cursor = Cursor.SELECT;
@@ -13,6 +14,8 @@ export class SelectTool extends Tool {
   private position: Point = {x: 0, y: 0};
   public readonly dragTool: DragTool;
   public focus: Focus;
+  public intersectionColor: string = "green";
+  public fullMatchColor: string = "#1545ff";
 
   private _start = this.start.bind(this);
   private _select = this.select.bind(this);
@@ -25,7 +28,7 @@ export class SelectTool extends Tool {
     this.focus = focus;
 
     this.boundingBox.style.fillColor = "none";
-    this.boundingBox.style.strokeColor = "#1545ff";
+    this.boundingBox.style.strokeColor = this.fullMatchColor;
     this.boundingBox.style.strokeWidth = "1";
     this.boundingBox.style.strokeDashArray = "5 5";
 
@@ -51,6 +54,28 @@ export class SelectTool extends Tool {
     let width = position.x - this.position.x;
     let height = position.y - this.position.y;
 
+    if (width > 0) {
+      this.boundingBox.style.strokeColor = this.fullMatchColor;
+    } else {
+      this.boundingBox.style.strokeColor = this.intersectionColor;
+    }
+
+    for (let element of this._container.elements) {
+      if (width > 0) { /* select box drawn from left to right */
+        if (ElementView.rectInRect(element.getVisibleRect(), this.boundingBox.getRect())) {
+          element.__highlight__();
+        } else {
+          element.__lowlight__();
+        }
+      } else { /* if select box drawn from right to left */
+        if (element.intersectsRect(this.boundingBox.getRect())) {
+          element.__highlight__();
+        } else {
+          element.__lowlight__();
+        }
+      }
+    }
+
     this.boundingBox.__drawSize__({
       x: this.position.x,
       y: this.position.y,
@@ -66,42 +91,21 @@ export class SelectTool extends Tool {
     let width = position.x - this.position.x;
 
     this._container.HTML.removeChild(this.boundingBox.SVG);
-    let boxPos = this.boundingBox.getRect();
-    let boxSize = this.boundingBox.getRect();
-    let boxPoints: any = {
-      topLeft: boxPos,
-      bottomRight: {
-        x: boxPos.x + boxSize.width,
-        y: boxPos.y + boxSize.height
-      }
-    };
 
     this._container.multiSelect();
 
-    elementsLoop:
-      for (let element of this._container.elements) {
-        let elementPoints = element.visiblePoints;
-
-        if (width > 0) {/* if select box drawn from right to left */
-          for (let point of elementPoints)
-            if (/* full match */
-              point.x < boxPoints.topLeft.x || point.x > boxPoints.bottomRight.x ||
-              point.y < boxPoints.topLeft.y || point.y > boxPoints.bottomRight.y
-            )
-              continue elementsLoop;
-
+    for (let element of this._container.elements) {
+      if (width > 0) { /* select box drawn from left to right */
+        if (ElementView.rectInRect(element.getVisibleRect(), this.boundingBox.getRect())) {
           this._container.focus(element, true, undefined, false);
-        } else {/* if select box drawn from left to right */
-          for (let point of elementPoints)
-            if (/* one point match */
-              point.x > boxPoints.topLeft.x && point.x < boxPoints.bottomRight.x &&
-              point.y > boxPoints.topLeft.y && point.y < boxPoints.bottomRight.y
-            ) {
-              this._container.focus(element, true, undefined, false);
-              break;
-            }
+        }
+      } else { /* if select box drawn from right to left */
+        if (element.intersectsRect(this.boundingBox.getRect())) {
+          this._container.focus(element, true, undefined, false);
         }
       }
+    }
+
     this._container.singleSelect();
 
     if (call) {

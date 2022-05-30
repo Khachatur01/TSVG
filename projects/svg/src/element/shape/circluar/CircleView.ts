@@ -45,6 +45,45 @@ export class CircleView extends CircularView {
     return ellipse;
   }
 
+  public override intersectsRect(rect: Rect): boolean {
+    let circleRect = this.getVisibleRect();
+    let cx = circleRect.x + circleRect.width / 2;
+    let cy = circleRect.y + circleRect.height / 2;
+    let r = circleRect.width / 2;
+    let intersects;
+
+    let distX = Math.abs(cx - rect.x - rect.width / 2);
+    let distY = Math.abs(cy - rect.y - rect.height / 2);
+
+    if (distX > (rect.width / 2 + r)) {
+      intersects = false;
+    } else if (distY > (rect.height / 2 + r)) {
+      intersects = false;
+    } else if (distX <= (rect.width / 2)) {
+      intersects = true;
+    } else if (distY <= (rect.height / 2)) {
+      intersects = true;
+    } else {
+      let dx = distX - rect.width / 2;
+      let dy = distY - rect.height / 2;
+      intersects = dx * dx + dy * dy <= r * r;
+    }
+
+    if (intersects) {
+      let inscribedSquareSide = Math.sqrt(Math.pow(2 * r, 2) / 2);
+      let inscribedSquareRect = {
+        x: cx - inscribedSquareSide / 2,
+        y: cy - inscribedSquareSide / 2,
+        width: inscribedSquareSide,
+        height: inscribedSquareSide
+      }
+
+      /* if rect is inside inscribedSquareRect, then there is no intersection */
+      intersects = !ElementView.rectInRect(rect, inscribedSquareRect);
+    }
+    return intersects;
+  }
+
   public override __setRect__(rect: Rect, delta: Point | null = null): void {
     if (delta) {
       let deltaXSign = delta.x < 0 ? -1 : 1;

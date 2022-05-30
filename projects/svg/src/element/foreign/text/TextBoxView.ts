@@ -28,6 +28,8 @@ export class TextBoxView extends ForeignObjectView {
     this._content.spellcheck = false;
     this.svgElement.innerHTML = "";
     this.svgElement.appendChild(this._content);
+    /* prevent from dropping elements inside */
+    this._content.ondrop = () => {return false};
 
     this.addEditCallBack();
     this.addFocusEvent();

@@ -33,7 +33,7 @@ export abstract class MoveDraw extends Drawer {
     this._drawableElement = this.createDrawableElement(this.startPosition);
 
     this.container.add(this._drawableElement);
-    this.container.drawTool.__drawing__();
+    this.drawTool?.__drawing__();
     if (call) {
       this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: this.startPosition, element: this._drawableElement});
     }
@@ -91,7 +91,7 @@ export abstract class MoveDraw extends Drawer {
     this.turnOnToolAfterDrawing();
 
     this.onEnd(call);
-    this.container.drawTool.__drawingEnd__();
+    this.drawTool?.__drawingEnd__();
 
     if (call) {
       this.container.__call__(Event.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});

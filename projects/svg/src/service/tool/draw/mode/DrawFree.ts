@@ -34,6 +34,7 @@ export class DrawFree extends Drawer {
     let pathObject = new Path();
     pathObject.add(new MoveTo(position));
     this._drawableElement = new FreeView(this.container, pathObject);
+    this.drawTool?.__drawing__();
 
     this.container.add(this._drawableElement);
 
@@ -83,6 +84,7 @@ export class DrawFree extends Drawer {
     } else {
       this._drawableElement.refPoint = this._drawableElement.center;
     }
+    this.drawTool?.__drawing__();
 
     if (call) {
       this.container.__call__(Event.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});

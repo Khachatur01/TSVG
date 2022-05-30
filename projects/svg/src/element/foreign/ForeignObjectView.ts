@@ -97,7 +97,9 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content = document.createElement('div');
     this._content.contentEditable = "true";
     this._content.style.height = "100%";
-    this.userSelect = false;
+    /* prevent from dropping elements inside */
+    this._content.ondrop = () => {return false};
+    // ondragstart="return false" ondrop="return false"
 
     /* Some of these functions may throw exception, because on some children classes, these functions are overridden */
     try {
@@ -196,11 +198,9 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
   public override __onFocus__(force: boolean = false) {
     this.svgElement.style.outline = this.outline;
-    this.userSelect = true;
   }
   public override __onBlur__() {
     this.svgElement.style.outline = "unset";
-    this.userSelect = false;
   }
 
   protected addCopyEvent() {
@@ -268,12 +268,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content.style.outline = "none";
     this.svgElement.innerHTML = "";
     this.svgElement.appendChild(this._content);
-    this.userSelect = false;
-  }
-
-  /** @deprecated */
-  public set userSelect(selectable: boolean) {
-    this._content.style.userSelect = /*selectable ? "text" :*/ "none";
   }
 
   public get boundingRect(): Rect {

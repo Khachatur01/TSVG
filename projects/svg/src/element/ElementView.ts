@@ -9,6 +9,7 @@ import {GroupView} from "./group/GroupView";
 import {Style} from "../service/style/Style";
 import {ElementType} from "../dataSource/constant/ElementType";
 import {Cursor} from "../dataSource/constant/Cursor";
+import {Line} from "../model/Line";
 
 export class ElementCursor {
   public cursor: any = {};
@@ -148,6 +149,66 @@ export abstract class ElementView implements Resizeable, Draggable {
   public abstract toPath(): PathView;
   public abstract get copy(): ElementView;
   public abstract isComplete(): boolean;
+
+  /**
+   * @param rect1 inside rect
+   * @param rect2 outside rect
+   *
+   * check if rect1 fully inside rect2
+   * */
+  public static rectInRect(rect1: Rect, rect2: Rect): boolean {
+    return (rect1.x > rect2.x) && (rect1.x + rect1.width < rect2.x + rect2.width) &&
+      (rect1.y > rect2.y) && (rect1.y + rect1.height < rect2.y + rect2.height);
+  }
+  public static pointInRect(point: Point, rect: Rect): boolean {
+    return (point.x > rect.x) && (point.x < rect.x + rect.width) &&
+      (point.y > rect.y) && (point.y < rect.y + rect.height);
+  }
+  public static linesIntersect(line0: Line, line1: Line): boolean {
+    /* returns false if lines are overlap */
+    let dx0 = line0.p1.x - line0.p0.x;
+    let dx1 = line1.p1.x - line1.p0.x;
+    let dy0 = line0.p1.y - line0.p0.y;
+    let dy1 = line1.p1.y - line1.p0.y;
+
+    let det0 = dy1 * (line1.p1.x - line0.p0.x) - dx1 * (line1.p1.y - line0.p0.y);
+    let det1 = dy1 * (line1.p1.x - line0.p1.x) - dx1 * (line1.p1.y - line0.p1.y);
+    let det2 = dy0 * (line0.p1.x - line1.p0.x) - dx0 * (line0.p1.y - line1.p0.y);
+    let det3 = dy0 * (line0.p1.x - line1.p1.x) - dx0 * (line0.p1.y - line1.p1.y);
+
+    return (det0 * det1 <= 0) && (det2 * det3 <= 0);
+  }
+  public static getRectSides(rect: Rect): Line[] {
+    return [
+      /* top side */
+      { p0: {x: rect.x, y: rect.y},                             p1: {x: rect.x + rect.width, y: rect.y}               },
+      /* right side */
+      { p0: {x: rect.x + rect.width, y: rect.y},                p1: {x: rect.x + rect.width, y: rect.y + rect.height} },
+      /* bottom side */
+      { p0: {x: rect.x + rect.width, y: rect.y + rect.height},  p1: {x: rect.x, y: rect.y + rect.height}              },
+      /* left side */
+      { p0: {x: rect.x, y: rect.y + rect.height},               p1: {x: rect.x, y: rect.y}                            }
+    ];
+  }
+  public intersectsRect(rect: Rect): boolean {
+    let points = this.visiblePoints;
+    let rectSides = ElementView.getRectSides(rect);
+    for (let i = 0; i < points.length; i++) {
+      if (ElementView.pointInRect(points[i], rect)) {
+        /* if some point in rect, then element is intersected with rect */
+        return true;
+      }
+      for (let side of rectSides) {
+        let next = i + 1 != points.length ? i + 1 : 0;
+
+        let line = {p0: points[i], p1: points[next]};
+        if (ElementView.linesIntersect(line, side)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
   public abstract __onFocus__(): void;
   public abstract __onBlur__(): void;

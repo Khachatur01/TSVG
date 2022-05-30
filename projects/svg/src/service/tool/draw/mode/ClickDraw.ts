@@ -25,6 +25,7 @@ export abstract class ClickDraw extends Drawer {
     this.clicksCount++;
 
     if (!this._drawableElement) {
+      this.drawTool?.__drawing__();
       this._drawableElement = this.createDrawableElement(position);
       this.container.add(this._drawableElement);
     } else {
@@ -63,7 +64,6 @@ export abstract class ClickDraw extends Drawer {
   protected abstract createDrawableElement(position: Point, ownerId?: string, index?: number): PointedView;
 
   protected click(event: MouseEvent | TouchEvent) {
-    this.container.drawTool.__drawing__();
     let containerRect = this.container?.HTML.getBoundingClientRect();
 
     let eventPosition = Container.__eventToPosition__(event);
@@ -103,13 +103,14 @@ export abstract class ClickDraw extends Drawer {
         this.container.__call__(Event.ELEMENT_CREATED, {element: drawableElementCopy});
       }
     }
-    this.container.drawTool.__drawingEnd__();
+
+    this._drawableElement = null;
+    this.clicksCount = 0;
+    this.drawTool?.__drawingEnd__();
 
     if (call) {
       this.container.__call__(Event.STOP_CLICK_DRAWING);
     }
-    this._drawableElement = null;
-    this.clicksCount = 0;
   }
 
   public stopDrawing(call: boolean = true) {

@@ -477,11 +477,12 @@ export class Container {
       this._focus.appendChild(element, showBounding, changeGlobalStyle, call);
     }
   }
-  public blur(element?: ElementView) {
-    if (element)
-      this._focus.removeChild(element);
-    else
-      this._focus.clear();
+  public blur(element?: ElementView, call: boolean = true) {
+    if (element) {
+      this._focus.removeChild(element, call);
+    } else {
+      this._focus.clear(call);
+    }
   }
 
   public get focused(): Focus {
