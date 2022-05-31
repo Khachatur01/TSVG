@@ -99,7 +99,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content.style.height = "100%";
     /* prevent from dropping elements inside */
     this._content.ondrop = () => {return false};
-    // ondragstart="return false" ondrop="return false"
 
     /* Some of these functions may throw exception, because on some children classes, these functions are overridden */
     try {
@@ -288,12 +287,12 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
   public override toJSON(): any {
     let json = super.toJSON();
-    json["content"] = encodeURIComponent(this._content.outerHTML);
+    json["content"] = this._content.outerHTML;
     return json;
   }
   public override fromJSON(json: any) {
     super.fromJSON(json);
-    this.svgElement.innerHTML = decodeURIComponent(json.content);
+    this.svgElement.innerHTML = json.content;
     this._content = this.svgElement.firstChild as HTMLElement;
     this.addEditCallBack();
     this.addFocusEvent();

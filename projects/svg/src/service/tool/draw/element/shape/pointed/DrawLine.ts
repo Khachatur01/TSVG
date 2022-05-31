@@ -14,7 +14,7 @@ export class DrawLine extends ClickDraw {
   public override makeMouseDown(position: Point, call: boolean = true) {
     super.makeMouseDown(position, call);
     if (this.clicksCount === 2) {
-      this.stopDrawing(call);
+      this.stopDrawing(false);
     }
   }
 

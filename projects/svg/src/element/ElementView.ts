@@ -153,7 +153,6 @@ export abstract class ElementView implements Resizeable, Draggable {
   /**
    * @param rect1 inside rect
    * @param rect2 outside rect
-   *
    * check if rect1 fully inside rect2
    * */
   public static rectInRect(rect1: Rect, rect2: Rect): boolean {
