@@ -44,26 +44,27 @@ export class PolylineView extends PointedView {
   }
 
   public override intersectsRect(rect: Rect): boolean {
-    let points = this.points;
-    let rectSides = ElementView.getRectSides(rect);
-    for (let i = 0; i < points.length; i++) {
-      if (ElementView.pointInRect(points[i], rect)) {
-        /* if some point in rect, then element is intersected with rect */
-        return true;
-      }
-      if (i + 1 == points.length) { /* 'i' is last point index */
-        /* if last point is not in rect, then element is not intersected with rect */
-        break; /* ends loop to return false */
-      }
-      for (let side of rectSides) {
-        let line = {p0: points[i], p1: points[i + 1]};
-        if (ElementView.linesIntersect(line, side)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    let points = this.visiblePoints;
+    return ElementView.pointsIntersectingRect(points, rect, false);
+    // let rectSides = ElementView.getRectSides(rect);
+    // for (let i = 0; i < points.length; i++) {
+    //   if (ElementView.pointInRect(points[i], rect)) {
+    //     /* if some point in rect, then element is intersected with rect */
+    //     return true;
+    //   }
+    //   if (i + 1 == points.length) { /* 'i' is last point index */
+    //     /* if last point is not in rect, then element is not intersected with rect */
+    //     break; /* ends loop to return false */
+    //   }
+    //   for (let side of rectSides) {
+    //     let line = {p0: points[i], p1: points[i + 1]};
+    //     if (ElementView.linesIntersect(line, side)) {
+    //       return true;
+    //     }
+    //   }
+    // }
+    //
+    // return false;
   }
 
   public override isComplete(): boolean {

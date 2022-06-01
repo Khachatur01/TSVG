@@ -3,7 +3,9 @@ import {ElementCursor, ElementView} from "../../ElementView";
 import {Container} from "../../../Container";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {CircularView} from "./CircularView";
-import {Cursor} from "../../../dataSource/constant/Cursor";
+import {Point} from "../../../model/Point";
+import {Matrix} from "../../../service/math/Matrix";
+import {Ellipse} from "../../../model/Ellipse";
 
 export class EllipseCursor extends ElementCursor {
   constructor() {
@@ -33,5 +35,36 @@ export class EllipseView extends CircularView {
     ellipse.style.set = this.style;
 
     return ellipse;
+  }
+
+  private getEllipseModel(): Ellipse {
+    return {
+      cx: this._rect.x + this._rect.width / 2,
+      cy: this._rect.y + this._rect.height / 2,
+      rx: this._rect.width / 2,
+      ry: this._rect.height / 2,
+    }
+  }
+
+  public getEllipticPoints(ellipse: Ellipse, count = 48): Point[] {
+    const stepAngle = 2 * Math.PI / count;
+
+    let points: Point[] = [];
+    for (let ang = 0; ang < 2 * Math.PI; ang += stepAngle) {
+      const x = ellipse.cx + ellipse.rx * Math.cos(ang);
+      const y = ellipse.cy + ellipse.ry * Math.sin(ang);
+      points.push({x, y});
+    }
+    return points;
+  }
+
+  public override intersectsRect(rect: Rect): boolean {
+    let points = Matrix.rotate(
+      this.getEllipticPoints(this.getEllipseModel()),
+      this._refPoint,
+      -this._angle
+    );
+
+    return ElementView.pointsIntersectingRect(points, rect);
   }
 }

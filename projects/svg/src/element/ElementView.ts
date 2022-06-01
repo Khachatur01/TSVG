@@ -151,9 +151,9 @@ export abstract class ElementView implements Resizeable, Draggable {
   public abstract isComplete(): boolean;
 
   /**
+   * check if rect1 fully inside rect2
    * @param rect1 inside rect
    * @param rect2 outside rect
-   * check if rect1 fully inside rect2
    * */
   public static rectInRect(rect1: Rect, rect2: Rect): boolean {
     return (rect1.x > rect2.x) && (rect1.x + rect1.width < rect2.x + rect2.width) &&
@@ -189,24 +189,44 @@ export abstract class ElementView implements Resizeable, Draggable {
       { p0: {x: rect.x, y: rect.y + rect.height},               p1: {x: rect.x, y: rect.y}                            }
     ];
   }
-  public intersectsRect(rect: Rect): boolean {
-    let points = this.visiblePoints;
+  /**
+   * check if polygon created by points, intersects rectangle
+   * @param points points of shape
+   * @param rect rectangle, to calculate intersection
+   * @param closedShape if shape is closed, calculate intersection as polygon, otherwise as polyline
+   * */
+  public static pointsIntersectingRect(points: Point[], rect: Rect, closedShape: boolean = true): boolean {
     let rectSides = ElementView.getRectSides(rect);
     for (let i = 0; i < points.length; i++) {
       if (ElementView.pointInRect(points[i], rect)) {
         /* if some point in rect, then element is intersected with rect */
         return true;
       }
-      for (let side of rectSides) {
-        let next = i + 1 != points.length ? i + 1 : 0;
 
-        let line = {p0: points[i], p1: points[next]};
+      let next;
+
+      if (closedShape) {
+        next = i + 1 != points.length ? i + 1 : 0;
+      } else if (i + 1 == points.length) { /* 'i' is last point index */
+        /* if last point is not in rect, then element is not intersected with rect */
+        break; /* ends loop to return false */
+      } else { /* closedShape is false, and 'i' is not last point index */
+        next = i + 1;
+      }
+
+      let line = {p0: points[i], p1: points[next]};
+      for (let side of rectSides) {
         if (ElementView.linesIntersect(line, side)) {
           return true;
         }
       }
     }
     return false;
+  }
+
+  public intersectsRect(rect: Rect): boolean {
+    let points = this.visiblePoints;
+    return ElementView.pointsIntersectingRect(points, rect);
   }
 
   public abstract __onFocus__(): void;
