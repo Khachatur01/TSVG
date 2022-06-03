@@ -396,17 +396,9 @@ export class Container {
     });
   }
 
-  public get elements(): Set<ElementView> {
-    return this._elements;
-  }
-  public set elements(elements: Set<ElementView>) {
-    this._elements = elements;
-  }
-
   public __setElementCursor__(element: ElementView, cursorType?: Cursor): void {
     let cursor;
-    if (!cursorType) {
-      // cursorType = Cursor.NO_TOOL;
+    if (!cursorType && cursorType !== 0) { /* cursorType can be 0 */
       cursorType = this.activeCursor;
     }
 
@@ -427,9 +419,20 @@ export class Container {
         element.SVG.style.cursor = cursor;
         element.content.style.cursor = cursor;
       }
+    } else if (element instanceof GroupView) {
+      element.elements.forEach((child: ElementView) => {
+        this.__setElementCursor__(child, cursorType);
+      });
     } else {
       element.SVG.style.cursor = cursor;
     }
+  }
+
+  public get elements(): Set<ElementView> {
+    return this._elements;
+  }
+  public set elements(elements: Set<ElementView>) {
+    this._elements = elements;
   }
 
   public add(element: ElementView, setElementActivity: boolean = true) {

@@ -128,6 +128,8 @@ export class SelectTool extends Tool {
       y: eventPosition.y - containerRect.top // y position within the element.
     };
     this.makeMouseDown(startPosition);
+
+    this._container.style.changeCursor(Cursor.NO_TOOL);
   }
   private select(event: MouseEvent | TouchEvent): void {
     let eventPosition = Container.__eventToPosition__(event);
@@ -149,6 +151,8 @@ export class SelectTool extends Tool {
     }
 
     this.makeMouseUp(endPosition);
+
+    this._container.style.changeCursor(this.cursor);
 
     this._container.HTML.removeEventListener("mousemove", this._select);
     this._container.HTML.removeEventListener("touchmove", this._select);

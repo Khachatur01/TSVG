@@ -114,8 +114,24 @@ export abstract class ElementView implements Resizeable, Draggable {
   protected _selectable: boolean = true;
   /* Model */
 
-  private _highlight = this.__highlight__.bind(this);
-  private _lowlight = this.__lowlight__.bind(this);
+  public constructor(container: Container, ownerId?: string, index?: number) {
+    this._container = container;
+    this.style = new ElementStyle(this);
+
+    /*
+    * One of ownerId and index arguments can't be undefined.
+    * Both should be defined or both should be undefined
+    * */
+    if (ownerId && index) { /* set defined id to element */
+      this._ownerId = ownerId;
+      this._index = index;
+    } else if (!ownerId && !index) { /* generate id for element */
+      this._ownerId = container.ownerId;
+      this._index = container.nextElementIndex;
+    } else {
+      throw Error("Missing id argument: ownerId{ " + ownerId + " }, index{ " + index + " }");
+    }
+  }
 
   public __translate__(delta: Point) {
     this.svgElement.style.transform =
@@ -129,6 +145,7 @@ export abstract class ElementView implements Resizeable, Draggable {
     return this._rect;
   };
   public abstract __setRect__(rect: Rect, delta?: Point): void; /* if delta set, calculate rect width and height by delta */
+
 
   protected abstract __updateView__(): void;
   public get visiblePoints(): Point[] {
@@ -165,17 +182,15 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
   public static linesIntersect(line0: Line, line1: Line): boolean {
     /* returns false if lines are overlap */
-    let dx0 = line0.p1.x - line0.p0.x;
-    let dx1 = line1.p1.x - line1.p0.x;
-    let dy0 = line0.p1.y - line0.p0.y;
-    let dy1 = line1.p1.y - line1.p0.y;
-
-    let det0 = dy1 * (line1.p1.x - line0.p0.x) - dx1 * (line1.p1.y - line0.p0.y);
-    let det1 = dy1 * (line1.p1.x - line0.p1.x) - dx1 * (line1.p1.y - line0.p1.y);
-    let det2 = dy0 * (line0.p1.x - line1.p0.x) - dx0 * (line0.p1.y - line1.p0.y);
-    let det3 = dy0 * (line0.p1.x - line1.p1.x) - dx0 * (line0.p1.y - line1.p1.y);
-
-    return (det0 * det1 <= 0) && (det2 * det3 <= 0);
+    let det, gamma, lambda;
+    det = (line0.p1.x - line0.p0.x) * (line1.p1.y - line1.p0.y) - (line1.p1.x - line1.p0.x) * (line0.p1.y - line0.p0.y);
+    if (det === 0) {
+      return false;
+    } else {
+      lambda = ((line1.p1.y - line1.p0.y) * (line1.p1.x - line0.p0.x) + (line1.p0.x - line1.p1.x) * (line1.p1.y - line0.p0.y)) / det;
+      gamma = ((line0.p0.y - line0.p1.y) * (line1.p1.x - line0.p0.x) + (line0.p1.x - line0.p0.x) * (line1.p1.y - line0.p0.y)) / det;
+      return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
+    }
   }
   public static getRectSides(rect: Rect): Line[] {
     return [
@@ -231,25 +246,6 @@ export abstract class ElementView implements Resizeable, Draggable {
 
   public abstract __onFocus__(): void;
   public abstract __onBlur__(): void;
-
-  public constructor(container: Container, ownerId?: string, index?: number) {
-    this._container = container;
-    this.style = new ElementStyle(this);
-
-    /*
-    * One of ownerId and index arguments can't be undefined.
-    * Both should be defined or both should be undefined
-    * */
-    if (ownerId && index) { /* set defined id to element */
-      this._ownerId = ownerId;
-      this._index = index;
-    } else if (!ownerId && !index) { /* generate id for element */
-      this._ownerId = container.ownerId;
-      this._index = container.nextElementIndex;
-    } else {
-      throw Error("Missing id argument: ownerId{ " + ownerId + " }, index{ " + index + " }");
-    }
-  }
 
   public get type(): ElementType {
     return this._type;
@@ -415,12 +411,12 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
 
   public setOverEvent(): void {
-    this.svgElement.addEventListener("mouseover", this._highlight);
-    this.svgElement.addEventListener("mouseout", this._lowlight);
+    this.svgElement.addEventListener("mouseover", this.__highlight__.bind(this));
+    this.svgElement.addEventListener("mouseout", this.__lowlight__.bind(this));
   }
   public removeOverEvent(): void {
-    this.svgElement.removeEventListener("mouseover", this._highlight);
-    this.svgElement.removeEventListener("mouseout", this._lowlight);
+    this.svgElement.removeEventListener("mouseover", this.__highlight__.bind(this));
+    this.svgElement.removeEventListener("mouseout", this.__lowlight__.bind(this));
   }
 
   public __remove__() {
@@ -440,12 +436,21 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
 
   public __highlight__(): void {
-    if (this._selectable && this._container.selectTool.isOn()) {
+    if (!this._container.selectTool.isOn() || !this._selectable) {
+      return;
+    }
+    if (this._group && this._group._selectable) { /* if in group and selectable */
+      this._group.SVG.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 0.7))";
+    } else{
       this.svgElement.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 0.7))";
     }
   }
   public __lowlight__(): void {
-    this.svgElement.style.filter = "unset";
+    if (this._group) { /* if in group */
+      this._group.SVG.style.filter = "unset";
+    } else{
+      this.svgElement.style.filter = "unset";
+    }
   }
 
   public __fixRect__(): void {

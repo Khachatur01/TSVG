@@ -242,6 +242,15 @@ export class GroupView extends ElementView {
     };
   }
 
+  public override intersectsRect(rect: Rect): boolean {
+    for (let element of this._elements) {
+      if (element.intersectsRect(rect)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public override getAttr(attribute: string): string {
     let [firstElement] = this._elements;
     let value = firstElement.SVG.getAttribute(attribute);
@@ -280,8 +289,10 @@ export class GroupView extends ElementView {
     this._elements.forEach(child => child.__fixAngle__());
   }
   public override __onFocus__() {
+    this.__highlight__();
   }
   public override __onBlur__() {
+    this.__lowlight__();
   }
 
   public toPath(): PathView {

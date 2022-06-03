@@ -119,6 +119,7 @@ export class TextBoxView extends ForeignObjectView {
 
   public override toJSON(): any {
     let json = super.toJSON();
+    json["content"] = undefined;
     json["text"] = this._content.value;
     return json;
   }

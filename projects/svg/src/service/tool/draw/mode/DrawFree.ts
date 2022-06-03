@@ -133,13 +133,15 @@ export class DrawFree extends Drawer {
   }
 
   public override stopDrawing(call?: boolean) {
-    this.container.drawTool.__drawingEnd__();
     this.container.HTML.removeEventListener('mousemove', this._draw);
     this.container.HTML.removeEventListener('touchmove', this._draw);
     document.removeEventListener('mouseup', this._drawEnd);
     document.removeEventListener('touchend', this._drawEnd);
 
-    this.makeMouseUp({x: 0, y: 0}, call);
+    if (this.drawTool?.__isDrawing()) {
+      this.makeMouseUp({x: 0, y: 0}, call);
+    }
+    this.container.drawTool.__drawingEnd__();
   }
 
   public start(call: boolean = true): void {

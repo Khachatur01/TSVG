@@ -292,8 +292,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   }
   public override fromJSON(json: any) {
     super.fromJSON(json);
-    this.svgElement.innerHTML = json.content;
-    this._content = this.svgElement.firstChild as HTMLElement;
+    if (json.content) {
+      this.svgElement.innerHTML = json.content;
+      this._content = this.svgElement.firstChild as HTMLElement;
+    }
     this.addEditCallBack();
     this.addFocusEvent();
     this.addCopyEvent();
