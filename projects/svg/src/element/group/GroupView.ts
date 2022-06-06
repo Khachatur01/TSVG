@@ -23,7 +23,6 @@ export class GroupStyle extends ElementStyle {
     this.element.elements.forEach((child: ElementView) => {
       child.style.strokeWidth = width;
     });
-    this.element.setAttr({"stroke-width": width});
   }
 
   public override get strokeDashArray(): string {
@@ -34,7 +33,6 @@ export class GroupStyle extends ElementStyle {
     this.element.elements.forEach((child: ElementView) => {
       child.style.strokeDashArray = array;
     });
-    this.element.setAttr({"stroke-dasharray": array});
   }
 
   public override get strokeColor(): string {
@@ -45,7 +43,6 @@ export class GroupStyle extends ElementStyle {
     this.element.elements.forEach((child: ElementView) => {
       child.style.strokeColor = color;
     });
-    this.element.setAttr({"stroke": color});
   }
 
   public override get fillColor(): string {
@@ -56,7 +53,6 @@ export class GroupStyle extends ElementStyle {
     this.element.elements.forEach((child: ElementView) => {
       child.style.fillColor = color;
     });
-    this.element.setAttr({"fill": color});
   }
 
   public override get fontSize(): string {
@@ -67,7 +63,6 @@ export class GroupStyle extends ElementStyle {
     this.element.elements.forEach((child: ElementView) => {
       child.style.fontSize = size;
     });
-    this.element.HTML.style.fontSize = size + "px";
   }
 
   public override get fontColor(): string {
@@ -78,7 +73,6 @@ export class GroupStyle extends ElementStyle {
     this.element.elements.forEach((child: ElementView) => {
       child.style.fontColor = color;
     });
-    this.element.HTML.style.color = color;
   }
 
   public override get backgroundColor(): string {
@@ -89,7 +83,6 @@ export class GroupStyle extends ElementStyle {
     this.element.elements.forEach((child: ElementView) => {
       child.style.backgroundColor = color;
     });
-    this.element.HTML.style.backgroundColor = color;
   }
 }
 
@@ -98,6 +91,7 @@ export class GroupView extends ElementView {
   protected override _type: ElementType = ElementType.GROUP;
 
   /* Model */
+  public override readonly style: ElementStyle = new GroupStyle(this);
   private _elements: Set<ElementView> = new Set<ElementView>()
   /* Model */
 

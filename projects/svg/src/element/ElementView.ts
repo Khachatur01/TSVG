@@ -101,7 +101,7 @@ export abstract class ElementView implements Resizeable, Draggable {
 
   /* Model */
   protected abstract _type: ElementType;
-  public readonly style: ElementStyle;
+  public readonly style: ElementStyle = new ElementStyle(this);
   protected _ownerId: string;
   protected _index: number;
   private _group: GroupView | null = null;
@@ -119,7 +119,6 @@ export abstract class ElementView implements Resizeable, Draggable {
 
   public constructor(container: Container, ownerId?: string, index?: number) {
     this._container = container;
-    this.style = new ElementStyle(this);
 
     /*
     * One of ownerId and index arguments can't be undefined.
