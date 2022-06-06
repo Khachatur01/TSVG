@@ -114,6 +114,9 @@ export abstract class ElementView implements Resizeable, Draggable {
   protected _selectable: boolean = true;
   /* Model */
 
+  private _highlight = this.__highlight__.bind(this);
+  private _lowlight = this.__lowlight__.bind(this);
+
   public constructor(container: Container, ownerId?: string, index?: number) {
     this._container = container;
     this.style = new ElementStyle(this);
@@ -411,12 +414,12 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
 
   public setOverEvent(): void {
-    this.svgElement.addEventListener("mouseover", this.__highlight__.bind(this));
-    this.svgElement.addEventListener("mouseout", this.__lowlight__.bind(this));
+    this.svgElement.addEventListener("mouseover", this._highlight);
+    this.svgElement.addEventListener("mouseout", this._lowlight);
   }
   public removeOverEvent(): void {
-    this.svgElement.removeEventListener("mouseover", this.__highlight__.bind(this));
-    this.svgElement.removeEventListener("mouseout", this.__lowlight__.bind(this));
+    this.svgElement.removeEventListener("mouseover", this._highlight);
+    this.svgElement.removeEventListener("mouseout", this._lowlight);
   }
 
   public __remove__() {
@@ -440,9 +443,9 @@ export abstract class ElementView implements Resizeable, Draggable {
       return;
     }
     if (this._group && this._group._selectable) { /* if in group and selectable */
-      this._group.SVG.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 0.7))";
+      this._group.SVG.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 1))";
     } else{
-      this.svgElement.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 0.7))";
+      this.svgElement.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 1))";
     }
   }
   public __lowlight__(): void {

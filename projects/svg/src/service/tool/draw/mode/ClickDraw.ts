@@ -89,7 +89,7 @@ export abstract class ClickDraw extends Drawer {
   }
 
   protected stopClickDrawing(call: boolean = true) {
-    if (!this._drawableElement) return;
+    if (!this._drawableElement || !this.drawTool?.isDrawing()) return;
 
     if (!this._drawableElement.isComplete()) {
       this.container.remove(this._drawableElement, true, true);

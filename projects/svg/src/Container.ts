@@ -219,9 +219,16 @@ class GlobalStyle extends Style {
   public changeCursor(cursorType: Cursor) {
     this.container.HTML.style.cursor = this.container.style.cursor[cursorType];
 
-    this.container.elements.forEach((element: ElementView) => {
-      this.container.__setElementCursor__(element, cursorType);
-    });
+    if (this.container.elements.size === 0) {
+      if (!cursorType && cursorType !== 0) { /* cursorType can be 0 */
+        cursorType = this.container.__activeCursor__;
+      }
+      this.container.__activeCursor__ = cursorType;
+    } else {
+      this.container.elements.forEach((element: ElementView) => {
+        this.container.__setElementCursor__(element, cursorType);
+      });
+    }
   }
 }
 
@@ -256,7 +263,7 @@ export class Container {
   public readonly style: GlobalStyle = new GlobalStyle(this);
   public readonly drawTools: DrawTools = new DrawTools(this);
   public activeTool: Tool | null;
-  protected activeCursor: Cursor = Cursor.NO_TOOL;
+  public __activeCursor__: Cursor = Cursor.NO_TOOL;
   /* Model */
 
   public constructor(containerId: string, ownerId: string, idPrefix: string = "", elementIndex: number = 0) {
@@ -399,10 +406,10 @@ export class Container {
   public __setElementCursor__(element: ElementView, cursorType?: Cursor): void {
     let cursor;
     if (!cursorType && cursorType !== 0) { /* cursorType can be 0 */
-      cursorType = this.activeCursor;
+      cursorType = this.__activeCursor__;
     }
+    this.__activeCursor__ = cursorType;
 
-    this.activeCursor = cursorType;
     if (!element.selectable && this.style.cursor.element[element.type].cursor[cursorType] != "none") {
       cursor = this.style.cursor[Cursor.NO_TOOL];
     } else if (this.style.cursor.element[element.type].cursor[cursorType]) {
@@ -444,7 +451,7 @@ export class Container {
       this.__setElementActivity__(element);
     }
 
-    this.__setElementCursor__(element/*, this.activeTool?.cursor*/);
+    this.__setElementCursor__(element /* this.activeTool?.cursor*/);
   }
   public remove(element: ElementView, force: boolean = false, call: boolean = true) {
     if (force || this.selectTool.isOn()) { /* if force don't check if select tool is on */

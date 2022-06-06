@@ -104,6 +104,7 @@ export class SelectTool extends Tool {
           this._container.focus(element, true, undefined, false);
         }
       }
+      element.__lowlight__();
     }
 
     this._container.singleSelect();
