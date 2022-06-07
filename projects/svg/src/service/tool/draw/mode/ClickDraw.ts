@@ -25,6 +25,9 @@ export abstract class ClickDraw extends Drawer {
     this.clicksCount++;
 
     if (!this._drawableElement) {
+      if (this.drawTool?.isDrawing) {
+        return;
+      }
       this.drawTool?.__drawing__();
       this._drawableElement = this.createDrawableElement(position);
       this.container.add(this._drawableElement);
@@ -89,7 +92,7 @@ export abstract class ClickDraw extends Drawer {
   }
 
   protected stopClickDrawing(call: boolean = true) {
-    if (!this._drawableElement || !this.drawTool?.isDrawing()) return;
+    if (!this._drawableElement || !this.drawTool?.isDrawing) return;
 
     if (!this._drawableElement.isComplete()) {
       this.container.remove(this._drawableElement, true, true);

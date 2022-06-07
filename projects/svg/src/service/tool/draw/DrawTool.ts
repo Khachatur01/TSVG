@@ -60,7 +60,7 @@ export class DrawTool extends Tool {
     this._container.blur();
   }
 
-  public isDrawing() {
+  public get isDrawing() {
     return this._isDrawing;
   }
   public __drawing__() {

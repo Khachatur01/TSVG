@@ -26,6 +26,9 @@ export class DrawFree extends Drawer {
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
+    if (this.drawTool?.isDrawing) {
+      return;
+    }
     if (this.snappable) {
       position = this.container.grid.getSnapPoint(position);
     }
@@ -137,7 +140,7 @@ export class DrawFree extends Drawer {
     document.removeEventListener('mouseup', this._drawEnd);
     document.removeEventListener('touchend', this._drawEnd);
 
-    if (this.drawTool?.isDrawing()) {
+    if (this.drawTool?.isDrawing) {
       this.makeMouseUp({x: 0, y: 0}, call);
     }
     this.container.drawTool.__drawingEnd__();

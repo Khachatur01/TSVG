@@ -24,6 +24,9 @@ export abstract class MoveDraw extends Drawer {
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
+    if (this.drawTool?.isDrawing) {
+      return;
+    }
     this.startPosition.x = position.x; //x position within the element.
     this.startPosition.y = position.y; //y position within the element.
 

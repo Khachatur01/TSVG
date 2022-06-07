@@ -16,6 +16,7 @@ export class HighlightTool extends Tool {
   private _width: string = "20";
   private path: PathView;
   private group: SVGGElement;
+  private _highlighting: boolean = false;
 
   private _highlightStart = this.highlightStart.bind(this);
   private _highlightMove = this.highlightMove.bind(this);
@@ -35,6 +36,9 @@ export class HighlightTool extends Tool {
   }
 
   public makeMouseDown(position: Point, call: boolean = true, settings?: any) {
+    if (this._highlighting) {
+      return;
+    }
     let start = new Path();
     start.add(
       new MoveTo(position)
@@ -47,7 +51,6 @@ export class HighlightTool extends Tool {
     }
 
     this.path = new PathView(this._container, {overEvent: false, globalStyle: false}, start);
-    // this.path.removeOverEvent();
     this.path.style.strokeWidth = this._width;
     this.path.style.strokeColor = this._color;
     this.path.style.fillColor = "none";
@@ -55,6 +58,7 @@ export class HighlightTool extends Tool {
 
     this.group.appendChild(this.path.SVG);
 
+    this._highlighting = true;
     if (call) {
       this._container.__call__(Event.HIGHLIGHT_MOUSE_DOWN, {position: position, element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
     }
@@ -89,6 +93,7 @@ export class HighlightTool extends Tool {
       if (pathView) this.group.removeChild(pathView.SVG)
     }, this._timeout);
 
+    this._highlighting = false;
     if (call) {
       this._container.__call__(Event.HIGHLIGHT_MOUSE_UP, {position: position, element: this.path});
       this._container.__call__(Event.HIGHLIGHTED, {element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
