@@ -31,6 +31,7 @@ export class SelectTool extends Tool {
     this.boundingBox.style.strokeColor = this.fullMatchColor;
     this.boundingBox.style.strokeWidth = "1";
     this.boundingBox.style.strokeDashArray = "5 5";
+    this.boundingBox.SVG.style.shapeRendering = "optimizespeed";
 
     this.boundingBox.removeOverEvent();
   }

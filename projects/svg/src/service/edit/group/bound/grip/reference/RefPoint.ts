@@ -20,8 +20,7 @@ export class RefPoint extends PathView {
   private _end = this.end.bind(this);
 
   public constructor(container: Container, focus: Focus, x: number = 0, y: number = 0) {
-    super(container);
-    this.removeOverEvent();
+    super(container, {});
     this.style.fillColor = "transparent";
     this.style.strokeColor = "#002fff";
     this.style.strokeWidth = "0.5";

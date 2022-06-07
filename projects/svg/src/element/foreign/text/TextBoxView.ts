@@ -4,6 +4,7 @@ import {Event} from "../../../dataSource/constant/Event";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {ElementCursor} from "../../ElementView";
 import {Rect} from "../../../model/Rect";
+import {ElementProperties} from "../../../model/ElementProperties";
 
 export class TextBoxCursor extends ElementCursor {
   constructor() {
@@ -15,8 +16,8 @@ export class TextBoxView extends ForeignObjectView {
   protected override _type: ElementType = ElementType.TEXT_BOX;
   protected override _content: HTMLTextAreaElement;
 
-  public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, removeOnEmpty: boolean = true, ownerId?: string, index?: number) {
-    super(container, rect, ownerId, index);
+  public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, removeOnEmpty: boolean = true, ownerId?: string, index?: number) {
+    super(container, {}, rect, ownerId, index);
 
     this._content = document.createElement("textarea");
     this._content.style.width = "100%";
@@ -45,7 +46,7 @@ export class TextBoxView extends ForeignObjectView {
       });
     }
 
-    this.style.setDefaultStyle();
+    this.setProperties(properties);
   }
 
   public get text(): string {
@@ -107,7 +108,7 @@ export class TextBoxView extends ForeignObjectView {
   }
 
   public override get copy(): TextBoxView {
-    let copy: TextBoxView = Object.assign(new TextBoxView(this._container), super.copy);
+    let copy: TextBoxView = Object.assign(new TextBoxView(this._container, this._properties), super.copy);
     copy._type = ElementType.TEXT_BOX;
     copy.text = this.text;
     return copy;

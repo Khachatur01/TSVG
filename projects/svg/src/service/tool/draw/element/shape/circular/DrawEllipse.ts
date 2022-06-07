@@ -7,7 +7,7 @@ import {ElementType} from "../../../../../../dataSource/constant/ElementType";
 
 export class DrawEllipse extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
-    let element = new EllipseView(this.container, {x: position.x, y: position.y, width: 0, height: 0});
+    let element = new EllipseView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     element.__fixRect__();
     return element;
   }

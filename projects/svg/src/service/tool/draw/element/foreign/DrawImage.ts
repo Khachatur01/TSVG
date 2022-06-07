@@ -8,7 +8,7 @@ import {ElementType} from "../../../../../dataSource/constant/ElementType";
 export class DrawImage extends MoveDraw {
   public src: string = "";
   protected createDrawableElement(position: Point): ElementView {
-    return new ImageView(this.container, this.src, {x: position.x, y: position.y, width: 0, height: 0});
+    return new ImageView(this.container, {overEvent: true, globalStyle: true}, this.src, {x: position.x, y: position.y, width: 0, height: 0});
   }
 
   protected override onIsNotComplete(call: boolean) {

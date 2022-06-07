@@ -4,12 +4,10 @@ import {ElementView} from "../../../../../element/ElementView";
 import {TextBoxView} from "../../../../../element/foreign/text/TextBoxView";
 import {Event} from "../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {ForeignObjectView} from "../../../../../element/foreign/ForeignObjectView";
-import {Container} from "../../../../../Container";
 
 export class DrawTextBox extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
-    let textBox = new TextBoxView(this.container, {x: position.x, y: position.y, width: 0, height: 0});
+    let textBox = new TextBoxView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     textBox.__onFocus__(true);
     return textBox;
   }
@@ -34,7 +32,7 @@ export class DrawTextBox extends MoveDraw {
       x: this.startPosition.x,
       y: this.startPosition.y,
       width: 200,
-      height: 100
+      height: 150
     });
     this._drawableElement.refPoint = this._drawableElement?.center;
   }

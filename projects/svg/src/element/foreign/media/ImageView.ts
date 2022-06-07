@@ -8,6 +8,7 @@ import {ForeignView} from "../../type/ForeignView";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {Cursor} from "../../../dataSource/constant/Cursor";
+import {ElementProperties} from "../../../model/ElementProperties";
 
 export class ImageCursor extends ElementCursor {
   constructor() {
@@ -23,8 +24,8 @@ export class ImageView extends ForeignView implements MoveDrawable {
   private _src: string = "";
   /* Model */
 
-  public constructor(container: Container, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
-    super(container, ownerId, index);
+  public constructor(container: Container, properties: ElementProperties = {}, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+    super(container, {}, ownerId, index);
     this.svgElement.id = this.id;
 
     this.svgElement.ondragstart = function () {
@@ -34,11 +35,11 @@ export class ImageView extends ForeignView implements MoveDrawable {
     this.__setRect__(rect);
     this.src = src;
 
-    this.setOverEvent();
-
     this.setAttr({
       preserveAspectRatio: "none"
     });
+
+    this.setProperties(properties);
   }
 
   protected __updateView__(): void {
@@ -51,7 +52,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
 
   }
   public get copy(): ImageView {
-    let image: ImageView = new ImageView(this._container, this._src, this._rect);
+    let image: ImageView = new ImageView(this._container, this._properties, this._src, this._rect);
 
     image.refPoint = Object.assign({}, this.refPoint);
     image.__rotate__(this._angle);
@@ -113,7 +114,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
   }
 
   public toPath(): PathView {
-    return new PathView(this._container);
+    return new PathView(this._container, this._properties);
   }
 
   public override toJSON(): any {

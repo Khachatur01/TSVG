@@ -10,6 +10,7 @@ import {ElementType} from "../../dataSource/constant/ElementType";
 import {Cursor} from "../../dataSource/constant/Cursor";
 import {DrawTextBox} from "../../service/tool/draw/element/foreign/DrawTextBox";
 import {DrawForeignObject} from "../../service/tool/draw/element/foreign/DrawForeignObject";
+import {ElementProperties} from "../../model/ElementProperties";
 
 export class ForeignObjectCursor extends ElementCursor {
   constructor() {
@@ -88,8 +89,8 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   public readonly outline: string = "thin solid #999";
   /* Model */
 
-  public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
-    super(container, ownerId, index);
+  public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+    super(container, {}, ownerId, index);
     this.svgElement.id = this.id;
     this.svgElement.style.outline = "none";
     this.svgElement.style.border = "none";
@@ -119,19 +120,15 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
 
     this.__setRect__(rect);
-    this.setOverEvent();
     this.setAttr({
       preserveAspectRatio: "none"
     });
 
-    try {
-      this.style.setDefaultStyle();
-    } catch (error: any) {
-    }
+    this.setProperties(properties);
   }
 
   public get copy(): ForeignObjectView {
-    let foreignObject: ForeignObjectView = new ForeignObjectView(this._container);
+    let foreignObject: ForeignObjectView = new ForeignObjectView(this._container, this._properties);
     foreignObject._content = this._content.cloneNode(true) as HTMLElement;
     foreignObject.svgElement.appendChild(foreignObject._content);
 
@@ -282,7 +279,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     return this._rect.width > 0 && this._rect.height > 0;
   }
   public toPath(): PathView {
-    return new PathView(this._container);
+    return new PathView(this._container, this._properties);
   }
 
   public override toJSON(): any {

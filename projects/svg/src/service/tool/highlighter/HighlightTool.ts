@@ -46,8 +46,8 @@ export class HighlightTool extends Tool {
       this._width = settings.width;
     }
 
-    this.path = new PathView(this._container, start);
-    this.path.removeOverEvent();
+    this.path = new PathView(this._container, {overEvent: false, globalStyle: false}, start);
+    // this.path.removeOverEvent();
     this.path.style.strokeWidth = this._width;
     this.path.style.strokeColor = this._color;
     this.path.style.fillColor = "none";
@@ -96,7 +96,6 @@ export class HighlightTool extends Tool {
   }
   public highlight(path: Path | string) {
     this.path = new PathView(this._container);
-    this.path.removeOverEvent();
 
     if (path instanceof Path) {
       this.path.path = path;

@@ -33,7 +33,7 @@ export class DrawFree extends Drawer {
 
     let pathObject = new Path();
     pathObject.add(new MoveTo(position));
-    this._drawableElement = new FreeView(this.container, pathObject);
+    this._drawableElement = new FreeView(this.container, {overEvent: true, globalStyle: true}, pathObject);
     this.drawTool?.__drawing__();
 
     this.container.add(this._drawableElement);

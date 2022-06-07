@@ -50,19 +50,19 @@ export class Grid {
     let height: number = this.container.HTML.clientHeight;
 
     let grid = document.createElementNS(ElementView.svgURI, "path");
-    grid.style.shapeRendering = "optimizeSpeed";
+    grid.style.shapeRendering = "geometricPrecision";
     grid.style.strokeWidth = this.strokeWidth + "";
     grid.style.stroke = this.strokeColor;
 
     let path = new Path();
 
     for (let i = this._snapSide; i < width; i += this._snapSide) {
-      path.add(new MoveTo({x: i, y: 0}));
-      path.add(new LineTo({x: i, y: height}));
+      path.add(new MoveTo({x: i + 0.5, y: 0}));
+      path.add(new LineTo({x: i + 0.5, y: height}));
     }
     for (let i = this._snapSide; i < height; i += this._snapSide) {
-      path.add(new MoveTo({x: 0, y: i}));
-      path.add(new LineTo({x: width, y: i}));
+      path.add(new MoveTo({x: 0, y: i + 0.5}));
+      path.add(new LineTo({x: width, y: i + 0.5}));
     }
 
     grid.setAttribute("d", path.toString());

@@ -4,6 +4,7 @@ import {Container} from "../../../../../Container";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
 import {ElementCursor, ElementView} from "../../../../ElementView";
+import {ElementProperties} from "../../../../../model/ElementProperties";
 
 export class RectangleCursor extends ElementCursor {}
 
@@ -16,20 +17,22 @@ export class RectangleCursor extends ElementCursor {}
 export class RectangleView extends PolygonView implements MoveDrawable {
   protected override _type: ElementType = ElementType.RECTANGLE;
 
-  public constructor(container: Container, rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
-    super(container, [
+  public constructor(container: Container, properties: ElementProperties = {}, rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+    super(container, {}, [
       /* 0 */                                                                                        /* 1 */
       {x: rect.x, y: rect.y},                            {x: rect.width + rect.x, y: rect.y},
       {x: rect.width + rect.x, y: rect.height + rect.y}, {x: rect.x, y: rect.height + rect.y}
       /* 2 */                                                                                        /* 3 */
     ], ownerId, index);
 
-    this.setOverEvent();
-    this.style.setDefaultStyle();
+    this.setProperties(properties);
   }
 
   public override get copy(): RectangleView {
-    let copy: RectangleView = Object.assign(new RectangleView(this._container), super.copy);
+    let copy: RectangleView = Object.assign(
+      new RectangleView(this._container, this._properties),
+      super.copy
+    );
     copy._type = ElementType.RECTANGLE;
     return copy;
   }

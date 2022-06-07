@@ -7,7 +7,7 @@ import {ElementType} from "../../../../../../../../dataSource/constant/ElementTy
 
 export class DrawRectangle extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
-    return new RectangleView(this.container, {x: position.x, y: position.y, width: 0, height: 0});
+    return new RectangleView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
   }
 
   public override start(call: boolean = true) {

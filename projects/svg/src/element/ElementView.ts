@@ -10,6 +10,8 @@ import {Style} from "../service/style/Style";
 import {ElementType} from "../dataSource/constant/ElementType";
 import {Cursor} from "../dataSource/constant/Cursor";
 import {Line} from "../model/Line";
+import {ElementProperties} from "../model/ElementProperties";
+import {packageTransformFactory} from "ng-packagr/lib/ng-package/package.transform";
 
 export class ElementCursor {
   public cursor: any = {};
@@ -86,6 +88,7 @@ export class ElementStyle extends Style {
   public setDefaultStyle(): void {
     let style = this.element.container.style;
     this.strokeWidth = style.strokeWidth;
+    this.strokeDashArray = style.strokeDashArray;
     this.strokeColor = style.strokeColor;
     this.fillColor = style.fillColor;
     this.fontSize = style.fontSize;
@@ -112,12 +115,20 @@ export abstract class ElementView implements Resizeable, Draggable {
   protected _lastRect: Rect = {x: 0, y: 0, width: 0, height: 0};
   protected ___lastAngle__: number = 0;
   protected _selectable: boolean = true;
+  protected _hasOverEvent: boolean = false;
+  protected _properties: ElementProperties = {};
   /* Model */
 
   private _highlight = this.__highlight__.bind(this);
   private _lowlight = this.__lowlight__.bind(this);
 
-  public constructor(container: Container, ownerId?: string, index?: number) {
+  /**
+   * @param container Container element that should contain this ElementView
+   * @param properties Simple object for element modification before creating {setOverEvent: boolean, setDefaultStyle: boolean}
+   * @param ownerId This element owner id. if not set, will get owner id of Container
+   * @param index This element index. If not set, will generate new numerical value
+   * */
+  public constructor(container: Container, properties: ElementProperties = {}, ownerId?: string, index?: number) {
     this._container = container;
 
     /*
@@ -132,6 +143,19 @@ export abstract class ElementView implements Resizeable, Draggable {
       this._index = container.nextElementIndex;
     } else {
       throw Error("Missing id argument: ownerId{ " + ownerId + " }, index{ " + index + " }");
+    }
+  }
+
+  protected setProperties(properties: ElementProperties) {
+    this._properties = Object.assign({}, properties);
+    this._properties.globalStyle = undefined; /* global style property should be set only in creation time */
+    if (properties.overEvent) {
+      this.setOverEvent();
+    }
+    if (properties.globalStyle) {
+      try {
+        this.style.setDefaultStyle();
+      } catch (e) {/* todo add exception handler */}
     }
   }
 
@@ -415,10 +439,12 @@ export abstract class ElementView implements Resizeable, Draggable {
   public setOverEvent(): void {
     this.svgElement.addEventListener("mouseover", this._highlight);
     this.svgElement.addEventListener("mouseout", this._lowlight);
+    this._properties.overEvent = true;
   }
   public removeOverEvent(): void {
     this.svgElement.removeEventListener("mouseover", this._highlight);
     this.svgElement.removeEventListener("mouseout", this._lowlight);
+    this._properties.overEvent = false;
   }
 
   public __remove__() {

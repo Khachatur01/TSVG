@@ -25,7 +25,7 @@ export class Style {
   public get strokeDashArray(): string {
     let array = this.style.get("stroke-dasharray");
     if (!array)
-      array = "";
+      array = "0";
 
     return array;
   }
@@ -90,6 +90,8 @@ export class Style {
       this.fontColor = style.fontColor;
     if (style.backgroundColor)
       this.backgroundColor = style.backgroundColor;
+    if (style.strokeDashArray)
+      this.strokeDashArray = style.strokeDashArray;
   }
 
   public clear(): void {
@@ -110,5 +112,4 @@ export class Style {
   public toJSON(): any {
     return this.object;
   }
-
 }

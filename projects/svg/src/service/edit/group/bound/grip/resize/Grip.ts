@@ -18,7 +18,7 @@ export abstract class Grip extends BoxView {
   protected focus: Focus;
 
   public constructor(container: Container, focus: Focus) {
-    super(container, {x: 0, y: 0, width: 10, height: 10});
+    super(container, {overEvent: true}, {x: 0, y: 0, width: 10, height: 10});
     this.svgElement.style.cursor = this._container.style.cursor[Cursor.GRIP];
     this.setAttr({
       fill: "white",

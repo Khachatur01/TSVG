@@ -5,6 +5,7 @@ import {Container} from "../../../Container";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {Rect} from "../../../model/Rect";
+import {ElementProperties} from "../../../model/ElementProperties";
 
 export class LineCursor extends ElementCursor {}
 
@@ -12,14 +13,13 @@ export class LineView extends PointedView implements MoveDrawable {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "line");
   protected override _type: ElementType = ElementType.LINE;
 
-  public constructor(container: Container, startPoint: Point = {x: 0, y: 0}, endPoint: Point = {x: 0, y: 0}, ownerId?: string, index?: number) {
-    super(container, ownerId, index);
+  public constructor(container: Container, properties: ElementProperties = {}, startPoint: Point = {x: 0, y: 0}, endPoint: Point = {x: 0, y: 0}, ownerId?: string, index?: number) {
+    super(container, {}, ownerId, index);
     this.svgElement.id = this.id;
 
     this.points = [startPoint, endPoint];
 
-    this.setOverEvent();
-    this.style.setDefaultStyle();
+    this.setProperties(properties);
   }
 
   protected __updateView__(): void {
@@ -32,7 +32,7 @@ export class LineView extends PointedView implements MoveDrawable {
   }
 
   public get copy(): LineView {
-    let line: LineView = new LineView(this._container);
+    let line: LineView = new LineView(this._container, this._properties);
     line.points = this._points.map(point => Object.assign({}, point)); /* copy points array */
 
     line.refPoint = Object.assign({}, this.refPoint);

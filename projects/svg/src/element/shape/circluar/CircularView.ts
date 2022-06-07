@@ -106,6 +106,6 @@ export abstract class CircularView extends ShapeView implements MoveDrawable{
     path.add(new Arc(rx, ry, this._angle, 0, 1, points[3]));
     path.add(new Arc(rx, ry, this._angle, 0, 1, points[0]));
 
-    return new PathView(this._container, path);
+    return new PathView(this._container, this._properties, path);
   }
 }

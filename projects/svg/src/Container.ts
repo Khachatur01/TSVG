@@ -206,6 +206,7 @@ class GlobalStyle extends Style {
 
   public __setGlobalStyle__(style: Style, call: boolean = true) {
     super.strokeWidth = style.strokeWidth;
+    super.strokeDashArray = style.strokeDashArray;
     super.strokeColor = style.strokeColor;
     super.fillColor = style.fillColor;
     super.fontSize = style.fontSize;

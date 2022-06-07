@@ -7,6 +7,7 @@ import {LineTo} from "../../model/path/line/LineTo";
 import {ElementType} from "../../dataSource/constant/ElementType";
 import {Rect} from "../../model/Rect";
 import {ShapeView} from "../type/ShapeView";
+import {ElementProperties} from "../../model/ElementProperties";
 
 export class PathCursor extends ElementCursor {}
 
@@ -19,18 +20,15 @@ export class PathView extends ShapeView {
   protected _lastPath: Path = new Path();
   /* Model */
 
-  public constructor(container: Container, path: Path = new Path(), ownerId?: string, index?: number) {
-    super(container, ownerId, index);
+  public constructor(container: Container, properties: ElementProperties = {}, path: Path = new Path(), ownerId?: string, index?: number) {
+    super(container, {}, ownerId, index);
+
     this.svgElement.id = this.id;
 
     this.path = path;
     this.__fixRect__();
 
-    this.setOverEvent();
-    try {
-      this.style.setDefaultStyle();
-    } catch (error: any) {
-    }
+    this.setProperties(properties);
   }
 
   protected override __updateView__() {
@@ -54,7 +52,7 @@ export class PathView extends ShapeView {
   }
 
   public get copy(): PathView {
-    let path: PathView = new PathView(this._container);
+    let path: PathView = new PathView(this._container, this._properties);
     path.path = this._path.copy;
     path.__fixRect__();
 

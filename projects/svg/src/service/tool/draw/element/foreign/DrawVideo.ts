@@ -8,7 +8,7 @@ import {ElementType} from "../../../../../dataSource/constant/ElementType";
 export class DrawVideo extends MoveDraw {
   public src: string = "";
   createDrawableElement(position: Point): ElementView {
-    return new VideoView(this.container, this.src, {x: position.x, y: position.y, width: 0, height: 0});
+    return new VideoView(this.container, {overEvent: true, globalStyle: true}, this.src, {x: position.x, y: position.y, width: 0, height: 0});
   }
 
   protected override onIsNotComplete(call: boolean) {

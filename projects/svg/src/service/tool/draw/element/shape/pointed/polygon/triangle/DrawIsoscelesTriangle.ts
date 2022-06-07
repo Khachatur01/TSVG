@@ -7,7 +7,7 @@ import {ElementType} from "../../../../../../../../dataSource/constant/ElementTy
 
 export class DrawIsoscelesTriangle extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
-    return new IsoscelesTriangleView(this.container, {x: 0, y: 0, width: 0, height: 0});
+    return new IsoscelesTriangleView(this.container, {overEvent: true, globalStyle: true}, {x: 0, y: 0, width: 0, height: 0});
   }
 
   public override start(call: boolean = true) {

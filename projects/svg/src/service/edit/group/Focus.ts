@@ -13,6 +13,7 @@ import {Matrix} from "../../math/Matrix";
 import {CircularView} from "../../../element/shape/circluar/CircularView";
 import {PointedView} from "../../../element/shape/pointed/PointedView";
 import {ForeignObjectView} from "../../../element/foreign/ForeignObjectView";
+import {ElementProperties} from "../../../model/ElementProperties";
 
 export class Focus implements Draggable, Resizeable {
   private readonly container: Container;
@@ -514,11 +515,11 @@ export class Focus implements Draggable, Resizeable {
     });
   }
 
-  public toPath() {
+  public toPath(properties: ElementProperties = {overEvent: true}) {
     if (this._children.size == 0) return;
     let refPoint = Object.assign({}, this.__refPoint__);
 
-    let path = new PathView(this.container);
+    let path = new PathView(this.container, properties);
     this._children.forEach((child: ElementView) => {
       path.addPath(child.toPath());
     });

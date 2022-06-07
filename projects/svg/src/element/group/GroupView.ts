@@ -4,6 +4,7 @@ import {Rect} from "../../model/Rect";
 import {PathView} from "../shape/PathView";
 import {Container} from "../../Container";
 import {ElementType} from "../../dataSource/constant/ElementType";
+import {ElementProperties} from "../../model/ElementProperties";
 
 export class GroupCursor extends ElementCursor {}
 
@@ -95,13 +96,15 @@ export class GroupView extends ElementView {
   private _elements: Set<ElementView> = new Set<ElementView>()
   /* Model */
 
-  public constructor(container: Container, ownerId?: string, index?: number) {
-    super(container, ownerId, index);
+  public constructor(container: Container, properties: ElementProperties = {}, ownerId?: string, index?: number) {
+    super(container, {}, ownerId, index);
     this.svgElement.id = this.id;
+
+    this.setProperties(properties);
   }
 
   public get copy(): GroupView {
-    let group: GroupView = new GroupView(this._container);
+    let group: GroupView = new GroupView(this._container, this._properties);
     this._elements.forEach((element: ElementView) => {
       let copy = element.copy;
       copy.group = group;
@@ -290,7 +293,7 @@ export class GroupView extends ElementView {
   }
 
   public toPath(): PathView {
-    return new PathView(this._container);
+    return new PathView(this._container, this._properties);
   }
 
   public isComplete(): boolean {

@@ -4,6 +4,7 @@ import {Path} from "../../../../model/path/Path";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {ElementCursor} from "../../../ElementView";
 import {Cursor} from "../../../../dataSource/constant/Cursor";
+import {ElementProperties} from "../../../../model/ElementProperties";
 
 export class FreeCursor extends PathCursor {
   constructor() {
@@ -15,11 +16,15 @@ export class FreeCursor extends PathCursor {
 export class FreeView extends PathView {
   protected override _type: ElementType = ElementType.FREE;
 
-  constructor(container: Container, path: Path = new Path(), ownerId?: string, index?: number) {
-    super(container, path, ownerId, index);
+  constructor(container: Container, properties: ElementProperties = {}, path: Path = new Path(), ownerId?: string, index?: number) {
+    super(container, {}, path, ownerId, index);
+    this.setProperties(properties);
   }
   public override get copy(): FreeView {
-    let copy: FreeView = Object.assign(new FreeView(this._container), super.copy);
+    let copy: FreeView = Object.assign(
+      new FreeView(this._container, this._properties),
+      super.copy
+    );
     copy._type = ElementType.FREE;
     return copy;
   }

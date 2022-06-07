@@ -7,7 +7,7 @@ import {ClickDraw} from "../../../mode/ClickDraw";
 
 export class DrawLine extends ClickDraw {
   protected createDrawableElement(position: Point): PointedView {
-    let element = new LineView(this.container, position, position);
+    let element = new LineView(this.container, {overEvent: true, globalStyle: true}, position, position);
     element.__fixRect__();
     return element;
   }

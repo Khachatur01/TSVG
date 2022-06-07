@@ -7,6 +7,7 @@ import {ElementCursor} from "../../ElementView";
 import {Rect} from "../../../model/Rect";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 import {Path} from "../../../model/path/Path";
+import {ElementProperties} from "../../../model/ElementProperties";
 
 export class VideoCursor extends ElementCursor {
   constructor() {
@@ -24,8 +25,8 @@ export class VideoView extends ForeignObjectView {
   private _src: string = "";
   /* Model */
 
-  public constructor(container: Container, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
-    super(container, rect, ownerId, index);
+  public constructor(container: Container, properties: ElementProperties = {}, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+    super(container, {}, rect, ownerId, index);
     this._content = document.createElement("video");
     this._content.style.width = "calc(100% - 20px)";
     this._content.style.height = "calc(100% - 20px)";
@@ -39,10 +40,19 @@ export class VideoView extends ForeignObjectView {
     this.src = src;
     this.svgElement.innerHTML = "";
     this.svgElement.appendChild(this._content);
+
+    this.setProperties(properties);
   }
 
   public override get copy(): VideoView {
-    return super.copy as VideoView;
+    let videoView: VideoView = new VideoView(this._container, this._properties, this._src, Object.assign({}, this._rect));
+    videoView.__fixRect__();
+
+    videoView.refPoint = Object.assign({}, this.refPoint);
+    videoView.__rotate__(this._angle);
+
+    videoView.style.set = this.style;
+    return videoView;
   }
 
   public get src(): string {

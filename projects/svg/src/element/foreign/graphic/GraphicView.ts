@@ -39,8 +39,8 @@ export class GraphicView extends ForeignView implements MoveDrawable {
   public override rotatable: boolean = false;
   /* Model */
 
-  public constructor(container: Container, center: Point = {x: 0, y: 0}, size: Size = {width: 1, height: 1}, ownerId?: string, index?: number) {
-    super(container, ownerId, index);
+  public constructor(container: Container, properties: any = {}, center: Point = {x: 0, y: 0}, size: Size = {width: 1, height: 1}, ownerId?: string, index?: number) {
+    super(container, {}, ownerId, index);
 
     this._axisGroup = document.createElementNS(ElementView.svgURI, "g");
     this._graphicGroup = document.createElementNS(ElementView.svgURI, "g");
@@ -67,8 +67,8 @@ export class GraphicView extends ForeignView implements MoveDrawable {
       x: center.x - size.width / 2,
       y: center.y - size.height / 2
     }
-    // this.setRect();
-    // this.drawAxis();
+
+    this.setProperties(properties);
   }
   protected __updateView__(): void {
     this.setAttr({
@@ -351,7 +351,7 @@ export class GraphicView extends ForeignView implements MoveDrawable {
   }
 
   public toPath(): PathView { /* TODO */
-    return new PathView(this._container);
+    return new PathView(this._container, this._properties);
   }
 
   public override toJSON(): any {

@@ -7,7 +7,7 @@ import {CircleView} from "../../../../../../element/shape/circluar/CircleView";
 
 export class DrawCircle extends MoveDraw {
   protected createDrawableElement(position: Point): ElementView {
-    let element = new CircleView(this.container, {x: position.x, y: position.y, width: 0, height: 0});
+    let element = new CircleView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     element.__fixRect__();
     return element;
   }

@@ -16,8 +16,7 @@ export class Node extends EllipseView {
   private _end = this.onEnd.bind(this);
 
   public constructor(container: Container, editTool: EditTool, position: Point, order: number) {
-    super(container, {x: position.x - 8, y: position.y - 8, width: 16, height: 16});
-    this.removeOverEvent();
+    super(container, {overEvent: true, globalStyle: false}, {x: position.x - 8, y: position.y - 8, width: 16, height: 16});
     this.style.fillColor = "white";
     this.style.strokeColor = "black";
     this.style.strokeWidth = "1";

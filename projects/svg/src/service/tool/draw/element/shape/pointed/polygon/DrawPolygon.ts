@@ -7,7 +7,7 @@ import {ElementType} from "../../../../../../../dataSource/constant/ElementType"
 
 export class DrawPolygon extends ClickDraw {
   protected createDrawableElement(position: Point): PointedView {
-    return new PolygonView(this.container, [
+    return new PolygonView(this.container, {overEvent: true, globalStyle: true}, [
       position, position
     ]);
   }

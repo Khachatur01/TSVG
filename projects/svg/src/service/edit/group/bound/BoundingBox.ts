@@ -29,7 +29,7 @@ export class BoundingBox extends BoxView {
   public perfect: boolean = false; /* for rotate point */
 
   public constructor(container: Container, focus: Focus, rect: Rect = {x: 0, y: 0, width: 0, height: 0}) {
-    super(container, rect);
+    super(container, {overEvent: false, globalStyle: false}, rect);
     this.style.fillColor = "transparent";
     this.style.strokeColor = "#002fff";
     this.style.strokeWidth = "1";
@@ -37,7 +37,6 @@ export class BoundingBox extends BoxView {
 
     this.svgElement.style.cursor = this._container.style.cursor[Cursor.BOUNDING_BOX];
     this.svgElement.style.display = "none";
-    this.removeOverEvent();
 
     this.focus = focus;
     this.referencePoint = new RefPoint(container, this.focus, 0, 0);

@@ -5,6 +5,7 @@ import {Container} from "../../../Container";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {CircularView} from "./CircularView";
 import {Cursor} from "../../../dataSource/constant/Cursor";
+import {ElementProperties} from "../../../model/ElementProperties";
 
 export class CircleCursor extends ElementCursor {
   constructor() {
@@ -17,14 +18,13 @@ export class CircleView extends CircularView {
   protected override svgElement: SVGCircleElement = document.createElementNS(ElementView.svgURI, "circle");
   protected override _type: ElementType = ElementType.CIRCLE;
 
-  public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
-    super(container, ownerId, index);
+  public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+    super(container, {}, ownerId, index);
     this.svgElement.id = this.id;
 
     this.__setRect__(rect);
 
-    this.setOverEvent();
-    this.style.setDefaultStyle();
+    this.setProperties(properties);
   }
 
   protected override __updateView__(): void {
@@ -36,7 +36,7 @@ export class CircleView extends CircularView {
   }
 
   public override get copy(): CircleView {
-    let ellipse: CircleView = new CircleView(this._container, Object.assign({}, this._rect));
+    let ellipse: CircleView = new CircleView(this._container, this._properties, Object.assign({}, this._rect));
     ellipse.refPoint = Object.assign({}, this.refPoint);
     ellipse.__rotate__(this._angle);
 

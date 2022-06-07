@@ -120,7 +120,7 @@ export abstract class PointedView extends ShapeView {
     for (let i = 1; i < visiblePoints.length; i++)
       path.add(new LineTo(visiblePoints[i]));
 
-    return new PathView(this._container, path);
+    return new PathView(this._container, this._properties, path);
   }
 
   public override toJSON(): any {

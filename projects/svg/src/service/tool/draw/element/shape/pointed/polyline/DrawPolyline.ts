@@ -7,7 +7,7 @@ import {ElementType} from "../../../../../../../dataSource/constant/ElementType"
 
 export class DrawPolyline extends ClickDraw {
   protected createDrawableElement(position: Point): PointedView {
-    return new PolylineView(this.container, [
+    return new PolylineView(this.container, {overEvent: true, globalStyle: true}, [
       position, position
     ]);
   }

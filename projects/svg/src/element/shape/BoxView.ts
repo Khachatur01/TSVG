@@ -5,6 +5,7 @@ import {Container} from "../../Container";
 import {PathView} from "./PathView";
 import {ShapeView} from "../type/ShapeView";
 import {ElementType} from "../../dataSource/constant/ElementType";
+import {ElementProperties} from "../../model/ElementProperties";
 
 export class BoxCursor extends ElementCursor {}
 
@@ -12,14 +13,14 @@ export class BoxView extends ShapeView {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "rect");
   protected override _type: ElementType = ElementType.BOX;
 
-  public constructor(container: Container, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
-    super(container, ownerId, index);
+  public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+    super(container, {}, ownerId, index);
     this.svgElement.id = this.id;
 
     this._rect = rect;
     this.__updateView__();
 
-    this.setOverEvent();
+    this.setProperties(properties);
   }
   protected __updateView__(): void {
     this.setAttr({
@@ -31,7 +32,7 @@ export class BoxView extends ShapeView {
   }
 
   public get copy(): BoxView {
-    let box: BoxView = new BoxView(this._container);
+    let box: BoxView = new BoxView(this._container, this._properties);
     box.__setRect__(Object.assign({}, this._rect));
     box.style.set = this.style;
 
@@ -66,7 +67,7 @@ export class BoxView extends ShapeView {
   }
 
   public override toPath(): PathView {
-    return new PathView(this._container);
+    return new PathView(this._container, this._properties); /* todo */
   }
 
 }
