@@ -2,7 +2,6 @@ import {PathCursor, PathView} from "../../PathView";
 import {Container} from "../../../../Container";
 import {Path} from "../../../../model/path/Path";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
-import {ElementCursor} from "../../../ElementView";
 import {Cursor} from "../../../../dataSource/constant/Cursor";
 import {ElementProperties} from "../../../../model/ElementProperties";
 

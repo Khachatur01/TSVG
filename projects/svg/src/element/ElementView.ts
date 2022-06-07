@@ -11,7 +11,6 @@ import {ElementType} from "../dataSource/constant/ElementType";
 import {Cursor} from "../dataSource/constant/Cursor";
 import {Line} from "../model/Line";
 import {ElementProperties} from "../model/ElementProperties";
-import {packageTransformFactory} from "ng-packagr/lib/ng-package/package.transform";
 
 export class ElementCursor {
   public cursor: any = {};

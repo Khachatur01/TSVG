@@ -9,7 +9,6 @@ import {Event} from "../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../../element/ElementView";
 import {Cursor} from "../../../../dataSource/constant/Cursor";
-import {LineTo} from "../../../../model/path/line/LineTo";
 
 export class DrawFree extends Drawer {
   private readonly container: Container;

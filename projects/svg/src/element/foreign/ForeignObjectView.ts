@@ -7,9 +7,6 @@ import {Event} from "../../dataSource/constant/Event";
 import {ForeignView} from "../type/ForeignView";
 import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../dataSource/constant/ElementType";
-import {Cursor} from "../../dataSource/constant/Cursor";
-import {DrawTextBox} from "../../service/tool/draw/element/foreign/DrawTextBox";
-import {DrawForeignObject} from "../../service/tool/draw/element/foreign/DrawForeignObject";
 import {ElementProperties} from "../../model/ElementProperties";
 
 export class ForeignObjectCursor extends ElementCursor {

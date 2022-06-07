@@ -6,7 +6,6 @@ import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
 import {ShapeView} from "../../type/ShapeView";
 import {ElementView} from "../../ElementView";
-import {Line} from "../../../model/Line";
 
 export abstract class PointedView extends ShapeView {
   /* Model */

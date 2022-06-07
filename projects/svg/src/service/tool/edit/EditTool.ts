@@ -7,7 +7,6 @@ import {Node} from "./Node";
 import {Event} from "../../../dataSource/constant/Event";
 import {Focus} from "../../edit/group/Focus";
 import {Cursor} from "../../../dataSource/constant/Cursor";
-import {ForeignObjectView} from "../../../element/foreign/ForeignObjectView";
 
 export class EditTool extends Tool {
   protected override _cursor: Cursor = Cursor.EDIT;

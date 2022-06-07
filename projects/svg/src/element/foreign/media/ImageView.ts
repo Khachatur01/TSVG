@@ -7,7 +7,6 @@ import {Container} from "../../../Container";
 import {ForeignView} from "../../type/ForeignView";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../dataSource/constant/ElementType";
-import {Cursor} from "../../../dataSource/constant/Cursor";
 import {ElementProperties} from "../../../model/ElementProperties";
 
 export class ImageCursor extends ElementCursor {

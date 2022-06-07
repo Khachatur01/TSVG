@@ -10,7 +10,6 @@ import {Event} from "../../../../../../dataSource/constant/Event";
 import {Focus} from "../../../Focus";
 import {Cursor} from "../../../../../../dataSource/constant/Cursor";
 import {Path} from "../../../../../../model/path/Path";
-import {ElementProperties} from "../../../../../../model/ElementProperties";
 
 export class RotatePoint extends PathView {
   private _start = this.start.bind(this);

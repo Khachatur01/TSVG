@@ -1,12 +1,9 @@
 import {Container} from "../../../Container";
 import {ForeignObjectView} from "../ForeignObjectView";
-import {Point} from "../../../model/Point";
-import {Size} from "../../../model/Size";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {ElementCursor} from "../../ElementView";
 import {Rect} from "../../../model/Rect";
 import {Cursor} from "../../../dataSource/constant/Cursor";
-import {Path} from "../../../model/path/Path";
 import {ElementProperties} from "../../../model/ElementProperties";
 
 export class VideoCursor extends ElementCursor {

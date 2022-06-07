@@ -5,14 +5,12 @@ import {BoundingBox} from "./bound/BoundingBox";
 import {Container} from "../../../Container";
 import {Rect} from "../../../model/Rect";
 import {Resizeable} from "../resize/Resizeable";
-import {Size} from "../../../model/Size";
 import {PathView} from "../../../element/shape/PathView";
 import {GroupView} from "../../../element/group/GroupView";
 import {Event} from "../../../dataSource/constant/Event";
 import {Matrix} from "../../math/Matrix";
 import {CircularView} from "../../../element/shape/circluar/CircularView";
 import {PointedView} from "../../../element/shape/pointed/PointedView";
-import {ForeignObjectView} from "../../../element/foreign/ForeignObjectView";
 import {ElementProperties} from "../../../model/ElementProperties";
 
 export class Focus implements Draggable, Resizeable {

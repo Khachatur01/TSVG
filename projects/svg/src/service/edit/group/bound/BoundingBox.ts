@@ -14,7 +14,6 @@ import {RefPoint} from "./grip/reference/RefPoint";
 import {RotatePoint} from "./grip/rotate/RotatePoint";
 import {ElementView} from "../../../../element/ElementView";
 import {BoxView} from "../../../../element/shape/BoxView";
-import {Size} from "../../../../model/Size";
 import {Focus} from "../Focus";
 import {Compass} from "../../../../dataSource/constant/Compass";
 import {Cursor} from "../../../../dataSource/constant/Cursor";
