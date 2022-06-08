@@ -48,7 +48,10 @@ export class LineView extends PointedView implements MoveDrawable {
   }
 
   public override pushPoint(point: Point): void {
-    this._points[1] = point;
+    if (this._points.length === 2) {
+      return;
+    }
+    this._points.push(point);
     this._rect = ElementView.calculateRect(this._points);
     this.__updateView__();
   }
