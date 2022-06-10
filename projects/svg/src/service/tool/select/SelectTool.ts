@@ -17,6 +17,8 @@ export class SelectTool extends Tool {
   public intersectionColor: string = "green";
   public fullMatchColor: string = "#1545ff";
 
+  private elementsOverEvent: {element: ElementView, overEvent: boolean}[] = [];
+
   private _start = this.start.bind(this);
   private _select = this.select.bind(this);
   private _end = this.end.bind(this);
@@ -37,6 +39,15 @@ export class SelectTool extends Tool {
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
+    /*
+    * Remove all elements over event, because when selecting element calls highlight event
+    */
+    this.elementsOverEvent = [];
+    this._container.elements.forEach((element: ElementView) => {
+      this.elementsOverEvent.push({element: element, overEvent: element.properties.overEvent || false});
+      element.removeOverEvent();
+    });
+
     this.position = position;
     this.boundingBox.__setRect__({
       x: position.x,
@@ -89,6 +100,14 @@ export class SelectTool extends Tool {
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
+    /*
+    * Recover elements over event. (Over event removed in makeMouseDown method)
+    */
+    this.elementsOverEvent.forEach((elementOverEvent) => {
+      if (elementOverEvent.overEvent) {
+        elementOverEvent.element.setOverEvent();
+      }
+    });
     let width = position.x - this.position.x;
 
     this._container.HTML.removeChild(this.boundingBox.SVG);

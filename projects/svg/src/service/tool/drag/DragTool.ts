@@ -61,7 +61,7 @@ export class DragTool extends Tool {
   }
 
   private dragStart(event: MouseEvent | TouchEvent) {
-    if (event.target == this._container.HTML) return;
+    if (event.target == this._container.HTML || this.focus.children.size === 0) return;
     this._container.HTML.addEventListener("mousemove", this._drag);
     this._container.HTML.addEventListener("touchmove", this._drag);
     document.addEventListener("mouseup", this._dragEnd);

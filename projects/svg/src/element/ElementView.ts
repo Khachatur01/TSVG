@@ -15,6 +15,7 @@ import {ElementProperties} from "../model/ElementProperties";
 export class ElementCursor {
   public cursor: any = {};
   constructor() {
+    this.cursor[Cursor.NO_TOOL] = "default";
     this.cursor[Cursor.SELECT] = "move";
     this.cursor[Cursor.EDIT] = "default";
   }
@@ -145,6 +146,9 @@ export abstract class ElementView implements Resizeable, Draggable {
     }
   }
 
+  public get properties(): ElementProperties {
+    return this._properties;
+  }
   protected setProperties(properties: ElementProperties) {
     this._properties = Object.assign({}, properties);
     this._properties.globalStyle = undefined; /* global style property should be set only in creation time */

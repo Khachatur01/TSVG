@@ -411,7 +411,7 @@ export class Container {
     }
     this.__activeCursor__ = cursorType;
 
-    if (!element.selectable && this.style.cursor.element[element.type].cursor[cursorType] != "none" && cursorType === Cursor.SELECT) {
+    if (!element.selectable && this.style.cursor.element[element.type].cursor[cursorType] != "none" && (cursorType === Cursor.SELECT || cursorType === Cursor.NO_TOOL)) {
       cursor = this.style.cursor[Cursor.NO_TOOL];
     } else if (this.style.cursor.element[element.type].cursor[cursorType]) {
       cursor = this.style.cursor.element[element.type].cursor[cursorType];
