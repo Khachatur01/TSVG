@@ -15,8 +15,10 @@ export class DrawTextBox extends MoveDraw {
   protected override turnOnToolAfterDrawing(): void {}
 
   protected override drawStart(event: MouseEvent | TouchEvent) {
-    if (event.target instanceof HTMLElement) {
-      if (event.target.parentElement instanceof SVGForeignObjectElement) {
+    if (event.target instanceof HTMLElement && event.target.parentElement instanceof SVGForeignObjectElement) {
+      let targetElementId = ElementView.parseId(event.target.parentElement.id);
+      let targetElement: ElementView | undefined = this.container.getElementById(targetElementId.ownerId, targetElementId.index, true);
+      if (!targetElement || targetElement.selectable) {
         return;
       }
     } else if (this.container.focused.children.size !== 0) {

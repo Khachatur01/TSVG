@@ -130,7 +130,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   public constructor(container: Container, properties: ElementProperties = {}, ownerId?: string, index?: number) {
     this._container = container;
 
-    /*
+    /**
     * One of ownerId and index arguments can't be undefined.
     * Both should be defined or both should be undefined
     * */
@@ -276,6 +276,16 @@ export abstract class ElementView implements Resizeable, Draggable {
     return this._type;
   }
 
+  public static parseId(id: string): {ownerId: string, index: number} {
+    let idArray = id.split(/[(_u)(_e)]+/);
+    let ownerId: string = idArray[1];
+    let index: number = parseInt(idArray[2]);
+
+    return {
+      ownerId: ownerId,
+      index: index
+    }
+  }
   public get id(): string {
     return this._container.idPrefix + "_u" + this._ownerId + "_e" + this._index;
   }
@@ -508,6 +518,7 @@ export abstract class ElementView implements Resizeable, Draggable {
       rect: this._rect,
       angle: this._angle,
       refPoint: this._refPoint,
+      properties: this._properties
     }
   }
   public fromJSON(json: any) {
@@ -521,5 +532,6 @@ export abstract class ElementView implements Resizeable, Draggable {
     this.__setRect__(json.rect);
     this.__rotate__(json.angle);
     this.refPoint = json.refPoint;
+    this.setProperties(json.properties);
   };
 }

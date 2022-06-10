@@ -331,9 +331,9 @@ export class Container {
     return this.elementIndex++;
   }
   /**
-   @param ownerId
-   @param index
-   @param deep for searching also in group
+   @param ownerId target element owner id
+   @param index target element index
+   @param deep for searching inside group elements also
    */
   public getElementById(ownerId: string, index: number, deep: boolean = false): ElementView | undefined {
     for (let element of this._elements) {
@@ -419,7 +419,7 @@ export class Container {
       cursor = this.HTML.style.cursor;
     }
 
-    if (element instanceof ForeignObjectView) { /* is element is foreign object and has content, set cursor also for content */
+    if (element instanceof ForeignObjectView) { /* is element foreign object and has content, set cursor also for content */
       if (element.selectable && this.drawTool.isOn() && this.drawTool.tool instanceof DrawTextBox) {
         element.SVG.style.cursor = "text";
         element.content.style.cursor = "text";
