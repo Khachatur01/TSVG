@@ -26,9 +26,11 @@ export abstract class Tool {
   public on(call: boolean = true): void {
     this._container.activeTool?.off(call);
     this._container.activeTool = this;
+    this._isOn = true;
   }
   public off(call: boolean = true): void {
     this._container.style.changeCursor(Cursor.NO_TOOL);
+    this._isOn = false;
   }
 
   public isOn(): boolean {

@@ -185,7 +185,6 @@ export class SelectTool extends Tool {
     super.on(call);
     this._container.HTML.addEventListener("mousedown", this._start);
     this._container.HTML.addEventListener("touchstart", this._start);
-    this._isOn = true;
     this.dragTool.on(call);
 
     this._container.style.changeCursor(this.cursor);
@@ -197,7 +196,6 @@ export class SelectTool extends Tool {
     super.off(call);
     this._container.HTML.removeEventListener("mousedown", this._start);
     this._container.HTML.removeEventListener("touchstart", this._start);
-    this._isOn = false;
     this.dragTool.off(call);
 
     if (call) {

@@ -83,7 +83,6 @@ export class EditTool extends Tool {
 
   public override on(call: boolean = true): void {
     super.on(call);
-    this._isOn = true;
     this.focus.children.forEach((child: ElementView) => {
       if (child instanceof PointedView) {
         this.editableElement = child;
@@ -100,7 +99,6 @@ export class EditTool extends Tool {
   }
   public override off(call: boolean = true): void {
     super.off();
-    this._isOn = false;
     this.focus.clear();
     this.removeEditableElement();
 

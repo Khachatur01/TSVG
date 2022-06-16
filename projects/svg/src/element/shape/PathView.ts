@@ -46,6 +46,9 @@ export class PathView extends ShapeView {
     this._rect = ElementView.calculateRect(path.points);
     this.__updateView__();
   }
+  public get pathString(): string {
+    return this._path.toString();
+  }
   public set pathString(path: string) {
     this._path.fromString(path);
     this._rect = ElementView.calculateRect(this._path.points);

@@ -189,7 +189,6 @@ export class HighlightTool extends Tool {
 
     this._container.HTML.addEventListener("mousedown", this._highlightStart);
     this._container.HTML.addEventListener("touchstart", this._highlightStart);
-    this._isOn = true;
     this._container.blur();
 
     this._container.style.changeCursor(this.cursor);
@@ -201,7 +200,6 @@ export class HighlightTool extends Tool {
     super.off();
     this._container.HTML.removeEventListener("mousedown", this._highlightStart);
     this._container.HTML.removeEventListener("touchstart", this._highlightStart);
-    this._isOn = false;
 
     if (call) {
       this._container.__call__(Event.HIGHLIGHT_TOOl_OFF);

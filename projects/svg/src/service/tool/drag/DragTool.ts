@@ -89,9 +89,9 @@ export class DragTool extends Tool {
 
   public override on(call: boolean = true): void {
     /* don't call super.on() function, that turns off previous tool. because previous tool is select tool */
+    this._isOn = true;
     this._container.HTML.addEventListener("mousedown", this._dragStart);
     this._container.HTML.addEventListener("touchstart", this._dragStart);
-    this._isOn = true;
 
     if (call) {
       this._container.__call__(Event.DRAG_TOOL_ON);
@@ -101,7 +101,6 @@ export class DragTool extends Tool {
     super.off(call);
     this._container.HTML.removeEventListener("mousedown", this._dragStart);
     this._container.HTML.removeEventListener("touchstart", this._dragStart);
-    this._isOn = false;
 
     if (call) {
       this._container.__call__(Event.DRAG_TOOL_OFF);
