@@ -89,16 +89,17 @@ export class Path {
 
     let pathArray = pathString
       .replace(/\s*,\s*/g, " ")
-      .matchAll(/[MmLlHhVvCcSsQqTtAaZz][\s.\d]*/g);
+      .matchAll(/[MmLlHhVvCcSsQqTtAaZz][\s\.\-\d]*/g);
 
     for (let commandString of pathArray) {
       let commandArray = commandString.toString().trim().split(" ");
+
       switch (commandArray[0]) {
         case "M":
         case "m":
           let moveTo = new MoveTo({
-            x: parseInt(commandArray[1]),
-            y: parseInt(commandArray[2])
+            x: parseFloat(commandArray[1]),
+            y: parseFloat(commandArray[2])
           });
           this.add(moveTo);
           break;
@@ -106,8 +107,8 @@ export class Path {
         case "L":
         case "l":
           let lineTo = new LineTo({
-            x: parseInt(commandArray[1]),
-            y: parseInt(commandArray[2])
+            x: parseFloat(commandArray[1]),
+            y: parseFloat(commandArray[2])
           });
           this.add(lineTo);
           break;
@@ -115,7 +116,7 @@ export class Path {
         case "H":
         case "h":
           let hLineTo = new HLineTo({
-            x: parseInt(commandArray[1]),
+            x: parseFloat(commandArray[1]),
             y: 0
           });
           this.add(hLineTo);
@@ -125,7 +126,7 @@ export class Path {
         case "v":
           let vLineTo = new VLineTo({
             x: 0,
-            y: parseInt(commandArray[1])
+            y: parseFloat(commandArray[1])
           });
           this.add(vLineTo);
           break;
@@ -133,14 +134,14 @@ export class Path {
         case "C":
         case "c":
           let cBezier = new CBezier({
-            x: parseInt(commandArray[1]),
-            y: parseInt(commandArray[2])
+            x: parseFloat(commandArray[1]),
+            y: parseFloat(commandArray[2])
           },{
-            x: parseInt(commandArray[3]),
-            y: parseInt(commandArray[4])
+            x: parseFloat(commandArray[3]),
+            y: parseFloat(commandArray[4])
           },{
-            x: parseInt(commandArray[5]),
-            y: parseInt(commandArray[6])
+            x: parseFloat(commandArray[5]),
+            y: parseFloat(commandArray[6])
           });
           this.add(cBezier);
           break;
@@ -148,11 +149,11 @@ export class Path {
         case "S":
         case "s":
           let sCBezier = new SCBezier({
-            x: parseInt(commandArray[1]),
-            y: parseInt(commandArray[2])
+            x: parseFloat(commandArray[1]),
+            y: parseFloat(commandArray[2])
           },{
-            x: parseInt(commandArray[3]),
-            y: parseInt(commandArray[4])
+            x: parseFloat(commandArray[3]),
+            y: parseFloat(commandArray[4])
           });
           this.add(sCBezier);
           break;
@@ -160,11 +161,11 @@ export class Path {
         case "Q":
         case "q":
           let qBezier = new QBezier({
-            x: parseInt(commandArray[1]),
-            y: parseInt(commandArray[2])
+            x: parseFloat(commandArray[1]),
+            y: parseFloat(commandArray[2])
           },{
-            x: parseInt(commandArray[3]),
-            y: parseInt(commandArray[4])
+            x: parseFloat(commandArray[3]),
+            y: parseFloat(commandArray[4])
           });
           this.add(qBezier);
           break;
@@ -172,8 +173,8 @@ export class Path {
         case "T":
         case "t":
           let sQBezier = new SQBezier({
-            x: parseInt(commandArray[1]),
-            y: parseInt(commandArray[2])
+            x: parseFloat(commandArray[1]),
+            y: parseFloat(commandArray[2])
           });
           this.add(sQBezier);
           break;
@@ -181,13 +182,13 @@ export class Path {
         case "A":
         case "a":
           let arc = new Arc(
-            parseInt(commandArray[1]),
-            parseInt(commandArray[2]),
-            parseInt(commandArray[3]),
-            parseInt(commandArray[4]),
-            parseInt(commandArray[5]), {
-            x: parseInt(commandArray[6]),
-            y: parseInt(commandArray[7])
+            parseFloat(commandArray[1]),
+            parseFloat(commandArray[2]),
+            parseFloat(commandArray[3]),
+            parseFloat(commandArray[4]),
+            parseFloat(commandArray[5]), {
+            x: parseFloat(commandArray[6]),
+            y: parseFloat(commandArray[7])
           });
           this.add(arc);
           break;
