@@ -154,7 +154,7 @@ export class BoundingBox extends BoxView {
     this._rect.height = Math.abs(this._rect.height);
 
     let points = this.points;
-    if (/*!points || */!this._grips) return
+    if (/*!points || */!this._grips) return;
     for (let grip of this._grips)
       grip.__setPosition__(points);
 

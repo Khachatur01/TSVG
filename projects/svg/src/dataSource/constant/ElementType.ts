@@ -16,5 +16,6 @@ export enum ElementType {
   TEXT_BOX,
   IMAGE,
   VIDEO,
-  GRAPHIC
+  GRAPHIC,
+  TABLE
 }

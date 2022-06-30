@@ -1,37 +1,34 @@
-import {EllipseView} from "../../../element/shape/circluar/EllipseView";
-import {Point} from "../../../model/Point";
-import {EditTool} from "./EditTool";
-import {Rect} from "../../../model/Rect";
-import {Matrix} from "../../math/Matrix";
-import {Container} from "../../../Container";
-import {Event} from "../../../dataSource/constant/Event";
-import {Cursor} from "../../../dataSource/constant/Cursor";
+import {EditTableTool} from "./EditTableTool";
+import {Container} from "../../../../Container";
+import {LineView} from "../../../../element/shape/pointed/LineView";
+import {Point} from "../../../../model/Point";
+import {Event} from "../../../../dataSource/constant/Event";
+import {Matrix} from "../../../math/Matrix";
+import {Rect} from "../../../../model/Rect";
+import {Table} from "../../../../dataSource/constant/Table";
 
-export class Node extends EllipseView {
-  private readonly editTool: EditTool;
+export class TableGrip {
+  private readonly editTool: EditTableTool;
+  private readonly type: Table;
   private readonly order: number;
+  private readonly _container: Container;
+  private lineView: LineView;
 
   private _start = this.onStart.bind(this);
   private _move = this.onMove.bind(this);
   private _end = this.onEnd.bind(this);
 
-  public constructor(container: Container, editTool: EditTool, position: Point, order: number) {
-    super(container, {overEvent: true, globalStyle: false}, {x: position.x - 8, y: position.y - 8, width: 16, height: 16});
-    this.style.fillColor = "white";
-    this.style.strokeColor = "black";
-    this.style.strokeWidth = "1";
-    this.svgElement.style.cursor = this._container.style.cursor[Cursor.NODE];
+  public constructor(container: Container, editTool: EditTableTool, type: Table, order: number, lineView: LineView) {
     this.editTool = editTool;
+    this.type = type;
     this.order = order;
-  }
-
-  public override __drag__(delta: Point) {
-    super.__drag__({x: delta.x - 8, y: delta.y - 8});
+    this._container = container;
+    this.lineView = lineView;
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
     if (call) {
-      this._container.__call__(Event.NODE_EDIT_MOUSE_DOWN, {order: this.order, position: position, element: this.editTool.editableElement});
+      this._container.__call__(Event.TABLE_EDIT_MOUSE_DOWN, {type: this.type, order: this.order, position: position, element: this.editTool.editableElement});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
@@ -42,11 +39,19 @@ export class Node extends EllipseView {
       this.editTool.editableElement.angle
     )[0];
 
-    this.editTool.editableElement.replacePoint(this.order, rotatedPosition);
-    this.__drag__(rotatedPosition);
+    switch (this.type) {
+      case Table.ROW:
+        let previousLineY: number = this.editTool.editableElement.getRowsHeight(0, this.order - 1);
+        this.editTool.editableElement.modifyRow(this.order, rotatedPosition.y - (previousLineY + this.editTool.editableElement.getRect().y));
+        break;
+      case Table.COL:
+        let previousLineX: number = this.editTool.editableElement.getColsWidth(0, this.order - 1);
+        this.editTool.editableElement.modifyCol(this.order, rotatedPosition.x - (previousLineX + this.editTool.editableElement.getRect().x));
+        break;
+    }
 
     if (call) {
-      this._container.__call__(Event.NODE_EDIT_MOUSE_MOVE, {order: this.order, position: position, element: this.editTool.editableElement});
+      this._container.__call__(Event.TABLE_EDIT_MOUSE_MOVE, {type: this.type, order: this.order, position: position, element: this.editTool.editableElement});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
@@ -58,9 +63,10 @@ export class Node extends EllipseView {
       this.editTool.editableElement.angle
     )[0];
 
+
     if (call) {
-      this._container.__call__(Event.NODE_EDIT_MOUSE_UP, {order: this.order, position: position, element: this.editTool.editableElement});
-      this._container.__call__(Event.NODE_EDITED, {order: this.order, position: rotatedPosition, element: this.editTool.editableElement});
+      this._container.__call__(Event.TABLE_EDIT_MOUSE_UP, {type: this.type, order: this.order, position: position, element: this.editTool.editableElement});
+      this._container.__call__(Event.TABLE_EDITED, {type: this.type, order: this.order, position: rotatedPosition, element: this.editTool.editableElement});
     }
   }
 
@@ -69,6 +75,8 @@ export class Node extends EllipseView {
     this.editTool.container.HTML.addEventListener("touchmove", this._move);
     document.addEventListener("mouseup", this._end);
     document.addEventListener("touchend", this._end);
+    this.lineView.SVG.style.cursor = "grabbing";
+    this._container.HTML.style.cursor = "grabbing";
 
     let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
@@ -97,6 +105,8 @@ export class Node extends EllipseView {
     this.editTool.container.HTML.removeEventListener("touchmove", this._move);
     document.removeEventListener("mouseup", this._end);
     document.removeEventListener("touchend", this._end);
+    this.lineView.SVG.style.cursor = "grab";
+    this._container.HTML.style.cursor = "default";
 
     let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
@@ -110,11 +120,15 @@ export class Node extends EllipseView {
   };
 
   public __on__() {
-    this.svgElement.addEventListener("mousedown", this._start);
-    this.svgElement.addEventListener("touchstart", this._start);
+    this.lineView.SVG.addEventListener("mousedown", this._start);
+    this.lineView.SVG.addEventListener("touchstart", this._start);
+    this.lineView.SVG.style.cursor = "grab";
+    this._container.HTML.style.cursor = "grab";
   }
   public __off__() {
-    this.svgElement.removeEventListener("mousedown", this._start);
-    this.svgElement.removeEventListener("touchstart", this._start);
+    this.lineView.SVG.removeEventListener("mousedown", this._start);
+    this.lineView.SVG.removeEventListener("touchstart", this._start);
+    this.lineView.SVG.style.cursor = "default";
+    this._container.HTML.style.cursor = "default";
   }
 }

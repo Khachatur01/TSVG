@@ -8,7 +8,7 @@ import {ElementProperties} from "../../../../model/ElementProperties";
 export class FreeCursor extends PathCursor {
   constructor() {
     super();
-    this.cursor[Cursor.EDIT] = "auto";
+    this.cursor[Cursor.EDIT_NODE] = "auto";
   }
 }
 

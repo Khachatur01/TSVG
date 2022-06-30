@@ -11,7 +11,8 @@ export class RectangleCursor extends ElementCursor {}
 /*
 *  0_____1
 *  |     |
-* 3|_____|2
+*  |_____|
+* 3       2
 * */
 
 export class RectangleView extends PolygonView implements MoveDrawable {
@@ -55,6 +56,7 @@ export class RectangleView extends PolygonView implements MoveDrawable {
       x: rect.x,
       y: rect.y + rect.height
     });
+
     this._rect = ElementView.calculateRect(this._points);
 
     this.__updateView__();

@@ -1,15 +1,15 @@
-import {Tool} from "../Tool";
-import {Container} from "../../../Container";
-import {PointedView} from "../../../element/shape/pointed/PointedView";
-import {ElementView} from "../../../element/ElementView";
-import {Point} from "../../../model/Point";
+import {Tool} from "../../Tool";
+import {Container} from "../../../../Container";
+import {PointedView} from "../../../../element/shape/pointed/PointedView";
+import {ElementView} from "../../../../element/ElementView";
+import {Point} from "../../../../model/Point";
 import {Node} from "./Node";
-import {Event} from "../../../dataSource/constant/Event";
-import {Focus} from "../../edit/group/Focus";
-import {Cursor} from "../../../dataSource/constant/Cursor";
+import {Event} from "../../../../dataSource/constant/Event";
+import {Focus} from "../../../edit/group/Focus";
+import {Cursor} from "../../../../dataSource/constant/Cursor";
 
-export class EditTool extends Tool {
-  protected override _cursor: Cursor = Cursor.EDIT;
+export class EditNodeTool extends Tool {
+  protected override _cursor: Cursor = Cursor.EDIT_NODE;
   private readonly nodesGroup: SVGGElement;
   private nodes: Node[] = [];
   private _editableElement: PointedView | null = null;
@@ -43,12 +43,6 @@ export class EditTool extends Tool {
     return this.nodesGroup;
   }
 
-  public get nodeEditableElement(): PointedView | null {
-    if (this._editableElement instanceof PointedView) {
-      return this._editableElement;
-    }
-    return null;
-  }
   public get editableElement(): PointedView | null {
     return this._editableElement;
   }
@@ -89,12 +83,10 @@ export class EditTool extends Tool {
       }
     });
     this._container.blur();
-    if (this._editableElement)
-      this._container.focus(this._editableElement, false);
 
     this._container.style.changeCursor(this.cursor);
     if (call) {
-      this._container.__call__(Event.EDIT_TOOl_ON);
+      this._container.__call__(Event.EDIT_NODE_TOOl_ON);
     }
   }
   public override off(call: boolean = true): void {
@@ -103,7 +95,7 @@ export class EditTool extends Tool {
     this.removeEditableElement();
 
     if (call) {
-      this._container.__call__(Event.EDIT_TOOl_OFF);
+      this._container.__call__(Event.EDIT_NODE_TOOl_OFF);
     }
   }
 }

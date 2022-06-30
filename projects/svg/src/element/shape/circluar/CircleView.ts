@@ -10,7 +10,7 @@ import {ElementProperties} from "../../../model/ElementProperties";
 export class CircleCursor extends ElementCursor {
   constructor() {
     super();
-    this.cursor[Cursor.EDIT] = "auto";
+    this.cursor[Cursor.EDIT_NODE] = "auto";
   }
 }
 

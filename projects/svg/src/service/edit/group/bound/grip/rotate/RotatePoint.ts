@@ -44,10 +44,7 @@ export class RotatePoint extends PathView {
       position
     ) - this.focus.angle;
 
-    this.focus.children.forEach((child: ElementView) => {
-      child.__fixAngle__();
-    });
-    this.focus.__lastAngle__ = this.getAngle(position);
+    this.focus.__fixAngle__();
 
     if (call) {
       this._container.__call__(Event.ROTATE_MOUSE_DOWN, {position: position, refPoint: this.focus.__refPoint__, elements: this.focus.children});

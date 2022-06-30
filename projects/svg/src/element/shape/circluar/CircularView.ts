@@ -80,7 +80,7 @@ export abstract class CircularView extends ShapeView implements MoveDrawable{
     /* get the bounding box */
     let rotatedBoundingRect: Rect = pathEllipse.SVG.getBoundingClientRect();
     /* and delete it from screen */
-    this._container.remove(pathEllipse);
+    this._container.remove(pathEllipse, true, false);
 
     rotatedBoundingRect.x -= containerRect.x;
     rotatedBoundingRect.y -= containerRect.y;

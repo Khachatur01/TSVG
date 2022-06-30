@@ -12,6 +12,8 @@ import {Matrix} from "../../math/Matrix";
 import {CircularView} from "../../../element/shape/circluar/CircularView";
 import {PointedView} from "../../../element/shape/pointed/PointedView";
 import {ElementProperties} from "../../../model/ElementProperties";
+import {CircleView} from "../../../element/shape/circluar/CircleView";
+import {TableView} from "../../../element/complex/TableView";
 
 export class Focus implements Draggable, Resizeable {
   private readonly container: Container;
@@ -243,6 +245,14 @@ export class Focus implements Draggable, Resizeable {
     }
     return false;
   }
+  public containsTableElement(): boolean {
+    for (const child of this._children) {
+      if (child instanceof TableView) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   public __translate__(delta: Point) {
     this._children.forEach(child => child.__translate__(delta));
@@ -307,7 +317,7 @@ export class Focus implements Draggable, Resizeable {
     if (this._children.size == 1) {
       this._children.forEach(child => child.__setRect__(rect, delta));
     } else {
-      /* TODO */
+      this._children.forEach(child => child.__setRect__(rect, delta));
     }
     this.__fit__();
   }
@@ -404,6 +414,9 @@ export class Focus implements Draggable, Resizeable {
   }
   public __fixAngle__(): void {
     this.___lastAngle__ = this.angle;
+    this._children.forEach((child: ElementView) => {
+      child.__fixAngle__();
+    });
   }
 
   public hasChild(xElement: ElementView): boolean {
@@ -462,9 +475,17 @@ export class Focus implements Draggable, Resizeable {
       );
     this.boundingBox.__rotate__(angle);
   }
-  public rotate(angle: number) {
-    this.__fixAngle__();
-    this.__rotate__(angle);
+
+  /**
+   * @param toAngle rotate focused element to this angle from fromAngle
+   * @param fromAngle rotate focused elements from this angle to toAngle
+   * */
+  public rotate(toAngle: number, fromAngle: number = 0) {
+    this.__lastAngle__ = fromAngle;
+    this._children.forEach((child: ElementView) => {
+      child.__fixAngle__();
+    });
+    this.__rotate__(toAngle);
   }
 
   public __fit__(): void {
@@ -488,7 +509,7 @@ export class Focus implements Draggable, Resizeable {
       let [singleElement] = this._children;
       if (singleElement instanceof GroupView) {
         this.boundingBox.__multipleFocus__(rotatable);
-      } else if (singleElement instanceof CircularView) {
+      } else if (singleElement instanceof CircleView) {
         this.boundingBox.__onlyCircleFocus__(rotatable);
       } else {
         this.boundingBox.__singleFocus__(rotatable);

@@ -1,27 +1,26 @@
 import {Tool} from "../Tool";
 import {Container} from "../../../Container";
 import {Event} from "../../../dataSource/constant/Event";
-import {ElementView} from "../../../element/ElementView";
 import {Point} from "../../../model/Point";
 import {Cursor} from "../../../dataSource/constant/Cursor";
+import {PathView} from "../../../element/shape/PathView";
+import {Path} from "../../../model/path/Path";
 
 export class PointerTool extends Tool {
   protected override _cursor: Cursor = Cursor.POINTER;
-  private readonly _cursorSVG: SVGElement;
+  private _pointerPath: PathView;
+  private _isVisible: boolean = false;
 
   private _move = this.move.bind(this);
 
-  public constructor(container: Container, URI: string) {
+  public constructor(container: Container, path?: Path) {
     super(container);
-    this._cursorSVG = document.createElementNS(ElementView.svgURI, "image");
-    this._cursorSVG.setAttribute("href", URI);
-    this.hide();
+    this._pointerPath = new PathView(this._container, {}, path);
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {}
   public makeMouseMove(position: Point, call: boolean = true) {
-    this._cursorSVG.setAttribute("x", position.x + "");
-    this._cursorSVG.setAttribute("y", position.y + "");
+    this._pointerPath.__translate__(position);
 
     if (call) {
       this._container.__call__(Event.POINTER_MOVE, {position: position});
@@ -29,11 +28,67 @@ export class PointerTool extends Tool {
   }
   public makeMouseUp(position: Point, call: boolean = true) {}
 
-  public setCursor(URI: string, call: boolean = true) {
-    this._cursorSVG.setAttribute("href", URI);
+  public getStrokeWidth(): string {
+    return this._pointerPath.style.strokeWidth;
+  }
+  public setStrokeWidth(width: string, call: boolean = true) {
+    this._pointerPath.style.strokeWidth = width;
+    if (call) {
+      this._container.__call__(Event.POINTER_STROKE_WIDTH_CHANGE, {strokeWidth: width});
+    }
+  }
+  public getStrokeDasharray(): string {
+    return this._pointerPath.style.strokeDashArray;
+  }
+  public setStrokeDasharray(dashArray: string, call: boolean = true) {
+    this._pointerPath.style.strokeDashArray = dashArray;
+    if (call) {
+      this._container.__call__(Event.POINTER_STROKE_DASH_ARRAY_CHANGE, {strokeDashArray: dashArray});
+    }
+  }
+  public getStrokeColor(): string {
+    return this._pointerPath.style.strokeColor;
+  }
+  public setStrokeColor(color: string, call: boolean = true) {
+    this._pointerPath.style.strokeColor = color;
+    if (call) {
+      this._container.__call__(Event.POINTER_STROKE_COLOR_CHANGE, {strokeColor: color});
+    }
+  }
+  public getFillColor(): string {
+    return this._pointerPath.style.fillColor;
+  }
+  public setFillColor(color: string, call: boolean = true) {
+    this._pointerPath.style.fillColor = color;
+    if (call) {
+      this._container.__call__(Event.POINTER_FILL_COLOR_CHANGE, {fillColor: color});
+    }
+  }
+
+  public get isVisible(): boolean {
+    return this._isVisible;
+  }
+
+  public add() {
+    this._container.pointersGroup.appendChild(this._pointerPath.SVG);
+    this._isVisible = true;
+  }
+
+  public remove() {
+    try {
+      this._container.pointersGroup.removeChild(this._pointerPath.SVG);
+      this._isVisible = false;
+    } catch (e) {}
+  }
+
+  public getPath(): Path {
+    return this._pointerPath.path;
+  }
+  public setPath(path: Path, call: boolean = true) {
+    this._pointerPath = new PathView(this._container, {}, path);
 
     if (call) {
-      this._container.__call__(Event.POINTER_CHANGE, {URI: URI});
+      this._container.__call__(Event.POINTER_CHANGE, {pathView: path});
     }
   }
   private move(event: TouchEvent | MouseEvent): void {
@@ -48,24 +103,12 @@ export class PointerTool extends Tool {
     this.makeMouseMove(movePosition);
   }
 
-  private hide(): void {
-    this._cursorSVG.setAttribute("x", "-40");
-    this._cursorSVG.setAttribute("y", "-60");
-    this._cursorSVG.setAttribute("width", "40");
-    this._cursorSVG.setAttribute("height", "60");
-  }
-
-  public get SVG(): SVGElement {
-    return this._cursorSVG;
-  }
-
   public override on(call: boolean = true): void {
     super.on(call);
-    document.addEventListener("touchmove", this._move);
-    document.addEventListener("mousemove", this._move);
-    this._isOn = true;
+    this.add();
+    this._container.HTML.addEventListener("touchmove", this._move);
+    this._container.HTML.addEventListener("mousemove", this._move);
     this._container.blur();
-    this.hide();
 
     this._container.style.changeCursor(this.cursor);
     if (call) {
@@ -74,11 +117,9 @@ export class PointerTool extends Tool {
   }
   public override off(call: boolean = true): void {
     super.off();
-    document.removeEventListener("touchmove", this._move);
-    document.removeEventListener("mousemove", this._move);
-    this._container.HTML.style.cursor = "default";
-    this._isOn = false;
-    this.hide();
+    this.remove();
+    this._container.HTML.removeEventListener("touchmove", this._move);
+    this._container.HTML.removeEventListener("mousemove", this._move);
 
     if (call) {
       this._container.__call__(Event.POINTER_TOOl_OFF);

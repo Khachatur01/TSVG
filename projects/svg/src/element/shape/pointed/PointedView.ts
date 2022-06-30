@@ -93,9 +93,9 @@ export abstract class PointedView extends ShapeView {
       dh = delta.y;
     } else {
       if (this._lastRect.width != 0)
-        dw = rect.width / this._lastRect.width;
+        dw = rect.width / (/*this._lastRect.x - rect.x + */this._lastRect.width);
       if (this._lastRect.height != 0)
-        dh = rect.height / this._lastRect.height;
+        dh = rect.height / (/*this._lastRect.y - rect.y + */this._lastRect.height);
     }
 
     for (let i = 0; i < this._points.length; i++) {

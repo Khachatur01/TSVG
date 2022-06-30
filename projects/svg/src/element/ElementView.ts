@@ -17,7 +17,8 @@ export class ElementCursor {
   constructor() {
     this.cursor[Cursor.NO_TOOL] = "default";
     this.cursor[Cursor.SELECT] = "move";
-    this.cursor[Cursor.EDIT] = "default";
+    this.cursor[Cursor.EDIT_NODE] = "default";
+    this.cursor[Cursor.EDIT_TABLE] = "default";
   }
 }
 
@@ -158,7 +159,7 @@ export abstract class ElementView implements Resizeable, Draggable {
     if (properties.globalStyle) {
       try {
         this.style.setDefaultStyle();
-      } catch (e) {/* todo add exception handler */}
+      } catch (e) {}
     }
   }
 
@@ -173,7 +174,10 @@ export abstract class ElementView implements Resizeable, Draggable {
   public getRect(): Rect {
     return this._rect;
   };
-  public abstract __setRect__(rect: Rect, delta?: Point): void; /* if delta set, calculate rect width and height by delta */
+  /**
+   * if delta is set, calculate rect width and height by delta
+   * */
+  public abstract __setRect__(rect: Rect, delta?: Point): void;
 
 
   protected abstract __updateView__(): void;

@@ -84,6 +84,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   public override readonly style: ForeignObjectStyle;
   protected _content: HTMLElement;
   public readonly outline: string = "thin solid #999";
+  private _lastCommittedHTML: string = "";
   /* Model */
 
   public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
@@ -185,7 +186,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       this._container.__call__(Event.ASSET_EDIT, {element: this});
     });
     this._content.addEventListener("blur", () => {
-      this._container.__call__(Event.ASSET_EDIT_COMMIT, {element: this});
+      if (this._content.outerHTML !== this._lastCommittedHTML) {
+        this._container.__call__(Event.ASSET_EDIT_COMMIT, {element: this});
+        this._content.outerHTML = this._lastCommittedHTML;
+      }
     });
   }
 

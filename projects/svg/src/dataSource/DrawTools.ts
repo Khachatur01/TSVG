@@ -15,6 +15,7 @@ import {DrawForeignObject} from "../service/tool/draw/element/foreign/DrawForeig
 import {ElementType} from "./constant/ElementType";
 import {Drawer} from "../service/tool/draw/Drawer";
 import {DrawCircle} from "../service/tool/draw/element/shape/circular/DrawCircle";
+import {DrawTable} from "../service/tool/draw/element/complex/DrawTable";
 
 export class DrawTools {
   private readonly container: Container;
@@ -32,6 +33,7 @@ export class DrawTools {
   private readonly _image: DrawImage;
   private readonly _foreignObject: DrawForeignObject;
   private readonly _graphic: DrawGraphic;
+  private readonly _table: DrawTable;
 
   public constructor(container: Container) {
     this.container = container;
@@ -50,6 +52,7 @@ export class DrawTools {
     this._image = new DrawImage(container);
     this._foreignObject = new DrawForeignObject(container);
     this._graphic = new DrawGraphic(container);
+    this._table = new DrawTable(container);
   }
 
   public get free(): DrawFree {
@@ -94,6 +97,9 @@ export class DrawTools {
   public get graphic(): DrawGraphic {
     return this._graphic;
   }
+  public get table(): DrawTable {
+    return this._table;
+  }
 
   public getByType(type: ElementType): Drawer {
     switch (type) {
@@ -133,6 +139,8 @@ export class DrawTools {
         return this._video;
       case ElementType.GRAPHIC:
         return this._graphic;
+      case ElementType.TABLE:
+        return this._table;
       default:
         throw Error("Type is incorrect");
     }

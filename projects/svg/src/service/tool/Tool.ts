@@ -11,9 +11,9 @@ export abstract class Tool {
     this._container = container;
   }
 
-  abstract makeMouseDown(position: Point, call?: boolean, parameter?: any): void;
-  abstract makeMouseMove(position: Point, call?: boolean, parameter?: any): void;
-  abstract makeMouseUp(position: Point, call?: boolean, parameter?: any): void;
+  abstract makeMouseDown(position: Point, call?: boolean, additional?: any): void;
+  abstract makeMouseMove(position: Point, call?: boolean, additional?: any): void;
+  abstract makeMouseUp(position: Point, call?: boolean, additional?: any): void;
 
   public get container() {
     return this._container;

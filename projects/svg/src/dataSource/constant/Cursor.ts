@@ -1,7 +1,8 @@
 export enum Cursor {
   NO_TOOL,
   SELECT,
-  EDIT,
+  EDIT_NODE,
+  EDIT_TABLE,
   DRAW,
   DRAW_FREE,
   POINTER,

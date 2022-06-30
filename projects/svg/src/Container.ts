@@ -3,7 +3,7 @@ import {ElementView} from "./element/ElementView";
 import {Focus} from "./service/edit/group/Focus";
 import {SelectTool} from "./service/tool/select/SelectTool";
 import {Tool} from "./service/tool/Tool";
-import {EditTool} from "./service/tool/edit/EditTool";
+import {EditNodeTool} from "./service/tool/edit/node/EditNodeTool";
 import {DrawTools} from "./dataSource/DrawTools";
 import {Grid} from "./service/grid/Grid";
 import {Event} from "./dataSource/constant/Event";
@@ -18,7 +18,7 @@ import {ForeignObjectCursor, ForeignObjectView} from "./element/foreign/ForeignO
 import {ElementType} from "./dataSource/constant/ElementType";
 import {EllipseCursor} from "./element/shape/circluar/EllipseView";
 import {BoxCursor} from "./element/shape/BoxView";
-import {PathCursor} from "./element/shape/PathView";
+import {PathCursor, PathView} from "./element/shape/PathView";
 import {LineCursor} from "./element/shape/pointed/LineView";
 import {FreeCursor} from "./element/shape/pointed/polyline/FreeView";
 import {PolylineCursor} from "./element/shape/pointed/polyline/PolylineView";
@@ -32,6 +32,8 @@ import {VideoCursor} from "./element/foreign/media/VideoView";
 import {GraphicCursor} from "./element/foreign/graphic/GraphicView";
 import {CircleCursor} from "./element/shape/circluar/CircleView";
 import {DrawTextBox} from "./service/tool/draw/element/foreign/DrawTextBox";
+import {TableCursor} from "./element/complex/TableView";
+import {EditTableTool} from "./service/tool/edit/table/EditTableTool";
 
 class GlobalStyle extends Style {
   private readonly default: Style;
@@ -50,7 +52,8 @@ class GlobalStyle extends Style {
     this.cursor[Cursor.DRAW] = "crosshair";
     this.cursor[Cursor.DRAW_FREE] = "crosshair";
     this.cursor[Cursor.SELECT] = "default";
-    this.cursor[Cursor.EDIT] = "default";
+    this.cursor[Cursor.EDIT_NODE] = "default";
+    this.cursor[Cursor.EDIT_TABLE] = "default";
     this.cursor[Cursor.POINTER] = "none";
     this.cursor[Cursor.HIGHLIGHTER] = "crosshair";
     this.cursor[Cursor.BOUNDING_BOX] = "move";
@@ -77,6 +80,7 @@ class GlobalStyle extends Style {
     this.cursor.element[ElementType.IMAGE] = new ImageCursor();
     this.cursor.element[ElementType.VIDEO] = new VideoCursor();
     this.cursor.element[ElementType.GRAPHIC] = new GraphicCursor();
+    this.cursor.element[ElementType.TABLE] = new TableCursor();
   }
 
   public override get strokeWidth(): string {
@@ -239,6 +243,7 @@ export class Container {
 
   private readonly container: HTMLElement;
   public readonly elementsGroup: SVGGElement;
+  public readonly pointersGroup: SVGGElement;
 
   /* Model */
   public readonly id: number;
@@ -257,7 +262,8 @@ export class Container {
   public readonly highlightTool: HighlightTool;
   public readonly pointerTool: PointerTool;
   public readonly drawTool: DrawTool;
-  public readonly editTool: EditTool;
+  public readonly editNodeTool: EditNodeTool;
+  public readonly editTableTool: EditTableTool;
   /* tools */
 
   public readonly grid: Grid;
@@ -282,9 +288,10 @@ export class Container {
     this._focus.on();
     this.drawTool = new DrawTool(this);
     this.highlightTool = new HighlightTool(this);
-    this.pointerTool = new PointerTool(this, "");
+    this.pointerTool = new PointerTool(this);
     this.selectTool = new SelectTool(this, this._focus);
-    this.editTool = new EditTool(this, this._focus);
+    this.editNodeTool = new EditNodeTool(this, this._focus);
+    this.editTableTool = new EditTableTool(this, this._focus);
     this.activeTool = this.selectTool;
     this.grid = new Grid(this);
     this.style = new GlobalStyle(this);
@@ -292,7 +299,7 @@ export class Container {
     this.container.addEventListener("mousedown", event => {
       if (event.target == this.container && !this.drawTool.isOn()) {
         this.blur();
-        if (this.editTool.isOn()) {
+        if (this.editNodeTool.isOn()) {
           this.drawTool.tool = this.drawTools.free;
           this.drawTool.on();
         }
@@ -301,7 +308,7 @@ export class Container {
     this.container.addEventListener("touchstart", event => {
       if (event.target == this.container && !this.drawTool.isOn()) {
         this.blur();
-        if (this.editTool.isOn()) {
+        if (this.editNodeTool.isOn()) {
           this.drawTool.tool = this.drawTools.free;
           this.drawTool.on();
         }
@@ -311,12 +318,15 @@ export class Container {
     this.elementsGroup = document.createElementNS(ElementView.svgURI, "g");
     this.elementsGroup.id = "elements";
 
+    this.pointersGroup = document.createElementNS(ElementView.svgURI, "g");
+    this.pointersGroup.id = "pointers";
+
     this.container.appendChild(this.grid.__group__); /* grid path */
     this.container.appendChild(this.elementsGroup); /* all elements */
     this.container.appendChild(this.highlightTool.SVG); /* highlight path */
-    this.container.appendChild(this.editTool.SVG); /* editing nodes */
+    this.container.appendChild(this.editNodeTool.SVG); /* editing nodes */
     this.container.appendChild(this._focus.SVG); /* bounding box, grips, rotation and reference point */
-    this.container.appendChild(this.pointerTool.SVG); /* pointer image */
+    this.container.appendChild(this.pointersGroup); /* all pointers */
 
     this.id = Container.nextContainerId
     Container.allContainers[Container.nextContainerId] = this;
@@ -367,9 +377,9 @@ export class Container {
   }
 
   private clickEvent(element: ElementView) {
-    if (this.editTool.isOn() && this.editTool.editableElement != element) {
+    if (this.editNodeTool.isOn() && this.editNodeTool.editableElement != element) {
       this.blur();
-      if (this.editTool.isOn()) {
+      if (this.editNodeTool.isOn()) {
         this.drawTool.tool = this.drawTools.free;
         this.drawTool.on();
       }

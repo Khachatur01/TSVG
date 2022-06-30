@@ -15,6 +15,7 @@ export class TextBoxCursor extends ElementCursor {
 export class TextBoxView extends ForeignObjectView {
   protected override _type: ElementType = ElementType.TEXT_BOX;
   protected override _content: HTMLTextAreaElement;
+  private _lastCommittedText: string = "";
 
   public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, removeOnEmpty: boolean = true, ownerId?: string, index?: number) {
     super(container, {}, rect, ownerId, index);
@@ -39,7 +40,7 @@ export class TextBoxView extends ForeignObjectView {
     this.addPasteEvent();
 
     if (removeOnEmpty) {
-      this._container.addCallBack(Event.EDIT_TOOl_OFF, () => {
+      this._container.addCallBack(Event.EDIT_NODE_TOOl_OFF, () => {
         if (this._content.value == "") {
           this._container.remove(this);
         }
@@ -71,12 +72,11 @@ export class TextBoxView extends ForeignObjectView {
         this._container.remove(this, true);
         this._container.selectTool.on();
       }
-      /* tool already changed to draw free */
-      if (this._container.drawTool.isOn()/* && this._container.drawTool.tool == this._container.drawTools.textBox*/) {
-        this._container.__call__(Event.TEXT_TYPING_COMMIT, {
-          text: this._content.value,
-          element: this
-        });
+      /* Tool already changed to draw free. No need to check */
+      /* if last committed text is equals to current text, don't call change callback */
+      if (this._container.drawTool.isOn() && this._lastCommittedText !== this._content.value/* && this._container.drawTool.tool == this._container.drawTools.textBox*/) {
+        this._lastCommittedText = this._content.value;
+        this._container.__call__(Event.TEXT_TYPING_COMMIT, {text: this._content.value, element: this});
       }
     });
   }

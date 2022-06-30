@@ -23,6 +23,7 @@ export class PolygonView extends PointedView {
 
   protected override __updateView__() {
     let string = "";
+
     this._points.forEach((point: Point) => {
       string += point.x + "," + point.y + " ";
     });
