@@ -9,7 +9,6 @@ import {PathView} from "../../../element/shape/PathView";
 import {GroupView} from "../../../element/group/GroupView";
 import {Event} from "../../../dataSource/constant/Event";
 import {Matrix} from "../../math/Matrix";
-import {CircularView} from "../../../element/shape/circluar/CircularView";
 import {PointedView} from "../../../element/shape/pointed/PointedView";
 import {ElementProperties} from "../../../model/ElementProperties";
 import {CircleView} from "../../../element/shape/circluar/CircleView";
@@ -141,7 +140,7 @@ export class Focus implements Draggable, Resizeable {
 
   public orderTop(call: boolean = true): void {
     this._children.forEach((child: ElementView) => {
-      this.container.elementsGroup.appendChild(child.SVG);
+      this.container.__elementsGroup__.appendChild(child.SVG);
       this.container.elements.delete(child);
       this.container.elements.add(child);
     });
@@ -155,9 +154,9 @@ export class Focus implements Draggable, Resizeable {
   public orderBottom(call: boolean = true): void {
     let newElements = new Set<ElementView>();
 
-    let firstChild = this.container.elementsGroup.firstChild;
+    let firstChild = this.container.__elementsGroup__.firstChild;
     this._children.forEach((child: ElementView) => {
-      this.container.elementsGroup.insertBefore(child.SVG, firstChild);
+      this.container.__elementsGroup__.insertBefore(child.SVG, firstChild);
       this.container.elements.delete(child);
       newElements.add(child);
     });

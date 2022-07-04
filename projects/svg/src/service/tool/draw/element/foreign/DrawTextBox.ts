@@ -4,8 +4,14 @@ import {ElementView} from "../../../../../element/ElementView";
 import {TextBoxView} from "../../../../../element/foreign/text/TextBoxView";
 import {Event} from "../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
+import {Container} from "../../../../../Container";
+import {Cursor} from "../../../../../dataSource/constant/Cursor";
 
 export class DrawTextBox extends MoveDraw {
+  public constructor(container: Container) {
+    super(container);
+    this.cursor = Cursor.DRAW_TEXT_BOX;
+  }
   protected createDrawableElement(position: Point): ElementView {
     let textBox = new TextBoxView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     textBox.__onFocus__(true);

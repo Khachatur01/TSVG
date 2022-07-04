@@ -70,13 +70,13 @@ export class PointerTool extends Tool {
   }
 
   public add() {
-    this._container.pointersGroup.appendChild(this._pointerPath.SVG);
+    this._container.__pointersGroup__.appendChild(this._pointerPath.SVG);
     this._isVisible = true;
   }
 
   public remove() {
     try {
-      this._container.pointersGroup.removeChild(this._pointerPath.SVG);
+      this._container.__pointersGroup__.removeChild(this._pointerPath.SVG);
       this._isVisible = false;
     } catch (e) {}
   }

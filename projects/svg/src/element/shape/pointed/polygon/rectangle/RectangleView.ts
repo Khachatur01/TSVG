@@ -18,7 +18,7 @@ export class RectangleCursor extends ElementCursor {}
 export class RectangleView extends PolygonView implements MoveDrawable {
   protected override _type: ElementType = ElementType.RECTANGLE;
 
-  public constructor(container: Container, properties: ElementProperties = {}, rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: ElementProperties = {}, rect = {x: 0, y: 0, width: 1, height: 1}, ownerId?: string, index?: number) {
     super(container, {}, [
       /* 0 */                                                                                        /* 1 */
       {x: rect.x, y: rect.y},                            {x: rect.width + rect.x, y: rect.y},

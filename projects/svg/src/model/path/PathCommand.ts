@@ -4,8 +4,9 @@ export abstract class PathCommand {
   protected _point: Point
   public close: boolean = false;
 
-  public constructor(point: Point) {
+  public constructor(point: Point, close: boolean = false) {
     this._point = point;
+    this.close = close;
   }
 
   public get position(): Point {

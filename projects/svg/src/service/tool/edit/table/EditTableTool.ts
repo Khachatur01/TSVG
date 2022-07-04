@@ -11,10 +11,13 @@ import {Table} from "../../../../dataSource/constant/Table";
 
 export class EditTableTool extends Tool {
   protected override _cursor: Cursor = Cursor.EDIT_NODE;
-  private rowGrips: TableGrip[] = [];
-  private colGrips: TableGrip[] = [];
+  public __topBorderGrip__: TableGrip | undefined;
+  public __leftBorderGrip__: TableGrip | undefined;
+  public __rowGrips__: TableGrip[] = [];
+  public __colGrips__: TableGrip[] = [];
   private _editableElement: TableView | null = null;
   public focus: Focus;
+  public showGrips: boolean = true;
 
   public constructor(container: Container, focus: Focus) {
     super(container);
@@ -24,32 +27,54 @@ export class EditTableTool extends Tool {
   public makeMouseDown(position: Point, call: boolean, additional: {order: number, type: Table}): void {
     switch (additional.type) {
       case Table.ROW:
-        this.rowGrips[additional.order].makeMouseDown(position, call);
+        if (additional.order == -1) {
+          this.__topBorderGrip__?.makeMouseDown(position, call);
+        } else {
+          this.__rowGrips__[additional.order].makeMouseDown(position, call);
+        }
         break;
       case Table.COL:
-        this.colGrips[additional.order].makeMouseDown(position, call);
+        if (additional.order == -1) {
+          this.__leftBorderGrip__?.makeMouseDown(position, call);
+        } else {
+          this.__colGrips__[additional.order].makeMouseDown(position, call);
+        }
         break;
     }
   }
-
   public makeMouseMove(position: Point, call: boolean, additional: {order: number, type: Table}): void {
     switch (additional.type) {
       case Table.ROW:
-        this.rowGrips[additional.order].makeMouseMove(position, call);
+        if (additional.order == -1) {
+          this.__topBorderGrip__?.makeMouseMove(position, call);
+        } else {
+          this.__rowGrips__[additional.order].makeMouseMove(position, call);
+        }
         break;
       case Table.COL:
-        this.colGrips[additional.order].makeMouseMove(position, call);
+        if (additional.order == -1) {
+          this.__leftBorderGrip__?.makeMouseMove(position, call);
+        } else {
+          this.__colGrips__[additional.order].makeMouseMove(position, call);
+        }
         break;
     }
   }
-
   public makeMouseUp(position: Point, call: boolean, additional: {order: number, type: Table}): void {
     switch (additional.type) {
       case Table.ROW:
-        this.rowGrips[additional.order].makeMouseUp(position, call);
+        if (additional.order == -1) {
+          this.__topBorderGrip__?.makeMouseUp(position, call);
+        } else {
+          this.__rowGrips__[additional.order].makeMouseUp(position, call);
+        }
         break;
       case Table.COL:
-        this.colGrips[additional.order].makeMouseUp(position, call);
+        if (additional.order == -1) {
+          this.__leftBorderGrip__?.makeMouseUp(position, call);
+        } else {
+          this.__colGrips__[additional.order].makeMouseUp(position, call);
+        }
         break;
     }
   }
@@ -64,34 +89,51 @@ export class EditTableTool extends Tool {
     this.focus.appendChild(editableElement, false, false);
     this._editableElement = editableElement;
 
+    this.__topBorderGrip__ = new TableGrip(this._container, this, Table.ROW, -1, this._editableElement.topBorder);
+    this.__topBorderGrip__.__on__();
+    this.__leftBorderGrip__ = new TableGrip(this._container, this, Table.COL, -1, this._editableElement.leftBorder);
+    this.__leftBorderGrip__.__on__();
+
+    if (this.showGrips) {
+      this._container.__nodesGroup__.appendChild(this.__leftBorderGrip__.SVG);
+      this._container.__nodesGroup__.appendChild(this.__topBorderGrip__.SVG);
+    }
+
     for (let i = 0; i < this._editableElement.rows.length; i++) {
       let line = this._editableElement.rows[i].line;
       if (line) {
-        this.rowGrips.push(
-          new TableGrip(this._container, this, Table.ROW, i, line)
-        );
+        let tableGrip = new TableGrip(this._container, this, Table.ROW, i, line);
+        this.__rowGrips__.push(tableGrip);
+        if (this.showGrips) {
+          this._container.__nodesGroup__.appendChild(tableGrip.SVG);
+        }
       }
-      this.rowGrips[i].__on__();
+      this.__rowGrips__[i].__on__();
     }
     for (let i = 0; i < this._editableElement.cols.length; i++) {
       let line = this._editableElement.cols[i].line;
       if (line) {
-        this.colGrips.push(
-          new TableGrip(this._container, this, Table.COL, i, line)
-        );
+        let tableGrip = new TableGrip(this._container, this, Table.COL, i, line);
+        this.__colGrips__.push(tableGrip);
+        if (this.showGrips) {
+          this._container.__nodesGroup__.appendChild(tableGrip.SVG);
+        }
       }
-      this.colGrips[i].__on__();
+      this.__colGrips__[i].__on__();
     }
   }
   public removeEditableElement() {
-    this.rowGrips.forEach(rowGrip => {
+    this._container.__nodesGroup__.innerHTML = "";
+    this.__topBorderGrip__?.__off__();
+    this.__leftBorderGrip__?.__off__();
+    this.__rowGrips__.forEach(rowGrip => {
       rowGrip.__off__();
     })
-    this.colGrips.forEach(colGrip => {
+    this.__colGrips__.forEach(colGrip => {
       colGrip.__off__();
     })
-    this.rowGrips = [];
-    this.colGrips = [];
+    this.__rowGrips__ = [];
+    this.__colGrips__ = [];
 
     if (!this._editableElement) return;
 
@@ -108,7 +150,6 @@ export class EditTableTool extends Tool {
     });
     this._container.blur();
 
-    this._container.style.changeCursor(this.cursor);
     if (call) {
       this._container.__call__(Event.EDIT_TABLE_TOOL_ON);
     }

@@ -8,10 +8,12 @@ import {ForeignView} from "../type/ForeignView";
 import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../dataSource/constant/ElementType";
 import {ElementProperties} from "../../model/ElementProperties";
+import {Cursor} from "../../dataSource/constant/Cursor";
 
 export class ForeignObjectCursor extends ElementCursor {
   constructor() {
     super();
+    this.cursor[Cursor.DRAW_TEXT_BOX] = "text";
   }
 }
 
@@ -247,6 +249,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
         this.__onBlur__();
       }
     });
+  }
+  public override set cursor(cursor: string) {
+    this.svgElement.style.cursor = cursor;
+    this._content.style.cursor = cursor;
   }
 
   public override get HTML(): HTMLElement | SVGElement {

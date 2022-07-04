@@ -10,15 +10,13 @@ import {Cursor} from "../../../../dataSource/constant/Cursor";
 
 export class EditNodeTool extends Tool {
   protected override _cursor: Cursor = Cursor.EDIT_NODE;
-  private readonly nodesGroup: SVGGElement;
   private nodes: Node[] = [];
   private _editableElement: PointedView | null = null;
   public focus: Focus;
+  public showNodes: boolean = true;
 
   public constructor(container: Container, focus: Focus) {
     super(container);
-    this.nodesGroup = document.createElementNS(ElementView.svgURI, "g");
-    this.nodesGroup.id = "nodes";
     this.focus = focus;
   }
 
@@ -33,14 +31,10 @@ export class EditNodeTool extends Tool {
   }
 
   private set refPoint(refPoint: Point) {
-    this.nodesGroup.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
+    this._container.__nodesGroup__.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
   }
   private rotate(angle: number) {
-    this.nodesGroup.style.transform = "rotate(" + angle + "deg)";
-  }
-
-  public get SVG(): SVGGElement {
-    return this.nodesGroup;
+    this._container.__nodesGroup__.style.transform = "rotate(" + angle + "deg)";
   }
 
   public get editableElement(): PointedView | null {
@@ -60,14 +54,16 @@ export class EditNodeTool extends Tool {
       let node: Node = new Node(this._container, this, point, order++);
       node.__on__();
       this.nodes.push(node);
-      this.nodesGroup.appendChild(node.SVG);
+      if (this.showNodes) {
+        this._container.__nodesGroup__.appendChild(node.SVG);
+      }
     }
 
     this.refPoint = editableElement.refPoint;
     this.rotate(editableElement.angle);
   }
   public removeEditableElement() {
-    this.nodesGroup.innerHTML = "";
+    this._container.__nodesGroup__.innerHTML = "";
     this.nodes = [];
     if (!this._editableElement) return;
 

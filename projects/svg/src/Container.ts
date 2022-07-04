@@ -18,7 +18,7 @@ import {ForeignObjectCursor, ForeignObjectView} from "./element/foreign/ForeignO
 import {ElementType} from "./dataSource/constant/ElementType";
 import {EllipseCursor} from "./element/shape/circluar/EllipseView";
 import {BoxCursor} from "./element/shape/BoxView";
-import {PathCursor, PathView} from "./element/shape/PathView";
+import {PathCursor} from "./element/shape/PathView";
 import {LineCursor} from "./element/shape/pointed/LineView";
 import {FreeCursor} from "./element/shape/pointed/polyline/FreeView";
 import {PolylineCursor} from "./element/shape/pointed/polyline/PolylineView";
@@ -51,6 +51,7 @@ class GlobalStyle extends Style {
     this.cursor[Cursor.NO_TOOL] = "default";
     this.cursor[Cursor.DRAW] = "crosshair";
     this.cursor[Cursor.DRAW_FREE] = "crosshair";
+    this.cursor[Cursor.DRAW_TEXT_BOX] = "crosshair";
     this.cursor[Cursor.SELECT] = "default";
     this.cursor[Cursor.EDIT_NODE] = "default";
     this.cursor[Cursor.EDIT_TABLE] = "default";
@@ -242,8 +243,9 @@ export class Container {
   private static nextContainerId = 0;
 
   private readonly container: HTMLElement;
-  public readonly elementsGroup: SVGGElement;
-  public readonly pointersGroup: SVGGElement;
+  public readonly __elementsGroup__: SVGGElement;
+  public readonly __pointersGroup__: SVGGElement;
+  public readonly __nodesGroup__: SVGGElement;
 
   /* Model */
   public readonly id: number;
@@ -315,18 +317,21 @@ export class Container {
       }
     });
 
-    this.elementsGroup = document.createElementNS(ElementView.svgURI, "g");
-    this.elementsGroup.id = "elements";
+    this.__elementsGroup__ = document.createElementNS(ElementView.svgURI, "g");
+    this.__elementsGroup__.id = "elements";
 
-    this.pointersGroup = document.createElementNS(ElementView.svgURI, "g");
-    this.pointersGroup.id = "pointers";
+    this.__pointersGroup__ = document.createElementNS(ElementView.svgURI, "g");
+    this.__pointersGroup__.id = "pointers";
+
+    this.__nodesGroup__ = document.createElementNS(ElementView.svgURI, "g");
+    this.__nodesGroup__.id = "nodes";
 
     this.container.appendChild(this.grid.__group__); /* grid path */
-    this.container.appendChild(this.elementsGroup); /* all elements */
+    this.container.appendChild(this.__elementsGroup__); /* all elements */
     this.container.appendChild(this.highlightTool.SVG); /* highlight path */
-    this.container.appendChild(this.editNodeTool.SVG); /* editing nodes */
+    this.container.appendChild(this.__nodesGroup__); /* editing nodes */
     this.container.appendChild(this._focus.SVG); /* bounding box, grips, rotation and reference point */
-    this.container.appendChild(this.pointersGroup); /* all pointers */
+    this.container.appendChild(this.__pointersGroup__); /* all pointers */
 
     this.id = Container.nextContainerId
     Container.allContainers[Container.nextContainerId] = this;
@@ -429,20 +434,12 @@ export class Container {
       cursor = this.HTML.style.cursor;
     }
 
-    if (element instanceof ForeignObjectView) { /* is element foreign object and has content, set cursor also for content */
-      if (element.selectable && this.drawTool.isOn() && this.drawTool.tool instanceof DrawTextBox) {
-        element.SVG.style.cursor = "text";
-        element.content.style.cursor = "text";
-      } else {
-        element.SVG.style.cursor = cursor;
-        element.content.style.cursor = cursor;
-      }
-    } else if (element instanceof GroupView) {
+    if (element instanceof GroupView) {
       element.elements.forEach((child: ElementView) => {
         this.__setElementCursor__(child, cursorType);
       });
     } else {
-      element.SVG.style.cursor = cursor;
+      element.cursor = cursor;
     }
   }
 
@@ -456,7 +453,7 @@ export class Container {
   public add(element: ElementView, setElementActivity: boolean = true) {
     if (!element) return;
     element.group = null;
-    this.elementsGroup.appendChild(element.SVG);
+    this.__elementsGroup__.appendChild(element.SVG);
     this._elements.add(element);
     if(setElementActivity) {
       this.__setElementActivity__(element);
@@ -477,7 +474,7 @@ export class Container {
   public clear() {
     this._focus.clear();
     this._elements.clear();
-    this.elementsGroup.innerHTML = "";
+    this.__elementsGroup__.innerHTML = "";
     this.drawTool.stopDrawing(false);
   }
 

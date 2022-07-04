@@ -5,10 +5,12 @@ import {ElementType} from "../../../dataSource/constant/ElementType";
 import {ElementCursor} from "../../ElementView";
 import {Rect} from "../../../model/Rect";
 import {ElementProperties} from "../../../model/ElementProperties";
+import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class TextBoxCursor extends ElementCursor {
   constructor() {
     super();
+    this.cursor[Cursor.DRAW_TEXT_BOX] = "text";
   }
 }
 

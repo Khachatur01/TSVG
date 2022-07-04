@@ -5,6 +5,7 @@ export enum Cursor {
   EDIT_TABLE,
   DRAW,
   DRAW_FREE,
+  DRAW_TEXT_BOX,
   POINTER,
   HIGHLIGHTER,
   BOUNDING_BOX,

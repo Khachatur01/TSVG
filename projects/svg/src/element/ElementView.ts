@@ -452,6 +452,14 @@ export abstract class ElementView implements Resizeable, Draggable {
       if (key && value)
         this.SVG.setAttribute(key, "" + value);
   }
+  public delAttr(attributes: string[]): void {
+    for (const attribute of attributes)
+      this.SVG.removeAttribute(attribute);
+  }
+
+  public set cursor(cursor: string) {
+    this.svgElement.style.cursor = cursor;
+  }
 
   public setOverEvent(): void {
     this.svgElement.addEventListener("mouseover", this._highlight);
