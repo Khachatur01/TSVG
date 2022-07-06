@@ -283,22 +283,27 @@ export class TableView extends ComplexView implements MoveDrawable {
     this._rows = [];
     this._cols = [];
 
+    if (rect.width < 0) {
+      rect.width = -rect.width;
+      rect.x -= rect.width;
+    }
+    if (rect.height < 0) {
+      rect.height = -rect.height;
+      rect.y -= rect.height;
+    }
+
     this._rect = rect;
 
     if (rows > 0) {
       let height = rect.height / rows;
       for (let i = 0; i < rows; i++) {
-        this._rows.push({
-          height: height
-        });
+        this._rows.push({height: height});
       }
     }
     if (cols > 0) {
       let width = rect.width / cols;
       for (let i = 0; i < cols; i++) {
-        this._cols.push({
-          width: width
-        });
+        this._cols.push({width: width});
       }
     }
     this.__rerenderView__();

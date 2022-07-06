@@ -420,14 +420,14 @@ export class Container {
   }
 
   public __setElementCursor__(element: ElementView, cursorType?: Cursor): void {
-    let cursor;
+    let cursor: string;
     if (!cursorType && cursorType !== 0) { /* cursorType can be 0 */
       cursorType = this.__activeCursor__;
     }
-    this.__activeCursor__ = cursorType;
 
     if (!element.selectable && this.style.cursor.element[element.type].cursor[cursorType] != "none" && (cursorType === Cursor.SELECT || cursorType === Cursor.NO_TOOL)) {
-      cursor = this.style.cursor[Cursor.NO_TOOL];
+      cursorType = this.activeTool?.cursor || Cursor.NO_TOOL;
+      cursor = this.style.cursor[cursorType];
     } else if (this.style.cursor.element[element.type].cursor[cursorType]) {
       cursor = this.style.cursor.element[element.type].cursor[cursorType];
     } else { /* set container cursor if element cursor is not defined */
@@ -441,6 +441,7 @@ export class Container {
     } else {
       element.cursor = cursor;
     }
+    this.__activeCursor__ = cursorType;
   }
 
   public get elements(): Set<ElementView> {
