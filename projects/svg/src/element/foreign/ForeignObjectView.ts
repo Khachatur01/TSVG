@@ -239,7 +239,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   }
   protected addFocusEvent(): void {
     this._content.addEventListener("focus", () => {
-      if (this._selectable && this._container.drawTool.isOn() && this._container.drawTool.tool == this._container.drawTools.textBox) {
+      if (this._selectable && this._container.tools.drawTool.isOn() && this._container.tools.drawTool.drawer == this._container.drawers.textBox) {
         this._container.blur();
         this._container.focus(this, false);
         this._content.focus();

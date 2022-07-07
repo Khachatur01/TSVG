@@ -1,20 +1,14 @@
-import {DrawTool} from "./service/tool/draw/DrawTool";
 import {ElementView} from "./element/ElementView";
 import {Focus} from "./service/edit/group/Focus";
-import {SelectTool} from "./service/tool/select/SelectTool";
-import {Tool} from "./service/tool/Tool";
-import {EditNodeTool} from "./service/tool/edit/node/EditNodeTool";
-import {DrawTools} from "./dataSource/DrawTools";
+import {Drawers} from "./dataSource/Drawers";
 import {Grid} from "./service/grid/Grid";
 import {Event} from "./dataSource/constant/Event";
 import {GroupCursor, GroupView} from "./element/group/GroupView";
 import {Style} from "./service/style/Style";
-import {HighlightTool} from "./service/tool/highlighter/HighlightTool";
-import {PointerTool} from "./service/tool/pointer/PointerTool";
 import {Point} from "./model/Point";
 import {TextBoxCursor} from "./element/foreign/text/TextBoxView";
 import {Cursor} from "./dataSource/constant/Cursor";
-import {ForeignObjectCursor, ForeignObjectView} from "./element/foreign/ForeignObjectView";
+import {ForeignObjectCursor} from "./element/foreign/ForeignObjectView";
 import {ElementType} from "./dataSource/constant/ElementType";
 import {EllipseCursor} from "./element/shape/circluar/EllipseView";
 import {BoxCursor} from "./element/shape/BoxView";
@@ -31,9 +25,8 @@ import {ImageCursor} from "./element/foreign/media/ImageView";
 import {VideoCursor} from "./element/foreign/media/VideoView";
 import {GraphicCursor} from "./element/foreign/graphic/GraphicView";
 import {CircleCursor} from "./element/shape/circluar/CircleView";
-import {DrawTextBox} from "./service/tool/draw/element/foreign/DrawTextBox";
 import {TableCursor} from "./element/complex/TableView";
-import {EditTableTool} from "./service/tool/edit/table/EditTableTool";
+import {Tools} from "./dataSource/Tools";
 
 class GlobalStyle extends Style {
   private readonly default: Style;
@@ -259,19 +252,10 @@ export class Container {
   public readonly ownerId: string;
   private elementIndex: number;
 
-  /* tools */
-  public readonly selectTool: SelectTool;
-  public readonly highlightTool: HighlightTool;
-  public readonly pointerTool: PointerTool;
-  public readonly drawTool: DrawTool;
-  public readonly editNodeTool: EditNodeTool;
-  public readonly editTableTool: EditTableTool;
-  /* tools */
-
   public readonly grid: Grid;
-  public readonly style: GlobalStyle = new GlobalStyle(this);
-  public readonly drawTools: DrawTools = new DrawTools(this);
-  public activeTool: Tool | null;
+  public readonly style: GlobalStyle;
+  public readonly drawers: Drawers;
+  public readonly tools: Tools;
   public __activeCursor__: Cursor = Cursor.NO_TOOL;
   /* Model */
 
@@ -288,31 +272,27 @@ export class Container {
 
     this._focus = new Focus(this);
     this._focus.on();
-    this.drawTool = new DrawTool(this);
-    this.highlightTool = new HighlightTool(this);
-    this.pointerTool = new PointerTool(this);
-    this.selectTool = new SelectTool(this, this._focus);
-    this.editNodeTool = new EditNodeTool(this, this._focus);
-    this.editTableTool = new EditTableTool(this, this._focus);
-    this.activeTool = this.selectTool;
+    this.style = new GlobalStyle(this);
+    this.drawers = new Drawers(this);
+    this.tools = new Tools(this);
     this.grid = new Grid(this);
     this.style = new GlobalStyle(this);
 
     this.container.addEventListener("mousedown", event => {
-      if (event.target == this.container && !this.drawTool.isOn()) {
+      if (event.target == this.container && !this.tools.drawTool.isOn()) {
         this.blur();
-        if (this.editNodeTool.isOn()) {
-          this.drawTool.tool = this.drawTools.free;
-          this.drawTool.on();
+        if (this.tools.editNodeTool.isOn()) {
+          this.tools.drawTool.drawer = this.drawers.free;
+          this.tools.drawTool.on();
         }
       }
     });
     this.container.addEventListener("touchstart", event => {
-      if (event.target == this.container && !this.drawTool.isOn()) {
+      if (event.target == this.container && !this.tools.drawTool.isOn()) {
         this.blur();
-        if (this.editNodeTool.isOn()) {
-          this.drawTool.tool = this.drawTools.free;
-          this.drawTool.on();
+        if (this.tools.editNodeTool.isOn()) {
+          this.tools.drawTool.drawer = this.drawers.free;
+          this.tools.drawTool.on();
         }
       }
     });
@@ -328,7 +308,7 @@ export class Container {
 
     this.container.appendChild(this.grid.__group__); /* grid path */
     this.container.appendChild(this.__elementsGroup__); /* all elements */
-    this.container.appendChild(this.highlightTool.SVG); /* highlight path */
+    this.container.appendChild(this.tools.highlightTool.SVG); /* highlight path */
     this.container.appendChild(this.__nodesGroup__); /* editing nodes */
     this.container.appendChild(this._focus.SVG); /* bounding box, grips, rotation and reference point */
     this.container.appendChild(this.__pointersGroup__); /* all pointers */
@@ -382,15 +362,15 @@ export class Container {
   }
 
   private clickEvent(element: ElementView) {
-    if (this.editNodeTool.isOn() && this.editNodeTool.editableElement != element) {
+    if (this.tools.editNodeTool.isOn() && this.tools.editNodeTool.editableElement != element) {
       this.blur();
-      if (this.editNodeTool.isOn()) {
-        this.drawTool.tool = this.drawTools.free;
-        this.drawTool.on();
+      if (this.tools.editNodeTool.isOn()) {
+        this.tools.drawTool.drawer = this.drawers.free;
+        this.tools.drawTool.on();
       }
       return;
     }
-    if (!this.selectTool.isOn()) {
+    if (!this.tools.selectTool.isOn()) {
       return;
     }
 
@@ -426,7 +406,7 @@ export class Container {
     }
 
     if (!element.selectable && this.style.cursor.element[element.type].cursor[cursorType] != "none" && (cursorType === Cursor.SELECT || cursorType === Cursor.NO_TOOL)) {
-      cursorType = this.activeTool?.cursor || Cursor.NO_TOOL;
+      cursorType = this.tools.activeTool?.cursor || Cursor.NO_TOOL;
       cursor = this.style.cursor[cursorType];
     } else if (this.style.cursor.element[element.type].cursor[cursorType]) {
       cursor = this.style.cursor.element[element.type].cursor[cursorType];
@@ -463,7 +443,7 @@ export class Container {
     this.__setElementCursor__(element /* this.activeTool?.cursor*/);
   }
   public remove(element: ElementView, force: boolean = false, call: boolean = true) {
-    if (force || this.selectTool.isOn()) { /* if force don't check if select tool is on */
+    if (force || this.tools.selectTool.isOn()) { /* if force don't check if select tool is on */
       element?.__remove__();
       this._elements.delete(element);
 
@@ -476,20 +456,23 @@ export class Container {
     this._focus.clear();
     this._elements.clear();
     this.__elementsGroup__.innerHTML = "";
-    this.drawTool.stopDrawing(false);
+    this.tools.drawTool.stopDrawing(false);
   }
 
   public get HTML(): HTMLElement {
     return this.container;
   }
 
-  public focusAll(showBounding: boolean = true) {
-    this.selectTool.on();
+  public focusAll(showBounding: boolean = true, call: boolean = true) {
+    this.tools.selectTool.on();
     this._elements.forEach((element: ElementView) => {
       if (element.selectable) {
-        this.focus(element, showBounding);
+        this.focus(element, showBounding, true, false);
       }
     });
+    if (call) {
+      this.__call__(Event.ALL_FOCUSED, {elements: this._elements});
+    }
   }
   public focus(element: ElementView, showBounding: boolean = true, changeGlobalStyle: boolean = true, call: boolean = true) {
     if (element.selectable) {
@@ -522,7 +505,7 @@ export class Container {
   }
   public set perfect(perfect: boolean) {
     this._perfect = perfect;
-    this.drawTool.perfect = perfect;
+    this.tools.drawTool.perfect = perfect;
     this._focus.boundingBox.perfect = perfect;
     if (perfect)
       this.__call__(Event.PERFECT_MODE_ON);

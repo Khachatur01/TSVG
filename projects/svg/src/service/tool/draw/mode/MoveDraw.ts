@@ -112,7 +112,7 @@ export abstract class MoveDraw extends Drawer {
   protected turnOnToolAfterDrawing(): void {
     if (this.drawTool?.toolAfterDrawing) {
       if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
-        this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
+        this.drawTool.toolAfterDrawing.drawer = this.container.drawers.free;
       }
       this.drawTool.toolAfterDrawing.on();
     }
@@ -156,7 +156,7 @@ export abstract class MoveDraw extends Drawer {
   }
 
   public override stopDrawing(call?: boolean) {
-    this.container.drawTool.__drawingEnd__();
+    this.container.tools.drawTool.__drawingEnd__();
 
     this.container.HTML.removeEventListener('mousemove', this._draw);
     this.container.HTML.removeEventListener('touchmove', this._draw);

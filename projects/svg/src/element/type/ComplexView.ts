@@ -1,5 +1,4 @@
 import {ElementView} from "../ElementView";
-import {Point} from "../../model/Point";
 
 export abstract class ComplexView extends ElementView {
   /** if ComplexView is svg element

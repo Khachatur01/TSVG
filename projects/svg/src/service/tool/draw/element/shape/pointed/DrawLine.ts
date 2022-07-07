@@ -31,7 +31,7 @@ export class DrawLine extends ClickDraw {
         this.container.__call__(Event.ELEMENT_CREATED, {element: drawableElementCopy});
       }
     }
-    this.container.drawTool.__drawingEnd__();
+    this.container.tools.drawTool.__drawingEnd__();
     if (call) {
       this.container.__call__(Event.STOP_CLICK_DRAWING);
     }

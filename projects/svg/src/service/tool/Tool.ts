@@ -24,8 +24,8 @@ export abstract class Tool {
   }
 
   public on(call: boolean = true): void {
-    this._container.activeTool?.off(call);
-    this._container.activeTool = this;
+    this._container.tools.activeTool?.off(call);
+    this._container.tools.activeTool = this;
     this._isOn = true;
   }
   public off(call: boolean = true): void {

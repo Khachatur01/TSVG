@@ -76,7 +76,7 @@ export class Focus implements Draggable, Resizeable {
     }
 
     if (call) {
-      this.container.__call__(Event.ELEMENT_FOCUSED, {element: element});
+      this.container.__call__(Event.ELEMENTS_FOCUSED, {elements: new Set([element])});
     }
   }
   public removeChild(element: ElementView, call: boolean = true): void {
@@ -108,7 +108,7 @@ export class Focus implements Draggable, Resizeable {
     }
 
     if (call) {
-      this.container.__call__(Event.ELEMENT_BLURRED, {element: element});
+      this.container.__call__(Event.ELEMENTS_BLURRED, {elements: new Set([element])});
     }
     this.__fit__();
   }
@@ -121,7 +121,7 @@ export class Focus implements Draggable, Resizeable {
     });
     this._children.clear();
     if (call) {
-      this.container.__call__(Event.BLURRED);
+      this.container.__call__(Event.ALL_BLURRED);
     }
   } /* blur all elements */
   public remove(call: boolean = true): void {
@@ -210,7 +210,7 @@ export class Focus implements Draggable, Resizeable {
 
     if (call) {
       this.container.__call__(Event.GROUP, {elements: children, group: group});
-      this.container.__call__(Event.ELEMENT_FOCUSED, {element: group});
+      this.container.__call__(Event.ELEMENTS_FOCUSED, {elements: group});
     }
 
     return group;
@@ -518,7 +518,7 @@ export class Focus implements Draggable, Resizeable {
   public __blur__(call: boolean = true) {
     this.boundingBox.__blur__();
     if (call) {
-      this.container.__call__(Event.BLURRED);
+      this.container.__call__(Event.ALL_BLURRED);
     }
   }
 
@@ -600,11 +600,12 @@ export class Focus implements Draggable, Resizeable {
       });
       this.container.add(element);
 
-      this.appendChild(element, sideEffects);
+      this.appendChild(element, sideEffects, true, false);
     });
 
     if (call) {
       this.container.__call__(Event.PASTE, {elements: newElements});
+      this.container.__call__(Event.ELEMENTS_FOCUSED, {elements: this._children});
     }
   }
 

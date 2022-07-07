@@ -33,10 +33,10 @@ export class DrawTool extends Tool {
     return this._drawer.cursor;
   }
 
-  public get tool(): Drawer {
+  public get drawer(): Drawer {
     return this._drawer;
   }
-  public set tool(drawer: Drawer) {
+  public set drawer(drawer: Drawer) {
     if (!drawer) return;
     this._drawer.stop();
     drawer.drawTool = this;

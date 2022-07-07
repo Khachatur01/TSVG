@@ -72,11 +72,11 @@ export class TextBoxView extends ForeignObjectView {
       this._content.scrollTop = 0;
       if (this._content.value == "") {
         this._container.remove(this, true);
-        this._container.selectTool.on();
+        this._container.tools.selectTool.on();
       }
       /* Tool already changed to draw free. No need to check */
       /* if last committed text is equals to current text, don't call change callback */
-      if (this._container.drawTool.isOn() && this._lastCommittedText !== this._content.value/* && this._container.drawTool.tool == this._container.drawTools.textBox*/) {
+      if (this._container.tools.drawTool.isOn() && this._lastCommittedText !== this._content.value/* && this._container.drawTool.tool == this._container.drawTools.textBox*/) {
         this._lastCommittedText = this._content.value;
         this._container.__call__(Event.TEXT_TYPING_COMMIT, {text: this._content.value, element: this});
       }

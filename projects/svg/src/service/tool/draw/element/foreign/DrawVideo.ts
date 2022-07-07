@@ -23,7 +23,7 @@ export class DrawVideo extends MoveDraw {
   }
   protected override onEnd(call: boolean) {
     if (call) {
-      this.container.selectTool.on();
+      this.container.tools.selectTool.on();
       if (this._drawableElement)
         this.container.focus(this._drawableElement);
     }

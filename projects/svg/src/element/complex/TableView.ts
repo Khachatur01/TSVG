@@ -30,6 +30,7 @@ export class TableView extends ComplexView implements MoveDrawable {
 
   private _lastRows: TableRow[] = [];
   private _lastCols: TableCol[] = [];
+  private _resizingRect: Rect = {x: 0, y: 0, width: 0, height: 0};
 
   private _rows: TableRow[] = [];
   private _cols: TableCol[] = [];
@@ -53,7 +54,7 @@ export class TableView extends ComplexView implements MoveDrawable {
     this._leftBorderLine = new LineView(this._container, {overEvent: false, globalStyle: false},
       {x: rect.x, y: rect.y}, {x: rect.x, y: rect.y + rect.height});
 
-    this.recreate(rect, rows, cols);
+    this.recreate(rect, rows, cols, false);
 
     this.svgElement.appendChild(this.background.SVG);
     this.svgElement.appendChild(this._topBorderLine.SVG);
@@ -136,8 +137,8 @@ export class TableView extends ComplexView implements MoveDrawable {
     this._rows.splice(after + 1, 0, {height: height});
     this.__rerenderView__();
 
-    if (this._container.editTableTool.isOn()) {
-      this._container.editTableTool.editableElement = this;
+    if (this._container.tools.editTableTool.isOn()) {
+      this._container.tools.editTableTool.editableElement = this;
     } else if (this._container.focused.children.has(this)) {
       this._container.focused.__fit__();
     }
@@ -153,8 +154,8 @@ export class TableView extends ComplexView implements MoveDrawable {
     this._cols.splice(after + 1, 0, {width: width});
     this.__rerenderView__();
 
-    if (this._container.editTableTool.isOn()) {
-      this._container.editTableTool.editableElement = this;
+    if (this._container.tools.editTableTool.isOn()) {
+      this._container.tools.editTableTool.editableElement = this;
     } else if (this._container.focused.children.has(this)) {
       this._container.focused.__fit__();
     }
@@ -171,8 +172,8 @@ export class TableView extends ComplexView implements MoveDrawable {
       this._rows.splice(index, 1);
       this.__rerenderView__();
 
-      if (this._container.editTableTool.isOn()) {
-        this._container.editTableTool.editableElement = this;
+      if (this._container.tools.editTableTool.isOn()) {
+        this._container.tools.editTableTool.editableElement = this;
       } else if (this._container.focused.children.has(this)) {
         this._container.focused.__fit__();
       }
@@ -190,8 +191,8 @@ export class TableView extends ComplexView implements MoveDrawable {
       this._cols.splice(index, 1);
       this.__rerenderView__();
 
-      if (this._container.editTableTool.isOn()) {
-        this._container.editTableTool.editableElement = this;
+      if (this._container.tools.editTableTool.isOn()) {
+        this._container.tools.editTableTool.editableElement = this;
       } else if (this._container.focused.children.has(this)) {
         this._container.focused.__fit__();
       }
@@ -210,10 +211,8 @@ export class TableView extends ComplexView implements MoveDrawable {
         this._rect.y -= deltaHeight;
         this._rect.height += deltaHeight;
         this.__updateView__();
-        return height;
-      } else {
-        return 0;
       }
+      return this._rows[index + 1].height;
     } else {
       let oldHeight: number = this._rows[index].height;
       let deltaHeight: number = height - oldHeight;
@@ -249,10 +248,8 @@ export class TableView extends ComplexView implements MoveDrawable {
         this._rect.x -= deltaWidth;
         this._rect.width += deltaWidth;
         this.__updateView__();
-        return width;
-      } else {
-        return 0;
       }
+      return this._cols[index + 1].width;
     } else {
       let oldWidth: number = this._cols[index].width;
       let deltaWidth: number = width - oldWidth;
@@ -327,6 +324,7 @@ export class TableView extends ComplexView implements MoveDrawable {
   public __drawSize__(rect: Rect): void {
     this.recreate(rect, this._rows.length, this._cols.length, false);
   }
+
   public __setRect__(rect: Rect, delta?: Point): void {
     let dw = 1;
     let dh = 1;
@@ -336,9 +334,9 @@ export class TableView extends ComplexView implements MoveDrawable {
       dh = delta.y;
     } else {
       if (this._lastRect.width != 0)
-        dw = rect.width / (/*this._lastRect.x - rect.x + */this._lastRect.width);
+        dw = rect.width / (this._lastRect.width);
       if (this._lastRect.height != 0)
-        dh = rect.height / (/*this._lastRect.y - rect.y + */this._lastRect.height);
+        dh = rect.height / (this._lastRect.height);
     }
 
     for (let i = 0; i < this._lastRows.length; i++) {
@@ -347,6 +345,19 @@ export class TableView extends ComplexView implements MoveDrawable {
     for (let i = 0; i < this._lastCols.length; i++) {
       this._cols[i].width = Math.abs(this._lastCols[i].width * dw);
     }
+
+    /*
+    * When changes resizing direction(fe. width: -20 -> 20 or height: 20 -> -20), columns or rows should be reversed.
+    * */
+    if (rect.width * this._resizingRect.width < 0) {
+      this._cols.reverse();
+      this._lastCols.reverse();
+    }
+    if (rect.height * this._resizingRect.height < 0) {
+      this._rows.reverse();
+      this._lastRows.reverse();
+    }
+    this._resizingRect = Object.assign({}, rect);
 
     if (rect.width < 0) {
       rect.x += rect.width;
@@ -449,6 +460,7 @@ export class TableView extends ComplexView implements MoveDrawable {
       this._lastCols.push({width: this._cols[i].width});
       this._cols[i].line?.__fixRect__();
     }
+    this._resizingRect = {x: 0, y: 0, width: 0, height: 0};
   }
 
   public get copyRows(): TableRow[] {

@@ -489,7 +489,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
 
   public __highlight__(): void {
-    if (!this._container.selectTool.isOn() || !this._selectable) {
+    if (!this._container.tools.selectTool.isOn() || !this._selectable) {
       return;
     }
     if (this._group && this._group._selectable) { /* if in group and selectable */

@@ -112,8 +112,6 @@ export class SelectTool extends Tool {
 
     this._container.HTML.removeChild(this.boundingBox.SVG);
 
-    this._container.multiSelect();
-
     for (let element of this._container.elements) {
       if (width > 0) { /* select box drawn from left to right */
         if (ElementView.rectInRect(element.getVisibleRect(), this.boundingBox.getRect())) {
@@ -127,10 +125,9 @@ export class SelectTool extends Tool {
       element.__lowlight__();
     }
 
-    this._container.singleSelect();
-
     if (call) {
       this._container.__call__(Event.SELECT_AREA_MOUSE_UP, {position: position});
+      this._container.__call__(Event.ELEMENTS_FOCUSED, {elements: this._container.focused.children});
     }
   }
 

@@ -143,7 +143,7 @@ export class DrawFree extends Drawer {
     if (this.drawTool?.isDrawing) {
       this.makeMouseUp({x: 0, y: 0}, call);
     }
-    this.container.drawTool.__drawingEnd__();
+    this.container.tools.drawTool.__drawingEnd__();
   }
 
   public start(call: boolean = true): void {

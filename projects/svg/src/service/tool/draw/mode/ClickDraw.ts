@@ -120,7 +120,7 @@ export abstract class ClickDraw extends Drawer {
     this.stopClickDrawing(call);
     if (this.drawTool?.toolAfterDrawing) {
       if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
-        this.drawTool.toolAfterDrawing.tool = this.container.drawTools.free;
+        this.drawTool.toolAfterDrawing.drawer = this.container.drawers.free;
       }
       this.drawTool.toolAfterDrawing.on();
     }

@@ -66,7 +66,7 @@ export abstract class Grip extends BoxView {
   public abstract __setPosition__(points: Point[]): void;
 
   private start(event: MouseEvent | TouchEvent) {
-    this._container.activeTool?.off();
+    this._container.tools.activeTool?.off();
     document.addEventListener("mousemove", this._move);
     document.addEventListener("touchmove", this._move);
     document.addEventListener("mouseup", this._end);
@@ -98,7 +98,7 @@ export abstract class Grip extends BoxView {
     this.makeMouseMove(client);
   }
   private end(event: MouseEvent | TouchEvent) {
-    this._container.activeTool?.on();
+    this._container.tools.activeTool?.on();
     document.removeEventListener("mousemove", this._move);
     document.removeEventListener("touchmove", this._move);
     document.removeEventListener("mouseup", this._end);
