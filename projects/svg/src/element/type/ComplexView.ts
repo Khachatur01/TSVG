@@ -1,18 +1,6 @@
 import {ElementView} from "../ElementView";
 
 export abstract class ComplexView extends ElementView {
-  /** if ComplexView is svg element
-  override __translate__(delta: Point) {
-    if (delta.x == 0 && delta.y == 0) {
-      this.delAttr(["x", "y"]);
-    } else {
-      this.setAttr({
-        x: delta.x,
-        y: delta.y
-      });
-    }
-  }*/
-
   override __onFocus__() {
     this.__highlight__();
   }

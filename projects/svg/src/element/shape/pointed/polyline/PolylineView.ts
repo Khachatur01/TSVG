@@ -13,7 +13,7 @@ export class PolylineView extends PointedView {
   protected override _type: ElementType = ElementType.POLYLINE;
 
   public constructor(container: Container, properties: ElementProperties = {}, points: Point[] = [], ownerId?: string, index?: number) {
-    super(container, {}, ownerId, index);
+    super(container, ownerId, index);
     this.svgElement.id = this.id;
 
     this.points = points;

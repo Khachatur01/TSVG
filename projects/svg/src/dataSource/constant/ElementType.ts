@@ -14,6 +14,7 @@ export enum ElementType {
   GROUP,
   FOREIGN_OBJECT,
   TEXT_BOX,
+  TEXT,
   IMAGE,
   VIDEO,
   GRAPHIC,

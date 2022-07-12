@@ -125,11 +125,11 @@ export abstract class ElementView implements Resizeable, Draggable {
 
   /**
    * @param container Container element that should contain this ElementView
-   * @param properties Simple object for element modification before creating {setOverEvent: boolean, setDefaultStyle: boolean}
+   // * @param properties Simple object for element modification before creating {setOverEvent: boolean, setDefaultStyle: boolean}
    * @param ownerId This element owner id. if not set, will get owner id of Container
    * @param index This element index. If not set, will generate new numerical value
    * */
-  public constructor(container: Container, properties: ElementProperties = {}, ownerId?: string, index?: number) {
+  public constructor(container: Container, ownerId?: string, index?: number) {
     this._container = container;
 
     /**
@@ -449,8 +449,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   }
   public setAttr(attributes: object): void {
     for (const [key, value] of Object.entries(attributes))
-      if (key && value)
-        this.SVG.setAttribute(key, "" + value);
+      this.SVG.setAttribute(key, "" + value);
   }
   public delAttr(attributes: string[]): void {
     for (const attribute of attributes)

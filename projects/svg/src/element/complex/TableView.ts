@@ -44,7 +44,7 @@ export class TableView extends ComplexView implements MoveDrawable {
                      cols: number = 0, rows: number = 0,
                      ownerId?: string, index?: number) {
 
-    super(container, {}, ownerId, index);
+    super(container, ownerId, index);
     this.svgElement.id = this.id;
 
     this.background = new RectangleView(this._container, {overEvent: false, globalStyle: false}, rect);

@@ -97,7 +97,7 @@ export class GroupView extends ElementView {
   /* Model */
 
   public constructor(container: Container, properties: ElementProperties = {}, ownerId?: string, index?: number) {
-    super(container, {}, ownerId, index);
+    super(container, ownerId, index);
     this.svgElement.id = this.id;
 
     this.setProperties(properties);

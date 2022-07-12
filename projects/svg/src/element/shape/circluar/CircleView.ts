@@ -19,7 +19,7 @@ export class CircleView extends CircularView {
   protected override _type: ElementType = ElementType.CIRCLE;
 
   public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
-    super(container, {}, ownerId, index);
+    super(container, ownerId, index);
     this.svgElement.id = this.id;
 
     this.__setRect__(rect);

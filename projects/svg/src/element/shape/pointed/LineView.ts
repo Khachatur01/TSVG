@@ -14,7 +14,7 @@ export class LineView extends PointedView implements MoveDrawable {
   protected override _type: ElementType = ElementType.LINE;
 
   public constructor(container: Container, properties: ElementProperties = {}, startPoint: Point = {x: 0, y: 0}, endPoint: Point = {x: 0, y: 0}, ownerId?: string, index?: number) {
-    super(container, {}, ownerId, index);
+    super(container, ownerId, index);
     this.svgElement.id = this.id;
 
     this.points = [startPoint, endPoint];

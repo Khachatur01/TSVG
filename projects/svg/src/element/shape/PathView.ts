@@ -21,7 +21,7 @@ export class PathView extends ShapeView {
   /* Model */
 
   public constructor(container: Container, properties: ElementProperties = {}, path: Path = new Path(), ownerId?: string, index?: number) {
-    super(container, {}, ownerId, index);
+    super(container, ownerId, index);
 
     this.svgElement.id = this.id;
 
@@ -89,8 +89,8 @@ export class PathView extends ShapeView {
     this.__updateView__();
   }
 
-  public addPath(path: PathView) {
-    path.commands.forEach((command: PathCommand) => {
+  public addPath(path: Path) {
+    path.getAll().forEach((command: PathCommand) => {
       this._path.add(command);
     });
 

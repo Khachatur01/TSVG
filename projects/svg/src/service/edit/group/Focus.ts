@@ -86,7 +86,7 @@ export class Focus implements Draggable, Resizeable {
     if (this._children.size == 0) {
       /* no element */
       this.container.style.__recoverGlobalStyle__();
-      this.__blur__();
+      this.__blur__(call);
     } else if (this._children.size == 1) {
       /* one element */
       this.container.style.__fixGlobalStyle__();
@@ -539,8 +539,10 @@ export class Focus implements Draggable, Resizeable {
 
     let path = new PathView(this.container, properties);
     this._children.forEach((child: ElementView) => {
-      path.addPath(child.toPath());
+      path.addPath(child.toPath().path);
     });
+    path.style.fillColor = "none";
+    path.style.strokeColor = "#000000";
     this.remove();
 
     this.container.add(path);

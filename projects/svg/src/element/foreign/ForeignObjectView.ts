@@ -90,7 +90,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   /* Model */
 
   public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
-    super(container, {}, ownerId, index);
+    super(container, ownerId, index);
     this.svgElement.id = this.id;
     this.svgElement.style.outline = "none";
     this.svgElement.style.border = "none";
@@ -162,10 +162,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   }
   protected __updateView__(): void {
     this.setAttr({
-      x: this._rect.x + "",
-      y: this._rect.y + "",
-      width: this._rect.width + "",
-      height: this._rect.height + ""
+      x: this._rect.x,
+      y: this._rect.y,
+      width: this._rect.width,
+      height: this._rect.height
     });
   }
 

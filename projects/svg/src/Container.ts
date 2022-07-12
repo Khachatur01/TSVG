@@ -270,9 +270,9 @@ export class Container {
     else
       throw new DOMException("Can't create container", "Container not found");
 
+    this.style = new GlobalStyle(this);
     this._focus = new Focus(this);
     this._focus.on();
-    this.style = new GlobalStyle(this);
     this.drawers = new Drawers(this);
     this.tools = new Tools(this);
     this.grid = new Grid(this);
@@ -280,20 +280,20 @@ export class Container {
 
     this.container.addEventListener("mousedown", event => {
       if (event.target == this.container && !this.tools.drawTool.isOn()) {
-        this.blur();
-        if (this.tools.editNodeTool.isOn()) {
+        if (this.tools.editNodeTool.isOn() || this.tools.editTableTool.isOn()) {
           this.tools.drawTool.drawer = this.drawers.free;
           this.tools.drawTool.on();
         }
+        this.blur();
       }
     });
     this.container.addEventListener("touchstart", event => {
       if (event.target == this.container && !this.tools.drawTool.isOn()) {
-        this.blur();
-        if (this.tools.editNodeTool.isOn()) {
+        if (this.tools.editNodeTool.isOn() || this.tools.editTableTool.isOn()) {
           this.tools.drawTool.drawer = this.drawers.free;
           this.tools.drawTool.on();
         }
+        this.blur();
       }
     });
 

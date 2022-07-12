@@ -16,6 +16,7 @@ import {ElementType} from "./constant/ElementType";
 import {Drawer} from "../service/tool/draw/Drawer";
 import {DrawCircle} from "../service/tool/draw/element/shape/circular/DrawCircle";
 import {DrawTable} from "../service/tool/draw/element/complex/DrawTable";
+import {DrawText} from "../service/tool/draw/element/foreign/DrawText";
 
 export class Drawers {
   private readonly container: Container;
@@ -29,6 +30,7 @@ export class Drawers {
   public readonly isoscelesTriangle: DrawIsoscelesTriangle;
   public readonly rightTriangle: DrawRightTriangle;
   public readonly textBox: DrawTextBox;
+  public readonly text: DrawText;
   public readonly video: DrawVideo;
   public readonly image: DrawImage;
   public readonly foreignObject: DrawForeignObject;
@@ -48,6 +50,7 @@ export class Drawers {
     this.isoscelesTriangle = new DrawIsoscelesTriangle(container);
     this.rightTriangle = new DrawRightTriangle(container);
     this.textBox = new DrawTextBox(container);
+    this.text = new DrawText(container);
     this.video = new DrawVideo(container);
     this.image = new DrawImage(container);
     this.foreignObject = new DrawForeignObject(container);
@@ -87,6 +90,8 @@ export class Drawers {
         return this.foreignObject;
       case ElementType.TEXT_BOX:
         return this.textBox;
+      case ElementType.TEXT:
+        return this.text;
       case ElementType.IMAGE:
         return this.image;
       case ElementType.VIDEO:
