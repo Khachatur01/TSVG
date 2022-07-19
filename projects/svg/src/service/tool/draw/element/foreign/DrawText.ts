@@ -1,7 +1,6 @@
 import {MoveDraw} from "../../mode/MoveDraw";
 import {Point} from "../../../../../model/Point";
 import {ElementView} from "../../../../../element/ElementView";
-import {TextBoxView} from "../../../../../element/foreign/text/TextBoxView";
 import {Event} from "../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
 import {Container} from "../../../../../Container";

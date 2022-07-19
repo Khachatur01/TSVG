@@ -222,10 +222,18 @@ export class RayView extends ComplexView implements ClickDrawable {
     this.__updateView__();
   }
 
-  private createSubStepPath(physicalStep: number, physicalSubStep: number, startPoint: Point, angle: number): Path {
-    let path: Path = new Path()
+  private createSubStepPath(physicalStep: number, physicalSubStep: number, mainStepPosition: Point, angle: number, maxLength?: number): Path {
+    let path: Path = new Path();
+    let subStepPhysicalLength = Angle.lineLength(this._startPoint, mainStepPosition);
+
     for (let subStepLength = physicalSubStep; subStepLength < physicalStep; subStepLength += physicalSubStep) {
-      let subStepPosition = Angle.lineFromVector(startPoint, angle, subStepLength);
+      let subStepPosition = Angle.lineFromVector(mainStepPosition, angle, subStepLength);
+
+      /* if sub steps position is outer from ray */
+      if (maxLength != undefined && (subStepPhysicalLength + subStepLength > maxLength)) {
+        break;
+      }
+
       let points = [
         {x: subStepPosition.x, y: subStepPosition.y - this.SUB_STEP_VIEW_SIZE},
         {x: subStepPosition.x, y: subStepPosition.y + this.SUB_STEP_VIEW_SIZE}
@@ -237,6 +245,7 @@ export class RayView extends ComplexView implements ClickDrawable {
       path.add(new MoveTo(points[0]));
       path.add(new LineTo(points[1]));
     }
+
     return path;
   }
   private createNumber(position: Point, number: number): TextView {
@@ -263,7 +272,7 @@ export class RayView extends ComplexView implements ClickDrawable {
 
     if (this._viewEffects.showSteps) {
       /* add sub steps before first step */
-      path.addPath(this.createSubStepPath(physicalStep, physicalSubStep, this._startPoint, angle));
+      path.addPath(this.createSubStepPath(physicalStep, physicalSubStep, this._startPoint, angle, lineLength));
       for (let stepLength = physicalStep; stepLength < lineLength; stepLength += physicalStep) {
         let stepPosition = Angle.lineFromVector(this._startPoint, angle, stepLength);
         let points = [
@@ -278,7 +287,7 @@ export class RayView extends ComplexView implements ClickDrawable {
         path.add(new LineTo(points[1]));
 
         /* add sub steps before current step */
-        path.addPath(this.createSubStepPath(physicalStep, physicalSubStep, stepPosition, angle));
+        path.addPath(this.createSubStepPath(physicalStep, physicalSubStep, stepPosition, angle, lineLength));
       }
     }
 
