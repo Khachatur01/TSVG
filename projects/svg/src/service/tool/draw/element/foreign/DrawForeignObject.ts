@@ -4,11 +4,12 @@ import {ElementView} from "../../../../../element/ElementView";
 import {ForeignObjectView} from "../../../../../element/foreign/ForeignObjectView";
 import {Event} from "../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
+import {MoveDrawable} from "../../type/MoveDrawable";
 
 export class DrawForeignObject extends MoveDraw {
   public content: string = "";
 
-  protected createDrawableElement(position: Point): ElementView {
+  protected createDrawableElement(position: Point): MoveDrawable {
     let videoView = new ForeignObjectView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     videoView.setContent(this.content);
     return videoView;

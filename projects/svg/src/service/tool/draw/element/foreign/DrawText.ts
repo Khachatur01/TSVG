@@ -6,6 +6,7 @@ import {ElementType} from "../../../../../dataSource/constant/ElementType";
 import {Container} from "../../../../../Container";
 import {Cursor} from "../../../../../dataSource/constant/Cursor";
 import {TextView} from "../../../../../element/foreign/text/TextView";
+import {MoveDrawable} from "../../type/MoveDrawable";
 
 export class DrawText extends MoveDraw {
   public text: string = "";
@@ -13,7 +14,7 @@ export class DrawText extends MoveDraw {
     super(container);
     this.cursor = Cursor.DRAW_TEXT_BOX;
   }
-  protected createDrawableElement(position: Point): ElementView {
+  protected createDrawableElement(position: Point): MoveDrawable {
     let text = new TextView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0}, this.text);
     text.__onFocus__();
     return text;

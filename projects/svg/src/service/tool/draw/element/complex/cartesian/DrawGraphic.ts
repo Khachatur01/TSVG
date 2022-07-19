@@ -8,7 +8,7 @@ import {GraphicView} from "../../../../../../element/complex/cartesian/GraphicVi
 
 export class DrawGraphic extends MoveDraw {
   public f: Function = (x: number) => x;
-  protected createDrawableElement(position: Point): ElementView {
+  protected createDrawableElement(position: Point): MoveDrawable {
     return new GraphicView(
       this.container,
       {overEvent: true, globalStyle: true},

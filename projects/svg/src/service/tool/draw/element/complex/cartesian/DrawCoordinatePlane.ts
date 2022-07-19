@@ -9,7 +9,7 @@ import {Style} from "../../../../../style/Style";
 
 export class DrawCoordinatePlane extends MoveDraw {
   public functions: {f: Function, style: Style}[] = [];
-  protected createDrawableElement(position: Point): ElementView {
+  protected createDrawableElement(position: Point): MoveDrawable {
     let coordinatePlane = new CoordinatePlaneView(this.container, {overEvent: true, globalStyle: false}, {x: position.x, y: position.y, width: 1, height: 1});
     this.functions.forEach(f => {
       coordinatePlane.addFunction(f.f, f.style);

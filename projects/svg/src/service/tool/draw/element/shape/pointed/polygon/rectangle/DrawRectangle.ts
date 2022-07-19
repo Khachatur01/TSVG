@@ -4,9 +4,10 @@ import {RectangleView} from "../../../../../../../../element/shape/pointed/polyg
 import {Point} from "../../../../../../../../model/Point";
 import {Event} from "../../../../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
+import {MoveDrawable} from "../../../../../type/MoveDrawable";
 
 export class DrawRectangle extends MoveDraw {
-  protected createDrawableElement(position: Point): ElementView {
+  protected createDrawableElement(position: Point): MoveDrawable {
     return new RectangleView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
   }
 

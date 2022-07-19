@@ -4,9 +4,10 @@ import {Point} from "../../../../../../model/Point";
 import {Event} from "../../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../../dataSource/constant/ElementType";
 import {CircleView} from "../../../../../../element/shape/circluar/CircleView";
+import {MoveDrawable} from "../../../type/MoveDrawable";
 
 export class DrawCircle extends MoveDraw {
-  protected createDrawableElement(position: Point): ElementView {
+  protected createDrawableElement(position: Point): MoveDrawable {
     let element = new CircleView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     element.__fixRect__();
     return element;

@@ -4,9 +4,10 @@ import {EllipseView} from "../../../../../../element/shape/circluar/EllipseView"
 import {Point} from "../../../../../../model/Point";
 import {Event} from "../../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../../dataSource/constant/ElementType";
+import {MoveDrawable} from "../../../type/MoveDrawable";
 
 export class DrawEllipse extends MoveDraw {
-  protected createDrawableElement(position: Point): ElementView {
+  protected createDrawableElement(position: Point): MoveDrawable {
     let element = new EllipseView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     element.__fixRect__();
     return element;

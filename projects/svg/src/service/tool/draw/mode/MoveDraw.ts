@@ -16,7 +16,7 @@ export abstract class MoveDraw extends Drawer {
   protected _draw = this.draw.bind(this);
   protected _drawEnd = this.drawEnd.bind(this);
 
-  protected _drawableElement: ElementView | null = null;
+  protected _drawableElement: MoveDrawable | null = null;
 
   public constructor(container: Container) {
     super();
@@ -35,7 +35,7 @@ export abstract class MoveDraw extends Drawer {
 
     this._drawableElement = this.createDrawableElement(this.startPosition);
 
-    this.container.add(this._drawableElement);
+    this.container.add(this._drawableElement as unknown as ElementView);
     this.drawTool?.__drawing__();
     if (call) {
       this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: this.startPosition, element: this._drawableElement});
@@ -104,11 +104,11 @@ export abstract class MoveDraw extends Drawer {
 
   public abstract override _new(): MoveDraw;
   public abstract override get type(): ElementType;
-  public get drawableElement(): ElementView | null {
+  public get drawableElement(): MoveDrawable | null {
     return this._drawableElement;
   }
 
-  protected abstract createDrawableElement(position: Point): ElementView;
+  protected abstract createDrawableElement(position: Point): MoveDrawable;
   protected turnOnToolAfterDrawing(): void {
     if (this.drawTool?.toolAfterDrawing) {
       if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
@@ -152,7 +152,7 @@ export abstract class MoveDraw extends Drawer {
   protected onEnd(call: boolean) {}
   protected onIsNotComplete(call: boolean) {
     if (this._drawableElement)
-      this.container.remove(this._drawableElement, true, false);
+      this.container.remove(this._drawableElement as unknown as ElementView, true, false);
   }
 
   public override stopDrawing(call?: boolean) {

@@ -4,9 +4,10 @@ import {MoveDraw} from "../../../../../mode/MoveDraw";
 import {RightTriangleView} from "../../../../../../../../element/shape/pointed/polygon/triangle/RightTriangleView";
 import {Event} from "../../../../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
+import {MoveDrawable} from "../../../../../type/MoveDrawable";
 
 export class DrawRightTriangle extends MoveDraw {
-  protected createDrawableElement(position: Point): ElementView {
+  protected createDrawableElement(position: Point): MoveDrawable {
     return new RightTriangleView(this.container, {overEvent: true, globalStyle: true}, {x: 0, y: 0, width: 0, height: 0});
   }
 

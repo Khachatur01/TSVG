@@ -7,7 +7,7 @@ import {NumberLineView} from "../../../../../../element/complex/cartesian/Number
 import {MoveDrawable} from "../../../type/MoveDrawable";
 
 export class DrawNumberLine extends MoveDraw {
-  protected createDrawableElement(position: Point): ElementView {
+  protected createDrawableElement(position: Point): MoveDrawable {
     return new NumberLineView(this.container, {overEvent: true, globalStyle: false}, {
       x: position.x,
       y: position.y,

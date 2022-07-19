@@ -6,9 +6,10 @@ import {
 } from "../../../../../../../../element/shape/pointed/polygon/triangle/IsoscelesTriangleView";
 import {Event} from "../../../../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
+import {MoveDrawable} from "../../../../../type/MoveDrawable";
 
 export class DrawIsoscelesTriangle extends MoveDraw {
-  protected createDrawableElement(position: Point): ElementView {
+  protected createDrawableElement(position: Point): MoveDrawable {
     return new IsoscelesTriangleView(this.container, {overEvent: true, globalStyle: true}, {x: 0, y: 0, width: 0, height: 0});
   }
 
