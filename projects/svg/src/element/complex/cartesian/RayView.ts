@@ -12,6 +12,7 @@ import {Angle} from "../../../service/math/Angle";
 import {Matrix} from "../../../service/math/Matrix";
 import {TextView} from "../../foreign/text/TextView";
 import {ClickDrawable} from "../../../service/tool/draw/type/ClickDrawable";
+import {ScaleProperties} from "./CartesianView";
 
 export class RayCursor extends ElementCursor {}
 
@@ -101,6 +102,7 @@ export class RayView extends ComplexView implements ClickDrawable {
     showZero: false,
     numbersDirection: 1,
   };
+  private _zoomFactor = 1;
 
   private _lastStartPoint: Point = {x: 0, y: 0};
   private _lastEndPoint: Point = {x: 0, y: 0};
@@ -109,12 +111,10 @@ export class RayView extends ComplexView implements ClickDrawable {
 
   protected _mainStepDivisors: number[] = [1, 2, 4, 5];
   protected _currentDivisor = this._mainStepDivisors[0];
-  protected readonly _limitMap: {[key: number]: {min: number, max: number}} = {};
 
   protected _physicalUnitLimits = {min: 60, max: 120};
   protected _mainStep: number = 1;
   protected _mainStepMultiplier: number = 10;
-
   protected _mainStepPhysicalUnit: number = 60; /* px - CHANGING on zoom */
 
   protected readonly STEP_VIEW_SIZE = 6;
@@ -126,6 +126,7 @@ export class RayView extends ComplexView implements ClickDrawable {
               viewEffects: RayViewEffects = {},
               startPoint: Point = {x: 0, y: 0},
               endPoint: Point = {x: 0, y: 0},
+              scale?: ScaleProperties,
               ownerId?: string, index?: number) {
 
     super(container, ownerId, index);
@@ -133,6 +134,7 @@ export class RayView extends ComplexView implements ClickDrawable {
     this.style = new RayStyle(this);
     this._startPoint = startPoint;
     this._endPoint = endPoint;
+
     this._rayPathView = new PathView(container, {overEvent: false, globalStyle: false});
     this._numbersGroup = document.createElementNS(ElementView.svgURI, "g");
     this._numbersGroup.setAttribute("stroke-width", "0");
@@ -141,6 +143,13 @@ export class RayView extends ComplexView implements ClickDrawable {
     this.svgElement.appendChild(this._rayPathView.SVG);
     this.svgElement.appendChild(this._numbersGroup);
 
+    if (scale) {
+      this._mainStep = scale.mainStep;
+      this._mainStepPhysicalUnit = scale.mainStepPhysicalUnit;
+      this._mainStepMultiplier = scale.mainStepMultiplier;
+      this._physicalUnitLimits.min = scale.physicalUnitLimits.min;
+      this._physicalUnitLimits.max = scale.physicalUnitLimits.max;
+    }
     this.setProperties(properties);
     this.viewEffects = viewEffects;
   }
@@ -197,6 +206,7 @@ export class RayView extends ComplexView implements ClickDrawable {
   }
 
   public zoomIn(factor: number) {
+    this._zoomFactor *= factor;
     this._mainStepPhysicalUnit *= factor;
 
     while (this.isInRange(this._mainStepMultiplier)) {
@@ -208,6 +218,7 @@ export class RayView extends ComplexView implements ClickDrawable {
     this.__updateView__();
   }
   public zoomOut(factor: number) {
+    this._zoomFactor /= factor;
     this._mainStepPhysicalUnit /= factor;
 
     let filteredDivisors = this._mainStepDivisors.filter(this.isInRange.bind(this));
@@ -406,9 +417,30 @@ export class RayView extends ComplexView implements ClickDrawable {
   public toPath(): PathView { /* todo */
     return new PathView(this._container);
   }
-  public override toJSON(): any { /* todo */
-    return super.toJSON()
+  public override toJSON(): any {
+    let json = super.toJSON();
+    json.startPoint = this._startPoint;
+    json.endPoint = this._endPoint;
+    json.currentDivisor = this._currentDivisor;
+    json.physicalUnitLimits = this._physicalUnitLimits;
+    json.mainStep = this._mainStep;
+    json.mainStepMultiplier = this._mainStepMultiplier;
+    json.mainStepPhysicalUnit = this._mainStepPhysicalUnit;
+    json.viewEffects = this._viewEffects;
+    json.zoomFactor = this._zoomFactor;
+    return json;
   }
-  public override fromJSON(json: any) { /* todo */
+  public override fromJSON(json: any) {
+    this._startPoint = json.startPoint;
+    this._endPoint = json.endPoint;
+    this._currentDivisor = json.currentDivisor;
+    this._physicalUnitLimits = json.physicalUnitLimits;
+    this._mainStep = json.mainStep;
+    this._mainStepMultiplier = json.mainStepMultiplier;
+    this._mainStepPhysicalUnit = json.mainStepPhysicalUnit;
+    this._viewEffects = json.viewEffects;
+    this.zoomIn(json.zoomFactor);
+    super.fromJSON(json);
+    this.__updateView__();
   };
 }

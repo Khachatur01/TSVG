@@ -79,6 +79,8 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
   private _negativeAxis: RayView;
   private _positiveAxis: RayView;
   public override rotatable: boolean = false;
+
+  private _zoomFactor = 1;
   /* Model */
 
   private readonly X_AXIS_COLOR = "#0000FF";
@@ -258,12 +260,14 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
 
   public override toJSON(): any {
     let json = super.toJSON();
-    json.center = this._origin;
+    json.origin = this._origin;
+    json.zoomFactor = this._zoomFactor;
     return json;
   }
   public override fromJSON(json: any) {
     super.fromJSON(json);
-    this.__moveOrigin__(json.center);
+    this._origin = json.origin;
+    this.zoomIn(json.zoomFactor);
     this.__updateView__();
   };
 }

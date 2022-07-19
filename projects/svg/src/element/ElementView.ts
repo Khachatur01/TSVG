@@ -106,7 +106,6 @@ export interface ElementProperties {
 export abstract class ElementView implements Resizeable, Draggable, Drawable {
   public static readonly svgURI: "http://www.w3.org/2000/svg" = "http://www.w3.org/2000/svg";
   protected abstract svgElement: SVGElement;
-  public readonly rotatable: boolean = true;
 
   /* Model */
   protected abstract _type: ElementType;
@@ -123,6 +122,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   protected _selectable: boolean = true;
   protected _hasOverEvent: boolean = false;
   protected _properties: ElementProperties = {};
+  public rotatable: boolean = true;
   /* Model */
 
   private _highlight = this.__highlight__.bind(this);
@@ -562,7 +562,8 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       rect: this._rect,
       angle: this._angle,
       refPoint: this._refPoint,
-      properties: this._properties
+      properties: this._properties,
+      rotatable: this.rotatable
     }
   }
   public fromJSON(json: any) {
@@ -577,5 +578,6 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     this.__rotate__(json.angle);
     this.refPoint = json.refPoint;
     this.setProperties(json.properties);
+    this.rotatable = json.rotatable;
   };
 }

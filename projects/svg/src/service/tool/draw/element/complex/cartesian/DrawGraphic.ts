@@ -50,6 +50,6 @@ export class DrawGraphic extends MoveDraw {
     return new DrawGraphic(this.container);
   }
   public get type(): ElementType {
-    return ElementType.COORDINATE_PLANE;
+    return ElementType.GRAPHIC;
   }
 }

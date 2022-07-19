@@ -5,9 +5,10 @@ import {ElementCursor, ElementProperties, ElementStyle, ElementView} from "../..
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {Container} from "../../../Container";
-import {CartesianView} from "./CartesianView";
+import {CartesianView, ScaleProperties} from "./CartesianView";
 import {RayView} from "./RayView";
 import {GraphicView} from "./GraphicView";
+import {Style} from "../../../service/style/Style";
 
 export class CoordinatePlaneCursor extends ElementCursor {}
 
@@ -77,7 +78,6 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
   public override readonly style: CoordinatePlaneStyle;
 
   /* Model */
-  // private _graphics: Map<Function, FunctionGraphic> = new Map<Function, FunctionGraphic>();
   private _negativeXAxis: RayView;
   private _positiveXAxis: RayView;
   private _negativeYAxis: RayView;
@@ -88,6 +88,17 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
 
   private readonly X_AXIS_COLOR = "#0000FF";
   private readonly Y_AXIS_COLOR = "#FF0000";
+
+  private _zoomFactor = 1;
+  private _scaleProperties: ScaleProperties = {
+    mainStep: 1,
+    mainStepPhysicalUnit: 60,
+    mainStepMultiplier: 10,
+    physicalUnitLimits: {
+      min: 60,
+      max: 120
+    }
+  };
   /* Model */
 
   /**
@@ -116,7 +127,8 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
       {overEvent: false, globalStyle: false},
       {numbersDirection: -1, showZero: true},
       {x: this._origin.x, y: this._origin.y},
-      {x: 0, y: this._origin.y}
+      {x: 0, y: this._origin.y},
+      this._scaleProperties
     );
     this._negativeXAxis.style.strokeColor = this.X_AXIS_COLOR;
     this._negativeXAxis.style.strokeWidth = this.AXIS_WIDTH;
@@ -128,7 +140,8 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
       {overEvent: false, globalStyle: false},
       {numbersDirection: 1},
       {x: this._origin.x, y: this._origin.y},
-      {x: this._rect.width, y: this._origin.y}
+      {x: this._rect.width, y: this._origin.y},
+      this._scaleProperties
     );
     this._positiveXAxis.style.strokeColor = this.X_AXIS_COLOR;
     this._positiveXAxis.style.strokeWidth = this.AXIS_WIDTH;
@@ -140,7 +153,8 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
       {overEvent: false, globalStyle: false},
       {numbersDirection: -1},
       {x: this._origin.x, y: this._origin.y},
-      {x: this._origin.x, y: this._rect.height}
+      {x: this._origin.x, y: this._rect.height},
+      this._scaleProperties
     );
     this._negativeYAxis.style.strokeColor = this.Y_AXIS_COLOR;
     this._negativeYAxis.style.strokeWidth = this.AXIS_WIDTH;
@@ -152,7 +166,8 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
       {overEvent: false, globalStyle: false},
       {numbersDirection: 1},
       {x: this._origin.x, y: this._origin.y},
-      {x: this._origin.x, y: 0}
+      {x: this._origin.x, y: 0},
+      this._scaleProperties
     );
     this._positiveYAxis.style.strokeColor = this.Y_AXIS_COLOR;
     this._positiveYAxis.style.strokeWidth = this.AXIS_WIDTH;
@@ -183,10 +198,6 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
       graphic.__updateView__();
     });
 
-    // this._graphics.forEach((functionGraphic: FunctionGraphic, f: Function) => {
-    //   functionGraphic.pathView.path = this.createGraphic(f);
-    // });
-
     this.setAttr({
       x: this._rect.x,
       y: this._rect.y,
@@ -212,17 +223,27 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
       {x: this._origin.x, y: 0}
     );
   }
-  public addFunction(f: Function, color: string = "#00000099", width: number = 2) {
+  public get graphics(): GraphicView[] {
+    return this._graphics;
+  }
+  public get functions(): Function[] {
+    let functions: Function[] = [];
+    this._graphics.forEach(graphic => {
+      functions.push(graphic.f);
+    });
+    return functions;
+  }
+  public addFunction(f: Function, style: Style) {
     let graphicView = new GraphicView(
       this._container,
       {overEvent: true, globalStyle: false},
-      Object.assign({}, this._rect),
+      {x: 0, y: 0, width: this._rect.width, height: this._rect.height},
       Object.assign({}, this._origin),
-      f
+      f,
+      this._scaleProperties
     );
-    graphicView.style.fillColor = "none";
-    graphicView.style.strokeColor = color;
-    graphicView.style.strokeWidth = width + "";
+
+    graphicView.style.set = style;
 
     this._graphics.push(graphicView);
     this._graphicGroup.appendChild(graphicView.SVG);
@@ -263,6 +284,7 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
   }
 
   public zoomIn(factor: number) {
+    this._zoomFactor *= factor;
     this._graphics.forEach(graphic => {
       graphic.zoomIn(factor);
     });
@@ -272,6 +294,7 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this._positiveYAxis.zoomIn(factor);
   }
   public zoomOut(factor: number) {
+    this._zoomFactor /= factor;
     this._graphics.forEach(graphic => {
       graphic.zoomOut(factor);
     });
@@ -380,22 +403,27 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
 
   public override toJSON(): any {
     let json = super.toJSON();
-    json.graphics = {};
-    // this._graphics.forEach((functionGraphic: FunctionGraphic, f: Function) => {
-    //   json.graphics[f.toString()] = {
-    //     color: functionGraphic.color,
-    //     width: functionGraphic.width
-    //   };
-    // });
-    json.center = this._origin;
+    json.graphics = [];
+    this._graphics.forEach(graphic => {
+      json.graphics.push({
+        f: graphic.f.toString(),
+        style: graphic.style
+      });
+    });
+    json.origin = this._origin;
+    json.zoomFactor = this._zoomFactor;
     return json;
   }
   public override fromJSON(json: any) {
     super.fromJSON(json);
-    // for (let f in json.graphics) {
-    //   this.addFunction(eval(f), json.graphics[f].color, json.graphics[f].width);
-    // }
-    this.__moveOrigin__(json.center);
-    this.__updateView__();
+    this._origin = json.origin;
+    this.zoomIn(json.zoomFactor);
+
+    this.reassignAxis();
+
+    this._graphics = [];
+    for (let graphic of json.graphics) {
+      this.addFunction(eval(graphic.f), graphic.style);
+    }
   };
 }

@@ -1,16 +1,19 @@
 import {ComplexView} from "../../type/ComplexView";
-import {PathView} from "../../shape/PathView";
 import {Point} from "../../../model/Point";
 import {Container} from "../../../Container";
 import {Rect} from "../../../model/Rect";
 import {ElementProperties, ElementView} from "../../ElementView";
 import {RectangleView} from "../../shape/pointed/polygon/rectangle/RectangleView";
 
-export interface FunctionGraphic {
-  color: string,
-  width: number,
-  pathView: PathView
+export interface ScaleProperties {
+  mainStep: number,
+  mainStepPhysicalUnit: number,
+  mainStepMultiplier: number,
+  physicalUnitLimits: {
+    min: number, max: number
+  }
 }
+
 export abstract class CartesianView extends ComplexView {
   protected svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "svg");
 

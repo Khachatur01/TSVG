@@ -8,10 +8,9 @@ import {Path} from "../../../model/path/Path";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
+import {ScaleProperties} from "./CartesianView";
 
 export class GraphicCursor extends ElementCursor {}
-
-export class GraphicStyle extends ElementStyle {}
 
 export class GraphicView extends PathView implements MoveDrawable {
   protected override _type: ElementType = ElementType.GRAPHIC;
@@ -19,8 +18,11 @@ export class GraphicView extends PathView implements MoveDrawable {
   private _origin: Point;
   private _lastOrigin: Point;
   private _f: Function;
+  private _zoomFactor = 1;
 
+  protected _physicalUnitLimits = {min: 60, max: 120};
   protected _mainStep: number = 1;
+  protected _mainStepMultiplier: number = 10;
   protected _mainStepPhysicalUnit: number = 60; /* px - CHANGING on zoom */
 
   constructor(container: Container,
@@ -28,12 +30,21 @@ export class GraphicView extends PathView implements MoveDrawable {
               rect: Rect = {x: 0, y: 0, width: 1, height: 1},
               origin: Point = {x: 0, y: 0},
               f: Function,
+              scale?: ScaleProperties,
               ownerId?: string, index?: number) {
     super(container, properties, new Path(), ownerId, index);
 
     this._origin = origin;
     this._lastOrigin = origin;
     this._rect = rect;
+    if (scale) {
+      this._mainStep = scale.mainStep;
+      this._mainStepPhysicalUnit = scale.mainStepPhysicalUnit;
+      this._mainStepMultiplier = scale.mainStepMultiplier;
+      this._physicalUnitLimits.min = scale.physicalUnitLimits.min;
+      this._physicalUnitLimits.max = scale.physicalUnitLimits.max;
+    }
+
     this._f = f;
     this.path = this.createGraphic();
   }
@@ -138,11 +149,21 @@ export class GraphicView extends PathView implements MoveDrawable {
     this._origin.y = this._lastOrigin.y - (this._rect.y - this._lastRect.y);
   }
   public zoomIn(factor: number) {
+    this._zoomFactor *= factor;
     this._mainStepPhysicalUnit *= factor;
+    if (this._mainStepPhysicalUnit > this._physicalUnitLimits.max) {
+      this._mainStepPhysicalUnit /= this._mainStepMultiplier;
+      this._mainStep /= this._mainStepMultiplier;
+    }
     this.path = this.createGraphic();
   }
   public zoomOut(factor: number) {
+    this._zoomFactor /= factor;
     this._mainStepPhysicalUnit /= factor;
+    if (this._mainStepPhysicalUnit < this._physicalUnitLimits.min) {
+      this._mainStepPhysicalUnit *= this._mainStepMultiplier;
+      this._mainStep *= this._mainStepMultiplier;
+    }
     this.path = this.createGraphic();
   }
 
@@ -155,6 +176,11 @@ export class GraphicView extends PathView implements MoveDrawable {
   public moveOrigin(delta: Point): void {
     this.__fixRect__();
     this.__moveOrigin__(delta);
+  }
+  public setOrigin(origin: Point): void {
+    this._origin = Object.assign({}, origin);
+
+    this.path = this.createGraphic();
   }
 
   public override __updateView__() {
@@ -171,4 +197,26 @@ export class GraphicView extends PathView implements MoveDrawable {
   public override get copy(): GraphicView { /* todo */
     return this;
   }
+  public override toJSON(): any {
+    let json = super.toJSON();
+    json.function = this._f.toString();
+    json.origin = this._origin;
+    json.physicalUnitLimits = this._physicalUnitLimits;
+    json.mainStep = this._mainStep;
+    json.mainStepMultiplier = this._mainStepMultiplier;
+    json.mainStepPhysicalUnit = this._mainStepPhysicalUnit;
+    json.zoomFactor = this._zoomFactor;
+    return json;
+  }
+  public override fromJSON(json: any) {
+    super.fromJSON(json);
+    this._f = eval(json.f);
+    this._origin = json.origin;
+    this._physicalUnitLimits = json.physicalUnitLimits;
+    this._mainStep = json.mainStep;
+    this._mainStepMultiplier = json.mainStepMultiplier;
+    this._mainStepPhysicalUnit = json.mainStepPhysicalUnit;
+    this.zoomIn(json.zoomFactor);
+    this.__updateView__();
+  };
 }
