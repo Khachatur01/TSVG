@@ -3,8 +3,7 @@ import {Rect} from "../../../../../model/Rect";
 import {Container} from "../../../../../Container";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {ElementCursor, ElementView} from "../../../../ElementView";
-import {ElementProperties} from "../../../../../model/ElementProperties";
+import {ElementCursor, ElementProperties, ElementView} from "../../../../ElementView";
 
 export class RectangleCursor extends ElementCursor {}
 

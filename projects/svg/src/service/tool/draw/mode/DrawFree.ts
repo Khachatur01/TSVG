@@ -77,9 +77,6 @@ export class DrawFree extends Drawer {
 
     if (additional) {
       this._drawableElement.pathString = additional.path;
-      this._drawableElement.setAttr({
-        d: additional.path
-      });
     }
     if (!this._drawableElement.isComplete()) {
       this.container.remove(this._drawableElement, true, false);

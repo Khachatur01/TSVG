@@ -17,6 +17,9 @@ export enum ElementType {
   TEXT,
   IMAGE,
   VIDEO,
+  RAY,
   GRAPHIC,
+  COORDINATE_PLANE,
+  NUMBER_LINE,
   TABLE
 }

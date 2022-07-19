@@ -1,4 +1,4 @@
-import {ElementView} from "../../../element/ElementView";
+import {ElementProperties, ElementView} from "../../../element/ElementView";
 import {Draggable} from "../../tool/drag/Draggable";
 import {Point} from "../../../model/Point";
 import {BoundingBox} from "./bound/BoundingBox";
@@ -10,7 +10,6 @@ import {GroupView} from "../../../element/group/GroupView";
 import {Event} from "../../../dataSource/constant/Event";
 import {Matrix} from "../../math/Matrix";
 import {PointedView} from "../../../element/shape/pointed/PointedView";
-import {ElementProperties} from "../../../model/ElementProperties";
 import {CircleView} from "../../../element/shape/circluar/CircleView";
 import {TableView} from "../../../element/complex/TableView";
 
@@ -72,7 +71,7 @@ export class Focus implements Draggable, Resizeable {
 
     this.__fit__();
     if(showBounding) {
-      this.__focus__(element.rotatable);
+      this.__focus__();
     }
 
     if (call) {
@@ -93,18 +92,10 @@ export class Focus implements Draggable, Resizeable {
       this._children.forEach((child: ElementView) => {
         this.container.style.__setGlobalStyle__(child.style);
         this.__rotate__(child.angle);
-        this.__focus__(child.rotatable);
+        this.__focus__();
       });
     } else {
-      /* multiple elements */
-      let rotatable: boolean = true;
-      for (let child of this._children) {
-        if (!child.rotatable) {
-          rotatable = false;
-          break;
-        }
-      }
-      this.__focus__(rotatable);
+      this.__focus__();
     }
 
     if (call) {
@@ -501,7 +492,15 @@ export class Focus implements Draggable, Resizeable {
     this.boundingBox.__positionGrips__();
   }
 
-  public __focus__(rotatable: boolean = true) {
+  public __focus__() {
+    let rotatable = true;
+    for (let child of this._children) {
+      if (!child.rotatable) {
+        rotatable = false;
+        break;
+      }
+    }
+
     if (this._children.size > 1) {
       this.boundingBox.__multipleFocus__(rotatable);
     } else {

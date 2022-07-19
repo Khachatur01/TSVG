@@ -8,7 +8,7 @@ import {Container} from "../Container";
 import {DrawIsoscelesTriangle} from "../service/tool/draw/element/shape/pointed/polygon/triangle/DrawIsoscelesTriangle";
 import {DrawRightTriangle} from "../service/tool/draw/element/shape/pointed/polygon/triangle/DrawRightTriangle";
 import {DrawTextBox} from "../service/tool/draw/element/foreign/DrawTextBox";
-import {DrawGraphic} from "../service/tool/draw/element/foreign/DrawGraphic";
+import {DrawCoordinatePlane} from "../service/tool/draw/element/complex/cartesian/DrawCoordinatePlane";
 import {DrawVideo} from "../service/tool/draw/element/foreign/DrawVideo";
 import {DrawImage} from "../service/tool/draw/element/foreign/DrawImage";
 import {DrawForeignObject} from "../service/tool/draw/element/foreign/DrawForeignObject";
@@ -17,6 +17,9 @@ import {Drawer} from "../service/tool/draw/Drawer";
 import {DrawCircle} from "../service/tool/draw/element/shape/circular/DrawCircle";
 import {DrawTable} from "../service/tool/draw/element/complex/DrawTable";
 import {DrawText} from "../service/tool/draw/element/foreign/DrawText";
+import {DrawNumberLine} from "../service/tool/draw/element/complex/cartesian/DrawNumberLine";
+import {DrawRay} from "../service/tool/draw/element/complex/cartesian/DrawRay";
+import {DrawGraphic} from "../service/tool/draw/element/complex/cartesian/DrawGraphic";
 
 export class Drawers {
   private readonly container: Container;
@@ -35,6 +38,9 @@ export class Drawers {
   public readonly image: DrawImage;
   public readonly foreignObject: DrawForeignObject;
   public readonly graphic: DrawGraphic;
+  public readonly ray: DrawRay;
+  public readonly coordinatePlane: DrawCoordinatePlane;
+  public readonly numberLine: DrawNumberLine;
   public readonly table: DrawTable;
 
   public constructor(container: Container) {
@@ -55,6 +61,9 @@ export class Drawers {
     this.image = new DrawImage(container);
     this.foreignObject = new DrawForeignObject(container);
     this.graphic = new DrawGraphic(container);
+    this.ray = new DrawRay(container);
+    this.coordinatePlane = new DrawCoordinatePlane(container);
+    this.numberLine = new DrawNumberLine(container);
     this.table = new DrawTable(container);
   }
 
@@ -64,10 +73,6 @@ export class Drawers {
         return this.ellipse;
       case ElementType.CIRCLE:
         return this.circle;
-      // case ElementType.BOX:
-      //   return this._box;
-      // case ElementType.PATH:
-      //   return this._path;
       case ElementType.LINE:
         return this.line;
       case ElementType.FREE:
@@ -76,16 +81,12 @@ export class Drawers {
         return this.polyline;
       case ElementType.POLYGON:
         return this.polygon;
-      // case ElementType.TRIANGLE:
-      //   return this._triangle;
       case ElementType.RIGHT_TRIANGLE:
         return this.rightTriangle;
       case ElementType.ISOSCELES_TRIANGLE:
         return this.isoscelesTriangle;
       case ElementType.RECTANGLE:
         return this.rectangle;
-      // case ElementType.GROUP:
-      //   return this._group;
       case ElementType.FOREIGN_OBJECT:
         return this.foreignObject;
       case ElementType.TEXT_BOX:
@@ -98,6 +99,12 @@ export class Drawers {
         return this.video;
       case ElementType.GRAPHIC:
         return this.graphic;
+      case ElementType.RAY:
+        return this.ray;
+      case ElementType.COORDINATE_PLANE:
+        return this.coordinatePlane;
+      case ElementType.NUMBER_LINE:
+        return this.numberLine;
       case ElementType.TABLE:
         return this.table;
       default:

@@ -1,11 +1,10 @@
 import {Point} from "../../../model/Point";
 import {Rect} from "../../../model/Rect";
-import {ElementCursor, ElementView} from "../../ElementView";
+import {ElementCursor, ElementProperties, ElementView} from "../../ElementView";
 import {Container} from "../../../Container";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {CircularView} from "./CircularView";
 import {Cursor} from "../../../dataSource/constant/Cursor";
-import {ElementProperties} from "../../../model/ElementProperties";
 
 export class CircleCursor extends ElementCursor {
   constructor() {
@@ -27,7 +26,7 @@ export class CircleView extends CircularView {
     this.setProperties(properties);
   }
 
-  protected override __updateView__(): void {
+  public override __updateView__(): void {
     this.setAttr({
       cx: this._rect.x + this._rect.width / 2,
       cy: this._rect.y + this._rect.height / 2,

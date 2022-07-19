@@ -37,7 +37,7 @@ export class RotatePoint extends PathView {
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
-    this.dAngle = Angle.fromPoints(
+    this.dAngle = Angle.fromThreePoints(
       {x: 0, y: this.focus.__refPoint__.y},
       this.focus.__refPoint__,
       position
@@ -101,7 +101,7 @@ export class RotatePoint extends PathView {
   }
 
   private getAngle(position: Point): number {
-    let angle = Angle.fromPoints(
+    let angle = Angle.fromThreePoints(
       {x: 0, y: this.focus.__refPoint__.y},
       this.focus.__refPoint__,
       position

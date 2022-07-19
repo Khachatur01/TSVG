@@ -14,7 +14,7 @@ export class NEGrip extends Grip {
 
   public override makeMouseDown(client: Point, call: boolean = true): void {
     super.makeMouseDown(client, call);
-    this.___lastAngle__ = Angle.fromPoints(
+    this.___lastAngle__ = Angle.fromThreePoints(
       {
         x: this.focus.__lastRect__.x,
         y: this.focus.__lastRect__.y + this.focus.__lastRect__.height

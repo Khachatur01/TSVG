@@ -1,4 +1,4 @@
-import {ElementCursor, ElementStyle, ElementView} from "../ElementView";
+import {ElementCursor, ElementProperties, ElementStyle, ElementView} from "../ElementView";
 import {Container} from "../../Container";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
@@ -7,7 +7,6 @@ import {Event} from "../../dataSource/constant/Event";
 import {ForeignView} from "../type/ForeignView";
 import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../dataSource/constant/ElementType";
-import {ElementProperties} from "../../model/ElementProperties";
 import {Cursor} from "../../dataSource/constant/Cursor";
 
 export class ForeignObjectCursor extends ElementCursor {
@@ -160,7 +159,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._rect = rect;
     this.__updateView__();
   }
-  protected __updateView__(): void {
+  public __updateView__(): void {
     this.setAttr({
       x: this._rect.x,
       y: this._rect.y,

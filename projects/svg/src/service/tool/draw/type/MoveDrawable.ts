@@ -1,6 +1,7 @@
 import {Rect} from "../../../../model/Rect";
+import {Drawable} from "./Drawable";
 
-export interface MoveDrawable {
+export interface MoveDrawable extends Drawable {
   /*
       This function sets size on drawing.
       Elements, which draw by moving,

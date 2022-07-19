@@ -52,6 +52,16 @@ export class Path {
   public add(command: PathCommand) {
     this.commands.push(command);
   }
+  public addAll(commands: PathCommand[]) {
+    commands.forEach(command => {
+      this.commands.push(command);
+    });
+  }
+  public addPath(path: Path) {
+    path.commands.forEach(command => {
+      this.commands.push(command);
+    });
+  }
   public remove(index: number) {
     if (index < 0)
       index = this.commands.length + index;

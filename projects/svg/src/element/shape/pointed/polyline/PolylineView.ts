@@ -1,10 +1,9 @@
-import {ElementCursor, ElementView} from "../../../ElementView";
+import {ElementCursor, ElementProperties, ElementView} from "../../../ElementView";
 import {Point} from "../../../../model/Point";
 import {PointedView} from "../PointedView";
 import {Container} from "../../../../Container";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {Rect} from "../../../../model/Rect";
-import {ElementProperties} from "../../../../model/ElementProperties";
 
 export class PolylineCursor extends ElementCursor {}
 
@@ -21,7 +20,7 @@ export class PolylineView extends PointedView {
     this.setProperties(properties);
   }
 
-  protected override __updateView__() {
+  public override __updateView__() {
     let string = "";
     this._points.forEach((point: Point) => {
       string += point.x + " " + point.y + " ";

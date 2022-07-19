@@ -1,14 +1,13 @@
-import {LineView} from "../../../../../../element/shape/pointed/LineView";
 import {Point} from "../../../../../../model/Point";
 import {Event} from "../../../../../../dataSource/constant/Event";
-import {PointedView} from "../../../../../../element/shape/pointed/PointedView";
 import {ElementType} from "../../../../../../dataSource/constant/ElementType";
 import {ClickDraw} from "../../../mode/ClickDraw";
+import {RayView} from "../../../../../../element/complex/cartesian/RayView";
 import {ElementView} from "../../../../../../element/ElementView";
 
-export class DrawLine extends ClickDraw {
-  protected createDrawableElement(position: Point): PointedView {
-    let element = new LineView(this.container, {overEvent: true, globalStyle: true}, position, position);
+export class DrawRay extends ClickDraw {
+  protected createDrawableElement(position: Point): RayView {
+    let element = new RayView(this.container, {overEvent: true, globalStyle: true}, {}, position, position);
     element.__fixRect__();
     return element;
   }
@@ -44,21 +43,21 @@ export class DrawLine extends ClickDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.LINE_TOOL_ON);
+      this.container.__call__(Event.RAY_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.LINE_TOOL_OFF);
+      this.container.__call__(Event.RAY_TOOL_OFF);
     }
   }
 
-  public _new(): DrawLine {
-    return new DrawLine(this.container);
+  public _new(): DrawRay {
+    return new DrawRay(this.container);
   }
   public get type(): ElementType {
-    return ElementType.LINE;
+    return ElementType.RAY;
   }
 }

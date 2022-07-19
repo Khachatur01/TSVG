@@ -1,15 +1,16 @@
 import {Drawer} from "../Drawer";
 import {Container} from "../../../../Container";
-import {PointedView} from "../../../../element/shape/pointed/PointedView";
 import {Point} from "../../../../model/Point";
 import {Angle} from "../../../math/Angle";
 import {Event} from "../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {DrawTool} from "../DrawTool";
+import {ClickDrawable} from "../type/ClickDrawable";
+import {ElementView} from "../../../../element/ElementView";
 
 export abstract class ClickDraw extends Drawer {
   protected container: Container;
-  protected _drawableElement: PointedView | null = null;
+  protected _drawableElement: ClickDrawable | null = null;
   protected clicksCount: number = 0;
 
   private _click = this.click.bind(this);
@@ -30,7 +31,7 @@ export abstract class ClickDraw extends Drawer {
       }
       this.drawTool?.__drawing__();
       this._drawableElement = this.createDrawableElement(position);
-      this.container.add(this._drawableElement);
+      this.container.add(this._drawableElement as unknown as ElementView);
     } else {
       this.makeMouseMove(position, false);
       this._drawableElement.pushPoint(position);
@@ -60,11 +61,11 @@ export abstract class ClickDraw extends Drawer {
 
   public abstract override _new(): ClickDraw;
   public abstract override get type(): ElementType;
-  public get drawableElement(): PointedView | null {
+  public get drawableElement(): ClickDrawable | null {
     return this._drawableElement;
   }
 
-  protected abstract createDrawableElement(position: Point, ownerId?: string, index?: number): PointedView;
+  protected abstract createDrawableElement(position: Point, ownerId?: string, index?: number): ClickDrawable;
 
   protected click(event: MouseEvent | TouchEvent) {
     let containerRect = this.container?.HTML.getBoundingClientRect();
@@ -95,7 +96,7 @@ export abstract class ClickDraw extends Drawer {
     if (!this._drawableElement || !this.drawTool?.isDrawing) return;
 
     if (!this._drawableElement.isComplete()) {
-      this.container.remove(this._drawableElement, true, true);
+      this.container.remove(this._drawableElement as unknown as ElementView, true, true);
     } else {
       this._drawableElement.removePoint(-1);
       this._drawableElement.refPoint = this._drawableElement.center;

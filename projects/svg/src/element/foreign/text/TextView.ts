@@ -1,9 +1,7 @@
-import {ForeignObjectView} from "../ForeignObjectView";
 import {Container} from "../../../Container";
 import {ElementType} from "../../../dataSource/constant/ElementType";
-import {ElementCursor} from "../../ElementView";
+import {ElementCursor, ElementProperties} from "../../ElementView";
 import {Rect} from "../../../model/Rect";
-import {ElementProperties} from "../../../model/ElementProperties";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 import {ForeignView} from "../../type/ForeignView";
 import {Point} from "../../../model/Point";
@@ -82,7 +80,7 @@ export class TextView extends ForeignView implements MoveDrawable {
     this.__updateView__();
   }
 
-  protected __updateView__(): void {
+  public __updateView__(): void {
     this.setAttr({
       x: this._rect.x,
       y: this._rect.y

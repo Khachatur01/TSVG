@@ -79,7 +79,7 @@ export class DrawTool extends Tool {
   public get drawableElement(): ElementView | undefined {
     let drawableElement = this._drawer?.drawableElement; /* drawableElement may be null */
     if (drawableElement) {
-      return drawableElement;
+      return drawableElement as ElementView;
     } else {
       return undefined;
     }

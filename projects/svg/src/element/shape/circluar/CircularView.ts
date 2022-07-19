@@ -10,7 +10,7 @@ import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 export abstract class CircularView extends ShapeView implements MoveDrawable{
   protected abstract override svgElement: SVGGeometryElement;
 
-  protected __updateView__(): void {
+  public __updateView__(): void {
     this.setAttr({
       cx: this._rect.x + this._rect.width / 2,
       cy: this._rect.y + this._rect.height / 2,

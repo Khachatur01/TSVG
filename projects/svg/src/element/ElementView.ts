@@ -10,7 +10,7 @@ import {Style} from "../service/style/Style";
 import {ElementType} from "../dataSource/constant/ElementType";
 import {Cursor} from "../dataSource/constant/Cursor";
 import {Line} from "../model/Line";
-import {ElementProperties} from "../model/ElementProperties";
+import {Drawable} from "../service/tool/draw/type/Drawable";
 
 export class ElementCursor {
   public cursor: any = {};
@@ -98,7 +98,12 @@ export class ElementStyle extends Style {
   }
 }
 
-export abstract class ElementView implements Resizeable, Draggable {
+export interface ElementProperties {
+  overEvent?: boolean,
+  globalStyle?: boolean
+}
+
+export abstract class ElementView implements Resizeable, Draggable, Drawable {
   public static readonly svgURI: "http://www.w3.org/2000/svg" = "http://www.w3.org/2000/svg";
   protected abstract svgElement: SVGElement;
   public readonly rotatable: boolean = true;
@@ -125,7 +130,6 @@ export abstract class ElementView implements Resizeable, Draggable {
 
   /**
    * @param container Container element that should contain this ElementView
-   // * @param properties Simple object for element modification before creating {setOverEvent: boolean, setDefaultStyle: boolean}
    * @param ownerId This element owner id. if not set, will get owner id of Container
    * @param index This element index. If not set, will generate new numerical value
    * */
@@ -150,7 +154,7 @@ export abstract class ElementView implements Resizeable, Draggable {
   public get properties(): ElementProperties {
     return this._properties;
   }
-  protected setProperties(properties: ElementProperties) {
+  public setProperties(properties: ElementProperties) {
     this._properties = Object.assign({}, properties);
     this._properties.globalStyle = undefined; /* global style property should be set only in creation time */
     if (properties.overEvent) {
@@ -179,8 +183,7 @@ export abstract class ElementView implements Resizeable, Draggable {
    * */
   public abstract __setRect__(rect: Rect, delta?: Point): void;
 
-
-  protected abstract __updateView__(): void;
+  public abstract __updateView__(): void;
   public get visiblePoints(): Point[] {
     return Matrix.rotate(
       this.points,
@@ -224,6 +227,32 @@ export abstract class ElementView implements Resizeable, Draggable {
       gamma = ((line0.p0.y - line0.p1.y) * (line1.p1.x - line0.p0.x) + (line0.p1.x - line0.p0.x) * (line1.p1.y - line0.p0.y)) / det;
       return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
     }
+  }
+  public static linesIntersectionPoint(line0: Line, line1: Line): Point | null {
+    /* Check if none of the lines are of length 0 */
+    if ((line0.p0.x === line0.p1.x && line0.p0.y === line0.p1.y) || (line1.p0.x === line1.p1.x && line1.p0.y === line1.p1.y)) {
+      return null;
+    }
+
+    let denominator = ((line1.p1.y - line1.p0.y) * (line0.p1.x - line0.p0.x) - (line1.p1.x - line1.p0.x) * (line0.p1.y - line0.p0.y));
+
+    /* Lines are parallel */
+    if (denominator === 0) {
+      return null;
+    }
+
+    let ua = ((line1.p1.x - line1.p0.x) * (line0.p0.y - line1.p0.y) - (line1.p1.y - line1.p0.y) * (line0.p0.x - line1.p0.x)) / denominator;
+    let ub = ((line0.p1.x - line0.p0.x) * (line0.p0.y - line1.p0.y) - (line0.p1.y - line0.p0.y) * (line0.p0.x - line1.p0.x)) / denominator;
+
+    /* is the intersection along the segments */
+    if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+      return null;
+    }
+
+    return {
+      x: line0.p0.x + ua * (line0.p1.x - line0.p0.x),
+      y: line0.p0.y + ua * (line0.p1.y - line0.p0.y)
+    };
   }
   public static getRectSides(rect: Rect): Line[] {
     return [

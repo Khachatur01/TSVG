@@ -67,7 +67,7 @@ export abstract class MoveDraw extends Drawer {
       height = snapPoint.y - this.startPosition.y;
     }
 
-    /* if _drawableElement instance of MoveDrawable, set drawSize */
+    /* if _drawableElement instance of MoveDrawable, set drawSize */ /* todo change drawable element type from ElementView to MoveDrawable */
     (this._drawableElement as unknown as MoveDrawable)?.__drawSize__({
       x: this.startPosition.x,
       y: this.startPosition.y,

@@ -1,10 +1,9 @@
-import {ElementCursor, ElementStyle, ElementView} from "../ElementView";
+import {ElementCursor, ElementProperties, ElementStyle, ElementView} from "../ElementView";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
 import {PathView} from "../shape/PathView";
 import {Container} from "../../Container";
 import {ElementType} from "../../dataSource/constant/ElementType";
-import {ElementProperties} from "../../model/ElementProperties";
 
 export class GroupCursor extends ElementCursor {}
 
@@ -300,7 +299,7 @@ export class GroupView extends ElementView {
     return true;
   }
 
-  protected __updateView__(): void {
+  public __updateView__(): void {
   }
 
   public override toJSON(): any {

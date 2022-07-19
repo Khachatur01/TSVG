@@ -15,7 +15,7 @@ export class NWGrip extends Grip {
   public override makeMouseDown(client: Point, call: boolean = true): void {
     super.makeMouseDown(client, call);
 
-    this.___lastAngle__ = 180 - Angle.fromPoints(
+    this.___lastAngle__ = 180 - Angle.fromThreePoints(
       {
         x: this.focus.__lastRect__.x + this.focus.__lastRect__.width,
         y: this.focus.__lastRect__.y + this.focus.__lastRect__.height

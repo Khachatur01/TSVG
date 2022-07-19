@@ -14,7 +14,7 @@ export class SEGrip extends Grip {
 
   public override makeMouseDown(client: Point, call: boolean = true): void {
     super.makeMouseDown(client, call);
-    this.___lastAngle__ = Angle.fromPoints(
+    this.___lastAngle__ = Angle.fromThreePoints(
       this.focus.__lastRect__,
       client,
       {x: 0, y: client.y}

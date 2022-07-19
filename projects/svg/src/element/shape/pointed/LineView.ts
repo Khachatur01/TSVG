@@ -1,11 +1,10 @@
-import {ElementCursor, ElementView} from "../../ElementView";
+import {ElementCursor, ElementProperties, ElementView} from "../../ElementView";
 import {PointedView} from "./PointedView";
 import {Point} from "../../../model/Point";
 import {Container} from "../../../Container";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {Rect} from "../../../model/Rect";
-import {ElementProperties} from "../../../model/ElementProperties";
 
 export class LineCursor extends ElementCursor {}
 
@@ -22,7 +21,7 @@ export class LineView extends PointedView implements MoveDrawable {
     this.setProperties(properties);
   }
 
-  protected __updateView__(): void {
+  public __updateView__(): void {
     this.setAttr({
       x1: this._points[0].x,
       y1: this._points[0].y,

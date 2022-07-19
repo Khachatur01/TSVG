@@ -3,8 +3,7 @@ import {Container} from "../../../../../Container";
 import {Rect} from "../../../../../model/Rect";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {ElementCursor} from "../../../../ElementView";
-import {ElementProperties} from "../../../../../model/ElementProperties";
+import {ElementCursor, ElementProperties} from "../../../../ElementView";
 
 export class RightTriangleCursor extends ElementCursor {}
 

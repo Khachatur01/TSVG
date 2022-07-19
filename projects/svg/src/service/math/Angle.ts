@@ -3,7 +3,7 @@ import {Point} from "../../model/Point";
 export class Angle {
   public static SNAP_ANGLE = 15;
 
-  public static fromPoints(A: Point, B: Point, C: Point): number {
+  public static fromThreePoints(A: Point, B: Point, C: Point): number {
     let AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
     let BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
     let AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
@@ -23,10 +23,24 @@ export class Angle {
   }
 
   // Angle is calculated by vector coordinates within 360°
-  public static angleFromCoords(start: Point, end: Point): number {
+  public static fromTwoPoints(start: Point, end: Point): number {
     const dx = Math.abs(end.x - start.x);
     const dy = Math.abs(end.y - start.y);
 
+    if (dx == 0) {
+      if (end.y < start.y) {
+        return 90;
+      } else {
+        return 270;
+      }
+    }
+    if (dy == 0) {
+      if (end.x > start.x) {
+        return 0;
+      } else {
+        return 180;
+      }
+    }
     // Angle of the right-triangle formed by coords
     const tAngle = Angle.radToDeg(Math.atan(dy / dx))
 
@@ -51,7 +65,7 @@ export class Angle {
   }
 
   public static snapAngleFromCoords(start: Point, end: Point): number {
-    const realAngle = Angle.angleFromCoords(start, end);
+    const realAngle = Angle.fromTwoPoints(start, end);
     const rem = realAngle % Angle.SNAP_ANGLE;
 
     let quot = Math.floor(realAngle / Angle.SNAP_ANGLE);

@@ -2,9 +2,8 @@ import {ForeignObjectView} from "../ForeignObjectView";
 import {Container} from "../../../Container";
 import {Event} from "../../../dataSource/constant/Event";
 import {ElementType} from "../../../dataSource/constant/ElementType";
-import {ElementCursor} from "../../ElementView";
+import {ElementCursor, ElementProperties} from "../../ElementView";
 import {Rect} from "../../../model/Rect";
-import {ElementProperties} from "../../../model/ElementProperties";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 
 export class TextBoxCursor extends ElementCursor {

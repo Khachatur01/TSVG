@@ -23,10 +23,13 @@ import {IsoscelesTriangleCursor} from "./element/shape/pointed/polygon/triangle/
 import {RectangleCursor} from "./element/shape/pointed/polygon/rectangle/RectangleView";
 import {ImageCursor} from "./element/foreign/media/ImageView";
 import {VideoCursor} from "./element/foreign/media/VideoView";
-import {GraphicCursor} from "./element/foreign/graphic/GraphicView";
+import {CoordinatePlaneCursor} from "./element/complex/cartesian/CoordinatePlaneView";
 import {CircleCursor} from "./element/shape/circluar/CircleView";
 import {TableCursor} from "./element/complex/TableView";
 import {Tools} from "./dataSource/Tools";
+import {NumberLineCursor} from "./element/complex/cartesian/NumberLineView";
+import {RayCursor} from "./element/complex/cartesian/RayView";
+import {GraphicCursor} from "./element/complex/cartesian/GraphicView";
 
 class GlobalStyle extends Style {
   private readonly default: Style;
@@ -73,7 +76,10 @@ class GlobalStyle extends Style {
     this.cursor.element[ElementType.TEXT_BOX] = new TextBoxCursor();
     this.cursor.element[ElementType.IMAGE] = new ImageCursor();
     this.cursor.element[ElementType.VIDEO] = new VideoCursor();
+    this.cursor.element[ElementType.RAY] = new RayCursor();
     this.cursor.element[ElementType.GRAPHIC] = new GraphicCursor();
+    this.cursor.element[ElementType.COORDINATE_PLANE] = new CoordinatePlaneCursor();
+    this.cursor.element[ElementType.NUMBER_LINE] = new NumberLineCursor();
     this.cursor.element[ElementType.TABLE] = new TableCursor();
   }
 

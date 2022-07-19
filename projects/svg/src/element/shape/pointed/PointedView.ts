@@ -6,8 +6,9 @@ import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
 import {ShapeView} from "../../type/ShapeView";
 import {ElementView} from "../../ElementView";
+import {ClickDrawable} from "../../../service/tool/draw/type/ClickDrawable";
 
-export abstract class PointedView extends ShapeView {
+export abstract class PointedView extends ShapeView implements ClickDrawable {
   /* Model */
   protected _points: Point[] = [];
   protected _lastPoints: Point[] = [];
@@ -67,7 +68,12 @@ export abstract class PointedView extends ShapeView {
       this._points[i].y = (delta.y + this._lastPoints[i].y);
     }
 
-    this._rect = ElementView.calculateRect(this._points);
+    this._rect = {
+      x: this._lastRect.x + delta.x,
+      y: this._lastRect.y + delta.y,
+      width: this._lastRect.width,
+      height: this._lastRect.height
+    };
 
     this.__updateView__();
   }

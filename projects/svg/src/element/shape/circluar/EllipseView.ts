@@ -1,12 +1,11 @@
 import {Rect} from "../../../model/Rect";
-import {ElementCursor, ElementView} from "../../ElementView";
+import {ElementCursor, ElementProperties, ElementView} from "../../ElementView";
 import {Container} from "../../../Container";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {CircularView} from "./CircularView";
 import {Point} from "../../../model/Point";
 import {Matrix} from "../../../service/math/Matrix";
 import {Ellipse} from "../../../model/Ellipse";
-import {ElementProperties} from "../../../model/ElementProperties";
 
 export class EllipseCursor extends ElementCursor {
   constructor() {

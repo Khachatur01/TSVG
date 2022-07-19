@@ -1,4 +1,4 @@
-import {ElementCursor, ElementView} from "../ElementView";
+import {ElementCursor, ElementProperties, ElementView} from "../ElementView";
 import {Path} from "../../model/path/Path";
 import {Point} from "../../model/Point";
 import {Container} from "../../Container";
@@ -7,7 +7,6 @@ import {LineTo} from "../../model/path/line/LineTo";
 import {ElementType} from "../../dataSource/constant/ElementType";
 import {Rect} from "../../model/Rect";
 import {ShapeView} from "../type/ShapeView";
-import {ElementProperties} from "../../model/ElementProperties";
 
 export class PathCursor extends ElementCursor {}
 
@@ -31,7 +30,8 @@ export class PathView extends ShapeView {
     this.setProperties(properties);
   }
 
-  protected override __updateView__() {
+  public override __updateView__() {
+    this._rect = ElementView.calculateRect(this._path.points);
     this.setAttr({
       d: this._path.toString()
     });
@@ -42,8 +42,6 @@ export class PathView extends ShapeView {
   }
   public set path(path: Path) {
     this._path = path;
-
-    this._rect = ElementView.calculateRect(path.points);
     this.__updateView__();
   }
   public get pathString(): string {
@@ -51,7 +49,7 @@ export class PathView extends ShapeView {
   }
   public set pathString(path: string) {
     this._path.fromString(path);
-    this._rect = ElementView.calculateRect(this._path.points);
+    this.__updateView__();
   }
 
   public get copy(): PathView {
@@ -84,8 +82,6 @@ export class PathView extends ShapeView {
     for (let i = 0; i < commands.length; i++) {
       commands[i].position = points[i];
     }
-
-    this._rect = ElementView.calculateRect(points);
     this.__updateView__();
   }
 
@@ -93,8 +89,6 @@ export class PathView extends ShapeView {
     path.getAll().forEach((command: PathCommand) => {
       this._path.add(command);
     });
-
-    this._rect = ElementView.calculateRect(path.points);
     this.__updateView__();
   }
   public addCommand(command: PathCommand) {
@@ -117,7 +111,6 @@ export class PathView extends ShapeView {
       };
     }
     this._path.setAll(commands);
-    this._rect = ElementView.calculateRect(this._path.points);
     this.__updateView__();
   }
   public override __drag__(delta: Point) {
@@ -132,7 +125,6 @@ export class PathView extends ShapeView {
     }
 
     this._path.setAll(thisCommands);
-    this._rect = ElementView.calculateRect(this._path.points);
     this.__updateView__();
   }
   public override __setRect__(rect: Rect, delta?: Point): void {
@@ -160,7 +152,6 @@ export class PathView extends ShapeView {
 
     this._path = new Path();
     this._path.setAll(commands);
-    this._rect = ElementView.calculateRect(this._path.points);
     this.__updateView__();
   }
 
@@ -169,17 +160,14 @@ export class PathView extends ShapeView {
   }
   public pushPoint(point: Point): void {
     this._path.add(new LineTo(point));
-    this._rect = ElementView.calculateRect(this._path.points);
     this.__updateView__();
   }
   public replacePoint(index: number, point: Point): void {
     this._path.replace(index, point);
-    this._rect = ElementView.calculateRect(this._path.points);
     this.__updateView__();
   }
   public removePoint(index: number): void {
     this._path.remove(index);
-    this._rect = ElementView.calculateRect(this._path.points);
     this.__updateView__();
   }
 

@@ -1,11 +1,10 @@
-import {ElementCursor, ElementView} from "../ElementView";
+import {ElementCursor, ElementProperties, ElementView} from "../ElementView";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
 import {Container} from "../../Container";
 import {PathView} from "./PathView";
 import {ShapeView} from "../type/ShapeView";
 import {ElementType} from "../../dataSource/constant/ElementType";
-import {ElementProperties} from "../../model/ElementProperties";
 
 export class BoxCursor extends ElementCursor {}
 
@@ -22,7 +21,7 @@ export class BoxView extends ShapeView {
 
     this.setProperties(properties);
   }
-  protected __updateView__(): void {
+  public __updateView__(): void {
     this.setAttr({
       x: this._rect.x,
       y: this._rect.y,
