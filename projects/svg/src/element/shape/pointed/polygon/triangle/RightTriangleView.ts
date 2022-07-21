@@ -20,15 +20,6 @@ export class RightTriangleView extends TriangleView implements MoveDrawable {
     this.setProperties(properties);
   }
 
-  public override get copy(): RightTriangleView {
-    let copy: RightTriangleView = Object.assign(
-      new RightTriangleView(this._container, this._properties),
-      super.copy
-    );
-    copy._type = ElementType.RIGHT_TRIANGLE;
-    return copy;
-  }
-
   public __drawSize__(rect: Rect) {
     this._points = [];
     this._points.push({ /* A */

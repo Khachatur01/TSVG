@@ -1,5 +1,4 @@
 import {MoveDraw} from "../../../mode/MoveDraw";
-import {ElementView} from "../../../../../../element/ElementView";
 import {EllipseView} from "../../../../../../element/shape/circluar/EllipseView";
 import {Point} from "../../../../../../model/Point";
 import {Event} from "../../../../../../dataSource/constant/Event";

@@ -93,6 +93,7 @@ export class RayView extends ComplexView implements ClickDrawable {
 
   public override readonly style: RayStyle;
 
+  private readonly _numberViews: TextView[] = [];
   private readonly _rayPathView: PathView;
   private readonly _numbersGroup: SVGGElement;
 
@@ -166,11 +167,7 @@ export class RayView extends ComplexView implements ClickDrawable {
       throw Error("No such point index");
     }
   }
-  public pushPoint(point: Point): void {
-    this._endPoint = point;
-    this._rect = ElementView.calculateRect(this._rayPathView.points);
-    this.__updateView__()
-  }
+  public pushPoint(point: Point): void {}
   public removePoint(index: number): void {}
   public replacePoint(index: number, point: Point): void {
     if (index < 0) {
@@ -323,14 +320,18 @@ export class RayView extends ComplexView implements ClickDrawable {
       this._numbersGroup.innerHTML = "";
 
       if (this._viewEffects.showZero) {
-        this._numbersGroup.appendChild(this.createNumber(this._startPoint, 0).SVG);
+        let numberView = this.createNumber(this._startPoint, 0);
+        this._numberViews.push(numberView);
+        this._numbersGroup.appendChild(numberView.SVG);
       }
 
       let step = this._mainStep / this._currentDivisor * (this._viewEffects.numbersDirection || 1);
       let number = step;
       for (let stepLength = physicalStep; stepLength < lineLength; stepLength += physicalStep) {
         let stepPosition = Angle.lineFromVector(this._startPoint, angle, stepLength);
-        this._numbersGroup.appendChild(this.createNumber(stepPosition, number).SVG);
+        let numberView = this.createNumber(stepPosition, number);
+        this._numberViews.push(numberView);
+        this._numbersGroup.appendChild(numberView.SVG);
         number += step;
       }
     }
@@ -369,6 +370,9 @@ export class RayView extends ComplexView implements ClickDrawable {
     };
 
     this._rayPathView.__drag__(delta);
+    this._numberViews.forEach(numberView => {
+      numberView.__drag__(delta);
+    });
   }
 
   public __setRect__(rect: Rect, delta?: Point): void {
@@ -402,16 +406,15 @@ export class RayView extends ComplexView implements ClickDrawable {
   public override __fixRect__() {
     super.__fixRect__();
     this._rayPathView.__fixRect__();
+    this._numberViews.forEach(numberView => {
+      numberView.__fixRect__();
+    });
     this._lastStartPoint = Object.assign({}, this._startPoint);
     this._lastEndPoint = Object.assign({}, this._endPoint);
   }
 
-  get copy(): ElementView { /* todo */
-    return this;
-  }
-
   public isComplete(): boolean { /* todo */
-    return false;
+    return this._startPoint.x === this._endPoint.x && this._startPoint.y === this._endPoint.y;
   }
 
   public toPath(): PathView { /* todo */
@@ -419,27 +422,27 @@ export class RayView extends ComplexView implements ClickDrawable {
   }
   public override toJSON(): any {
     let json = super.toJSON();
-    json.startPoint = this._startPoint;
-    json.endPoint = this._endPoint;
+    json.startPoint = Object.assign({}, this._startPoint);
+    json.endPoint = Object.assign({}, this._endPoint);
     json.currentDivisor = this._currentDivisor;
-    json.physicalUnitLimits = this._physicalUnitLimits;
+    json.physicalUnitLimits = Object.assign({}, this._physicalUnitLimits);
     json.mainStep = this._mainStep;
     json.mainStepMultiplier = this._mainStepMultiplier;
     json.mainStepPhysicalUnit = this._mainStepPhysicalUnit;
-    json.viewEffects = this._viewEffects;
+    json.viewEffects = Object.assign({}, this._viewEffects);
     json.zoomFactor = this._zoomFactor;
     return json;
   }
   public override fromJSON(json: any) {
-    this._startPoint = json.startPoint;
-    this._endPoint = json.endPoint;
+    this._startPoint = Object.assign({}, json.startPoint);
+    this._endPoint = Object.assign({}, json.endPoint);
     this._currentDivisor = json.currentDivisor;
-    this._physicalUnitLimits = json.physicalUnitLimits;
+    this._physicalUnitLimits = Object.assign({}, json.physicalUnitLimits);
     this._mainStep = json.mainStep;
     this._mainStepMultiplier = json.mainStepMultiplier;
     this._mainStepPhysicalUnit = json.mainStepPhysicalUnit;
-    this._viewEffects = json.viewEffects;
-    this.zoomIn(json.zoomFactor);
+    this._viewEffects = Object.assign({}, json.viewEffects);
+    this._zoomFactor = json.zoomFactor;
     super.fromJSON(json);
     this.__updateView__();
   };

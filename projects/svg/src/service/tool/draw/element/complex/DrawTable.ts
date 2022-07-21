@@ -1,6 +1,5 @@
 import {MoveDraw} from "../../mode/MoveDraw";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {ElementView} from "../../../../../element/ElementView";
 import {Point} from "../../../../../model/Point";
 import {TableView} from "../../../../../element/complex/TableView";
 import {Event} from "../../../../../dataSource/constant/Event";

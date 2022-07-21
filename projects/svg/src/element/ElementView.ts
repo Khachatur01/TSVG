@@ -200,7 +200,13 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     ];
   };
   public abstract toPath(): PathView;
-  public abstract get copy(): ElementView;
+  public get copy(): ElementView {
+    return this._container.createElementFromJSON(
+      JSON.parse(
+        JSON.stringify(this.toJSON())
+      )
+    );
+  };
   public abstract isComplete(): boolean;
 
   /**

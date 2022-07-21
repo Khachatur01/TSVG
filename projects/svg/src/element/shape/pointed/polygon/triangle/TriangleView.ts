@@ -14,10 +14,4 @@ export class TriangleView extends PolygonView {
 
     this.setProperties(properties);
   }
-
-  public override get copy(): TriangleView {
-    let copy: TriangleView = Object.assign(new TriangleView(this._container, this._properties), super.copy);
-    copy._type = ElementType.TRIANGLE;
-    return copy;
-  }
 }

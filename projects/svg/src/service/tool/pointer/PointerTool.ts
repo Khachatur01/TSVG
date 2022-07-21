@@ -94,7 +94,7 @@ export class PointerTool extends Tool {
   private move(event: TouchEvent | MouseEvent): void {
     let containerRect = this._container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.stopImmediatePropagation();
+    event.preventDefault();
 
     let movePosition = {
       x: eventPosition.x - containerRect.left,

@@ -126,22 +126,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.setProperties(properties);
   }
 
-  public get copy(): ForeignObjectView {
-    let foreignObject: ForeignObjectView = new ForeignObjectView(this._container, this._properties);
-    foreignObject._content = this._content.cloneNode(true) as HTMLElement;
-    foreignObject.svgElement.appendChild(foreignObject._content);
-
-    foreignObject.__setRect__(Object.assign({}, this._rect));
-    foreignObject.__fixRect__();
-
-    foreignObject.refPoint = Object.assign({}, this.refPoint);
-    foreignObject.__rotate__(this._angle);
-
-    foreignObject.style.set = this.style;
-
-    return foreignObject;
-  }
-
   public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
@@ -290,13 +274,13 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
   public override toJSON(): any {
     let json = super.toJSON();
-    json["content"] = this._content.outerHTML;
+    json["content"] = encodeURIComponent(this._content.outerHTML);
     return json;
   }
   public override fromJSON(json: any) {
     super.fromJSON(json);
     if (json.content) {
-      this.svgElement.innerHTML = json.content;
+      this.svgElement.innerHTML = decodeURIComponent(json.content);
       this._content = this.svgElement.firstChild as HTMLElement;
     }
     this.addEditCallBack();

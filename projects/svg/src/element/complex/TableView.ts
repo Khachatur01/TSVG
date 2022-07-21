@@ -477,24 +477,6 @@ export class TableView extends ComplexView implements MoveDrawable {
     return colsCopy;
   }
 
-  public get copy(): ElementView {
-    let table: TableView = new TableView(this._container, this._properties);
-
-    table.setTable(
-      Object.assign({}, this._rect),
-      this.copyRows,
-      this.copyCols
-    );
-
-    table.__fixRect__();
-
-    table.refPoint = Object.assign({}, this._refPoint);
-    table.__rotate__(this._angle);
-
-    table.style.set = this.style;
-    return table;
-  }
-
   public isComplete(): boolean {
     return this._rect.width > 0 && this._rect.height > 0 && this._rows.length > 0 && this._cols.length > 0;
   }

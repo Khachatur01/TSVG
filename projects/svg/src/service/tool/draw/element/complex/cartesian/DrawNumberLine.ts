@@ -1,7 +1,6 @@
 import {Point} from "../../../../../../model/Point";
 import {MoveDraw} from "../../../mode/MoveDraw";
 import {ElementType} from "../../../../../../dataSource/constant/ElementType";
-import {ElementView} from "../../../../../../element/ElementView";
 import {Event} from "../../../../../../dataSource/constant/Event";
 import {NumberLineView} from "../../../../../../element/complex/cartesian/NumberLineView";
 import {MoveDrawable} from "../../../type/MoveDrawable";

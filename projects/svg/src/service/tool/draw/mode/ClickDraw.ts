@@ -10,7 +10,7 @@ import {ElementView} from "../../../../element/ElementView";
 
 export abstract class ClickDraw extends Drawer {
   protected container: Container;
-  protected _drawableElement: ClickDrawable | null = null;
+  protected _drawableElement: ClickDrawable | undefined = undefined;
   protected clicksCount: number = 0;
 
   private _click = this.click.bind(this);
@@ -61,7 +61,7 @@ export abstract class ClickDraw extends Drawer {
 
   public abstract override _new(): ClickDraw;
   public abstract override get type(): ElementType;
-  public get drawableElement(): ClickDrawable | null {
+  public get drawableElement(): ClickDrawable | undefined {
     return this._drawableElement;
   }
 
@@ -108,7 +108,7 @@ export abstract class ClickDraw extends Drawer {
       }
     }
 
-    this._drawableElement = null;
+    this._drawableElement = undefined;
     this.clicksCount = 0;
     this.drawTool?.__drawingEnd__();
 

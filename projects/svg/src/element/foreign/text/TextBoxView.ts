@@ -108,13 +108,6 @@ export class TextBoxView extends ForeignObjectView {
     this.text = this.text.substring(0, start) + text + this.text.substring(end);
   }
 
-  public override get copy(): TextBoxView {
-    let copy: TextBoxView = Object.assign(new TextBoxView(this._container, this._properties), super.copy);
-    copy._type = ElementType.TEXT_BOX;
-    copy.text = this.text;
-    return copy;
-  }
-
   public override isComplete(): boolean {
     return this._rect.width > 15 && this._rect.height > 15;
   }

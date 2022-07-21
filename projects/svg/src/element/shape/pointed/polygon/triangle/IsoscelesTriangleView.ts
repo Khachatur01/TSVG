@@ -20,15 +20,6 @@ export class IsoscelesTriangleView extends TriangleView implements MoveDrawable 
     this.setProperties(properties);
   }
 
-  public override get copy(): IsoscelesTriangleView {
-    let copy: IsoscelesTriangleView = Object.assign(
-      new IsoscelesTriangleView(this._container, this._properties),
-      super.copy
-    );
-    copy._type = ElementType.ISOSCELES_TRIANGLE;
-    return copy;
-  }
-
   public __drawSize__(rect: Rect): void {
     this._points = [];
     this._points.push({ /* A */

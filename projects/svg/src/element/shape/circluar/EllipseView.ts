@@ -26,16 +26,6 @@ export class EllipseView extends CircularView {
     this.setProperties(properties);
   }
 
-  public get copy(): EllipseView {
-    let ellipse: EllipseView = new EllipseView(this._container, this._properties, Object.assign({}, this._rect));
-    ellipse.refPoint = Object.assign({}, this.refPoint);
-    ellipse.__rotate__(this._angle);
-
-    ellipse.style.set = this.style;
-
-    return ellipse;
-  }
-
   private getEllipseModel(): Ellipse {
     return {
       cx: this._rect.x + this._rect.width / 2,

@@ -40,17 +40,6 @@ export class VideoView extends ForeignObjectView {
     this.setProperties(properties);
   }
 
-  public override get copy(): VideoView {
-    let videoView: VideoView = new VideoView(this._container, this._properties, this._src, Object.assign({}, this._rect));
-    videoView.__fixRect__();
-
-    videoView.refPoint = Object.assign({}, this.refPoint);
-    videoView.__rotate__(this._angle);
-
-    videoView.style.set = this.style;
-    return videoView;
-  }
-
   public get src(): string {
     return this._src;
   }

@@ -30,19 +30,6 @@ export class PolygonView extends PointedView {
     this.setAttr({points: string});
   }
 
-  public get copy(): PolygonView {
-    let polygon: PolygonView = new PolygonView(this._container, this._properties);
-    polygon.points = this._points.map(point => Object.assign({}, point)); /* copy points array */
-    polygon.__fixRect__();
-
-    polygon.refPoint = Object.assign({}, this.refPoint);
-    polygon.__rotate__(this._angle);
-
-    polygon.style.set = this.style;
-
-    return polygon;
-  }
-
   public override isComplete(): boolean {
     return this._points.length >= 3;
   }

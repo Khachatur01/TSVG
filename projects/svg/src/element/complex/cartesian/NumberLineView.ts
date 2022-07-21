@@ -155,10 +155,6 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
     );
   }
 
-  public get copy(): NumberLineView { /* TODO */
-    return new NumberLineView(this._container);
-  }
-
   public override get points(): Point[] {
     let points = super.points;
     points.push(this.center)

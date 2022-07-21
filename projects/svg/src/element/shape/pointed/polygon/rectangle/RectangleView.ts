@@ -28,15 +28,6 @@ export class RectangleView extends PolygonView implements MoveDrawable {
     this.setProperties(properties);
   }
 
-  public override get copy(): RectangleView {
-    let copy: RectangleView = Object.assign(
-      new RectangleView(this._container, this._properties),
-      super.copy
-    );
-    copy._type = ElementType.RECTANGLE;
-    return copy;
-  }
-
   public __drawSize__(rect: Rect) {
     this._points = [];
     this._points.push({ /* 0 */

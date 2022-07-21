@@ -10,8 +10,8 @@ import {DrawFree} from "./mode/DrawFree";
 export class DrawTool extends Tool {
   private _drawer: Drawer;
   private _isDrawing: boolean = false;
-  public toolAfterDrawing: Tool | null;
   public perfect: boolean = false;
+  public toolAfterDrawing: Tool | undefined;
 
   public constructor(container: Container) {
     super(container);

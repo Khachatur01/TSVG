@@ -6,30 +6,33 @@ import {Event} from "./dataSource/constant/Event";
 import {GroupCursor, GroupView} from "./element/group/GroupView";
 import {Style} from "./service/style/Style";
 import {Point} from "./model/Point";
-import {TextBoxCursor} from "./element/foreign/text/TextBoxView";
+import {TextBoxCursor, TextBoxView} from "./element/foreign/text/TextBoxView";
 import {Cursor} from "./dataSource/constant/Cursor";
-import {ForeignObjectCursor} from "./element/foreign/ForeignObjectView";
+import {ForeignObjectCursor, ForeignObjectView} from "./element/foreign/ForeignObjectView";
 import {ElementType} from "./dataSource/constant/ElementType";
-import {EllipseCursor} from "./element/shape/circluar/EllipseView";
-import {BoxCursor} from "./element/shape/BoxView";
-import {PathCursor} from "./element/shape/PathView";
-import {LineCursor} from "./element/shape/pointed/LineView";
-import {FreeCursor} from "./element/shape/pointed/polyline/FreeView";
-import {PolylineCursor} from "./element/shape/pointed/polyline/PolylineView";
-import {PolygonCursor} from "./element/shape/pointed/polygon/PolygonView";
-import {TriangleCursor} from "./element/shape/pointed/polygon/triangle/TriangleView";
-import {RightTriangleCursor} from "./element/shape/pointed/polygon/triangle/RightTriangleView";
-import {IsoscelesTriangleCursor} from "./element/shape/pointed/polygon/triangle/IsoscelesTriangleView";
-import {RectangleCursor} from "./element/shape/pointed/polygon/rectangle/RectangleView";
-import {ImageCursor} from "./element/foreign/media/ImageView";
-import {VideoCursor} from "./element/foreign/media/VideoView";
-import {CoordinatePlaneCursor} from "./element/complex/cartesian/CoordinatePlaneView";
-import {CircleCursor} from "./element/shape/circluar/CircleView";
-import {TableCursor} from "./element/complex/TableView";
+import {EllipseCursor, EllipseView} from "./element/shape/circluar/EllipseView";
+import {BoxCursor, BoxView} from "./element/shape/BoxView";
+import {PathCursor, PathView} from "./element/shape/PathView";
+import {LineCursor, LineView} from "./element/shape/pointed/LineView";
+import {FreeCursor, FreeView} from "./element/shape/pointed/polyline/FreeView";
+import {PolylineCursor, PolylineView} from "./element/shape/pointed/polyline/PolylineView";
+import {PolygonCursor, PolygonView} from "./element/shape/pointed/polygon/PolygonView";
+import {TriangleCursor, TriangleView} from "./element/shape/pointed/polygon/triangle/TriangleView";
+import {RightTriangleCursor, RightTriangleView} from "./element/shape/pointed/polygon/triangle/RightTriangleView";
+import {
+  IsoscelesTriangleCursor,
+  IsoscelesTriangleView
+} from "./element/shape/pointed/polygon/triangle/IsoscelesTriangleView";
+import {RectangleCursor, RectangleView} from "./element/shape/pointed/polygon/rectangle/RectangleView";
+import {ImageCursor, ImageView} from "./element/foreign/media/ImageView";
+import {VideoCursor, VideoView} from "./element/foreign/media/VideoView";
+import {CoordinatePlaneCursor, CoordinatePlaneView} from "./element/complex/cartesian/CoordinatePlaneView";
+import {CircleCursor, CircleView} from "./element/shape/circluar/CircleView";
+import {TableCursor, TableView} from "./element/complex/TableView";
 import {Tools} from "./dataSource/Tools";
-import {NumberLineCursor} from "./element/complex/cartesian/NumberLineView";
-import {RayCursor} from "./element/complex/cartesian/RayView";
-import {GraphicCursor} from "./element/complex/cartesian/GraphicView";
+import {NumberLineCursor, NumberLineView} from "./element/complex/cartesian/NumberLineView";
+import {RayCursor, RayView} from "./element/complex/cartesian/RayView";
+import {GraphicCursor, GraphicView} from "./element/complex/cartesian/GraphicView";
 
 class GlobalStyle extends Style {
   private readonly default: Style;
@@ -345,6 +348,61 @@ export class Container {
       }
     }
     return undefined;
+  }
+  public createElementByType(type: ElementType): ElementView {
+    switch (type) {
+      case ElementType.BOX:
+        return new BoxView(this);
+      case ElementType.ELLIPSE:
+        return new EllipseView(this);
+      case ElementType.CIRCLE:
+        return new CircleView(this);
+      case ElementType.FOREIGN_OBJECT:
+        return new ForeignObjectView(this);
+      case ElementType.FREE:
+        return new FreeView(this);
+      case ElementType.LINE:
+        return new LineView(this);
+      case ElementType.PATH:
+        return new PathView(this);
+      case ElementType.POLYGON:
+        return new PolygonView(this);
+      case ElementType.POLYLINE:
+        return new PolylineView(this);
+      case ElementType.RECTANGLE:
+        return new RectangleView(this);
+      case ElementType.COORDINATE_PLANE:
+        return new CoordinatePlaneView(this);
+      case ElementType.GRAPHIC:
+        return new GraphicView(this, undefined, undefined, undefined, (x: number) => x);
+      case ElementType.RAY:
+        return new RayView(this);
+      case ElementType.NUMBER_LINE:
+        return new NumberLineView(this);
+      case ElementType.GROUP:
+        return new GroupView(this);
+      case ElementType.TRIANGLE:
+        return new TriangleView(this);
+      case ElementType.ISOSCELES_TRIANGLE:
+        return new IsoscelesTriangleView(this);
+      case ElementType.RIGHT_TRIANGLE:
+        return new RightTriangleView(this);
+      case ElementType.TEXT_BOX:
+        return new TextBoxView(this);
+      case ElementType.IMAGE:
+        return new ImageView(this, undefined, "");
+      case ElementType.VIDEO:
+        return new VideoView(this, undefined, "");
+      case ElementType.TABLE:
+        return new TableView(this);
+      default:
+        throw Error("Unknown element type");
+    }
+  }
+  public createElementFromJSON(elementJSON: any): ElementView {
+    let element = this.createElementByType(elementJSON.type);
+    element.fromJSON(elementJSON);
+    return element;
   }
 
   public __call__(name: Event, parameters: any = {}): void {

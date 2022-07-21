@@ -102,22 +102,6 @@ export class GroupView extends ElementView {
     this.setProperties(properties);
   }
 
-  public get copy(): GroupView {
-    let group: GroupView = new GroupView(this._container, this._properties);
-    this._elements.forEach((element: ElementView) => {
-      let copy = element.copy;
-      copy.group = group;
-      group.addElement(copy);
-    });
-
-    group.refPoint = Object.assign({}, this.refPoint);
-    group._angle = (this._angle);
-
-    group.style.set = this.style;
-
-    return group;
-  }
-
   public getElementById(ownerId: string, index: number): ElementView | undefined {
     for (let element of this._elements) {
       if (element instanceof GroupView) {
@@ -291,7 +275,7 @@ export class GroupView extends ElementView {
     this.__lowlight__();
   }
 
-  public toPath(): PathView {
+  public toPath(): PathView { /* todo */
     return new PathView(this._container, this._properties);
   }
 
@@ -304,17 +288,17 @@ export class GroupView extends ElementView {
 
   public override toJSON(): any {
     let json =  super.toJSON();
-    json["elements"] = [];
+    json["children"] = [];
     for (let element of this._elements) {
-      json["elements"].push(element.toJSON());
+      json["children"].push(element.toJSON());
     }
     return json;
   }
   public override fromJSON(json: any) {
     super.fromJSON(json);
     this.removeElements();
-    json.elements.forEach((element: any) => {
-      this.addElement(element);
+    json.children.forEach((childJSON: any) => {
+      this.addElement(this._container.createElementFromJSON(childJSON));
     });
   };
 }

@@ -12,7 +12,7 @@ import {Cursor} from "../../../../dataSource/constant/Cursor";
 
 export class DrawFree extends Drawer {
   private readonly container: Container;
-  private _drawableElement: FreeView | null = null;
+  private _drawableElement: FreeView | undefined = undefined;
   public snappable: boolean = false;
 
   private _drawStart = this.drawStart.bind(this);
@@ -97,7 +97,7 @@ export class DrawFree extends Drawer {
   public get type(): ElementType {
     return ElementType.FREE;
   }
-  public get drawableElement(): ElementView | null {
+  public get drawableElement(): ElementView | undefined {
     return this._drawableElement;
   }
 

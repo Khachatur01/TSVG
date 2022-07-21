@@ -257,10 +257,6 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     })
   }
 
-  public get copy(): CoordinatePlaneView { /* TODO */
-    return new CoordinatePlaneView(this._container);
-  }
-
   public override get points(): Point[] {
     let points = super.points;
     let realCenter: Point = {

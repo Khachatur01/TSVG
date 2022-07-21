@@ -30,17 +30,6 @@ export class BoxView extends ShapeView {
     });
   }
 
-  public get copy(): BoxView {
-    let box: BoxView = new BoxView(this._container, this._properties);
-    box.__setRect__(Object.assign({}, this._rect));
-    box.style.set = this.style;
-
-    box.refPoint = Object.assign({}, this.refPoint);
-    box.__rotate__(this._angle);
-
-    return box;
-  }
-
   __correct__(refPoint: Point, lastRefPoint: Point): void {}
   public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;

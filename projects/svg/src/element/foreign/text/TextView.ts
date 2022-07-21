@@ -31,18 +31,6 @@ export class TextView extends ForeignView implements MoveDrawable {
     this.setProperties(properties);
   }
 
-  public override get copy(): TextView {
-    let copy: TextView = new TextView(this._container, this._properties);
-    copy._type = ElementType.TEXT;
-
-    copy.text = this._text;
-    copy.style.set = this.style;
-
-    copy.refPoint = Object.assign({}, this.refPoint);
-    copy.__rotate__(this._angle);
-    return copy;
-  }
-
   get text(): string {
     return this._text;
   }

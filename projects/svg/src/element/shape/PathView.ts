@@ -52,19 +52,6 @@ export class PathView extends ShapeView {
     this.__updateView__();
   }
 
-  public get copy(): PathView {
-    let path: PathView = new PathView(this._container, this._properties);
-    path.path = this._path.copy;
-    path.__fixRect__();
-
-    path.refPoint = Object.assign({}, this.refPoint);
-    path.__rotate__(this._angle);
-
-    path.style.set = this.style;
-
-    return path;
-  }
-
   public override __fixRect__() {
     super.__fixRect__();
     this._lastPath = this._path.copy;

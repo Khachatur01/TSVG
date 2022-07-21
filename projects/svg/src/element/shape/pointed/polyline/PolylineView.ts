@@ -29,19 +29,6 @@ export class PolylineView extends PointedView {
     this.setAttr({points: string});
   }
 
-  public get copy(): PolylineView {
-    let polyline: PolylineView = new PolylineView(this._container, this._properties);
-    polyline.points = this._points.map(point => Object.assign({}, point)); /* copy points array */
-    polyline.__fixRect__();
-
-    polyline.refPoint = Object.assign({}, this.refPoint);
-    polyline.__rotate__(this._angle);
-
-    polyline.style.set = this.style;
-
-    return polyline;
-  }
-
   public override intersectsRect(rect: Rect): boolean {
     let points = this.visiblePoints;
     return ElementView.pointsIntersectingRect(points, rect, false);

@@ -16,7 +16,7 @@ export abstract class MoveDraw extends Drawer {
   protected _draw = this.draw.bind(this);
   protected _drawEnd = this.drawEnd.bind(this);
 
-  protected _drawableElement: MoveDrawable | null = null;
+  protected _drawableElement: MoveDrawable | undefined = undefined;
 
   public constructor(container: Container) {
     super();
@@ -104,7 +104,7 @@ export abstract class MoveDraw extends Drawer {
 
   public abstract override _new(): MoveDraw;
   public abstract override get type(): ElementType;
-  public get drawableElement(): MoveDrawable | null {
+  public get drawableElement(): MoveDrawable | undefined {
     return this._drawableElement;
   }
 

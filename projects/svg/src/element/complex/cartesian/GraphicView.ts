@@ -1,7 +1,7 @@
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {Point} from "../../../model/Point";
 import {Rect} from "../../../model/Rect";
-import {ElementCursor, ElementProperties, ElementStyle} from "../../ElementView";
+import {ElementCursor, ElementProperties} from "../../ElementView";
 import {PathView} from "../../shape/PathView";
 import {Container} from "../../../Container";
 import {Path} from "../../../model/path/Path";
@@ -194,12 +194,9 @@ export class GraphicView extends PathView implements MoveDrawable {
     this._lastOrigin = Object.assign({}, this._origin);
   }
 
-  public override get copy(): GraphicView { /* todo */
-    return this;
-  }
   public override toJSON(): any {
     let json = super.toJSON();
-    json.function = this._f.toString();
+    json.f = this._f.toString();
     json.origin = this._origin;
     json.physicalUnitLimits = this._physicalUnitLimits;
     json.mainStep = this._mainStep;

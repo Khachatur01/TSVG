@@ -30,30 +30,11 @@ export class LineView extends PointedView implements MoveDrawable {
     });
   }
 
-  public get copy(): LineView {
-    let line: LineView = new LineView(this._container, this._properties);
-    line.points = this._points.map(point => Object.assign({}, point)); /* copy points array */
-
-    line.refPoint = Object.assign({}, this.refPoint);
-    line.__rotate__(this._angle);
-
-    line.style.set = this.style;
-
-    return line;
-  }
-
   public __drawSize__(rect: Rect) {
     this.__setRect__(rect);
   }
 
-  public override pushPoint(point: Point): void {
-    if (this._points.length === 2) {
-      return;
-    }
-    this._points.push(point);
-    this._rect = ElementView.calculateRect(this._points);
-    this.__updateView__();
-  }
+  public override pushPoint(point: Point): void {}
   public override removePoint(index: number): void {}
 
   public override isComplete(): boolean {

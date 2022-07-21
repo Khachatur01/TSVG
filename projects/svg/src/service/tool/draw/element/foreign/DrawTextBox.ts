@@ -22,13 +22,14 @@ export class DrawTextBox extends MoveDraw {
   protected override turnOnToolAfterDrawing(): void {}
 
   protected override drawStart(event: MouseEvent | TouchEvent) {
+    /* turn on text edit mode when clicking to text box element */
     if (event.target instanceof HTMLElement && event.target.parentElement instanceof SVGForeignObjectElement) {
       let targetElementId = ElementView.parseId(event.target.parentElement.id);
       let targetElement: ElementView | undefined = this.container.getElementById(targetElementId.ownerId, targetElementId.index, true);
       if (!targetElement || targetElement.selectable) {
         return;
       }
-    } else if (this.container.focused.children.size !== 0) {
+    } else if (this.container.focused.children.size !== 0) { /* turn on default tool when clicking outside of text box */
       super.turnOnToolAfterDrawing();
       return;
     }

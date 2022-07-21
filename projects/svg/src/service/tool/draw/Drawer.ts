@@ -18,5 +18,5 @@ export abstract class Drawer {
 
   public abstract _new(): Drawer;
   public abstract get type(): ElementType;
-  public abstract get drawableElement(): Drawable | null;
+  public abstract get drawableElement(): Drawable | undefined;
 }
