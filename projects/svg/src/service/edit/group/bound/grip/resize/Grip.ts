@@ -9,6 +9,7 @@ import {Event} from "../../../../../../dataSource/constant/Event";
 
 export abstract class Grip extends BoxView {
   protected _lastResize: Rect = {x: 0, y: 0, width: 0, height: 0};
+  protected mouseCurrentPos: Point = {x: 0, y: 0};
   private _start = this.start.bind(this);
   private _move = this.move.bind(this);
   private _end = this.end.bind(this);
@@ -74,10 +75,13 @@ export abstract class Grip extends BoxView {
 
     let containerRect = this._container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
+    this.mouseCurrentPos = {
+      x: eventPosition.x - containerRect.x,
+      y: eventPosition.y - containerRect.y
+    };
 
     let client: Point = Matrix.rotate(
-      [{x: eventPosition.x - containerRect.x, y: eventPosition.y - containerRect.y}],
+      [this.mouseCurrentPos],
       this.focus.__refPoint__,
       this.focus.angle
     )[0];
@@ -87,29 +91,28 @@ export abstract class Grip extends BoxView {
   private move(event: MouseEvent | TouchEvent) {
     let containerRect = this._container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
+    this.mouseCurrentPos = {
+      x: eventPosition.x - containerRect.x,
+      y: eventPosition.y - containerRect.y
+    };
 
     let client: Point = Matrix.rotate(
-      [{x: eventPosition.x - containerRect.x, y: eventPosition.y - containerRect.y}],
+      [this.mouseCurrentPos],
       this.focus.__refPoint__,
       this.focus.angle
     )[0];
 
     this.makeMouseMove(client);
   }
-  private end(event: MouseEvent | TouchEvent) {
+  private end() {
     this._container.tools.activeTool?.on();
     document.removeEventListener("mousemove", this._move);
     document.removeEventListener("touchmove", this._move);
     document.removeEventListener("mouseup", this._end);
     document.removeEventListener("touchend", this._end);
 
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-
     let client: Point = Matrix.rotate(
-      [{x: eventPosition.x - containerRect.x, y: eventPosition.y - containerRect.y}],
+      [this.mouseCurrentPos],
       this.focus.__refPoint__,
       this.focus.angle
     )[0];

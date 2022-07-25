@@ -9,9 +9,9 @@ import {Event} from "../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../../element/ElementView";
 import {Cursor} from "../../../../dataSource/constant/Cursor";
+import {DrawTool} from "../DrawTool";
 
 export class DrawFree extends Drawer {
-  private readonly container: Container;
   private _drawableElement: FreeView | undefined = undefined;
   public snappable: boolean = false;
 
@@ -19,29 +19,28 @@ export class DrawFree extends Drawer {
   private _draw = this.draw.bind(this);
   private _drawEnd = this.drawEnd.bind(this);
 
-  public constructor(container: Container) {
-    super();
-    this.container = container;
+  public constructor(drawTool: DrawTool) {
+    super(drawTool);
     this.cursor = Cursor.DRAW_FREE;
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {
-    if (this.drawTool?.isDrawing) {
+    if (this.drawTool.isDrawing) {
       return;
     }
     if (this.snappable) {
-      position = this.container.grid.getSnapPoint(position);
+      position = this.drawTool.container.grid.getSnapPoint(position);
     }
 
     let pathObject = new Path();
     pathObject.add(new MoveTo(position));
-    this._drawableElement = new FreeView(this.container, {overEvent: true, globalStyle: true}, pathObject);
-    this.drawTool?.__drawing__();
+    this._drawableElement = new FreeView(this.drawTool.container, {overEvent: true, globalStyle: true}, pathObject);
+    this.drawTool.__drawing__();
 
-    this.container.add(this._drawableElement);
+    this.drawTool.container.add(this._drawableElement);
 
     if (call) {
-      this.container.__call__(Event.DRAW_MOUSE_DOWN, {position: position, element: this._drawableElement});
+      this.drawTool.container.__call__(Event.DRAW_MOUSE_DOWN, {position: position, element: this._drawableElement});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true, additional?: any) {
@@ -52,10 +51,10 @@ export class DrawFree extends Drawer {
         d: additional.path
       });
     } else {
-      if (this.snappable && this.container.grid.isSnap()) {
-        position = this.container.grid.getSnapPoint(position);
+      if (this.snappable && this.drawTool.container.grid.isSnap()) {
+        position = this.drawTool.container.grid.getSnapPoint(position);
         this._drawableElement.pushPoint(position);
-      } else if (this.drawTool?.perfect) {
+      } else if (this.drawTool.perfect) {
         try {
           let lastPoint: Point = this._drawableElement.getPoint(-1);
           position = Angle.snapLineEnd(lastPoint, position) as Point;
@@ -69,7 +68,7 @@ export class DrawFree extends Drawer {
     }
 
     if (call) {
-      this.container.__call__(Event.DRAW_MOUSE_MOVE, {position: position, element: this._drawableElement});
+      this.drawTool.container.__call__(Event.DRAW_MOUSE_MOVE, {position: position, element: this._drawableElement});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true, additional?: any) {
@@ -79,20 +78,20 @@ export class DrawFree extends Drawer {
       this._drawableElement.pathString = additional.path;
     }
     if (!this._drawableElement.isComplete()) {
-      this.container.remove(this._drawableElement, true, false);
+      this.drawTool.container.remove(this._drawableElement, true, false);
     } else {
       this._drawableElement.refPoint = this._drawableElement.center;
     }
-    this.drawTool?.__drawing__();
+    this.drawTool.__drawing__();
 
     if (call) {
-      this.container.__call__(Event.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
-      this.container.__call__(Event.ELEMENT_CREATED, {position: position, element: this._drawableElement});
+      this.drawTool.container.__call__(Event.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
+      this.drawTool.container.__call__(Event.ELEMENT_CREATED, {position: position, element: this._drawableElement});
     }
   }
 
   public _new(): DrawFree {
-    return new DrawFree(this.container);
+    return new DrawFree(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.FREE;
@@ -102,61 +101,58 @@ export class DrawFree extends Drawer {
   }
 
   private drawStart(event: MouseEvent | TouchEvent) {
-    this.container.HTML.addEventListener('mousemove', this._draw);
-    this.container.HTML.addEventListener('touchmove', this._draw);
+    this.drawTool.container.HTML.addEventListener('mousemove', this._draw);
+    this.drawTool.container.HTML.addEventListener('touchmove', this._draw);
     document.addEventListener('mouseup', this._drawEnd);
     document.addEventListener('touchend', this._drawEnd);
 
-    let containerRect = this.container.HTML.getBoundingClientRect();
+    let containerRect = this.drawTool.container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-
-    this.makeMouseDown({
+    this.drawTool.__mouseCurrentPos__ = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
-    });
+    };
+    this.makeMouseDown(this.drawTool.mouseCurrentPos);
   }
   private draw(event: MouseEvent | TouchEvent): void {
-    let containerRect = this.container.HTML.getBoundingClientRect();
-
+    let containerRect = this.drawTool.container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-
-    this.makeMouseMove({
+    this.drawTool.__mouseCurrentPos__ = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
-    });
+    };
+    this.makeMouseMove(this.drawTool.mouseCurrentPos);
   }
   private drawEnd() {
     this.stopDrawing();
   }
 
   public override stopDrawing(call?: boolean) {
-    this.container.HTML.removeEventListener('mousemove', this._draw);
-    this.container.HTML.removeEventListener('touchmove', this._draw);
+    this.drawTool.container.HTML.removeEventListener('mousemove', this._draw);
+    this.drawTool.container.HTML.removeEventListener('touchmove', this._draw);
     document.removeEventListener('mouseup', this._drawEnd);
     document.removeEventListener('touchend', this._drawEnd);
 
-    if (this.drawTool?.isDrawing) {
-      this.makeMouseUp({x: 0, y: 0}, call);
+    if (this.drawTool.isDrawing) {
+      this.makeMouseUp(this.drawTool.mouseCurrentPos, call);
     }
-    this.container.tools.drawTool.__drawingEnd__();
+    this.drawTool.container.tools.drawTool.__drawingEnd__();
   }
 
   public start(call: boolean = true): void {
-    this.container.HTML.addEventListener('mousedown', this._drawStart);
-    this.container.HTML.addEventListener('touchstart', this._drawStart);
+    this.drawTool.container.HTML.addEventListener('mousedown', this._drawStart);
+    this.drawTool.container.HTML.addEventListener('touchstart', this._drawStart);
 
     if (call) {
-      this.container.__call__(Event.FREE_HAND_TOOL_ON);
+      this.drawTool.container.__call__(Event.FREE_HAND_TOOL_ON);
     }
   }
   public stop(call: boolean = true): void {
-    this.container.HTML.removeEventListener('mousedown', this._drawStart);
-    this.container.HTML.removeEventListener('touchstart', this._drawStart);
+    this.drawTool.container.HTML.removeEventListener('mousedown', this._drawStart);
+    this.drawTool.container.HTML.removeEventListener('touchstart', this._drawStart);
 
     if (call) {
-      this.container.__call__(Event.FREE_HAND_TOOL_OFF);
+      this.drawTool.container.__call__(Event.FREE_HAND_TOOL_OFF);
     }
   }
 }

@@ -11,6 +11,7 @@ export class Node extends EllipseView {
   private readonly editTool: EditNodeTool;
   private readonly order: number;
 
+  protected mouseCurrentPos: Point = {x: 0, y: 0};
   private _start = this.onStart.bind(this);
   private _move = this.onMove.bind(this);
   private _end = this.onEnd.bind(this);
@@ -72,41 +73,31 @@ export class Node extends EllipseView {
 
     let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
 
-    let position = this._container.grid.getSnapPoint({
+    this.mouseCurrentPos = this._container.grid.getSnapPoint({
       x: eventPosition.x - containerRect.x,
       y: eventPosition.y - containerRect.y
     });
-    this.makeMouseDown(position);
+    this.makeMouseDown(this.mouseCurrentPos);
   };
   protected onMove(event: MouseEvent | TouchEvent): void {
     let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
 
-    let position = this._container.grid.getSnapPoint({
+    this.mouseCurrentPos = this._container.grid.getSnapPoint({
       x: eventPosition.x - containerRect.x,
       y: eventPosition.y - containerRect.y
     });
 
-    this.makeMouseMove(position);
+    this.makeMouseMove(this.mouseCurrentPos);
   };
-  protected onEnd(event: MouseEvent | TouchEvent): void {
+  protected onEnd(): void {
     this.editTool.container.HTML.removeEventListener("mousemove", this._move);
     this.editTool.container.HTML.removeEventListener("touchmove", this._move);
     document.removeEventListener("mouseup", this._end);
     document.removeEventListener("touchend", this._end);
 
-    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-
-    let position = this._container.grid.getSnapPoint({
-      x: eventPosition.x - containerRect.x,
-      y: eventPosition.y - containerRect.y
-    });
-    this.makeMouseUp(position);
+    this.makeMouseUp(this.mouseCurrentPos);
   };
 
   public __on__() {

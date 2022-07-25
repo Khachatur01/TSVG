@@ -73,7 +73,6 @@ export class PointerTool extends Tool {
     this._container.__pointersGroup__.appendChild(this._pointerPath.SVG);
     this._isVisible = true;
   }
-
   public remove() {
     try {
       this._container.__pointersGroup__.removeChild(this._pointerPath.SVG);
@@ -94,7 +93,7 @@ export class PointerTool extends Tool {
   private move(event: TouchEvent | MouseEvent): void {
     let containerRect = this._container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
+    this._mouseCurrentPos = eventPosition;
 
     let movePosition = {
       x: eventPosition.x - containerRect.left,

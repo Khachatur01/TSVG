@@ -20,6 +20,7 @@ export class TableGrip {
   private readonly _grip: PathView;
   private size: number = 0;
 
+  protected mouseCurrentPos: Point = {x: 0, y: 0};
   private _start = this.onStart.bind(this);
   private _move = this.onMove.bind(this);
   private _end = this.onEnd.bind(this);
@@ -90,25 +91,25 @@ export class TableGrip {
     return this._grip.SVG;
   }
 
-  private getPreviousRow(order: number): LineView | undefined {
-    if (order == 0) {
+  private getPreviousRow(): LineView | undefined {
+    if (this.order == 0) {
       return this.editTool.editableElement?.topBorder;
     } else {
       return this.editTool.editableElement?.rows[this.order - 1].line;
     }
   }
-  private getNextRow(order: number): LineView | undefined {
+  private getNextRow(): LineView | undefined {
     return this.editTool.editableElement?.rows[this.order + 1].line;
   }
 
-  private getPreviousCol(order: number): LineView | undefined {
-    if (order == 0) {
+  private getPreviousCol(): LineView | undefined {
+    if (this.order == 0) {
       return this.editTool.editableElement?.leftBorder;
     } else {
       return this.editTool.editableElement?.cols[this.order - 1].line;
     }
   }
-  private getNextCol(order: number): LineView | undefined {
+  private getNextCol(): LineView | undefined {
     return this.editTool.editableElement?.cols[this.order + 1].line;
   }
 
@@ -129,9 +130,9 @@ export class TableGrip {
       case Table.ROW:
         let height: number;
         if (this.order == -1) {
-          height = (this.getNextRow(this.order)?.points[0].y || 2) - rotatedPosition.y;
+          height = (this.getNextRow()?.points[0].y || 2) - rotatedPosition.y;
         } else {
-          height = rotatedPosition.y - (this.getPreviousRow(this.order)?.points[0].y || 0);
+          height = rotatedPosition.y - (this.getPreviousRow()?.points[0].y || 0);
         }
         /* row may be not modified, and modify row method will return real size */
         this.size = this.editTool.editableElement.modifyRow(this.order, height);
@@ -139,9 +140,9 @@ export class TableGrip {
       case Table.COL:
         let width: number;
         if (this.order == -1) {
-          width = (this.getNextCol(this.order)?.points[0].x || 2) - rotatedPosition.x;
+          width = (this.getNextCol()?.points[0].x || 2) - rotatedPosition.x;
         } else {
-          width = rotatedPosition.x - (this.getPreviousCol(this.order)?.points[0].x || 0);
+          width = rotatedPosition.x - (this.getPreviousCol()?.points[0].x || 0);
         }
         /* col may be not modified, and modify col method will return real size */
         this.size = this.editTool.editableElement.modifyCol(this.order, width);
@@ -170,25 +171,21 @@ export class TableGrip {
 
     let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-
-    let position = this._container.grid.getSnapPoint({
+    this.mouseCurrentPos = this._container.grid.getSnapPoint({
       x: eventPosition.x - containerRect.x,
       y: eventPosition.y - containerRect.y
     });
-    this.makeMouseDown(position);
+    this.makeMouseDown(this.mouseCurrentPos);
   };
   protected onMove(event: MouseEvent | TouchEvent): void {
     let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-
-    let position = this._container.grid.getSnapPoint({
+    this.mouseCurrentPos = this._container.grid.getSnapPoint({
       x: eventPosition.x - containerRect.x,
       y: eventPosition.y - containerRect.y
     });
 
-    this.makeMouseMove(position);
+    this.makeMouseMove(this.mouseCurrentPos);
 
     this.editTool.__topBorderGrip__?.__updatePosition__();
     this.editTool.__leftBorderGrip__?.__updatePosition__();
@@ -199,7 +196,7 @@ export class TableGrip {
       colGrip.__updatePosition__();
     });
   };
-  protected onEnd(event: MouseEvent | TouchEvent): void {
+  protected onEnd(): void {
     this.editTool.container.HTML.removeEventListener("mousemove", this._move);
     this.editTool.container.HTML.removeEventListener("touchmove", this._move);
     document.removeEventListener("mouseup", this._end);
@@ -208,15 +205,7 @@ export class TableGrip {
     this._grip.SVG.style.cursor = "grab";
     this._container.HTML.style.cursor = "default";
 
-    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-
-    let position = this._container.grid.getSnapPoint({
-      x: eventPosition.x - containerRect.x,
-      y: eventPosition.y - containerRect.y
-    });
-    this.makeMouseUp(position);
+    this.makeMouseUp(this.mouseCurrentPos);
   };
 
   public __on__() {

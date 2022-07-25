@@ -6,6 +6,7 @@ export abstract class Tool {
   protected _cursor: Cursor = Cursor.NO_TOOL;
   protected readonly _container: Container;
   protected _isOn: boolean = false;
+  protected _mouseCurrentPos: Point = {x: 0, y: 0}; /* current position needed for touch end event, because touch end event can't catch end position */
 
   protected constructor(container: Container) {
     this._container = container;
@@ -35,5 +36,12 @@ export abstract class Tool {
 
   public isOn(): boolean {
     return this._isOn;
+  }
+
+  get mouseCurrentPos(): Point {
+    return this._mouseCurrentPos;
+  }
+  set __mouseCurrentPos__(position: Point) {
+    this._mouseCurrentPos = position;
   }
 }

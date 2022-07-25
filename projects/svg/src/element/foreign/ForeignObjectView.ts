@@ -173,7 +173,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content.addEventListener("blur", () => {
       if (this._content.outerHTML !== this._lastCommittedHTML) {
         this._container.__call__(Event.ASSET_EDIT_COMMIT, {element: this});
-        this._content.outerHTML = this._lastCommittedHTML;
+        this._lastCommittedHTML = this._content.outerHTML;
       }
     });
   }

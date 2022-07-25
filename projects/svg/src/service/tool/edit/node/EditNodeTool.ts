@@ -7,7 +7,6 @@ import {Node} from "./Node";
 import {Event} from "../../../../dataSource/constant/Event";
 import {Focus} from "../../../edit/group/Focus";
 import {Cursor} from "../../../../dataSource/constant/Cursor";
-import {DrawTool} from "../../draw/DrawTool";
 
 export class EditNodeTool extends Tool {
   protected override _cursor: Cursor = Cursor.EDIT_NODE;

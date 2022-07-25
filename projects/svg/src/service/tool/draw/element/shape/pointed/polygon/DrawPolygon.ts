@@ -7,7 +7,7 @@ import {ElementType} from "../../../../../../../dataSource/constant/ElementType"
 
 export class DrawPolygon extends ClickDraw {
   protected createDrawableElement(position: Point): PointedView {
-    return new PolygonView(this.container, {overEvent: true, globalStyle: true}, [
+    return new PolygonView(this.drawTool.container, {overEvent: true, globalStyle: true}, [
       position, position
     ]);
   }
@@ -16,19 +16,19 @@ export class DrawPolygon extends ClickDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.POLYGON_TOOL_ON);
+      this.drawTool.container.__call__(Event.POLYGON_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.POLYGON_TOOL_OFF);
+      this.drawTool.container.__call__(Event.POLYGON_TOOL_OFF);
     }
   }
 
   public _new(): DrawPolygon {
-    return new DrawPolygon(this.container);
+    return new DrawPolygon(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.POLYGON;

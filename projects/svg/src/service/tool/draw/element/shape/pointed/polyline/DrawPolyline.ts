@@ -7,7 +7,7 @@ import {ElementType} from "../../../../../../../dataSource/constant/ElementType"
 
 export class DrawPolyline extends ClickDraw {
   protected createDrawableElement(position: Point): PointedView {
-    return new PolylineView(this.container, {overEvent: true, globalStyle: true}, [
+    return new PolylineView(this.drawTool.container, {overEvent: true, globalStyle: true}, [
       position, position
     ]);
   }
@@ -16,19 +16,19 @@ export class DrawPolyline extends ClickDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.POLYLINE_TOOL_ON);
+      this.drawTool.container.__call__(Event.POLYLINE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.POLYLINE_TOOL_OFF);
+      this.drawTool.container.__call__(Event.POLYLINE_TOOL_OFF);
     }
   }
 
   public _new(): DrawPolyline {
-    return new DrawPolyline(this.container);
+    return new DrawPolyline(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.POLYLINE;

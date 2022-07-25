@@ -137,38 +137,28 @@ export class SelectTool extends Tool {
     this._container.HTML.addEventListener("touchmove", this._select);
     document.addEventListener("mouseup", this._end);
     document.addEventListener("touchend", this._end);
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-    let containerRect = this._container.HTML.getBoundingClientRect();
 
-    let startPosition = {
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this._mouseCurrentPos = {
       x: eventPosition.x - containerRect.left, // x position within the element.
       y: eventPosition.y - containerRect.top // y position within the element.
     };
-    this.makeMouseDown(startPosition);
+    this.makeMouseDown(this._mouseCurrentPos);
 
     this._container.style.changeCursor(Cursor.NO_TOOL);
   }
   private select(event: MouseEvent | TouchEvent): void {
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let movePosition = {
+    let eventPosition = Container.__eventToPosition__(event);
+    this._mouseCurrentPos = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
-    this.makeMouseMove(movePosition);
+    this.makeMouseMove(this._mouseCurrentPos);
   }
-  private end(event: MouseEvent | TouchEvent): void {
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let endPosition = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    }
-
-    this.makeMouseUp(endPosition);
+  private end(): void {
+    this.makeMouseUp(this._mouseCurrentPos);
 
     this._container.style.changeCursor(this.cursor);
 

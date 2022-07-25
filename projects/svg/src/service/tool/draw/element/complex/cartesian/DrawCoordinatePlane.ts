@@ -9,7 +9,7 @@ import {Style} from "../../../../../style/Style";
 export class DrawCoordinatePlane extends MoveDraw {
   public functions: {f: Function, style: Style}[] = [];
   protected createDrawableElement(position: Point): MoveDrawable {
-    let coordinatePlane = new CoordinatePlaneView(this.container, {overEvent: true, globalStyle: false}, {x: position.x, y: position.y, width: 1, height: 1});
+    let coordinatePlane = new CoordinatePlaneView(this.drawTool.container, {overEvent: true, globalStyle: false}, {x: position.x, y: position.y, width: 1, height: 1});
     this.functions.forEach(f => {
       coordinatePlane.addFunction(f.f, f.style);
     });
@@ -33,19 +33,19 @@ export class DrawCoordinatePlane extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.COORDINATE_PLANE_TOOL_ON);
+      this.drawTool.container.__call__(Event.COORDINATE_PLANE_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.COORDINATE_PLANE_TOOL_OFF);
+      this.drawTool.container.__call__(Event.COORDINATE_PLANE_TOOL_OFF);
     }
   }
 
   public _new(): DrawCoordinatePlane {
-    return new DrawCoordinatePlane(this.container);
+    return new DrawCoordinatePlane(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.COORDINATE_PLANE;

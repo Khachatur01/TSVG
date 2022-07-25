@@ -2,19 +2,19 @@ import {MoveDraw} from "../../mode/MoveDraw";
 import {Point} from "../../../../../model/Point";
 import {Event} from "../../../../../dataSource/constant/Event";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {Container} from "../../../../../Container";
 import {Cursor} from "../../../../../dataSource/constant/Cursor";
 import {TextView} from "../../../../../element/foreign/text/TextView";
 import {MoveDrawable} from "../../type/MoveDrawable";
+import {DrawTool} from "../../DrawTool";
 
 export class DrawText extends MoveDraw {
   public text: string = "";
-  public constructor(container: Container) {
-    super(container);
+  public constructor(drawTool: DrawTool) {
+    super(drawTool);
     this.cursor = Cursor.DRAW_TEXT_BOX;
   }
   protected createDrawableElement(position: Point): MoveDrawable {
-    let text = new TextView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0}, this.text);
+    let text = new TextView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0}, this.text);
     text.__onFocus__();
     return text;
   }
@@ -36,19 +36,19 @@ export class DrawText extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.TEXT_TOOL_ON);
+      this.drawTool.container.__call__(Event.TEXT_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.TEXT_TOOL_OFF);
+      this.drawTool.container.__call__(Event.TEXT_TOOL_OFF);
     }
   }
 
   public _new(): DrawText {
-    return new DrawText(this.container);
+    return new DrawText(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.TEXT_BOX;

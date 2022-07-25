@@ -8,7 +8,6 @@ import {ElementView} from "../../../../element/ElementView";
 import {Event} from "../../../../dataSource/constant/Event";
 import {TableGrip} from "./TableGrip";
 import {Table} from "../../../../dataSource/constant/Table";
-import {DrawTool} from "../../draw/DrawTool";
 
 export class EditTableTool extends Tool {
   protected override _cursor: Cursor = Cursor.EDIT_NODE;

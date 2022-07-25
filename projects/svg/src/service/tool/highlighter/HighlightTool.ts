@@ -146,7 +146,7 @@ export class HighlightTool extends Tool {
 
     let containerRect = this._container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
+    this._mouseCurrentPos = eventPosition;
 
     let startPosition = {
       x: eventPosition.x - containerRect.left,
@@ -158,7 +158,7 @@ export class HighlightTool extends Tool {
   private highlightMove(event: MouseEvent | TouchEvent): void {
     let containerRect = this._container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
+    this._mouseCurrentPos = eventPosition;
 
     let movePosition = {
       x: eventPosition.x - containerRect.left,
@@ -174,12 +174,10 @@ export class HighlightTool extends Tool {
     document.removeEventListener("touchend", this._highlightEnd);
 
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
 
     let position = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
+      x: this._mouseCurrentPos.x - containerRect.left,
+      y: this._mouseCurrentPos.y - containerRect.top
     };
     this.makeMouseUp(position);
   }

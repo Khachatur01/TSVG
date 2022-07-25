@@ -14,6 +14,7 @@ export class RotatePoint extends PathView {
   private _start = this.start.bind(this);
   private _move = this.move.bind(this);
   private _end = this.end.bind(this);
+  private mouseCurrentPos: Point = {x: 0, y: 0};
 
   private readonly SNAP_ANGLE: number = 15;
   private _r: number = 8;
@@ -122,26 +123,24 @@ export class RotatePoint extends PathView {
     document.addEventListener("mouseup", this._end);
     document.addEventListener("touchend", this._end);
 
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let position = {
+    let eventPosition = Container.__eventToPosition__(event);
+    this.mouseCurrentPos = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
 
-    this.makeMouseDown(position);
+    this.makeMouseDown(this.mouseCurrentPos);
   }
   private move(event: MouseEvent | TouchEvent) {
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
     let containerRect = this._container.HTML.getBoundingClientRect();
-    let position = {
+    let eventPosition = Container.__eventToPosition__(event);
+    this.mouseCurrentPos = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
 
-    this.makeMouseMove(position);
+    this.makeMouseMove(this.mouseCurrentPos);
   }
   private end(event: MouseEvent | TouchEvent) {
     this._container.tools.activeTool?.on();
@@ -150,15 +149,7 @@ export class RotatePoint extends PathView {
     document.removeEventListener("mouseup", this._end);
     document.removeEventListener("touchend", this._end);
 
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let position = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-
-    this.makeMouseUp(position);
+    this.makeMouseUp(this.mouseCurrentPos);
   }
 
   public __on__() {

@@ -9,7 +9,7 @@ export class DrawForeignObject extends MoveDraw {
   public content: string = "";
 
   protected createDrawableElement(position: Point): MoveDrawable {
-    let videoView = new ForeignObjectView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
+    let videoView = new ForeignObjectView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     videoView.setContent(this.content);
     return videoView;
   }
@@ -32,19 +32,19 @@ export class DrawForeignObject extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.ASSET_TOOL_ON);
+      this.drawTool.container.__call__(Event.ASSET_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.ASSET_TOOL_OFF);
+      this.drawTool.container.__call__(Event.ASSET_TOOL_OFF);
     }
   }
 
   public _new(): DrawForeignObject {
-    return new DrawForeignObject(this.container);
+    return new DrawForeignObject(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.FOREIGN_OBJECT;

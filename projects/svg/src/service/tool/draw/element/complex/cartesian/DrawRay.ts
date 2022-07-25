@@ -7,7 +7,7 @@ import {ElementView} from "../../../../../../element/ElementView";
 
 export class DrawRay extends ClickDraw {
   protected createDrawableElement(position: Point): RayView {
-    let element = new RayView(this.container, {overEvent: true, globalStyle: true}, {}, position, position);
+    let element = new RayView(this.drawTool.container, {overEvent: true, globalStyle: true}, {}, position, position);
     element.__fixRect__();
     return element;
   }
@@ -22,18 +22,18 @@ export class DrawRay extends ClickDraw {
     if (!this._drawableElement) return;
 
     if (this.clicksCount === 1) {
-      this.container.remove(this._drawableElement as unknown as ElementView, true, false);
+      this.drawTool.container.remove(this._drawableElement as unknown as ElementView, true, false);
     } else {
       this._drawableElement.refPoint = this._drawableElement.center;
       if (call) {
         let drawableElementCopy = this._drawableElement.copy;
         drawableElementCopy.index = this._drawableElement.index;
-        this.container.__call__(Event.ELEMENT_CREATED, {element: drawableElementCopy});
+        this.drawTool.container.__call__(Event.ELEMENT_CREATED, {element: drawableElementCopy});
       }
     }
-    this.container.tools.drawTool.__drawingEnd__();
+    this.drawTool.container.tools.drawTool.__drawingEnd__();
     if (call) {
-      this.container.__call__(Event.STOP_CLICK_DRAWING);
+      this.drawTool.container.__call__(Event.STOP_CLICK_DRAWING);
     }
     this._drawableElement = undefined;
     this.clicksCount = 0;
@@ -43,19 +43,19 @@ export class DrawRay extends ClickDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.RAY_TOOL_ON);
+      this.drawTool.container.__call__(Event.RAY_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.RAY_TOOL_OFF);
+      this.drawTool.container.__call__(Event.RAY_TOOL_OFF);
     }
   }
 
   public _new(): DrawRay {
-    return new DrawRay(this.container);
+    return new DrawRay(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.RAY;

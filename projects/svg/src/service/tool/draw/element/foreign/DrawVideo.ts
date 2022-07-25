@@ -9,7 +9,7 @@ import {MoveDrawable} from "../../type/MoveDrawable";
 export class DrawVideo extends MoveDraw {
   public src: string = "";
   createDrawableElement(position: Point): MoveDrawable {
-    return new VideoView(this.container, {overEvent: true, globalStyle: true}, this.src, {x: position.x, y: position.y, width: 0, height: 0});
+    return new VideoView(this.drawTool.container, {overEvent: true, globalStyle: true}, this.src, {x: position.x, y: position.y, width: 0, height: 0});
   }
 
   protected override onIsNotComplete(call: boolean) {
@@ -24,9 +24,9 @@ export class DrawVideo extends MoveDraw {
   }
   protected override onEnd(call: boolean) {
     if (call) {
-      this.container.tools.selectTool.on();
+      this.drawTool.container.tools.selectTool.on();
       if (this._drawableElement)
-        this.container.focus(this._drawableElement as unknown as ElementView);
+        this.drawTool.container.focus(this._drawableElement as unknown as ElementView);
     }
   }
 
@@ -34,19 +34,19 @@ export class DrawVideo extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.VIDEO_TOOL_ON);
+      this.drawTool.container.__call__(Event.VIDEO_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.VIDEO_TOOL_OFF);
+      this.drawTool.container.__call__(Event.VIDEO_TOOL_OFF);
     }
   }
 
   public _new(): DrawVideo {
-    return new DrawVideo(this.container);
+    return new DrawVideo(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.VIDEO;

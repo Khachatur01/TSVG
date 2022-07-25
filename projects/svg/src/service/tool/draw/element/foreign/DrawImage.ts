@@ -8,7 +8,7 @@ import {MoveDrawable} from "../../type/MoveDrawable";
 export class DrawImage extends MoveDraw {
   public src: string = "";
   protected createDrawableElement(position: Point): MoveDrawable {
-    return new ImageView(this.container, {overEvent: true, globalStyle: true}, this.src, {x: position.x, y: position.y, width: 0, height: 0});
+    return new ImageView(this.drawTool.container, {overEvent: true, globalStyle: true}, this.src, {x: position.x, y: position.y, width: 0, height: 0});
   }
 
   protected override onIsNotComplete(call: boolean) {
@@ -28,19 +28,19 @@ export class DrawImage extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.IMAGE_TOOL_ON);
+      this.drawTool.container.__call__(Event.IMAGE_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.IMAGE_TOOL_OFF);
+      this.drawTool.container.__call__(Event.IMAGE_TOOL_OFF);
     }
   }
 
   public _new(): DrawImage {
-    return new DrawImage(this.container);
+    return new DrawImage(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.IMAGE;

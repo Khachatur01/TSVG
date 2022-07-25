@@ -9,7 +9,7 @@ export class DrawGraphic extends MoveDraw {
   public f: Function = (x: number) => x;
   protected createDrawableElement(position: Point): MoveDrawable {
     return new GraphicView(
-      this.container,
+      this.drawTool.container,
       {overEvent: true, globalStyle: true},
       {x: position.x, y: position.y, width: 1, height: 1},
       {x: 1, y: 1},
@@ -34,19 +34,19 @@ export class DrawGraphic extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.GRAPHIC_TOOL_ON);
+      this.drawTool.container.__call__(Event.GRAPHIC_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.GRAPHIC_TOOL_OFF);
+      this.drawTool.container.__call__(Event.GRAPHIC_TOOL_OFF);
     }
   }
 
   public _new(): DrawGraphic {
-    return new DrawGraphic(this.container);
+    return new DrawGraphic(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.GRAPHIC;

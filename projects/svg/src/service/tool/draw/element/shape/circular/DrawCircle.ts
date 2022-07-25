@@ -7,7 +7,7 @@ import {MoveDrawable} from "../../../type/MoveDrawable";
 
 export class DrawCircle extends MoveDraw {
   protected createDrawableElement(position: Point): MoveDrawable {
-    let element = new CircleView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
+    let element = new CircleView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     element.__fixRect__();
     return element;
   }
@@ -16,19 +16,19 @@ export class DrawCircle extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.CIRCLE_TOOL_ON);
+      this.drawTool.container.__call__(Event.CIRCLE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.CIRCLE_TOOL_OFF);
+      this.drawTool.container.__call__(Event.CIRCLE_TOOL_OFF);
     }
   }
 
   public _new(): DrawCircle {
-    return new DrawCircle(this.container);
+    return new DrawCircle(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.CIRCLE;

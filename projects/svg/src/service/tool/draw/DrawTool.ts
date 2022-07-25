@@ -16,7 +16,7 @@ export class DrawTool extends Tool {
   public constructor(container: Container) {
     super(container);
     this.toolAfterDrawing = this;
-    this._drawer = new DrawFree(container);
+    this._drawer = new DrawFree(this);
   }
 
   public makeMouseDown(position: Point, call: boolean = true, parameter?: any) {

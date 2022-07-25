@@ -4,7 +4,6 @@ import {DrawPolyline} from "../service/tool/draw/element/shape/pointed/polyline/
 import {DrawEllipse} from "../service/tool/draw/element/shape/circular/DrawEllipse";
 import {DrawPolygon} from "../service/tool/draw/element/shape/pointed/polygon/DrawPolygon";
 import {DrawFree} from "../service/tool/draw/mode/DrawFree";
-import {Container} from "../Container";
 import {DrawIsoscelesTriangle} from "../service/tool/draw/element/shape/pointed/polygon/triangle/DrawIsoscelesTriangle";
 import {DrawRightTriangle} from "../service/tool/draw/element/shape/pointed/polygon/triangle/DrawRightTriangle";
 import {DrawTextBox} from "../service/tool/draw/element/foreign/DrawTextBox";
@@ -20,9 +19,10 @@ import {DrawText} from "../service/tool/draw/element/foreign/DrawText";
 import {DrawNumberLine} from "../service/tool/draw/element/complex/cartesian/DrawNumberLine";
 import {DrawRay} from "../service/tool/draw/element/complex/cartesian/DrawRay";
 import {DrawGraphic} from "../service/tool/draw/element/complex/cartesian/DrawGraphic";
+import {DrawTool} from "../service/tool/draw/DrawTool";
 
 export class Drawers {
-  private readonly container: Container;
+  private readonly drawTool: DrawTool;
   public readonly free: DrawFree;
   public readonly line: DrawLine;
   public readonly polyline: DrawPolyline;
@@ -43,28 +43,28 @@ export class Drawers {
   public readonly numberLine: DrawNumberLine;
   public readonly table: DrawTable;
 
-  public constructor(container: Container) {
-    this.container = container;
+  public constructor(drawTool: DrawTool) {
+    this.drawTool = drawTool;
 
-    this.free = new DrawFree(container);
-    this.line = new DrawLine(container);
-    this.polyline = new DrawPolyline(container);
-    this.ellipse = new DrawEllipse(container);
-    this.circle = new DrawCircle(container);
-    this.polygon = new DrawPolygon(container);
-    this.rectangle = new DrawRectangle(container);
-    this.isoscelesTriangle = new DrawIsoscelesTriangle(container);
-    this.rightTriangle = new DrawRightTriangle(container);
-    this.textBox = new DrawTextBox(container);
-    this.text = new DrawText(container);
-    this.video = new DrawVideo(container);
-    this.image = new DrawImage(container);
-    this.foreignObject = new DrawForeignObject(container);
-    this.graphic = new DrawGraphic(container);
-    this.ray = new DrawRay(container);
-    this.coordinatePlane = new DrawCoordinatePlane(container);
-    this.numberLine = new DrawNumberLine(container);
-    this.table = new DrawTable(container);
+    this.free = new DrawFree(drawTool);
+    this.line = new DrawLine(drawTool);
+    this.polyline = new DrawPolyline(drawTool);
+    this.ellipse = new DrawEllipse(drawTool);
+    this.circle = new DrawCircle(drawTool);
+    this.polygon = new DrawPolygon(drawTool);
+    this.rectangle = new DrawRectangle(drawTool);
+    this.isoscelesTriangle = new DrawIsoscelesTriangle(drawTool);
+    this.rightTriangle = new DrawRightTriangle(drawTool);
+    this.textBox = new DrawTextBox(drawTool);
+    this.text = new DrawText(drawTool);
+    this.video = new DrawVideo(drawTool);
+    this.image = new DrawImage(drawTool);
+    this.foreignObject = new DrawForeignObject(drawTool);
+    this.graphic = new DrawGraphic(drawTool);
+    this.ray = new DrawRay(drawTool);
+    this.coordinatePlane = new DrawCoordinatePlane(drawTool);
+    this.numberLine = new DrawNumberLine(drawTool);
+    this.table = new DrawTable(drawTool);
   }
 
   public getByType(type: ElementType): Drawer {

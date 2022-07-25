@@ -7,7 +7,7 @@ import {MoveDrawable} from "../../../type/MoveDrawable";
 
 export class DrawNumberLine extends MoveDraw {
   protected createDrawableElement(position: Point): MoveDrawable {
-    return new NumberLineView(this.container, {overEvent: true, globalStyle: false}, {
+    return new NumberLineView(this.drawTool.container, {overEvent: true, globalStyle: false}, {
       x: position.x,
       y: position.y,
       width: 1,
@@ -32,19 +32,19 @@ export class DrawNumberLine extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.NUMBER_LINE_TOOL_ON);
+      this.drawTool.container.__call__(Event.NUMBER_LINE_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.NUMBER_LINE_TOOL_OFF);
+      this.drawTool.container.__call__(Event.NUMBER_LINE_TOOL_OFF);
     }
   }
 
   public _new(): DrawNumberLine {
-    return new DrawNumberLine(this.container);
+    return new DrawNumberLine(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.NUMBER_LINE;

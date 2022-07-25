@@ -5,8 +5,12 @@ import {Cursor} from "../../../dataSource/constant/Cursor";
 import {Drawable} from "./type/Drawable";
 
 export abstract class Drawer {
-  public drawTool: DrawTool | null = null;
+  public drawTool: DrawTool;
   public cursor: Cursor = Cursor.DRAW;
+
+  protected constructor(drawTool: DrawTool) {
+    this.drawTool = drawTool;
+  }
 
   public abstract start(call?: boolean): void;
   public abstract stop(call?: boolean): void;

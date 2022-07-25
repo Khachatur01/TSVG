@@ -67,24 +67,30 @@ export class DragTool extends Tool {
     document.addEventListener("mouseup", this._dragEnd);
     document.addEventListener("touchend", this._dragEnd);
 
+    let containerRect = this.container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-    this.makeMouseDown(eventPosition);
+    this._mouseCurrentPos = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+    this.makeMouseDown(this._mouseCurrentPos);
   }
   private drag(event: MouseEvent | TouchEvent) {
+    let containerRect = this.container.HTML.getBoundingClientRect();
     let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-    this.makeMouseMove(eventPosition);
+    this._mouseCurrentPos = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+    this.makeMouseMove(this._mouseCurrentPos);
   }
-  private dragEnd(event: MouseEvent | TouchEvent) {
+  private dragEnd() {
     this._container.HTML.removeEventListener("mousemove", this._drag);
     this._container.HTML.removeEventListener("touchmove", this._drag);
     document.removeEventListener("mouseup", this._dragEnd);
     document.removeEventListener("touchend", this._dragEnd);
 
-    let eventPosition = Container.__eventToPosition__(event);
-    event.preventDefault();
-    this.makeMouseUp(eventPosition);
+    this.makeMouseUp(this._mouseCurrentPos);
   }
 
   public override on(call: boolean = true): void {

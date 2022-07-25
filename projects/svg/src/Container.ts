@@ -282,8 +282,8 @@ export class Container {
     this.style = new GlobalStyle(this);
     this._focus = new Focus(this);
     this._focus.on();
-    this.drawers = new Drawers(this);
     this.tools = new Tools(this);
+    this.drawers = new Drawers(this.tools.drawTool);
     this.grid = new Grid(this);
     this.style = new GlobalStyle(this);
 

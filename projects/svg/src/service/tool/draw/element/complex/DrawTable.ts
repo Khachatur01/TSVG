@@ -7,7 +7,7 @@ import {MoveDrawable} from "../../type/MoveDrawable";
 
 export class DrawTable extends MoveDraw {
   protected createDrawableElement(position: Point): MoveDrawable {
-    return new TableView(this.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 1, height: 1}, 3, 4);
+    return new TableView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 1, height: 1}, 3, 4);
   }
 
   public override makeMouseDown(position: Point, call: boolean = true) {
@@ -19,19 +19,19 @@ export class DrawTable extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.container.__call__(Event.TABLE_TOOL_ON);
+      this.drawTool.container.__call__(Event.TABLE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.container.__call__(Event.TABLE_TOOL_OFF);
+      this.drawTool.container.__call__(Event.TABLE_TOOL_OFF);
     }
   }
 
   public _new(): DrawTable {
-    return new DrawTable(this.container);
+    return new DrawTable(this.drawTool);
   }
 
   get type(): ElementType {

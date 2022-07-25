@@ -76,8 +76,8 @@ export class TextBoxView extends ForeignObjectView {
       /* Tool already changed to draw free. No need to check */
       /* if last committed text is equals to current text, don't call change callback */
       if (this._container.tools.drawTool.isOn() && this._lastCommittedText !== this._content.value/* && this._container.drawTool.tool == this._container.drawTools.textBox*/) {
-        this._lastCommittedText = this._content.value;
         this._container.__call__(Event.TEXT_TYPING_COMMIT, {text: this._content.value, element: this});
+        this._lastCommittedText = this._content.value;
       }
     });
   }
@@ -90,7 +90,6 @@ export class TextBoxView extends ForeignObjectView {
 
         this.replaceSelected("");
       }
-      event.preventDefault();
     });
   }
   protected override addPasteEvent() {
@@ -98,7 +97,6 @@ export class TextBoxView extends ForeignObjectView {
       let paste = this.container.focused.__clipboard__.text;
 
       this.replaceSelected(paste);
-      event.preventDefault();
     });
   }
 

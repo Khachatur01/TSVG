@@ -30,7 +30,7 @@ export class BoxView extends ShapeView {
     });
   }
 
-  __correct__(refPoint: Point, lastRefPoint: Point): void {}
+  public __correct__(refPoint: Point, lastRefPoint: Point): void {}
   public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
