@@ -256,7 +256,7 @@ export class GroupView extends ElementView {
   public override __rotate__(angle: number) {
     this._angle = angle;
     this._elements.forEach(child =>
-      child.__rotate__((angle + child.__lastAngle__ - this.___lastAngle__) % 360)
+      child.__rotate__((angle + child.__lastAngle__ - this._lastAngle) % 360)
     );
   }
 

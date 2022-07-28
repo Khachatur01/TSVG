@@ -105,8 +105,8 @@ export class PointerTool extends Tool {
   public override on(call: boolean = true): void {
     super.on(call);
     this.add();
-    document.addEventListener("touchmove", this._move);
-    document.addEventListener("mousemove", this._move);
+    this._container.HTML.addEventListener("touchmove", this._move);
+    this._container.HTML.addEventListener("mousemove", this._move);
     this._container.blur();
 
     this._container.style.changeCursor(this.cursor);
@@ -117,8 +117,8 @@ export class PointerTool extends Tool {
   public override off(call: boolean = true): void {
     super.off();
     this.remove();
-    document.removeEventListener("touchmove", this._move);
-    document.removeEventListener("mousemove", this._move);
+    this._container.HTML.removeEventListener("touchmove", this._move);
+    this._container.HTML.removeEventListener("mousemove", this._move);
 
     if (call) {
       this._container.__call__(Event.POINTER_TOOl_OFF);

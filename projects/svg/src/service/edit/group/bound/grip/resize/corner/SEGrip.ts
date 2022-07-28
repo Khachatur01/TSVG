@@ -14,7 +14,7 @@ export class SEGrip extends Grip {
 
   public override makeMouseDown(client: Point, call: boolean = true): void {
     super.makeMouseDown(client, call);
-    this.___lastAngle__ = Angle.fromThreePoints(
+    this._lastAngle = Angle.fromThreePoints(
       this.focus.__lastRect__,
       client,
       {x: 0, y: client.y}
@@ -29,7 +29,7 @@ export class SEGrip extends Grip {
     let position = this.focus.__lastRect__;
 
     if (this._container.perfect) {
-      let angle = this.___lastAngle__;
+      let angle = this._lastAngle;
       if (client.x < position.x && client.y < position.y) /* II */
         angle = 180 - (360 - angle);
       else if (client.x < position.x) /* III */

@@ -101,7 +101,6 @@ export class GraphicView extends PathView implements MoveDrawable {
   public override __drag__(delta: Point): void {
     this._origin.x = this._lastOrigin.x + delta.x;
     this._origin.y = this._lastOrigin.y + delta.y;
-
     super.__drag__(delta);
   }
 

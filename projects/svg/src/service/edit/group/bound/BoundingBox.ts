@@ -78,7 +78,7 @@ export class BoundingBox extends BoxView {
     return this.___refPointGroup__;
   }
 
-  public __fixRefPoint__() {
+  public override __fixRefPoint__() {
     this.referencePoint.__fixPosition__();
   }
   public set __lastRefPoint__(refPoint: Point) {

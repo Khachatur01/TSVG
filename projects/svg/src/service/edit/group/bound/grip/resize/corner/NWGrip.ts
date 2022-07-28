@@ -15,7 +15,7 @@ export class NWGrip extends Grip {
   public override makeMouseDown(client: Point, call: boolean = true): void {
     super.makeMouseDown(client, call);
 
-    this.___lastAngle__ = 180 - Angle.fromThreePoints(
+    this._lastAngle = 180 - Angle.fromThreePoints(
       {
         x: this.focus.__lastRect__.x + this.focus.__lastRect__.width,
         y: this.focus.__lastRect__.y + this.focus.__lastRect__.height
@@ -41,7 +41,7 @@ export class NWGrip extends Grip {
         x: elementRect.x + elementRect.width,
         y: elementRect.y + elementRect.height
       };
-      let angle = this.___lastAngle__;
+      let angle = this._lastAngle;
       if (client.x > originPoint.x && client.y > originPoint.y) /* IV */
         angle = 360 - (180 - angle);
       else if (client.x > originPoint.x) /* I */

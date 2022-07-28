@@ -267,16 +267,16 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     return points;
   }
 
-  override __translate__(delta: Point) {
-    this.setAttr({
-      x: this._lastRect.x + delta.x,
-      y: this._lastRect.y + delta.y
-    });
+  public override __translate__(delta: Point) {
+    this.__drag__(delta);
   }
   public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
-    this.__translate__(delta);
+    this.setAttr({
+      x: this._lastRect.x + delta.x,
+      y: this._lastRect.y + delta.y
+    });
   }
 
   public zoomIn(factor: number) {

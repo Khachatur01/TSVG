@@ -124,13 +124,13 @@ export abstract class ClickDraw extends Drawer {
   public start(call: boolean = true): void {
     this.drawTool.container.HTML.addEventListener('mousedown', this._click);
     this.drawTool.container.HTML.addEventListener('touchstart', this._click);
-    this.drawTool.container.HTML.addEventListener("mousemove", this._move);
+    document.addEventListener("mousemove", this._move);
     /* this.container.HTML.addEventListener("touchmove", this._move); */
   }
   public stop(call: boolean = true): void {
     this.drawTool.container.HTML.removeEventListener('mousedown', this._click);
     this.drawTool.container.HTML.removeEventListener('touchstart', this._click);
-    this.drawTool.container.HTML.removeEventListener('mousemove', this._move);
+    document.removeEventListener('mousemove', this._move);
     /* this.container.HTML.removeEventListener('touchmove', this._move); */
     this.stopClickDrawing(call);
   }

@@ -162,15 +162,15 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
   }
 
   override __translate__(delta: Point) {
-    this.setAttr({
-      x: this._lastRect.x + delta.x,
-      y: this._lastRect.y + delta.y
-    });
+    this.__drag__(delta);
   }
   public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
-    this.__translate__(delta);
+    this.setAttr({
+      x: this._lastRect.x + delta.x,
+      y: this._lastRect.y + delta.y
+    });
   }
 
   public __moveOrigin__(delta: Point): void {

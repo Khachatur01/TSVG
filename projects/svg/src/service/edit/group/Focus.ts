@@ -397,16 +397,15 @@ export class Focus implements Draggable, Resizeable {
 
   public __fixRect__(): void {
     this.boundingBox.__fixRect__();
-    this._children.forEach(child => child.__fixRect__());
+    this._children.forEach((child: ElementView) => child.__fixRect__());
   }
   public __fixRefPoint__(): void {
     this.boundingBox.__fixRefPoint__();
+    this._children.forEach((child: ElementView) => child.__fixRefPoint__());
   }
   public __fixAngle__(): void {
     this.___lastAngle__ = this.angle;
-    this._children.forEach((child: ElementView) => {
-      child.__fixAngle__();
-    });
+    this._children.forEach((child: ElementView) => child.__fixAngle__());
   }
 
   public hasChild(xElement: ElementView): boolean {

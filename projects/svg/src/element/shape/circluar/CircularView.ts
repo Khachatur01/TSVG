@@ -7,7 +7,7 @@ import {MoveTo} from "../../../model/path/point/MoveTo";
 import {Arc} from "../../../model/path/curve/arc/Arc";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 
-export abstract class CircularView extends ShapeView implements MoveDrawable{
+export abstract class CircularView extends ShapeView implements MoveDrawable {
   protected abstract override svgElement: SVGGeometryElement;
 
   public __updateView__(): void {

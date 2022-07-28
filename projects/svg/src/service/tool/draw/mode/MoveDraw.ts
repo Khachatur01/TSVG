@@ -114,8 +114,8 @@ export abstract class MoveDraw extends Drawer {
   }
 
   protected drawStart(event: MouseEvent | TouchEvent) {
-    this.drawTool.container.HTML.addEventListener('mousemove', this._draw);
-    this.drawTool.container.HTML.addEventListener('touchmove', this._draw);
+    document.addEventListener('mousemove', this._draw);
+    document.addEventListener('touchmove', this._draw);
     document.addEventListener('mouseup', this._drawEnd);
     document.addEventListener('touchend', this._drawEnd);
 
@@ -152,8 +152,8 @@ export abstract class MoveDraw extends Drawer {
   public override stopDrawing(call?: boolean) {
     this.drawTool.container.tools.drawTool.__drawingEnd__();
 
-    this.drawTool.container.HTML.removeEventListener('mousemove', this._draw);
-    this.drawTool.container.HTML.removeEventListener('touchmove', this._draw);
+    document.removeEventListener('mousemove', this._draw);
+    document.removeEventListener('touchmove', this._draw);
     document.removeEventListener('mouseup', this._drawEnd);
     document.removeEventListener('touchend', this._drawEnd);
 

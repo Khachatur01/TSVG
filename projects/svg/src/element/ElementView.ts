@@ -115,10 +115,12 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   private _group: GroupView | null = null;
   protected _container: Container;
   protected _rect: Rect = {x: 0, y: 0, width: 0, height: 0};
+  protected _translateDelta: Point = {x: 0, y: 0};
   protected _angle: number = 0;
   protected _refPoint: Point = {x: 0, y: 0};
   protected _lastRect: Rect = {x: 0, y: 0, width: 0, height: 0};
-  protected ___lastAngle__: number = 0;
+  protected _lastAngle: number = 0;
+  protected _lastRefPoint: Point = {x: 0, y: 0};
   protected _selectable: boolean = true;
   protected _hasOverEvent: boolean = false;
   protected _properties: ElementProperties = {};
@@ -168,6 +170,10 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   }
 
   public __translate__(delta: Point) {
+    this._rect.x = this._lastRect.x + delta.x;
+    this._rect.y = this._lastRect.y + delta.y;
+    this._refPoint.x = this._lastRefPoint.x + delta.x;
+    this._refPoint.y = this._lastRefPoint.y + delta.y;
     this.svgElement.style.transform =
       "translate(" + delta.x + "px, " + delta.y + "px) rotate(" + this._angle + "deg)";
   }
@@ -175,8 +181,26 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   public getVisibleRect(): Rect {
     return ElementView.calculateRect(this.visiblePoints);
   };
+  public getVisibleRectPoints(): Point[] {
+    let points: Point[] = [
+      {x: this._rect.x, y: this._rect.y},
+      {x: this._rect.x + this._rect.width, y: this._rect.y},
+      {x: this._rect.x + this._rect.width, y: this._rect.y + this._rect.height},
+      {x: this._rect.x, y: this._rect.y + this._rect.height}
+    ];
+    return Matrix.rotate(
+      points,
+      this._refPoint,
+      -this._angle
+    );
+  }
   public getRect(): Rect {
-    return this._rect;
+    return {
+      x: this._rect.x,
+      y: this._rect.y,
+      width: this._rect.width,
+      height: this._rect.height,
+    };
   };
   /**
    * if delta is set, calculate rect width and height by delta
@@ -544,14 +568,17 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     this._lastRect = Object.assign({}, this._rect);
   }
   public __fixAngle__(): void {
-    this.___lastAngle__ = this._angle;
+    this._lastAngle = this._angle;
+  }
+  public __fixRefPoint__(): void {
+    this._lastRefPoint = Object.assign({}, this._refPoint);
   }
 
   public get __lastRect__(): Rect {
     return this._lastRect;
   }
   public get __lastAngle__(): number {
-    return this.___lastAngle__;
+    return this._lastAngle;
   }
 
   public toJSON(): any {
