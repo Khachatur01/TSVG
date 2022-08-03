@@ -5,10 +5,12 @@ import {Point} from "../../../model/Point";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 import {PathView} from "../../../element/shape/PathView";
 import {Path} from "../../../model/path/Path";
+import {ElementView} from "../../../element/ElementView";
 
 export class PointerTool extends Tool {
   protected override _cursor: Cursor = Cursor.POINTER;
   private _pointerPath: PathView;
+  private _pointer: SVGElement;
   private _isVisible: boolean = false;
 
   private _move = this.move.bind(this);
@@ -16,11 +18,14 @@ export class PointerTool extends Tool {
   public constructor(container: Container, path?: Path) {
     super(container);
     this._pointerPath = new PathView(this._container, {}, path);
+    this._pointer = document.createElementNS(ElementView.svgURI, "svg");
+    this._pointer.appendChild(this._pointerPath.SVG);
   }
 
   public makeMouseDown(position: Point, call: boolean = true) {}
   public makeMouseMove(position: Point, call: boolean = true) {
-    this._pointerPath.__translate__(position);
+    this._pointer.setAttribute("x", position.x + "");
+    this._pointer.setAttribute("y", position.y + "");
 
     if (call) {
       this._container.__call__(Event.POINTER_MOVE, {position: position});
@@ -70,12 +75,12 @@ export class PointerTool extends Tool {
   }
 
   public add() {
-    this._container.__pointersGroup__.appendChild(this._pointerPath.SVG);
+    this._container.__pointersGroup__.appendChild(this._pointer);
     this._isVisible = true;
   }
   public remove() {
     try {
-      this._container.__pointersGroup__.removeChild(this._pointerPath.SVG);
+      this._container.__pointersGroup__.removeChild(this._pointer);
       this._isVisible = false;
     } catch (e) {}
   }
@@ -105,8 +110,8 @@ export class PointerTool extends Tool {
   public override on(call: boolean = true): void {
     super.on(call);
     this.add();
-    this._container.HTML.addEventListener("touchmove", this._move);
-    this._container.HTML.addEventListener("mousemove", this._move);
+    document.addEventListener("touchmove", this._move);
+    document.addEventListener("mousemove", this._move);
     this._container.blur();
 
     this._container.style.changeCursor(this.cursor);
@@ -117,8 +122,8 @@ export class PointerTool extends Tool {
   public override off(call: boolean = true): void {
     super.off();
     this.remove();
-    this._container.HTML.removeEventListener("touchmove", this._move);
-    this._container.HTML.removeEventListener("mousemove", this._move);
+    document.removeEventListener("touchmove", this._move);
+    document.removeEventListener("mousemove", this._move);
 
     if (call) {
       this._container.__call__(Event.POINTER_TOOl_OFF);

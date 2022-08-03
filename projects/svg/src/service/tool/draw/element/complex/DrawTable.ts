@@ -7,7 +7,7 @@ import {MoveDrawable} from "../../type/MoveDrawable";
 
 export class DrawTable extends MoveDraw {
   protected createDrawableElement(position: Point): MoveDrawable {
-    return new TableView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 1, height: 1}, 3, 4);
+    return new TableView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 1, height: 1}, 4, 3);
   }
 
   public override makeMouseDown(position: Point, call: boolean = true) {
