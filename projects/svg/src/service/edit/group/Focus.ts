@@ -181,7 +181,6 @@ export class Focus implements Draggable, Resizeable {
     let group = new GroupView(this.container);
     this._children.forEach((element: ElementView) => {
       this.container.elements.delete(element);
-      element.group = group;
       children.add(element);
     });
 

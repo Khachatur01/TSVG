@@ -89,6 +89,7 @@ export class TextBoxView extends ForeignObjectView {
         this._container.focused.__clipboard__.text = text;
 
         this.replaceSelected("");
+        event.preventDefault();
       }
     });
   }
@@ -97,6 +98,7 @@ export class TextBoxView extends ForeignObjectView {
       let paste = this.container.focused.__clipboard__.text;
 
       this.replaceSelected(paste);
+      event.preventDefault();
     });
   }
 
@@ -104,6 +106,7 @@ export class TextBoxView extends ForeignObjectView {
     let start = this._content.selectionStart;
     let end = this._content.selectionEnd;
     this.text = this.text.substring(0, start) + text + this.text.substring(end);
+    this._content.setSelectionRange(start, start);
   }
 
   public override isComplete(): boolean {

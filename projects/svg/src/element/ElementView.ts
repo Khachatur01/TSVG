@@ -344,7 +344,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   }
 
   public static parseId(id: string): {ownerId: string, index: number} {
-    let idArray = id.split(/[(_u)(_e)]+/);
+    let idArray = id.split(/(_u|_e)+/);
     let ownerId: string = idArray[1];
     let index: number = parseInt(idArray[2]);
 

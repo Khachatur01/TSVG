@@ -3,7 +3,7 @@ import {Container} from "../../../../../Container";
 import {Rect} from "../../../../../model/Rect";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {ElementCursor, ElementProperties} from "../../../../ElementView";
+import {ElementCursor, ElementProperties, ElementView} from "../../../../ElementView";
 
 export class RightTriangleCursor extends ElementCursor {}
 
@@ -34,7 +34,7 @@ export class RightTriangleView extends TriangleView implements MoveDrawable {
       x: rect.x + rect.width,
       y: rect.y + rect.height
     });
-    this._rect = rect;
+    this._rect = ElementView.calculateRect(this._points);
 
     this.__updateView__();
   }

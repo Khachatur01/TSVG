@@ -283,10 +283,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       this.svgElement.innerHTML = decodeURIComponent(json.content);
       this._content = this.svgElement.firstChild as HTMLElement;
     }
-    this.addEditCallBack();
-    this.addFocusEvent();
-    this.addCopyEvent();
-    this.addCutEvent();
-    this.addPasteEvent();
+    // this.addEditCallBack();
+    // this.addFocusEvent();
+    // this.addCopyEvent();
+    // this.addCutEvent();
+    // this.addPasteEvent();
   };
 }

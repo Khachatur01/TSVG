@@ -117,6 +117,7 @@ export class GroupView extends ElementView {
   }
   public addElement(element: ElementView) {
     this._elements.add(element);
+    element.group = this;
     this.svgElement.appendChild(element.SVG);
     this.recalculateRect();
   }
@@ -130,6 +131,7 @@ export class GroupView extends ElementView {
     this.svgElement.innerHTML = "";
     elements.forEach((element: ElementView) => {
       this.svgElement.appendChild(element.SVG);
+      element.group = this;
     });
     this.recalculateRect();
   }

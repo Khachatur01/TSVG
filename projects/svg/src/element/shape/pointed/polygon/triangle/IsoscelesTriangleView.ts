@@ -3,7 +3,7 @@ import {Container} from "../../../../../Container";
 import {Rect} from "../../../../../model/Rect";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {ElementCursor, ElementProperties} from "../../../../ElementView";
+import {ElementCursor, ElementProperties, ElementView} from "../../../../ElementView";
 
 export class IsoscelesTriangleCursor extends ElementCursor {}
 
@@ -34,12 +34,7 @@ export class IsoscelesTriangleView extends TriangleView implements MoveDrawable 
       x: rect.x + rect.width,
       y: rect.y + rect.height
     });
-    this._rect = {
-      x: rect.x - rect.width,
-      y: rect.y,
-      width: rect.width * 2,
-      height: rect.height
-    };
+    this._rect = ElementView.calculateRect(this._points);
 
     this.__updateView__();
   }
