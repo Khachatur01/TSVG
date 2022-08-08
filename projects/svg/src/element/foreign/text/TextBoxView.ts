@@ -17,6 +17,21 @@ export class TextBoxView extends ForeignObjectView {
   protected override _type: ElementType = ElementType.TEXT_BOX;
   protected override _content: HTMLTextAreaElement;
   private _lastCommittedText: string = "";
+  protected override cutEvent = (event: ClipboardEvent) => {
+    let text = document.getSelection()?.toString();
+    if (text) {
+      this._container.focused.__clipboard__.text = text;
+
+      this.replaceSelected("");
+      event.preventDefault();
+    }
+  };
+  protected override pasteEvent = (event: ClipboardEvent) => {
+    let paste = this.container.focused.__clipboard__.text;
+
+    this.replaceSelected(paste);
+    event.preventDefault();
+  };
 
   public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, removeOnEmpty: boolean = true, ownerId?: string, index?: number) {
     super(container, {}, rect, ownerId, index);
@@ -36,9 +51,8 @@ export class TextBoxView extends ForeignObjectView {
 
     this.addEditCallBack();
     this.addFocusEvent();
-    this.addCopyEvent();
-    this.addCutEvent();
-    this.addPasteEvent();
+
+    this.safeClipboard = this._container.focused.__clipboard__.isSafe;
 
     if (removeOnEmpty) {
       this._container.addCallBack(Event.EDIT_NODE_TOOl_OFF, () => {
@@ -82,31 +96,12 @@ export class TextBoxView extends ForeignObjectView {
     });
   }
 
-  protected override addCutEvent() {
-    this._content.addEventListener('cut', (event: ClipboardEvent) => {
-      let text = document.getSelection()?.toString();
-      if (text) {
-        this._container.focused.__clipboard__.text = text;
-
-        this.replaceSelected("");
-        event.preventDefault();
-      }
-    });
-  }
-  protected override addPasteEvent() {
-    this._content.addEventListener('paste', (event: ClipboardEvent) => {
-      let paste = this.container.focused.__clipboard__.text;
-
-      this.replaceSelected(paste);
-      event.preventDefault();
-    });
-  }
-
   public replaceSelected(text: string) {
     let start = this._content.selectionStart;
     let end = this._content.selectionEnd;
     this.text = this.text.substring(0, start) + text + this.text.substring(end);
-    this._content.setSelectionRange(start, start);
+    let replacedTextEnd = start + text.length;
+    this._content.setSelectionRange(replacedTextEnd, replacedTextEnd);
   }
 
   public override isComplete(): boolean {

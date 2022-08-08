@@ -12,6 +12,7 @@ import {Matrix} from "../../math/Matrix";
 import {PointedView} from "../../../element/shape/pointed/PointedView";
 import {CircleView} from "../../../element/shape/circluar/CircleView";
 import {TableView} from "../../../element/complex/TableView";
+import {ForeignObjectView} from "../../../element/foreign/ForeignObjectView";
 
 export class Focus implements Draggable, Resizeable {
   private readonly container: Container;
@@ -24,9 +25,10 @@ export class Focus implements Draggable, Resizeable {
   public readonly boundingBox: BoundingBox;
 
   private pasteCount: number = 0;
-  public __clipboard__: {elements: Set<ElementView>, text: string} = {
+  public __clipboard__: {elements: Set<ElementView>, text: string, isSafe: boolean} = {
     elements: new Set<ElementView>(),
-    text: ""
+    text: "",
+    isSafe: false, /* if in safe mode, then will be used this clipboard, to prevent clipboard sharing with browser clipboard */
   };
 
   public constructor(container: Container) {
@@ -549,6 +551,14 @@ export class Focus implements Draggable, Resizeable {
     this.__refPoint__ = refPoint;
   }
 
+  public set safeClipboard(isSafe: boolean) {
+    this.__clipboard__.isSafe = isSafe;
+    this._children.forEach((child: ElementView) => {
+      if (child instanceof ForeignObjectView) {
+        child.safeClipboard = isSafe;
+      }
+    });
+  }
   public copy(call: boolean = true): void {
     this.pasteCount = 0;
     this.__clipboard__.elements.clear();
@@ -560,7 +570,6 @@ export class Focus implements Draggable, Resizeable {
       this.container.__call__(Event.COPY, {elements: this._children});
     }
   }
-
   public cut(call: boolean = true): void {
     let childrenCopy: Set<ElementView> = new Set<ElementView>();
     this._children.forEach((child: ElementView) => {

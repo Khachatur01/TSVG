@@ -86,6 +86,35 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   protected _content: HTMLElement;
   public readonly outline: string = "thin solid #999";
   private _lastCommittedHTML: string = "";
+  protected copyEvent = (event: ClipboardEvent) => {
+    let text = document.getSelection()?.toString();
+    if (text) {
+      this._container.focused.__clipboard__.text = text;
+    }
+    event.preventDefault();
+  };
+  protected cutEvent = (event: ClipboardEvent) => {
+    let text = document.getSelection()?.toString();
+    if (text) {
+      this._container.focused.__clipboard__.text = text;
+      const selection = window.getSelection();
+      if (selection?.rangeCount) {
+        selection.deleteFromDocument();
+      }
+    }
+    event.preventDefault();
+  };
+  protected pasteEvent = (event: ClipboardEvent) => {
+    let paste = this.container.focused.__clipboard__.text;
+
+    const selection = window.getSelection();
+    if (!selection?.rangeCount || paste === "") return;
+
+    selection.deleteFromDocument();
+    selection.getRangeAt(0).insertNode(document.createTextNode(paste));
+
+    event.preventDefault();
+  };
   /* Model */
 
   public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
@@ -100,23 +129,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     /* prevent from dropping elements inside */
     this._content.ondrop = () => {return false};
 
-    /* Some of these functions may throw exception, because on some children classes, these functions are overridden */
-    try {
-      this.addEditCallBack();
-    } catch (exception) {}
-    try {
-      this.addFocusEvent();
-    } catch (exception) {}
-    try {
-      this.addCopyEvent();
-    } catch (exception) {}
-    try {
-      this.addCutEvent();
-    } catch (exception) {}
-    try {
-      this.addPasteEvent();
-    } catch (exception) {}
+    this.addEditCallBack();
+    this.addFocusEvent();
 
+    this.safeClipboard = this._container.focused.__clipboard__.isSafe;
 
     this.__setRect__(rect);
     this.setAttr({
@@ -126,6 +142,27 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.setProperties(properties);
   }
 
+  public set safeClipboard(isSafe: boolean) {
+    if (isSafe) {
+      this._content.addEventListener('copy', this.copyEvent);
+      this._content.addEventListener('cut', this.cutEvent);
+      this._content.addEventListener('paste', this.pasteEvent);
+    } else {
+      this._content.removeEventListener('copy', this.copyEvent);
+      this._content.removeEventListener('cut', this.cutEvent);
+      this._content.removeEventListener('paste', this.pasteEvent);
+    }
+  }
+
+  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x == 0 && delta.y == 0) return;
+
+    this._rect.x = this._rect.x + delta.x;
+    this._rect.y = this._rect.y + delta.y;
+
+    this.__updateView__();
+  }
   public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
@@ -143,6 +180,9 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._rect = rect;
     this.__updateView__();
   }
+  public __drawSize__(rect: Rect) {
+    this.__setRect__(rect);
+  }
   public __updateView__(): void {
     this.setAttr({
       x: this._rect.x,
@@ -150,20 +190,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       width: this._rect.width,
       height: this._rect.height
     });
-  }
-
-  public override __correct__(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
-
-    this._rect.x = this._rect.x + delta.x;
-    this._rect.y = this._rect.y + delta.y;
-
-    this.__updateView__();
-  }
-
-  public __drawSize__(rect: Rect) {
-    this.__setRect__(rect);
   }
 
   protected addEditCallBack() {
@@ -185,41 +211,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.svgElement.style.outline = "unset";
   }
 
-  protected addCopyEvent() {
-    this._content.addEventListener('copy', (event: ClipboardEvent) => {
-      let text = document.getSelection()?.toString();
-      if (text) {
-        this._container.focused.__clipboard__.text = text;
-      }
-      event.preventDefault();
-    });
-  }
-  protected addCutEvent() {
-    this._content.addEventListener('cut', (event: ClipboardEvent) => {
-      let text = document.getSelection()?.toString();
-      if (text) {
-        this._container.focused.__clipboard__.text = text;
-        const selection = window.getSelection();
-        if (selection?.rangeCount) {
-          selection.deleteFromDocument();
-        }
-      }
-      event.preventDefault();
-    });
-  }
-  protected addPasteEvent() {
-    this._content.addEventListener('paste', (event: ClipboardEvent) => {
-      let paste = this.container.focused.__clipboard__.text;
-
-      const selection = window.getSelection();
-      if (!selection?.rangeCount || paste === "") return;
-
-      selection.deleteFromDocument();
-      selection.getRangeAt(0).insertNode(document.createTextNode(paste));
-
-      event.preventDefault();
-    });
-  }
   protected addFocusEvent(): void {
     this._content.addEventListener("focus", () => {
       if (this._selectable && this._container.tools.drawTool.isOn() && this._container.tools.drawTool.drawer == this._container.drawers.textBox) {
