@@ -6,10 +6,12 @@ import {Matrix} from "../../../../../math/Matrix";
 import {Focus} from "../../../Focus";
 import {Cursor} from "../../../../../../dataSource/constant/Cursor";
 import {Event} from "../../../../../../dataSource/constant/Event";
+import {Tool} from "../../../../../tool/Tool";
 
 export abstract class Grip extends BoxView {
   protected _lastResize: Rect = {x: 0, y: 0, width: 0, height: 0};
   protected mouseCurrentPos: Point = {x: 0, y: 0};
+  private _lastActiveTool: Tool | null = null;
   private _start = this.start.bind(this);
   private _move = this.move.bind(this);
   private _end = this.end.bind(this);
@@ -67,7 +69,9 @@ export abstract class Grip extends BoxView {
   public abstract __setPosition__(points: Point[]): void;
 
   private start(event: MouseEvent | TouchEvent) {
+    this._lastActiveTool = this._container.tools.activeTool;
     this._container.tools.activeTool?.off();
+
     document.addEventListener("mousemove", this._move);
     document.addEventListener("touchmove", this._move);
     document.addEventListener("mouseup", this._end);
@@ -105,7 +109,7 @@ export abstract class Grip extends BoxView {
     this.makeMouseMove(client);
   }
   private end() {
-    this._container.tools.activeTool?.on();
+    this._lastActiveTool?.on();
     document.removeEventListener("mousemove", this._move);
     document.removeEventListener("touchmove", this._move);
     document.removeEventListener("mouseup", this._end);

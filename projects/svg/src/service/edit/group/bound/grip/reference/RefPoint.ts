@@ -7,6 +7,7 @@ import {Point} from "../../../../../../model/Point";
 import {Event} from "../../../../../../dataSource/constant/Event";
 import {Focus} from "../../../Focus";
 import {Cursor} from "../../../../../../dataSource/constant/Cursor";
+import {Tool} from "../../../../../tool/Tool";
 
 export class RefPoint extends PathView {
   private readonly _r: number = 5; /* radius */
@@ -14,6 +15,7 @@ export class RefPoint extends PathView {
   private _center: Point = {x: 0, y: 0};
   private focus: Focus;
   private mouseCurrentPos: Point = {x: 0, y: 0};
+  private _lastActiveTool: Tool | null = null;
 
   private moving: boolean = false;
   private _start = this.start.bind(this);
@@ -108,7 +110,9 @@ export class RefPoint extends PathView {
   }
 
   private start(event: MouseEvent | TouchEvent) {
+    this._lastActiveTool = this._container.tools.activeTool;
     this._container.tools.activeTool?.off();
+
     this._container.HTML.addEventListener("mousemove", this._move);
     this._container.HTML.addEventListener("touchmove", this._move);
     document.addEventListener("mouseup", this._end);
@@ -133,7 +137,7 @@ export class RefPoint extends PathView {
     this.makeMouseMove(this.mouseCurrentPos);
   }
   private end() {
-    this._container.tools.activeTool?.on();
+    this._lastActiveTool?.on();
     if (!this.moving) return;
 
     this._container.HTML.removeEventListener("mousemove", this._move);

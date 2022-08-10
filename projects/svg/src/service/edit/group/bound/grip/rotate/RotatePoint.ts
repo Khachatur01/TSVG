@@ -9,12 +9,14 @@ import {Event} from "../../../../../../dataSource/constant/Event";
 import {Focus} from "../../../Focus";
 import {Cursor} from "../../../../../../dataSource/constant/Cursor";
 import {Path} from "../../../../../../model/path/Path";
+import {Tool} from "../../../../../tool/Tool";
 
 export class RotatePoint extends PathView {
   private _start = this.start.bind(this);
   private _move = this.move.bind(this);
   private _end = this.end.bind(this);
   private mouseCurrentPos: Point = {x: 0, y: 0};
+  private _lastActiveTool: Tool | null = null;
 
   private readonly SNAP_ANGLE: number = 15;
   private _r: number = 8;
@@ -117,7 +119,9 @@ export class RotatePoint extends PathView {
   }
 
   private start(event: MouseEvent | TouchEvent) {
+    this._lastActiveTool = this._container.tools.activeTool;
     this._container.tools.activeTool?.off();
+
     this._container.HTML.addEventListener("mousemove", this._move);
     this._container.HTML.addEventListener("touchmove", this._move);
     document.addEventListener("mouseup", this._end);
@@ -143,7 +147,7 @@ export class RotatePoint extends PathView {
     this.makeMouseMove(this.mouseCurrentPos);
   }
   private end(event: MouseEvent | TouchEvent) {
-    this._container.tools.activeTool?.on();
+    this._lastActiveTool?.on();
     this._container.HTML.removeEventListener("mousemove", this._move);
     this._container.HTML.removeEventListener("touchmove", this._move);
     document.removeEventListener("mouseup", this._end);
