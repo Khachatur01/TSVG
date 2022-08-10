@@ -30,6 +30,7 @@ export abstract class Tool {
     this._isOn = true;
   }
   public off(call: boolean = true): void {
+    this._container.tools.activeTool = null;
     this._container.style.changeCursor(Cursor.NO_TOOL);
     this._isOn = false;
   }
