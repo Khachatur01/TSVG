@@ -12,9 +12,6 @@ import {Path} from "../../../../../../model/path/Path";
 import {Tool} from "../../../../../tool/Tool";
 
 export class RotatePoint extends PathView {
-  private _start = this.start.bind(this);
-  private _move = this.move.bind(this);
-  private _end = this.end.bind(this);
   private mouseCurrentPos: Point = {x: 0, y: 0};
   private _lastActiveTool: Tool | null = null;
 
@@ -37,7 +34,49 @@ export class RotatePoint extends PathView {
     this.drawPoint(this._position);
     this.svgElement.style.display = "none";
     this.svgElement.style.cursor = this._container.style.cursor[Cursor.ROTATE_POINT];
+
+    this.mouseDownEvent = this.mouseDownEvent.bind(this);
+    this.mouseMoveEvent = this.mouseMoveEvent.bind(this);
+    this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
+
+  private mouseDownEvent(event: MouseEvent | TouchEvent) {
+    this._lastActiveTool = this._container.tools.activeTool;
+    this._container.tools.activeTool?.off();
+
+    this._container.HTML.addEventListener("mousemove", this.mouseMoveEvent);
+    this._container.HTML.addEventListener("touchmove", this.mouseMoveEvent);
+    document.addEventListener("mouseup", this.mouseUpEvent);
+    document.addEventListener("touchend", this.mouseUpEvent);
+
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this.mouseCurrentPos = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+
+    this.makeMouseDown(this.mouseCurrentPos);
+  };
+  private mouseMoveEvent(event: MouseEvent | TouchEvent) {
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this.mouseCurrentPos = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+
+    this.makeMouseMove(this.mouseCurrentPos);
+  };
+  private mouseUpEvent() {
+    this._lastActiveTool?.on();
+    this._container.HTML.removeEventListener("mousemove", this.mouseMoveEvent);
+    this._container.HTML.removeEventListener("touchmove", this.mouseMoveEvent);
+    document.removeEventListener("mouseup", this.mouseUpEvent);
+    document.removeEventListener("touchend", this.mouseUpEvent);
+
+    this.makeMouseUp(this.mouseCurrentPos);
+  };
 
   public makeMouseDown(position: Point, call: boolean = true) {
     this.dAngle = Angle.fromThreePoints(
@@ -118,50 +157,12 @@ export class RotatePoint extends PathView {
     return angle;
   }
 
-  private start(event: MouseEvent | TouchEvent) {
-    this._lastActiveTool = this._container.tools.activeTool;
-    this._container.tools.activeTool?.off();
-
-    this._container.HTML.addEventListener("mousemove", this._move);
-    this._container.HTML.addEventListener("touchmove", this._move);
-    document.addEventListener("mouseup", this._end);
-    document.addEventListener("touchend", this._end);
-
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this.mouseCurrentPos = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-
-    this.makeMouseDown(this.mouseCurrentPos);
-  }
-  private move(event: MouseEvent | TouchEvent) {
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this.mouseCurrentPos = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-
-    this.makeMouseMove(this.mouseCurrentPos);
-  }
-  private end(event: MouseEvent | TouchEvent) {
-    this._lastActiveTool?.on();
-    this._container.HTML.removeEventListener("mousemove", this._move);
-    this._container.HTML.removeEventListener("touchmove", this._move);
-    document.removeEventListener("mouseup", this._end);
-    document.removeEventListener("touchend", this._end);
-
-    this.makeMouseUp(this.mouseCurrentPos);
-  }
-
   public __on__() {
-    this.svgElement.addEventListener("mousedown", this._start);
-    this.svgElement.addEventListener("touchstart", this._start);
+    this.svgElement.addEventListener("mousedown", this.mouseDownEvent);
+    this.svgElement.addEventListener("touchstart", this.mouseDownEvent);
   }
   public __off__() {
-    this.svgElement.removeEventListener("mousedown", this._start);
-    this.svgElement.removeEventListener("touchstart", this._start);
+    this.svgElement.removeEventListener("mousedown", this.mouseDownEvent);
+    this.svgElement.removeEventListener("touchstart", this.mouseDownEvent);
   }
 }

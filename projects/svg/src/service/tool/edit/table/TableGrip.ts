@@ -21,9 +21,6 @@ export class TableGrip {
   private size: number = 0;
 
   protected mouseCurrentPos: Point = {x: 0, y: 0};
-  private _start = this.onStart.bind(this);
-  private _move = this.onMove.bind(this);
-  private _end = this.onEnd.bind(this);
 
   public constructor(container: Container, editTool: EditTableTool, type: Table, order: number, lineView: LineView) {
     this.editTool = editTool;
@@ -45,7 +42,59 @@ export class TableGrip {
       this._grip.refPoint = this.editTool.editableElement.refPoint;
       this._grip.__rotate__(this.editTool.editableElement.angle);
     }
+
+    this.mouseDownEvent = this.mouseDownEvent.bind(this);
+    this.mouseMoveEvent = this.mouseMoveEvent.bind(this);
+    this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
+
+  private mouseDownEvent(event: MouseEvent | TouchEvent) {
+    this.editTool.container.HTML.addEventListener("mousemove", this.mouseMoveEvent);
+    this.editTool.container.HTML.addEventListener("touchmove", this.mouseMoveEvent);
+    document.addEventListener("mouseup", this.mouseUpEvent);
+    document.addEventListener("touchend", this.mouseUpEvent);
+    this.lineView.SVG.style.cursor = "grabbing";
+    this._grip.SVG.style.cursor = "grabbing";
+    this._container.HTML.style.cursor = "grabbing";
+
+    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this.mouseCurrentPos = this._container.grid.getSnapPoint({
+      x: eventPosition.x - containerRect.x,
+      y: eventPosition.y - containerRect.y
+    });
+    this.makeMouseDown(this.mouseCurrentPos);
+  };
+  private mouseMoveEvent(event: MouseEvent | TouchEvent) {
+    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this.mouseCurrentPos = this._container.grid.getSnapPoint({
+      x: eventPosition.x - containerRect.x,
+      y: eventPosition.y - containerRect.y
+    });
+
+    this.makeMouseMove(this.mouseCurrentPos);
+
+    this.editTool.__topBorderGrip__?.__updatePosition__();
+    this.editTool.__leftBorderGrip__?.__updatePosition__();
+    this.editTool.__rowGrips__.forEach(rowGrip => {
+      rowGrip.__updatePosition__();
+    });
+    this.editTool.__colGrips__.forEach(colGrip => {
+      colGrip.__updatePosition__();
+    });
+  };
+  private mouseUpEvent() {
+    this.editTool.container.HTML.removeEventListener("mousemove", this.mouseMoveEvent);
+    this.editTool.container.HTML.removeEventListener("touchmove", this.mouseMoveEvent);
+    document.removeEventListener("mouseup", this.mouseUpEvent);
+    document.removeEventListener("touchend", this.mouseUpEvent);
+    this.lineView.SVG.style.cursor = "grab";
+    this._grip.SVG.style.cursor = "grab";
+    this._container.HTML.style.cursor = "default";
+
+    this.makeMouseUp(this.mouseCurrentPos);
+  };
 
   private createGripPath(center: Point, type: Table): Path {
     if (!this.editTool.editableElement) {
@@ -160,67 +209,19 @@ export class TableGrip {
     }
   }
 
-  protected onStart(event: MouseEvent | TouchEvent): void {
-    this.editTool.container.HTML.addEventListener("mousemove", this._move);
-    this.editTool.container.HTML.addEventListener("touchmove", this._move);
-    document.addEventListener("mouseup", this._end);
-    document.addEventListener("touchend", this._end);
-    this.lineView.SVG.style.cursor = "grabbing";
-    this._grip.SVG.style.cursor = "grabbing";
-    this._container.HTML.style.cursor = "grabbing";
-
-    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this.mouseCurrentPos = this._container.grid.getSnapPoint({
-      x: eventPosition.x - containerRect.x,
-      y: eventPosition.y - containerRect.y
-    });
-    this.makeMouseDown(this.mouseCurrentPos);
-  };
-  protected onMove(event: MouseEvent | TouchEvent): void {
-    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this.mouseCurrentPos = this._container.grid.getSnapPoint({
-      x: eventPosition.x - containerRect.x,
-      y: eventPosition.y - containerRect.y
-    });
-
-    this.makeMouseMove(this.mouseCurrentPos);
-
-    this.editTool.__topBorderGrip__?.__updatePosition__();
-    this.editTool.__leftBorderGrip__?.__updatePosition__();
-    this.editTool.__rowGrips__.forEach(rowGrip => {
-      rowGrip.__updatePosition__();
-    });
-    this.editTool.__colGrips__.forEach(colGrip => {
-      colGrip.__updatePosition__();
-    });
-  };
-  protected onEnd(): void {
-    this.editTool.container.HTML.removeEventListener("mousemove", this._move);
-    this.editTool.container.HTML.removeEventListener("touchmove", this._move);
-    document.removeEventListener("mouseup", this._end);
-    document.removeEventListener("touchend", this._end);
-    this.lineView.SVG.style.cursor = "grab";
-    this._grip.SVG.style.cursor = "grab";
-    this._container.HTML.style.cursor = "default";
-
-    this.makeMouseUp(this.mouseCurrentPos);
-  };
-
   public __on__() {
-    this._grip.SVG.addEventListener("mousedown", this._start);
-    this._grip.SVG.addEventListener("touchstart", this._start);
-    this.lineView.SVG.addEventListener("mousedown", this._start);
-    this.lineView.SVG.addEventListener("touchstart", this._start);
+    this._grip.SVG.addEventListener("mousedown", this.mouseDownEvent);
+    this._grip.SVG.addEventListener("touchstart", this.mouseDownEvent);
+    this.lineView.SVG.addEventListener("mousedown", this.mouseDownEvent);
+    this.lineView.SVG.addEventListener("touchstart", this.mouseDownEvent);
     this._grip.SVG.style.cursor = "grab";
     this.lineView.SVG.style.cursor = "grab";
   }
   public __off__() {
-    this._grip.SVG.removeEventListener("mousedown", this._start);
-    this._grip.SVG.removeEventListener("touchstart", this._start);
-    this.lineView.SVG.removeEventListener("mousedown", this._start);
-    this.lineView.SVG.removeEventListener("touchstart", this._start);
+    this._grip.SVG.removeEventListener("mousedown", this.mouseDownEvent);
+    this._grip.SVG.removeEventListener("touchstart", this.mouseDownEvent);
+    this.lineView.SVG.removeEventListener("mousedown", this.mouseDownEvent);
+    this.lineView.SVG.removeEventListener("touchstart", this.mouseDownEvent);
     this._grip.SVG.style.cursor = "default";
     this.lineView.SVG.style.cursor = "default";
   }

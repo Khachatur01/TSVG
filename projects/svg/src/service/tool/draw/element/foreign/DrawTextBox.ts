@@ -21,7 +21,7 @@ export class DrawTextBox extends MoveDraw {
 
   protected override turnOnToolAfterDrawing(): void {}
 
-  protected override drawStart(event: MouseEvent | TouchEvent) {
+  protected override mouseDownEvent(event: MouseEvent | TouchEvent) {
     /* turn on text edit mode when clicking to text box element */
     if (event.target instanceof HTMLElement && event.target.parentElement instanceof SVGForeignObjectElement) {
       let targetElementId = ElementView.parseId(event.target.parentElement.id);
@@ -33,7 +33,7 @@ export class DrawTextBox extends MoveDraw {
       super.turnOnToolAfterDrawing();
       return;
     }
-    super.drawStart(event);
+    super.mouseDownEvent(event);
   }
 
   protected override onIsNotComplete(call: boolean) {

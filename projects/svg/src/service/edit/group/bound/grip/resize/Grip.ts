@@ -12,9 +12,6 @@ export abstract class Grip extends BoxView {
   protected _lastResize: Rect = {x: 0, y: 0, width: 0, height: 0};
   protected mouseCurrentPos: Point = {x: 0, y: 0};
   private _lastActiveTool: Tool | null = null;
-  private _start = this.start.bind(this);
-  private _move = this.move.bind(this);
-  private _end = this.end.bind(this);
 
   protected side: number = 10;
   protected halfSide: number = 5;
@@ -29,9 +26,67 @@ export abstract class Grip extends BoxView {
       stroke: "#002fff"
     });
     this.focus = focus;
-
     this.svgElement.style.display = "none";
+
+    this.mouseDownEvent = this.mouseDownEvent.bind(this);
+    this.mouseMoveEvent = this.mouseMoveEvent.bind(this);
+    this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
+
+  private mouseDownEvent(event: MouseEvent | TouchEvent) {
+    this._lastActiveTool = this._container.tools.activeTool;
+    this._container.tools.activeTool?.off();
+    document.addEventListener("mousemove", this.mouseMoveEvent);
+    document.addEventListener("touchmove", this.mouseMoveEvent);
+    document.addEventListener("mouseup", this.mouseUpEvent);
+    document.addEventListener("touchend", this.mouseUpEvent);
+
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this.mouseCurrentPos = {
+      x: eventPosition.x - containerRect.x,
+      y: eventPosition.y - containerRect.y
+    };
+
+    let client: Point = Matrix.rotate(
+      [this.mouseCurrentPos],
+      this.focus.__refPoint__,
+      this.focus.angle
+    )[0];
+
+    this.makeMouseDown(client);
+  };
+  private mouseMoveEvent(event: MouseEvent | TouchEvent) {
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this.mouseCurrentPos = {
+      x: eventPosition.x - containerRect.x,
+      y: eventPosition.y - containerRect.y
+    };
+
+    let client: Point = Matrix.rotate(
+      [this.mouseCurrentPos],
+      this.focus.__refPoint__,
+      this.focus.angle
+    )[0];
+
+    this.makeMouseMove(client);
+  };
+  private mouseUpEvent() {
+    this._lastActiveTool?.on();
+    document.removeEventListener("mousemove", this.mouseMoveEvent);
+    document.removeEventListener("touchmove", this.mouseMoveEvent);
+    document.removeEventListener("mouseup", this.mouseUpEvent);
+    document.removeEventListener("touchend", this.mouseUpEvent);
+
+    let client: Point = Matrix.rotate(
+      [this.mouseCurrentPos],
+      this.focus.__refPoint__,
+      this.focus.angle
+    )[0];
+
+    this.makeMouseUp(client);
+  };
 
   public makeMouseDown(position: Point, call: boolean = true): void {
     this.focus.__fixRect__();
@@ -68,68 +123,12 @@ export abstract class Grip extends BoxView {
 
   public abstract __setPosition__(points: Point[]): void;
 
-  private start(event: MouseEvent | TouchEvent) {
-    this._lastActiveTool = this._container.tools.activeTool;
-    this._container.tools.activeTool?.off();
-
-    document.addEventListener("mousemove", this._move);
-    document.addEventListener("touchmove", this._move);
-    document.addEventListener("mouseup", this._end);
-    document.addEventListener("touchend", this._end);
-
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this.mouseCurrentPos = {
-      x: eventPosition.x - containerRect.x,
-      y: eventPosition.y - containerRect.y
-    };
-
-    let client: Point = Matrix.rotate(
-      [this.mouseCurrentPos],
-      this.focus.__refPoint__,
-      this.focus.angle
-    )[0];
-
-    this.makeMouseDown(client);
-  }
-  private move(event: MouseEvent | TouchEvent) {
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this.mouseCurrentPos = {
-      x: eventPosition.x - containerRect.x,
-      y: eventPosition.y - containerRect.y
-    };
-
-    let client: Point = Matrix.rotate(
-      [this.mouseCurrentPos],
-      this.focus.__refPoint__,
-      this.focus.angle
-    )[0];
-
-    this.makeMouseMove(client);
-  }
-  private end() {
-    this._lastActiveTool?.on();
-    document.removeEventListener("mousemove", this._move);
-    document.removeEventListener("touchmove", this._move);
-    document.removeEventListener("mouseup", this._end);
-    document.removeEventListener("touchend", this._end);
-
-    let client: Point = Matrix.rotate(
-      [this.mouseCurrentPos],
-      this.focus.__refPoint__,
-      this.focus.angle
-    )[0];
-
-    this.makeMouseUp(client);
-  }
-
   public __on__() {
-    this.svgElement.addEventListener("mousedown", this._start);
-    this.svgElement.addEventListener("touchstart", this._start);
+    this.svgElement.addEventListener("mousedown", this.mouseDownEvent);
+    this.svgElement.addEventListener("touchstart", this.mouseDownEvent);
   }
   public __off__() {
-    this.svgElement.removeEventListener("mousedown", this._start);
-    this.svgElement.removeEventListener("touchstart", this._start);
+    this.svgElement.removeEventListener("mousedown", this.mouseDownEvent);
+    this.svgElement.removeEventListener("touchstart", this.mouseDownEvent);
   }
 }

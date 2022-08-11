@@ -10,11 +10,7 @@ import {Cursor} from "../../../../dataSource/constant/Cursor";
 export class Node extends EllipseView {
   private readonly editTool: EditNodeTool;
   private readonly order: number;
-
   protected mouseCurrentPos: Point = {x: 0, y: 0};
-  private _start = this.onStart.bind(this);
-  private _move = this.onMove.bind(this);
-  private _end = this.onEnd.bind(this);
 
   public constructor(container: Container, editTool: EditNodeTool, position: Point, order: number) {
     super(container, {overEvent: true, globalStyle: false}, {x: position.x - 8, y: position.y - 8, width: 16, height: 16});
@@ -24,11 +20,50 @@ export class Node extends EllipseView {
     this.svgElement.style.cursor = this._container.style.cursor[Cursor.NODE];
     this.editTool = editTool;
     this.order = order;
+
+    this.mouseDownEvent = this.mouseDownEvent.bind(this);
+    this.mouseMoveEvent = this.mouseMoveEvent.bind(this);
+    this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
 
   public override __drag__(delta: Point) {
     super.__drag__({x: delta.x - 8, y: delta.y - 8});
   }
+
+  private mouseDownEvent(event: MouseEvent | TouchEvent) {
+    this.editTool.container.HTML.addEventListener("mousemove", this.mouseMoveEvent);
+    this.editTool.container.HTML.addEventListener("touchmove", this.mouseMoveEvent);
+    document.addEventListener("mouseup", this.mouseUpEvent);
+    document.addEventListener("touchend", this.mouseUpEvent);
+
+    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+
+    this.mouseCurrentPos = this._container.grid.getSnapPoint({
+      x: eventPosition.x - containerRect.x,
+      y: eventPosition.y - containerRect.y
+    });
+    this.makeMouseDown(this.mouseCurrentPos);
+  };
+  private mouseMoveEvent(event: MouseEvent | TouchEvent) {
+    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+
+    this.mouseCurrentPos = this._container.grid.getSnapPoint({
+      x: eventPosition.x - containerRect.x,
+      y: eventPosition.y - containerRect.y
+    });
+
+    this.makeMouseMove(this.mouseCurrentPos);
+  };
+  private mouseUpEvent() {
+    this.editTool.container.HTML.removeEventListener("mousemove", this.mouseMoveEvent);
+    this.editTool.container.HTML.removeEventListener("touchmove", this.mouseMoveEvent);
+    document.removeEventListener("mouseup", this.mouseUpEvent);
+    document.removeEventListener("touchend", this.mouseUpEvent);
+
+    this.makeMouseUp(this.mouseCurrentPos);
+  };
 
   public makeMouseDown(position: Point, call: boolean = true) {
     if (call) {
@@ -65,47 +100,12 @@ export class Node extends EllipseView {
     }
   }
 
-  protected onStart(event: MouseEvent | TouchEvent): void {
-    this.editTool.container.HTML.addEventListener("mousemove", this._move);
-    this.editTool.container.HTML.addEventListener("touchmove", this._move);
-    document.addEventListener("mouseup", this._end);
-    document.addEventListener("touchend", this._end);
-
-    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-
-    this.mouseCurrentPos = this._container.grid.getSnapPoint({
-      x: eventPosition.x - containerRect.x,
-      y: eventPosition.y - containerRect.y
-    });
-    this.makeMouseDown(this.mouseCurrentPos);
-  };
-  protected onMove(event: MouseEvent | TouchEvent): void {
-    let containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-
-    this.mouseCurrentPos = this._container.grid.getSnapPoint({
-      x: eventPosition.x - containerRect.x,
-      y: eventPosition.y - containerRect.y
-    });
-
-    this.makeMouseMove(this.mouseCurrentPos);
-  };
-  protected onEnd(): void {
-    this.editTool.container.HTML.removeEventListener("mousemove", this._move);
-    this.editTool.container.HTML.removeEventListener("touchmove", this._move);
-    document.removeEventListener("mouseup", this._end);
-    document.removeEventListener("touchend", this._end);
-
-    this.makeMouseUp(this.mouseCurrentPos);
-  };
-
   public __on__() {
-    this.svgElement.addEventListener("mousedown", this._start);
-    this.svgElement.addEventListener("touchstart", this._start);
+    this.svgElement.addEventListener("mousedown", this.mouseDownEvent);
+    this.svgElement.addEventListener("touchstart", this.mouseDownEvent);
   }
   public __off__() {
-    this.svgElement.removeEventListener("mousedown", this._start);
-    this.svgElement.removeEventListener("touchstart", this._start);
+    this.svgElement.removeEventListener("mousedown", this.mouseDownEvent);
+    this.svgElement.removeEventListener("touchstart", this.mouseDownEvent);
   }
 }

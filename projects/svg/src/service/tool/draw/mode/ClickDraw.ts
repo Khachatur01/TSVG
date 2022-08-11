@@ -12,12 +12,33 @@ export abstract class ClickDraw extends Drawer {
   protected _drawableElement: ClickDrawable | undefined = undefined;
   protected clicksCount: number = 0;
 
-  private _click = this.click.bind(this);
-  private _move = this.move.bind(this);
-
   public constructor(drawTool: DrawTool) {
     super(drawTool);
+
+    this.mouseDownEvent = this.mouseDownEvent.bind(this);
+    this.mouseMoveEvent = this.mouseMoveEvent.bind(this);
   }
+
+  private mouseDownEvent (event: MouseEvent | TouchEvent) {
+    let containerRect = this.drawTool.container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this.drawTool.__mouseCurrentPos__ = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+
+    this.makeMouseDown(this.drawTool.mouseCurrentPos);
+  };
+  private mouseMoveEvent (event: MouseEvent | TouchEvent) {
+    let containerRect = this.drawTool.container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this.drawTool.__mouseCurrentPos__ = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+
+    this.makeMouseMove(this.drawTool.mouseCurrentPos);
+  };
 
   public makeMouseDown(position: Point, call: boolean = true) {
     position = this.drawTool.container.grid.getSnapPoint(position);
@@ -65,27 +86,6 @@ export abstract class ClickDraw extends Drawer {
 
   protected abstract createDrawableElement(position: Point, ownerId?: string, index?: number): ClickDrawable;
 
-  protected click(event: MouseEvent | TouchEvent) {
-    let containerRect = this.drawTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this.drawTool.__mouseCurrentPos__ = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-
-    this.makeMouseDown(this.drawTool.mouseCurrentPos);
-  }
-  protected move(event: MouseEvent | TouchEvent) {
-    let containerRect = this.drawTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this.drawTool.__mouseCurrentPos__ = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-
-    this.makeMouseMove(this.drawTool.mouseCurrentPos);
-  }
-
   protected stopClickDrawing(call: boolean = true) {
     if (!this._drawableElement || !this.drawTool.isDrawing) return;
 
@@ -122,15 +122,15 @@ export abstract class ClickDraw extends Drawer {
   }
 
   public start(call: boolean = true): void {
-    this.drawTool.container.HTML.addEventListener('mousedown', this._click);
-    this.drawTool.container.HTML.addEventListener('touchstart', this._click);
-    document.addEventListener("mousemove", this._move);
+    this.drawTool.container.HTML.addEventListener('mousedown', this.mouseDownEvent);
+    this.drawTool.container.HTML.addEventListener('touchstart', this.mouseDownEvent);
+    document.addEventListener("mousemove", this.mouseMoveEvent);
     /* this.container.HTML.addEventListener("touchmove", this._move); */
   }
   public stop(call: boolean = true): void {
-    this.drawTool.container.HTML.removeEventListener('mousedown', this._click);
-    this.drawTool.container.HTML.removeEventListener('touchstart', this._click);
-    document.removeEventListener('mousemove', this._move);
+    this.drawTool.container.HTML.removeEventListener('mousedown', this.mouseDownEvent);
+    this.drawTool.container.HTML.removeEventListener('touchstart', this.mouseDownEvent);
+    document.removeEventListener('mousemove', this.mouseMoveEvent);
     /* this.container.HTML.removeEventListener('touchmove', this._move); */
     this.stopClickDrawing(call);
   }

@@ -18,10 +18,6 @@ export class HighlightTool extends Tool {
   private group: SVGGElement;
   private _highlighting: boolean = false;
 
-  private _highlightStart = this.highlightStart.bind(this);
-  private _highlightMove = this.highlightMove.bind(this);
-  private _highlightEnd = this.highlightEnd.bind(this);
-
   public constructor(container: Container, group?: SVGGElement) {
     super(container);
 
@@ -33,7 +29,55 @@ export class HighlightTool extends Tool {
       this.group = document.createElementNS(ElementView.svgURI, "g");
       this.group.id = "highlight";
     }
+
+    this.mouseDownEvent = this.mouseDownEvent.bind(this);
+    this.mouseMoveEvent = this.mouseMoveEvent.bind(this);
+    this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
+
+  private mouseDownEvent(event: MouseEvent | TouchEvent) {
+    this._container.HTML.addEventListener("mousemove", this.mouseMoveEvent);
+    this._container.HTML.addEventListener("touchmove", this.mouseMoveEvent);
+    document.addEventListener("mouseup", this.mouseUpEvent);
+    document.addEventListener("touchend", this.mouseUpEvent);
+
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this._mouseCurrentPos = eventPosition;
+
+    let startPosition = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+
+    this.makeMouseDown(startPosition);
+  };
+  private mouseMoveEvent(event: MouseEvent | TouchEvent) {
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this._mouseCurrentPos = eventPosition;
+
+    let movePosition = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+
+    this.makeMouseMove(movePosition);
+  };
+  private mouseUpEvent() {
+    this._container.HTML.removeEventListener("mousemove", this.mouseMoveEvent);
+    this._container.HTML.removeEventListener("touchmove", this.mouseMoveEvent);
+    document.removeEventListener("mouseup", this.mouseUpEvent);
+    document.removeEventListener("touchend", this.mouseUpEvent);
+
+    let containerRect = this._container.HTML.getBoundingClientRect();
+
+    let position = {
+      x: this._mouseCurrentPos.x - containerRect.left,
+      y: this._mouseCurrentPos.y - containerRect.top
+    };
+    this.makeMouseUp(position);
+  };
 
   public makeMouseDown(position: Point, call: boolean = true, settings?: any) {
     if (this._highlighting) {
@@ -138,55 +182,11 @@ export class HighlightTool extends Tool {
     this.group = group;
   }
 
-  private highlightStart(event: MouseEvent | TouchEvent): void  {
-    this._container.HTML.addEventListener("mousemove", this._highlightMove);
-    this._container.HTML.addEventListener("touchmove", this._highlightMove);
-    document.addEventListener("mouseup", this._highlightEnd);
-    document.addEventListener("touchend", this._highlightEnd);
-
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this._mouseCurrentPos = eventPosition;
-
-    let startPosition = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-
-    this.makeMouseDown(startPosition);
-  }
-  private highlightMove(event: MouseEvent | TouchEvent): void {
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this._mouseCurrentPos = eventPosition;
-
-    let movePosition = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-
-    this.makeMouseMove(movePosition);
-  }
-  private highlightEnd(event: MouseEvent | TouchEvent): void {
-    this._container.HTML.removeEventListener("mousemove", this._highlightMove);
-    this._container.HTML.removeEventListener("touchmove", this._highlightMove);
-    document.removeEventListener("mouseup", this._highlightEnd);
-    document.removeEventListener("touchend", this._highlightEnd);
-
-    let containerRect = this._container.HTML.getBoundingClientRect();
-
-    let position = {
-      x: this._mouseCurrentPos.x - containerRect.left,
-      y: this._mouseCurrentPos.y - containerRect.top
-    };
-    this.makeMouseUp(position);
-  }
-
   public override on(call: boolean = true): void {
     super.on(call);
 
-    this._container.HTML.addEventListener("mousedown", this._highlightStart);
-    this._container.HTML.addEventListener("touchstart", this._highlightStart);
+    this._container.HTML.addEventListener("mousedown", this.mouseDownEvent);
+    this._container.HTML.addEventListener("touchstart", this.mouseDownEvent);
     this._container.blur();
 
     this._container.style.changeCursor(this.cursor);
@@ -196,8 +196,8 @@ export class HighlightTool extends Tool {
   }
   public override off(call: boolean = true): void {
     super.off();
-    this._container.HTML.removeEventListener("mousedown", this._highlightStart);
-    this._container.HTML.removeEventListener("touchstart", this._highlightStart);
+    this._container.HTML.removeEventListener("mousedown", this.mouseDownEvent);
+    this._container.HTML.removeEventListener("touchstart", this.mouseDownEvent);
 
     if (call) {
       this._container.__call__(Event.HIGHLIGHT_TOOl_OFF);

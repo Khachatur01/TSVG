@@ -9,16 +9,45 @@ import {DrawTool} from "../DrawTool";
 
 export abstract class MoveDraw extends Drawer {
   protected startPosition: Point = {x: 0, y: 0};
-
-  protected _drawStart = this.drawStart.bind(this);
-  protected _draw = this.draw.bind(this);
-  protected _drawEnd = this.drawEnd.bind(this);
-
   protected _drawableElement: MoveDrawable | undefined = undefined;
 
   public constructor(drawTool: DrawTool) {
     super(drawTool);
+
+    this.mouseDownEvent = this.mouseDownEvent.bind(this);
+    this.mouseMoveEvent = this.mouseMoveEvent.bind(this);
+    this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
+
+  protected mouseDownEvent(event: MouseEvent | TouchEvent) {
+    document.addEventListener('mousemove', this.mouseMoveEvent);
+    document.addEventListener('touchmove', this.mouseMoveEvent);
+    document.addEventListener('mouseup', this.mouseUpEvent);
+    document.addEventListener('touchend', this.mouseUpEvent);
+
+    let containerRect = this.drawTool.container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this.drawTool.__mouseCurrentPos__ = {
+      x: eventPosition.x - containerRect.left, //x position within the element.
+      y: eventPosition.y - containerRect.top  //y position within the element.
+    };
+
+    this.makeMouseDown(this.drawTool.mouseCurrentPos);
+  };
+  protected mouseMoveEvent (event: MouseEvent | TouchEvent) {
+    if (!this._drawableElement) return;
+    let containerRect = this.drawTool.container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this.drawTool.__mouseCurrentPos__ = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+
+    this.makeMouseMove(this.drawTool.mouseCurrentPos);
+  };
+  protected mouseUpEvent() {
+    this.stopDrawing();
+  };
 
   public makeMouseDown(position: Point, call: boolean = true) {
     if (this.drawTool.isDrawing) {
@@ -113,36 +142,6 @@ export abstract class MoveDraw extends Drawer {
     }
   }
 
-  protected drawStart(event: MouseEvent | TouchEvent) {
-    document.addEventListener('mousemove', this._draw);
-    document.addEventListener('touchmove', this._draw);
-    document.addEventListener('mouseup', this._drawEnd);
-    document.addEventListener('touchend', this._drawEnd);
-
-    let containerRect = this.drawTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this.drawTool.__mouseCurrentPos__ = {
-      x: eventPosition.x - containerRect.left, //x position within the element.
-      y: eventPosition.y - containerRect.top  //y position within the element.
-    };
-
-    this.makeMouseDown(this.drawTool.mouseCurrentPos);
-  }
-  protected draw(event: MouseEvent | TouchEvent) {
-    if (!this._drawableElement) return;
-    let containerRect = this.drawTool.container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this.drawTool.__mouseCurrentPos__ = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-
-    this.makeMouseMove(this.drawTool.mouseCurrentPos);
-  }
-  protected drawEnd() {
-    this.stopDrawing();
-  }
-
   protected onEnd(call: boolean) {}
   protected onIsNotComplete(call: boolean) {
     if (this._drawableElement)
@@ -152,20 +151,20 @@ export abstract class MoveDraw extends Drawer {
   public override stopDrawing(call?: boolean) {
     this.drawTool.container.tools.drawTool.__drawingEnd__();
 
-    document.removeEventListener('mousemove', this._draw);
-    document.removeEventListener('touchmove', this._draw);
-    document.removeEventListener('mouseup', this._drawEnd);
-    document.removeEventListener('touchend', this._drawEnd);
+    document.removeEventListener('mousemove', this.mouseMoveEvent);
+    document.removeEventListener('touchmove', this.mouseMoveEvent);
+    document.removeEventListener('mouseup', this.mouseUpEvent);
+    document.removeEventListener('touchend', this.mouseUpEvent);
 
     this.makeMouseUp(this.drawTool.mouseCurrentPos, call);
   }
 
   public start(call: boolean = true): void {
-    this.drawTool.container.HTML.addEventListener('mousedown', this._drawStart);
-    this.drawTool.container.HTML.addEventListener('touchstart', this._drawStart);
+    this.drawTool.container.HTML.addEventListener('mousedown', this.mouseDownEvent);
+    this.drawTool.container.HTML.addEventListener('touchstart', this.mouseDownEvent);
   }
   public stop(call: boolean = true): void {
-    this.drawTool.container.HTML.removeEventListener('mousedown', this._drawStart);
-    this.drawTool.container.HTML.removeEventListener('touchstart', this._drawStart);
+    this.drawTool.container.HTML.removeEventListener('mousedown', this.mouseDownEvent);
+    this.drawTool.container.HTML.removeEventListener('touchstart', this.mouseDownEvent);
   }
 }

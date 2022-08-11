@@ -19,10 +19,6 @@ export class SelectTool extends Tool {
 
   private elementsOverEvent: {element: ElementView, overEvent: boolean}[] = [];
 
-  private _start = this.start.bind(this);
-  private _select = this.select.bind(this);
-  private _end = this.end.bind(this);
-
   public constructor(container: Container, focus: Focus) {
     super(container);
     this.boundingBox = new RectangleView(container);
@@ -36,7 +32,48 @@ export class SelectTool extends Tool {
     this.boundingBox.SVG.style.shapeRendering = "optimizespeed";
 
     this.boundingBox.removeOverEvent();
+
+    this.mouseDownEvent = this.mouseDownEvent.bind(this);
+    this.mouseMoveEvent = this.mouseMoveEvent.bind(this);
+    this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
+
+  private mouseDownEvent(event: MouseEvent | TouchEvent) {
+    if (event.target != this._container.HTML) return;
+    this._container.HTML.addEventListener("mousemove", this.mouseMoveEvent);
+    this._container.HTML.addEventListener("touchmove", this.mouseMoveEvent);
+    document.addEventListener("mouseup", this.mouseUpEvent);
+    document.addEventListener("touchend", this.mouseUpEvent);
+
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this._mouseCurrentPos = {
+      x: eventPosition.x - containerRect.left, // x position within the element.
+      y: eventPosition.y - containerRect.top // y position within the element.
+    };
+    this.makeMouseDown(this._mouseCurrentPos);
+
+    this._container.style.changeCursor(Cursor.NO_TOOL);
+  };
+  private mouseMoveEvent(event: MouseEvent | TouchEvent) {
+    let containerRect = this._container.HTML.getBoundingClientRect();
+    let eventPosition = Container.__eventToPosition__(event);
+    this._mouseCurrentPos = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+    this.makeMouseMove(this._mouseCurrentPos);
+  };
+  private mouseUpEvent() {
+    this.makeMouseUp(this._mouseCurrentPos);
+
+    this._container.style.changeCursor(this.cursor);
+
+    this._container.HTML.removeEventListener("mousemove", this.mouseMoveEvent);
+    this._container.HTML.removeEventListener("touchmove", this.mouseMoveEvent);
+    document.removeEventListener("mouseup", this.mouseUpEvent);
+    document.removeEventListener("touchend", this.mouseUpEvent);
+  };
 
   public makeMouseDown(position: Point, call: boolean = true) {
     /*
@@ -131,47 +168,10 @@ export class SelectTool extends Tool {
     }
   }
 
-  private start(event: MouseEvent | TouchEvent): void {
-    if (event.target != this._container.HTML) return;
-    this._container.HTML.addEventListener("mousemove", this._select);
-    this._container.HTML.addEventListener("touchmove", this._select);
-    document.addEventListener("mouseup", this._end);
-    document.addEventListener("touchend", this._end);
-
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this._mouseCurrentPos = {
-      x: eventPosition.x - containerRect.left, // x position within the element.
-      y: eventPosition.y - containerRect.top // y position within the element.
-    };
-    this.makeMouseDown(this._mouseCurrentPos);
-
-    this._container.style.changeCursor(Cursor.NO_TOOL);
-  }
-  private select(event: MouseEvent | TouchEvent): void {
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
-    this._mouseCurrentPos = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-    this.makeMouseMove(this._mouseCurrentPos);
-  }
-  private end(): void {
-    this.makeMouseUp(this._mouseCurrentPos);
-
-    this._container.style.changeCursor(this.cursor);
-
-    this._container.HTML.removeEventListener("mousemove", this._select);
-    this._container.HTML.removeEventListener("touchmove", this._select);
-    document.removeEventListener("mouseup", this._end);
-    document.removeEventListener("touchend", this._end);
-  }
-
   public override on(call: boolean = true): void {
     super.on(call);
-    this._container.HTML.addEventListener("mousedown", this._start);
-    this._container.HTML.addEventListener("touchstart", this._start);
+    this._container.HTML.addEventListener("mousedown", this.mouseDownEvent);
+    this._container.HTML.addEventListener("touchstart", this.mouseDownEvent);
     this.dragTool.on(call);
 
     this._container.style.changeCursor(this.cursor);
@@ -181,8 +181,8 @@ export class SelectTool extends Tool {
   }
   public override off(call: boolean = true): void {
     super.off(call);
-    this._container.HTML.removeEventListener("mousedown", this._start);
-    this._container.HTML.removeEventListener("touchstart", this._start);
+    this._container.HTML.removeEventListener("mousedown", this.mouseDownEvent);
+    this._container.HTML.removeEventListener("touchstart", this.mouseDownEvent);
     this.dragTool.off(call);
 
     if (call) {
