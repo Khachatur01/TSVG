@@ -117,21 +117,27 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   };
   /* Model */
 
-  public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+  public constructor(
+    container: Container,
+    properties: ElementProperties = {},
+    rect: Rect = {x: 0, y: 0, width: 0, height: 0},
+    contentEditable: boolean = true,
+    ownerId?: string, index?: number
+  ) {
+
     super(container, ownerId, index);
     this.svgElement.id = this.id;
     this.svgElement.style.outline = "none";
     this.svgElement.style.border = "none";
     this.style = new ForeignObjectStyle(this);
     this._content = document.createElement('div');
-    this._content.contentEditable = "true";
+    this._content.contentEditable = contentEditable + "";
     this._content.style.height = "100%";
     /* prevent from dropping elements inside */
     this._content.ondrop = () => {return false};
 
     this.addEditCallBack();
     this.addFocusEvent();
-
     this.safeClipboard = this._container.focused.__clipboard__.isSafe;
 
     this.__setRect__(rect);
@@ -236,6 +242,13 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     return this.svgElement;
   }
 
+  public get contentEditable(): boolean {
+    return this._content.contentEditable === "true";
+  }
+  public set contentEditable(editable: boolean) {
+    this._content.contentEditable = editable + "";
+  }
+
   public get content(): HTMLElement {
     return this._content;
   }
@@ -274,10 +287,5 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       this.svgElement.innerHTML = decodeURIComponent(json.content);
       this._content = this.svgElement.firstChild as HTMLElement;
     }
-    // this.addEditCallBack();
-    // this.addFocusEvent();
-    // this.addCopyEvent();
-    // this.addCutEvent();
-    // this.addPasteEvent();
   };
 }

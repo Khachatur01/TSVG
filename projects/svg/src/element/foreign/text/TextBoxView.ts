@@ -34,7 +34,7 @@ export class TextBoxView extends ForeignObjectView {
   };
 
   public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, removeOnEmpty: boolean = true, ownerId?: string, index?: number) {
-    super(container, {}, rect, ownerId, index);
+    super(container, {}, rect, false, ownerId, index);
 
     this._content = document.createElement("textarea");
     this._content.style.width = "100%";
