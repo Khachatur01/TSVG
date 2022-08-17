@@ -80,6 +80,8 @@ export class RayStyle extends ElementStyle {
   }
 }
 
+export interface RayProperties extends ElementProperties {}
+
 export interface RayViewEffects {
   showSteps?: boolean;
   showNumbers?: boolean;
@@ -123,12 +125,14 @@ export class RayView extends ComplexView implements ClickDrawable {
   protected readonly SUB_STEPS_COUNT = 4;
 
   constructor(container: Container,
-              properties: ElementProperties = {},
+              properties: RayProperties = {},
               viewEffects: RayViewEffects = {},
               startPoint: Point = {x: 0, y: 0},
               endPoint: Point = {x: 0, y: 0},
               scale?: ScaleProperties,
-              ownerId?: string, index?: number) {
+              ownerId?: string,
+              index?: number
+  ) {
 
     super(container, ownerId, index);
 
