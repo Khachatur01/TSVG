@@ -10,7 +10,7 @@ export class DrawForeignObject extends MoveDraw {
   public contentEditable: boolean = true;
 
   protected createDrawableElement(position: Point): MoveDrawable {
-    let videoView = new ForeignObjectView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0}, this.contentEditable);
+    let videoView = new ForeignObjectView(this.drawTool.container, {overEvent: true, globalStyle: true, contentEditable: this.contentEditable}, {x: position.x, y: position.y, width: 0, height: 0});
     videoView.setContent(this.content);
     return videoView;
   }

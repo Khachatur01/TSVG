@@ -1,4 +1,4 @@
-import {TriangleView} from "./TriangleView";
+import {TriangleProperties, TriangleView} from "./TriangleView";
 import {Container} from "../../../../../Container";
 import {Rect} from "../../../../../model/Rect";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
@@ -7,10 +7,12 @@ import {ElementCursor, ElementProperties, ElementView} from "../../../../Element
 
 export class IsoscelesTriangleCursor extends ElementCursor {}
 
+export interface IsoscelesTriangleProperties extends TriangleProperties {}
+
 export class IsoscelesTriangleView extends TriangleView implements MoveDrawable {
   protected override _type: ElementType = ElementType.ISOSCELES_TRIANGLE;
 
-  public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: IsoscelesTriangleProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, {},
       {x: rect.x, y: rect.y},
       {x: rect.x, y: rect.y + rect.width},

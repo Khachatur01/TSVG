@@ -1,4 +1,4 @@
-import {TriangleView} from "./TriangleView";
+import {TriangleProperties, TriangleView} from "./TriangleView";
 import {Container} from "../../../../../Container";
 import {Rect} from "../../../../../model/Rect";
 import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
@@ -7,10 +7,12 @@ import {ElementCursor, ElementProperties, ElementView} from "../../../../Element
 
 export class RightTriangleCursor extends ElementCursor {}
 
+export interface RightTriangleProperties extends TriangleProperties {}
+
 export class RightTriangleView extends TriangleView implements MoveDrawable {
   protected override _type: ElementType = ElementType.RIGHT_TRIANGLE;
 
-  public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: RightTriangleProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, {},
       {x: rect.x, y: rect.y}, /* PointA */
       {x: rect.x, y: rect.y + rect.width},  /* PointB */

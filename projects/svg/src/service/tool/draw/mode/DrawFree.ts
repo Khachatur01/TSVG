@@ -1,5 +1,5 @@
 import {Drawer} from "../Drawer";
-import {FreeView} from "../../../../element/shape/pointed/polyline/FreeView";
+import {FreeView} from "../../../../element/shape/path/FreeView";
 import {Container} from "../../../../Container";
 import {Point} from "../../../../model/Point";
 import {Angle} from "../../../math/Angle";

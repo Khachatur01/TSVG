@@ -1,7 +1,7 @@
 import {CartesianView} from "./CartesianView";
 import {ElementCursor, ElementProperties, ElementStyle} from "../../ElementView";
 import {ElementType} from "../../../dataSource/constant/ElementType";
-import {PathView} from "../../shape/PathView";
+import {PathView} from "../../shape/path/PathView";
 import {Point} from "../../../model/Point";
 import {Container} from "../../../Container";
 import {Rect} from "../../../model/Rect";
@@ -71,6 +71,8 @@ export class NumberLineStyle extends ElementStyle {
   }
 }
 
+export interface NumberLineProperties extends ElementProperties {}
+
 export class NumberLineView extends CartesianView implements MoveDrawable {
   protected override _type: ElementType = ElementType.NUMBER_LINE;
   public override readonly style: NumberLineStyle;
@@ -93,9 +95,11 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
    * @param index This element index. If not set, will generate new numerical value
    * */
   public constructor(container: Container,
-                     properties: ElementProperties = {},
+                     properties: NumberLineProperties = {},
                      rect: Rect = {x: 0, y: 0, width: 1, height: 1},
-                     ownerId?: string, index?: number) {
+                     ownerId?: string,
+                     index?: number
+  ) {
     super(container, properties, rect, ownerId, index);
     this.svgElement.id = this.id;
     this.style = new NumberLineStyle(this);

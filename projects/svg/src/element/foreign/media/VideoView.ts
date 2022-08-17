@@ -1,5 +1,5 @@
 import {Container} from "../../../Container";
-import {ForeignObjectView} from "../ForeignObjectView";
+import {ForeignObjectProperties, ForeignObjectView} from "../ForeignObjectView";
 import {ElementType} from "../../../dataSource/constant/ElementType";
 import {ElementCursor, ElementProperties} from "../../ElementView";
 import {Rect} from "../../../model/Rect";
@@ -12,6 +12,8 @@ export class VideoCursor extends ElementCursor {
   }
 }
 
+export interface VideoProperties extends ForeignObjectProperties {}
+
 export class VideoView extends ForeignObjectView {
   protected override _type: ElementType = ElementType.VIDEO;
   private readonly source: HTMLSourceElement;
@@ -21,8 +23,8 @@ export class VideoView extends ForeignObjectView {
   private _src: string = "";
   /* Model */
 
-  public constructor(container: Container, properties: ElementProperties = {}, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
-    super(container, {}, rect, false, ownerId, index);
+  public constructor(container: Container, properties: VideoProperties = {}, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+    super(container, {}, rect, ownerId, index);
     this._content = document.createElement("video");
     this._content.style.width = "calc(100% - 20px)";
     this._content.style.height = "calc(100% - 20px)";

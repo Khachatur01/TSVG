@@ -5,7 +5,7 @@ import {BoundingBox} from "./bound/BoundingBox";
 import {Container} from "../../../Container";
 import {Rect} from "../../../model/Rect";
 import {Resizeable} from "../resize/Resizeable";
-import {PathView} from "../../../element/shape/PathView";
+import {PathView} from "../../../element/shape/path/PathView";
 import {GroupView} from "../../../element/group/GroupView";
 import {Event} from "../../../dataSource/constant/Event";
 import {Matrix} from "../../math/Matrix";

@@ -1,6 +1,6 @@
 import {Point} from "../../../../model/Point";
 import {Rect} from "../../../../model/Rect";
-import {PathView} from "../../../../element/shape/PathView";
+import {PathView} from "../../../../element/shape/path/PathView";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 import {Container} from "../../../../Container";
 import {GroupView} from "../../../../element/group/GroupView";

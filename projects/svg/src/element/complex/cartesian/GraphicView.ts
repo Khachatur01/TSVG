@@ -2,7 +2,7 @@ import {ElementType} from "../../../dataSource/constant/ElementType";
 import {Point} from "../../../model/Point";
 import {Rect} from "../../../model/Rect";
 import {ElementCursor, ElementProperties} from "../../ElementView";
-import {PathView} from "../../shape/PathView";
+import {PathView} from "../../shape/path/PathView";
 import {Container} from "../../../Container";
 import {Path} from "../../../model/path/Path";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
@@ -11,6 +11,8 @@ import {LineTo} from "../../../model/path/line/LineTo";
 import {ScaleProperties} from "./CartesianView";
 
 export class GraphicCursor extends ElementCursor {}
+
+export interface GraphicProperties extends ElementProperties {}
 
 export class GraphicView extends PathView implements MoveDrawable {
   protected override _type: ElementType = ElementType.GRAPHIC;
@@ -26,12 +28,14 @@ export class GraphicView extends PathView implements MoveDrawable {
   protected _mainStepPhysicalUnit: number = 60; /* px - CHANGING on zoom */
 
   constructor(container: Container,
-              properties: ElementProperties = {},
+              properties: GraphicProperties = {},
               rect: Rect = {x: 0, y: 0, width: 1, height: 1},
               origin: Point = {x: 0, y: 0},
               f: Function,
               scale?: ScaleProperties,
-              ownerId?: string, index?: number) {
+              ownerId?: string,
+              index?: number
+  ) {
     super(container, properties, new Path(), ownerId, index);
 
     this._origin = origin;

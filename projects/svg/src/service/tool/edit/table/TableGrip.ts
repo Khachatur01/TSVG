@@ -6,7 +6,7 @@ import {Event} from "../../../../dataSource/constant/Event";
 import {Matrix} from "../../../math/Matrix";
 import {Rect} from "../../../../model/Rect";
 import {Table} from "../../../../dataSource/constant/Table";
-import {PathView} from "../../../../element/shape/PathView";
+import {PathView} from "../../../../element/shape/path/PathView";
 import {Path} from "../../../../model/path/Path";
 import {MoveTo} from "../../../../model/path/point/MoveTo";
 import {LineTo} from "../../../../model/path/line/LineTo";

@@ -2,7 +2,7 @@ import {Container} from "../../../../../../Container";
 import {MoveTo} from "../../../../../../model/path/point/MoveTo";
 import {Arc} from "../../../../../../model/path/curve/arc/Arc";
 import {LineTo} from "../../../../../../model/path/line/LineTo";
-import {PathView} from "../../../../../../element/shape/PathView";
+import {PathView} from "../../../../../../element/shape/path/PathView";
 import {Point} from "../../../../../../model/Point";
 import {Event} from "../../../../../../dataSource/constant/Event";
 import {Focus} from "../../../Focus";

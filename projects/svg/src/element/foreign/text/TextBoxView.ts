@@ -1,4 +1,4 @@
-import {ForeignObjectView} from "../ForeignObjectView";
+import {ForeignObjectProperties, ForeignObjectView} from "../ForeignObjectView";
 import {Container} from "../../../Container";
 import {Event} from "../../../dataSource/constant/Event";
 import {ElementType} from "../../../dataSource/constant/ElementType";
@@ -12,6 +12,8 @@ export class TextBoxCursor extends ElementCursor {
     this.cursor[Cursor.DRAW_TEXT_BOX] = "text";
   }
 }
+
+export interface TextBoxProperties extends ForeignObjectProperties {}
 
 export class TextBoxView extends ForeignObjectView {
   protected override _type: ElementType = ElementType.TEXT_BOX;
@@ -33,8 +35,8 @@ export class TextBoxView extends ForeignObjectView {
     event.preventDefault();
   };
 
-  public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, removeOnEmpty: boolean = true, ownerId?: string, index?: number) {
-    super(container, {}, rect, false, ownerId, index);
+  public constructor(container: Container, properties: TextBoxProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, removeOnEmpty: boolean = true, ownerId?: string, index?: number) {
+    super(container, {}, rect, ownerId, index);
 
     this._content = document.createElement("textarea");
     this._content.style.width = "100%";

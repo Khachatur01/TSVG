@@ -1,9 +1,10 @@
 import {ElementCursor, ElementProperties, ElementStyle, ElementView} from "../ElementView";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
-import {PathView} from "../shape/PathView";
+import {PathView} from "../shape/path/PathView";
 import {Container} from "../../Container";
 import {ElementType} from "../../dataSource/constant/ElementType";
+import {PolygonProperties} from "../shape/pointed/polygon/PolygonView";
 
 export class GroupCursor extends ElementCursor {}
 
@@ -86,6 +87,8 @@ export class GroupStyle extends ElementStyle {
   }
 }
 
+export interface GroupProperties extends ElementProperties {}
+
 export class GroupView extends ElementView {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "g");
   protected override _type: ElementType = ElementType.GROUP;
@@ -95,7 +98,7 @@ export class GroupView extends ElementView {
   private _elements: Set<ElementView> = new Set<ElementView>()
   /* Model */
 
-  public constructor(container: Container, properties: ElementProperties = {}, ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: GroupProperties = {}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement.id = this.id;
 

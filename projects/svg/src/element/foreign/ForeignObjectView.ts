@@ -2,7 +2,7 @@ import {ElementCursor, ElementProperties, ElementStyle, ElementView} from "../El
 import {Container} from "../../Container";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
-import {PathView} from "../shape/PathView";
+import {PathView} from "../shape/path/PathView";
 import {Event} from "../../dataSource/constant/Event";
 import {ForeignView} from "../type/ForeignView";
 import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
@@ -77,6 +77,10 @@ class ForeignObjectStyle extends ElementStyle {
   }
 }
 
+export interface ForeignObjectProperties extends ElementProperties {
+  contentEditable?: boolean
+}
+
 export class ForeignObjectView extends ForeignView implements MoveDrawable {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "foreignObject");
   protected override _type: ElementType = ElementType.FOREIGN_OBJECT;
@@ -119,10 +123,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
   public constructor(
     container: Container,
-    properties: ElementProperties = {},
+    properties: ForeignObjectProperties = {},
     rect: Rect = {x: 0, y: 0, width: 0, height: 0},
-    contentEditable: boolean = true,
-    ownerId?: string, index?: number
+    ownerId?: string,
+    index?: number
   ) {
 
     super(container, ownerId, index);
@@ -131,7 +135,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.svgElement.style.border = "none";
     this.style = new ForeignObjectStyle(this);
     this._content = document.createElement('div');
-    this._content.contentEditable = contentEditable + "";
     this._content.style.height = "100%";
     /* prevent from dropping elements inside */
     this._content.ondrop = () => {return false};
@@ -148,6 +151,13 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.setProperties(properties);
   }
 
+  public override setProperties(properties: ForeignObjectProperties) {
+    super.setProperties(properties);
+    if (properties.contentEditable != undefined) {
+      this._content.contentEditable = properties.contentEditable + "";
+    }
+  }
+
   public set safeClipboard(isSafe: boolean) {
     if (isSafe) {
       this._content.addEventListener('copy', this.copyEvent);
@@ -160,15 +170,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     }
   }
 
-  public override __correct__(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
-
-    this._rect.x = this._rect.x + delta.x;
-    this._rect.y = this._rect.y + delta.y;
-
-    this.__updateView__();
-  }
   public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;

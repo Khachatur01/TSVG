@@ -4,7 +4,7 @@ import {Rect} from "../model/Rect";
 import {Draggable} from "../service/tool/drag/Draggable";
 import {Matrix} from "../service/math/Matrix";
 import {Container} from "../Container";
-import {PathView} from "./shape/PathView";
+import {PathView} from "./shape/path/PathView";
 import {GroupView} from "./group/GroupView";
 import {Style} from "../service/style/Style";
 import {ElementType} from "../dataSource/constant/ElementType";
@@ -385,7 +385,15 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     this._container = container;
   }
 
-  public abstract __correct__(refPoint: Point, lastRefPoint: Point): void;
+  public __correct__(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x == 0 && delta.y == 0) return;
+
+    this._rect.x = this._rect.x + delta.x;
+    this._rect.y = this._rect.y + delta.y;
+
+    this.__updateView__();
+  }
   public __getCorrectionDelta__(refPoint: Point, lastRefPoint: Point) {
     /* calculate delta */
     let rotatedRefPoint = Matrix.rotate(

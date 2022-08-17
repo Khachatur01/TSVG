@@ -1,11 +1,11 @@
 import {Point} from "../../../model/Point";
 import {Rect} from "../../../model/Rect";
-import {PathView} from "../PathView";
+import {PathView} from "../path/PathView";
 import {Path} from "../../../model/path/Path";
 import {MoveTo} from "../../../model/path/point/MoveTo";
 import {LineTo} from "../../../model/path/line/LineTo";
 import {ShapeView} from "../../type/ShapeView";
-import {ElementView} from "../../ElementView";
+import {ElementProperties, ElementView} from "../../ElementView";
 import {ClickDrawable} from "../../../service/tool/draw/type/ClickDrawable";
 
 export abstract class PointedView extends ShapeView implements ClickDrawable {

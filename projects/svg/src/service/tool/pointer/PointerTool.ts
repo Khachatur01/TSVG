@@ -3,7 +3,7 @@ import {Container} from "../../../Container";
 import {Event} from "../../../dataSource/constant/Event";
 import {Point} from "../../../model/Point";
 import {Cursor} from "../../../dataSource/constant/Cursor";
-import {PathView} from "../../../element/shape/PathView";
+import {PathView} from "../../../element/shape/path/PathView";
 import {Path} from "../../../model/path/Path";
 import {ElementView} from "../../../element/ElementView";
 

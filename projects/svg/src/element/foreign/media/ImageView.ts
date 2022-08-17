@@ -1,5 +1,5 @@
 import {ElementCursor, ElementProperties, ElementView} from "../../ElementView";
-import {PathView} from "../../shape/PathView";
+import {PathView} from "../../shape/path/PathView";
 import {Size} from "../../../model/Size";
 import {Rect} from "../../../model/Rect";
 import {Point} from "../../../model/Point";
@@ -7,12 +7,15 @@ import {Container} from "../../../Container";
 import {ForeignView} from "../../type/ForeignView";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../dataSource/constant/ElementType";
+import {ForeignObjectProperties} from "../ForeignObjectView";
 
 export class ImageCursor extends ElementCursor {
   constructor() {
     super();
   }
 }
+
+export interface ImageProperties extends ElementProperties {}
 
 export class ImageView extends ForeignView implements MoveDrawable {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "image");
@@ -22,7 +25,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
   private _src: string = "";
   /* Model */
 
-  public constructor(container: Container, properties: ElementProperties = {}, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: ImageProperties = {}, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement.id = this.id;
 
@@ -53,16 +56,6 @@ export class ImageView extends ForeignView implements MoveDrawable {
   public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
-    this.__updateView__();
-  }
-
-  public override __correct__(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
-
-    this._rect.x = this._rect.x + delta.x;
-    this._rect.y = this._rect.y + delta.y;
-
     this.__updateView__();
   }
 

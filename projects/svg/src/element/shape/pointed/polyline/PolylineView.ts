@@ -7,11 +7,13 @@ import {Rect} from "../../../../model/Rect";
 
 export class PolylineCursor extends ElementCursor {}
 
+export interface PolylineProperties extends ElementProperties {}
+
 export class PolylineView extends PointedView {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "polyline");
   protected override _type: ElementType = ElementType.POLYLINE;
 
-  public constructor(container: Container, properties: ElementProperties = {}, points: Point[] = [], ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: PolylineProperties = {}, points: Point[] = [], ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement.id = this.id;
 

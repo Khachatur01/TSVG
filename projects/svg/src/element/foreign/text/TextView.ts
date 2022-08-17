@@ -6,8 +6,9 @@ import {Cursor} from "../../../dataSource/constant/Cursor";
 import {ForeignView} from "../../type/ForeignView";
 import {Point} from "../../../model/Point";
 import {EllipseView} from "../../shape/circluar/EllipseView";
-import {PathView} from "../../shape/PathView";
+import {PathView} from "../../shape/path/PathView";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
+import {ForeignObjectProperties} from "../ForeignObjectView";
 
 export class TextBoxCursor extends ElementCursor {
   constructor() {
@@ -16,12 +17,21 @@ export class TextBoxCursor extends ElementCursor {
   }
 }
 
+export interface TextProperties extends ElementProperties {}
+
 export class TextView extends ForeignView implements MoveDrawable {
   protected override _type: ElementType = ElementType.TEXT;
   protected svgElement: SVGElement = document.createElementNS(EllipseView.svgURI, "text");
   private _text: string = "";
 
-  public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, text: string = "", ownerId?: string, index?: number) {
+  public constructor(
+    container: Container,
+    properties: TextProperties = {},
+    rect: Rect = {x: 0, y: 0, width: 0, height: 0},
+    text: string = "",
+    ownerId?: string,
+    index?: number
+  ) {
     super(container, ownerId, index);
 
     this._rect = rect;
@@ -40,7 +50,7 @@ export class TextView extends ForeignView implements MoveDrawable {
     this.svgElement.innerHTML = text;
   }
 
-  public __correct__(refPoint: Point, lastRefPoint: Point): void {
+  public override __correct__(refPoint: Point, lastRefPoint: Point): void {
     let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
     this.__drag__(delta);

@@ -12,9 +12,9 @@ import {ForeignObjectCursor, ForeignObjectView} from "./element/foreign/ForeignO
 import {ElementType} from "./dataSource/constant/ElementType";
 import {EllipseCursor, EllipseView} from "./element/shape/circluar/EllipseView";
 import {BoxCursor, BoxView} from "./element/shape/BoxView";
-import {PathCursor, PathView} from "./element/shape/PathView";
+import {PathCursor, PathView} from "./element/shape/path/PathView";
 import {LineCursor, LineView} from "./element/shape/pointed/LineView";
-import {FreeCursor, FreeView} from "./element/shape/pointed/polyline/FreeView";
+import {FreeCursor, FreeView} from "./element/shape/path/FreeView";
 import {PolylineCursor, PolylineView} from "./element/shape/pointed/polyline/PolylineView";
 import {PolygonCursor, PolygonView} from "./element/shape/pointed/polygon/PolygonView";
 import {TriangleCursor, TriangleView} from "./element/shape/pointed/polygon/triangle/TriangleView";

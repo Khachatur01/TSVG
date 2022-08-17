@@ -3,12 +3,13 @@ import {ElementType} from "../../dataSource/constant/ElementType";
 import {Point} from "../../model/Point";
 import {Rect} from "../../model/Rect";
 import {ElementCursor, ElementProperties, ElementView} from "../ElementView";
-import {PathView} from "../shape/PathView";
+import {PathView} from "../shape/path/PathView";
 import {Container} from "../../Container";
 import {MoveDrawable} from "../../service/tool/draw/type/MoveDrawable";
 import {LineView} from "../shape/pointed/LineView";
 import {Event} from "../../dataSource/constant/Event";
 import {RectangleView} from "../shape/pointed/polygon/rectangle/RectangleView";
+import {ForeignObjectProperties} from "../foreign/ForeignObjectView";
 
 interface TableRow {
   height: number,
@@ -22,6 +23,8 @@ interface TableCol {
 
 export class TableCursor extends ElementCursor {}
 
+export interface TableProperties extends ElementProperties {}
+
 export class TableView extends ComplexView implements MoveDrawable {
   protected svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "g");
   protected _type: ElementType = ElementType.TABLE;
@@ -33,12 +36,12 @@ export class TableView extends ComplexView implements MoveDrawable {
 
   private _rows: TableRow[] = [];
   private _cols: TableCol[] = [];
-  private background: RectangleView;
-  private _topBorderLine: LineView;
-  private _leftBorderLine: LineView;
+  private readonly background: RectangleView;
+  private readonly _topBorderLine: LineView;
+  private readonly _leftBorderLine: LineView;
 
   public constructor(container: Container,
-                     properties: ElementProperties = {},
+                     properties: TableProperties = {},
                      rect = {x: 0, y: 0, width: 1, height: 1},
                      cols: number = 0, rows: number = 0,
                      ownerId?: string, index?: number) {
@@ -64,7 +67,7 @@ export class TableView extends ComplexView implements MoveDrawable {
     this.setProperties(properties);
   }
 
-  public __correct__(refPoint: Point, lastRefPoint: Point): void {
+  public override __correct__(refPoint: Point, lastRefPoint: Point): void {
     let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
 

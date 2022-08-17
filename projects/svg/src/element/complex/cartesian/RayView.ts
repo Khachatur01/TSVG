@@ -2,7 +2,7 @@ import {ElementType} from "../../../dataSource/constant/ElementType";
 import {Point} from "../../../model/Point";
 import {Rect} from "../../../model/Rect";
 import {ElementCursor, ElementProperties, ElementStyle, ElementView} from "../../ElementView";
-import {PathView} from "../../shape/PathView";
+import {PathView} from "../../shape/path/PathView";
 import {ComplexView} from "../../type/ComplexView";
 import {Container} from "../../../Container";
 import {Path} from "../../../model/path/Path";
@@ -349,7 +349,7 @@ export class RayView extends ComplexView implements ClickDrawable {
     this.__updateView__();
   }
 
-  public __correct__(refPoint: Point, lastRefPoint: Point): void {
+  public override __correct__(refPoint: Point, lastRefPoint: Point): void {
     let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x == 0 && delta.y == 0) return;
 

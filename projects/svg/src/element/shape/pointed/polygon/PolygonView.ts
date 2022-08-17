@@ -2,16 +2,18 @@ import {ElementCursor, ElementProperties, ElementView} from "../../../ElementVie
 import {Point} from "../../../../model/Point";
 import {PointedView} from "../PointedView";
 import {Container} from "../../../../Container";
-import {PathView} from "../../PathView";
+import {PathView} from "../../path/PathView";
 import {ElementType} from "../../../../dataSource/constant/ElementType";
 
 export class PolygonCursor extends ElementCursor {}
+
+export interface PolygonProperties extends ElementProperties {}
 
 export class PolygonView extends PointedView {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "polygon");
   protected override _type: ElementType = ElementType.POLYGON;
 
-  public constructor(container: Container, properties: ElementProperties = {}, points: Point[] = [], ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: PolygonProperties = {}, points: Point[] = [], ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement.id = this.id;
 

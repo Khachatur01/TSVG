@@ -1,14 +1,16 @@
-import {ElementCursor, ElementProperties, ElementView} from "../ElementView";
-import {Path} from "../../model/path/Path";
-import {Point} from "../../model/Point";
-import {Container} from "../../Container";
-import {PathCommand} from "../../model/path/PathCommand";
-import {LineTo} from "../../model/path/line/LineTo";
-import {ElementType} from "../../dataSource/constant/ElementType";
-import {Rect} from "../../model/Rect";
-import {ShapeView} from "../type/ShapeView";
+import {ElementCursor, ElementProperties, ElementView} from "../../ElementView";
+import {Path} from "../../../model/path/Path";
+import {Point} from "../../../model/Point";
+import {Container} from "../../../Container";
+import {PathCommand} from "../../../model/path/PathCommand";
+import {LineTo} from "../../../model/path/line/LineTo";
+import {ElementType} from "../../../dataSource/constant/ElementType";
+import {Rect} from "../../../model/Rect";
+import {ShapeView} from "../../type/ShapeView";
 
 export class PathCursor extends ElementCursor {}
+
+export interface PathProperties extends ElementProperties {}
 
 export class PathView extends ShapeView {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "path");
@@ -19,7 +21,7 @@ export class PathView extends ShapeView {
   protected _lastPath: Path = new Path();
   /* Model */
 
-  public constructor(container: Container, properties: ElementProperties = {}, path: Path = new Path(), ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: PathProperties = {}, path: Path = new Path(), ownerId?: string, index?: number) {
     super(container, ownerId, index);
 
     this.svgElement.id = this.id;

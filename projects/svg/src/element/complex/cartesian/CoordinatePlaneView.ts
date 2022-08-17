@@ -1,6 +1,6 @@
 import {Rect} from "../../../model/Rect";
 import {Point} from "../../../model/Point";
-import {PathView} from "../../shape/PathView";
+import {PathView} from "../../shape/path/PathView";
 import {ElementCursor, ElementProperties, ElementStyle, ElementView} from "../../ElementView";
 import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
 import {ElementType} from "../../../dataSource/constant/ElementType";
@@ -9,8 +9,6 @@ import {CartesianView, ScaleProperties} from "./CartesianView";
 import {RayView} from "./RayView";
 import {GraphicView} from "./GraphicView";
 import {Style} from "../../../service/style/Style";
-
-export class CoordinatePlaneCursor extends ElementCursor {}
 
 export class CoordinatePlaneStyle extends ElementStyle {
   protected override element: CoordinatePlaneView;
@@ -73,6 +71,10 @@ export class CoordinatePlaneStyle extends ElementStyle {
   }
 }
 
+export class CoordinatePlaneCursor extends ElementCursor {}
+
+export interface CoordinatePlaneProperties extends ElementProperties {}
+
 export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
   protected override _type: ElementType = ElementType.COORDINATE_PLANE;
   public override readonly style: CoordinatePlaneStyle;
@@ -110,10 +112,12 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
    * @param index This element index. If not set, will generate new numerical value
    * */
   public constructor(container: Container,
-                     properties: ElementProperties = {},
+                     properties: CoordinatePlaneProperties = {},
                      rect: Rect = {x: 0, y: 0, width: 1, height: 1},
                      origin: Point = {x: 0, y: 0},
-                     ownerId?: string, index?: number) {
+                     ownerId?: string,
+                     index?: number
+  ) {
     super(container, properties, rect, ownerId, index);
     this.svgElement.id = this.id;
     this._rect = rect;
