@@ -9,28 +9,30 @@ import {MoveDrawable} from "../../type/MoveDrawable";
 import {DrawTool} from "../../DrawTool";
 
 export class DrawTextBox extends MoveDraw {
+  private overdraw = false;
   public constructor(drawTool: DrawTool) {
     super(drawTool);
     this.cursor = Cursor.DRAW_TEXT_BOX;
   }
   protected createDrawableElement(position: Point): MoveDrawable {
     let textBox = new TextBoxView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
-    textBox.__onFocus__(true);
+    textBox.__onFocus__();
     return textBox;
   }
-
-  protected override turnOnToolAfterDrawing(): void {}
 
   protected override mouseDownEvent(event: MouseEvent | TouchEvent) {
     /* turn on text edit mode when clicking to text box element */
     if (event.target instanceof HTMLElement && event.target.parentElement instanceof SVGForeignObjectElement) {
       let targetElementId = ElementView.parseId(event.target.parentElement.id);
       let targetElement: ElementView | undefined = this.drawTool.container.getElementById(targetElementId.ownerId, targetElementId.index, true);
-      if (!targetElement || targetElement.selectable) {
-        return;
+      /* if target element is selectable, turn on text edit mode
+      * or if can't create over other text boxes, do nothing
+      *  */
+      if (targetElement?.selectable || !this.overdraw) {
+        return; /* will focus text box for editing (if selectable) */
       }
-    } else if (this.drawTool.container.focused.children.size !== 0) { /* turn on default tool when clicking outside of text box */
-      super.turnOnToolAfterDrawing();
+    } else if (this.drawTool.container.focused.children.size !== 0) { /* clicked outside of text box */
+      this.drawTool.container.blur();
       return;
     }
     super.mouseDownEvent(event);
@@ -44,7 +46,6 @@ export class DrawTextBox extends MoveDraw {
       width: 200,
       height: 150
     });
-    this._drawableElement.refPoint = this._drawableElement?.center;
   }
 
   protected override onEnd(call: boolean) {
@@ -53,7 +54,6 @@ export class DrawTextBox extends MoveDraw {
         let textBox = (this._drawableElement as TextBoxView);
         this.drawTool.container.focus(textBox, false, undefined /* set default */, false);
         textBox.content.focus();
-        textBox.__onFocus__(true);
       }
     }
   }

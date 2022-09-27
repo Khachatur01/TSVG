@@ -19,8 +19,6 @@ export class DrawText extends MoveDraw {
     return text;
   }
 
-  protected override turnOnToolAfterDrawing(): void {}
-
   protected override onIsNotComplete(call: boolean) {
     if (!this._drawableElement) return;
     this._drawableElement.__setRect__({

@@ -1,6 +1,7 @@
 import {Container} from "../../Container";
 import {Point} from "../../model/Point";
 import {Cursor} from "../../dataSource/constant/Cursor";
+import {Event} from "../../dataSource/constant/Event";
 
 export abstract class Tool {
   protected _cursor: Cursor = Cursor.NO_TOOL;
@@ -28,6 +29,9 @@ export abstract class Tool {
     this._container.tools.activeTool?.off(call);
     this._container.tools.activeTool = this;
     this._isOn = true;
+    if (call) {
+      this._container.__call__(Event.TOOL_ON, {tool: this});
+    }
   }
   public off(call: boolean = true): void {
     if (this == this._container.tools.activeTool) { /* if this is the active tool, make active tool null */
@@ -35,6 +39,9 @@ export abstract class Tool {
     }
     this._container.style.changeCursor(Cursor.NO_TOOL);
     this._isOn = false;
+    if (call) {
+      this._container.__call__(Event.TOOL_OFF, {tool: this});
+    }
   }
 
   public isOn(): boolean {

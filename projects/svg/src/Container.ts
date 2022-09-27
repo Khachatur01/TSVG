@@ -289,19 +289,13 @@ export class Container {
 
     this.container.addEventListener("mousedown", event => {
       if (event.target == this.container && !this.tools.drawTool.isOn()) {
-        if (this.tools.editNodeTool.isOn() || this.tools.editTableTool.isOn()) {
-          this.tools.drawTool.drawer = this.drawers.free;
-          this.tools.drawTool.on();
-        }
+        this.__call__(Event.CLICKED_ON_CONTAINER);
         this.blur();
       }
     });
     this.container.addEventListener("touchstart", event => {
       if (event.target == this.container && !this.tools.drawTool.isOn()) {
-        if (this.tools.editNodeTool.isOn() || this.tools.editTableTool.isOn()) {
-          this.tools.drawTool.drawer = this.drawers.free;
-          this.tools.drawTool.on();
-        }
+        this.__call__(Event.CLICKED_ON_CONTAINER);
         this.blur();
       }
     });

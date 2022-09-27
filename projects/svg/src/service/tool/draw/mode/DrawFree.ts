@@ -87,6 +87,7 @@ export class DrawFree extends Drawer {
     if (call) {
       this.drawTool.container.__call__(Event.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
       this.drawTool.container.__call__(Event.ELEMENT_CREATED, {position: position, element: this._drawableElement});
+      this.drawTool.container.__call__(Event.END_DRAWING, {drawer: this});
     }
   }
 

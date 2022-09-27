@@ -79,15 +79,20 @@ export class TextBoxView extends ForeignObjectView {
   }
   public override addEditCallBack() {
     this._content.addEventListener("input", () => {
-      this._container.__call__(Event.TEXT_TYPING, {text: this._content.value, element: this}
-      );
+      this._container.__call__(Event.TEXT_TYPING, {text: this._content.value, element: this});
     });
 
     this._content.addEventListener('blur', () => {
+      if (!this.callBlurEvent) {
+        this.callBlurEvent = true;
+        return;
+      }
+
       this._content.scrollTop = 0;
       if (this._content.value == "") {
         this._container.remove(this, true);
         this._container.tools.selectTool.on();
+
       }
       /* Tool already changed to draw free. No need to check */
       /* if last committed text is equals to current text, don't call change callback */

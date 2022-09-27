@@ -34,6 +34,7 @@ export class DrawRay extends ClickDraw {
     this.drawTool.container.tools.drawTool.__drawingEnd__();
     if (call) {
       this.drawTool.container.__call__(Event.STOP_CLICK_DRAWING);
+      this.drawTool.container.__call__(Event.END_DRAWING, {drawer: this});
     }
     this._drawableElement = undefined;
     this.clicksCount = 0;

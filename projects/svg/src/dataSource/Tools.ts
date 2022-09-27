@@ -9,12 +9,12 @@ import {EditTableTool} from "../service/tool/edit/table/EditTableTool";
 
 export class Tools {
   private readonly _container: Container;
-  public readonly drawTool: DrawTool;
-  public readonly highlightTool: HighlightTool;
-  public readonly pointerTool: PointerTool;
-  public readonly selectTool: SelectTool;
-  public readonly editNodeTool: EditNodeTool;
-  public readonly editTableTool: EditTableTool;
+  public drawTool: DrawTool;
+  public highlightTool: HighlightTool;
+  public pointerTool: PointerTool;
+  public selectTool: SelectTool;
+  public editNodeTool: EditNodeTool;
+  public editTableTool: EditTableTool;
   public activeTool: Tool | null;
 
   public constructor(container: Container) {

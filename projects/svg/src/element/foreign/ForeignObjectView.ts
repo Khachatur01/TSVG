@@ -88,7 +88,8 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   /* Model */
   public override readonly style: ForeignObjectStyle;
   protected _content: HTMLElement;
-  public readonly outline: string = "thin solid #999";
+  public readonly editOutline: string = "thin solid #999";
+  public readonly defaultOutline: string = "thin solid #ddd";
   private _lastCommittedHTML: string = "";
   protected copyEvent = (event: ClipboardEvent) => {
     let text = document.getSelection()?.toString();
@@ -121,6 +122,9 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   };
   /* Model */
 
+  /* this flag will be used when content blurred, and no need to call blur event's callback */
+  protected callBlurEvent: boolean = true;
+
   public constructor(
     container: Container,
     properties: ForeignObjectProperties = {},
@@ -131,7 +135,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
     super(container, ownerId, index);
     this.svgElement.id = this.id;
-    this.svgElement.style.outline = "none";
+    this.svgElement.style.outline = this.defaultOutline;
     this.svgElement.style.border = "none";
     this.style = new ForeignObjectStyle(this);
     this._content = document.createElement('div');
@@ -204,6 +208,11 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       this._container.__call__(Event.ASSET_EDIT, {element: this});
     });
     this._content.addEventListener("blur", () => {
+      if (!this.callBlurEvent) {
+        this.callBlurEvent = true;
+        return;
+      }
+
       if (this._content.outerHTML !== this._lastCommittedHTML) {
         this._container.__call__(Event.ASSET_EDIT_COMMIT, {element: this});
         this._lastCommittedHTML = this._content.outerHTML;
@@ -211,21 +220,22 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     });
   }
 
-  public override __onFocus__(force: boolean = false) {
-    this.svgElement.style.outline = this.outline;
+  public override __onFocus__() {
+    this.svgElement.style.outline = this.editOutline;
   }
   public override __onBlur__() {
-    this.svgElement.style.outline = "unset";
+    this.svgElement.style.outline = this.defaultOutline;
   }
 
   protected addFocusEvent(): void {
-    this._content.addEventListener("focus", () => {
+    this._content.addEventListener("focus", (event) => {
       if (this._selectable && this._container.tools.drawTool.isOn() && this._container.tools.drawTool.drawer == this._container.drawers.textBox) {
-        this._container.blur();
-        this._container.focus(this, false);
+        this._container.blur(undefined, false);
+        this._container.focus(this, false, undefined, false);
         this._content.focus();
         this.__onFocus__();
       } else {
+        this.callBlurEvent = false;
         this._content.blur();
         this.__onBlur__();
       }
@@ -241,13 +251,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       return this._content;
     }
     return this.svgElement;
-  }
-
-  public get contentEditable(): boolean {
-    return this._content.contentEditable === "true";
-  }
-  public set contentEditable(editable: boolean) {
-    this._content.contentEditable = editable + "";
   }
 
   public get content(): HTMLElement {

@@ -25,9 +25,7 @@ export class DrawForeignObject extends MoveDraw {
     });
     this._drawableElement.refPoint = this._drawableElement?.center;
   }
-  protected override onEnd(call: boolean) {
-
-  }
+  protected override onEnd(call: boolean) {}
 
   public override start(call: boolean) {
     super.start(call);

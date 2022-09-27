@@ -86,7 +86,7 @@ export class ElementStyle extends Style {
     this.element.HTML.style.backgroundColor = color;
   }
 
-  public setDefaultStyle(): void {
+  public setGlobalStyle(): void {
     let style = this.element.container.style;
     this.strokeWidth = style.strokeWidth;
     this.strokeDashArray = style.strokeDashArray;
@@ -164,7 +164,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     }
     if (properties.globalStyle) {
       try {
-        this.style.setDefaultStyle();
+        this.style.setGlobalStyle();
       } catch (e) {}
     }
   }

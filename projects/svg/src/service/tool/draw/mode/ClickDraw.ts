@@ -108,17 +108,12 @@ export abstract class ClickDraw extends Drawer {
 
     if (call) {
       this.drawTool.container.__call__(Event.STOP_CLICK_DRAWING);
+      this.drawTool.container.__call__(Event.END_DRAWING, {drawer: this});
     }
   }
 
   public stopDrawing(call: boolean = true) {
     this.stopClickDrawing(call);
-    if (this.drawTool.toolAfterDrawing) {
-      if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
-        this.drawTool.toolAfterDrawing.drawer = this.drawTool.container.drawers.free;
-      }
-      this.drawTool.toolAfterDrawing.on();
-    }
   }
 
   public start(call: boolean = true): void {

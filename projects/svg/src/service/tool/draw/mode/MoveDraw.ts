@@ -112,17 +112,16 @@ export abstract class MoveDraw extends Drawer {
     if (!this._drawableElement.isComplete()) {
       this.onIsNotComplete(call);
     }
+    this.onEnd(call);
 
     this._drawableElement.refPoint = this._drawableElement.center;
 
-    this.turnOnToolAfterDrawing();
-
-    this.onEnd(call);
     this.drawTool.__drawingEnd__();
 
     if (call) {
       this.drawTool.container.__call__(Event.DRAW_MOUSE_UP, {position: position, element: this._drawableElement});
       this.drawTool.container.__call__(Event.ELEMENT_CREATED, {element: this._drawableElement});
+      this.drawTool.container.__call__(Event.END_DRAWING, {drawer: this});
     }
   }
 
@@ -133,14 +132,6 @@ export abstract class MoveDraw extends Drawer {
   }
 
   protected abstract createDrawableElement(position: Point): MoveDrawable;
-  protected turnOnToolAfterDrawing(): void {
-    if (this.drawTool.toolAfterDrawing) {
-      if (this.drawTool.toolAfterDrawing instanceof DrawTool) {
-        this.drawTool.toolAfterDrawing.drawer = this.drawTool.container.drawers.free;
-      }
-      this.drawTool.toolAfterDrawing.on();
-    }
-  }
 
   protected onEnd(call: boolean) {}
   protected onIsNotComplete(call: boolean) {

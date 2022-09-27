@@ -6,16 +6,15 @@ import {ElementType} from "../../../dataSource/constant/ElementType";
 import {ElementView} from "../../../element/ElementView";
 import {Cursor} from "../../../dataSource/constant/Cursor";
 import {DrawFree} from "./mode/DrawFree";
+import {Event} from "../../../dataSource/constant/Event";
 
 export class DrawTool extends Tool {
   private _drawer: Drawer;
   private _isDrawing: boolean = false;
   public perfect: boolean = false;
-  public toolAfterDrawing: Tool | undefined;
 
   public constructor(container: Container) {
     super(container);
-    this.toolAfterDrawing = this;
     this._drawer = new DrawFree(this);
   }
 
@@ -37,10 +36,15 @@ export class DrawTool extends Tool {
     return this._drawer;
   }
   public set drawer(drawer: Drawer) {
+    let call = true; /* todo create 'call' parameter when all wb brunches will be merged with svg-wb-proto */
     if (!drawer) return;
     this._drawer.stop();
     drawer.drawTool = this;
+    let oldDrawer = this._drawer;
     this._drawer = drawer;
+    if (call) {
+      this._container.__call__(Event.DRAWER_CHANGED, {oldDrawer: oldDrawer, newDrawer: drawer});
+    }
   }
 
   public override on(call: boolean = true): void {
