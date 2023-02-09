@@ -1,13 +1,13 @@
-import {MoveDraw} from "../../../mode/MoveDraw";
-import {EllipseView} from "../../../../../../element/shape/circluar/EllipseView";
+import {MoveDraw} from '../../../mode/MoveDraw';
+import {MoveDrawable} from '../../../type/MoveDrawable';
 import {Point} from "../../../../../../model/Point";
-import {Event} from "../../../../../../dataSource/constant/Event";
+import {EllipseView} from "../../../../../../element/shape/circluar/EllipseView";
+import {SVGEvent} from "../../../../../../dataSource/constant/SVGEvent";
 import {ElementType} from "../../../../../../dataSource/constant/ElementType";
-import {MoveDrawable} from "../../../type/MoveDrawable";
 
 export class DrawEllipse extends MoveDraw {
   protected createDrawableElement(position: Point): MoveDrawable {
-    let element = new EllipseView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
+    const element = new EllipseView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     element.__fixRect__();
     return element;
   }
@@ -16,14 +16,14 @@ export class DrawEllipse extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.ELLIPSE_TOOL_ON);
+      this.drawTool.container.__call__(SVGEvent.ELLIPSE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.ELLIPSE_TOOL_OFF);
+      this.drawTool.container.__call__(SVGEvent.ELLIPSE_TOOL_OFF);
     }
   }
 

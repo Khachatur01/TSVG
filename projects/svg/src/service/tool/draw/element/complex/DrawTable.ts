@@ -1,9 +1,9 @@
-import {MoveDraw} from "../../mode/MoveDraw";
-import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {Point} from "../../../../../model/Point";
-import {TableView} from "../../../../../element/complex/TableView";
-import {Event} from "../../../../../dataSource/constant/Event";
-import {MoveDrawable} from "../../type/MoveDrawable";
+import {MoveDraw} from '../../mode/MoveDraw';
+import {ElementType} from '../../../../../dataSource/constant/ElementType';
+import {Point} from '../../../../../model/Point';
+import {TableView} from '../../../../../element/complex/TableView';
+import {SVGEvent} from '../../../../../dataSource/constant/SVGEvent';
+import {MoveDrawable} from '../../type/MoveDrawable';
 
 export class DrawTable extends MoveDraw {
   protected createDrawableElement(position: Point): MoveDrawable {
@@ -19,14 +19,14 @@ export class DrawTable extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.TABLE_TOOL_ON);
+      this.drawTool.container.__call__(SVGEvent.TABLE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.TABLE_TOOL_OFF);
+      this.drawTool.container.__call__(SVGEvent.TABLE_TOOL_OFF);
     }
   }
 

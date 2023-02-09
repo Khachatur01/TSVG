@@ -1,8 +1,8 @@
-import {Point} from "../Point";
+import {Point} from '../Point';
 
 export abstract class PathCommand {
-  protected _point: Point
-  public close: boolean = false;
+  protected _point: Point;
+  public close = false;
 
   public constructor(point: Point, close: boolean = false) {
     this._point = point;
@@ -10,16 +10,16 @@ export abstract class PathCommand {
   }
 
   public get position(): Point {
-    return this._point
+    return this._point;
   }
   public set position(position: Point) {
     this._point = {
       x: position.x,
       y: position.y
-    }
+    };
   }
 
-  public abstract get string(): string;
+  public abstract toString(): string;
 
   public abstract get copy(): PathCommand;
 }

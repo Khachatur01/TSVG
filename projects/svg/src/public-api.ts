@@ -1,22 +1,17 @@
 /*
  * Public API Surface of svg
  */
-export * from './Container'
+export * from './Container';
 
 export * from './dataSource/constant/Compass';
 export * from './dataSource/constant/Cursor';
 export * from './dataSource/constant/ElementType';
-export * from './dataSource/constant/Event';
+export * from './dataSource/constant/SVGEvent';
 export * from './dataSource/constant/Table';
 export * from './dataSource/Drawers';
 
 export * from './element/foreign/ForeignObjectView';
 export * from './element/complex/TableView';
-export * from './element/complex/cartesian/CartesianView';
-export * from './element/complex/cartesian/CoordinatePlaneView';
-export * from './element/complex/cartesian/GraphicView';
-export * from './element/complex/cartesian/NumberLineView';
-export * from './element/complex/cartesian/RayView';
 export * from './element/foreign/media/ImageView';
 export * from './element/foreign/media/VideoView';
 export * from './element/foreign/text/TextBoxView';
@@ -80,10 +75,6 @@ export * from './service/tool/draw/DrawTool';
 export * from './service/tool/draw/element/shape/pointed/DrawLine';
 export * from './service/tool/draw/element/shape/pointed/polyline/DrawPolyline';
 export * from './service/tool/draw/element/foreign/DrawForeignObject';
-export * from './service/tool/draw/element/complex/cartesian/DrawCoordinatePlane';
-export * from './service/tool/draw/element/complex/cartesian/DrawGraphic';
-export * from './service/tool/draw/element/complex/cartesian/DrawNumberLine';
-export * from './service/tool/draw/element/complex/cartesian/DrawRay';
 export * from './service/tool/draw/element/foreign/DrawImage';
 export * from './service/tool/draw/element/foreign/DrawTextBox';
 export * from './service/tool/draw/element/foreign/DrawVideo';

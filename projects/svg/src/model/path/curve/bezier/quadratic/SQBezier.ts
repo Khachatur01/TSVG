@@ -1,10 +1,10 @@
-import {PathCommand} from "../../../PathCommand";
-import {Point} from "../../../../Point";
+import {PathCommand} from '../../../PathCommand';
+import {Point} from '../../../../Point';
 
 export class SQBezier extends PathCommand {
-  public get string(): string {
-    return "T " +
-      this._point.x + " " + this._point.y + (this.close ? " Z" : "");
+  public toString(): string {
+    return 'T ' +
+      this._point.x + ' ' + this._point.y + (this.close ? ' Z' : '');
   }
 
   public override get position(): Point {

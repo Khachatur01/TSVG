@@ -1,17 +1,18 @@
-import {ElementCursor, ElementProperties, ElementView} from "../../ElementView";
-import {PointedView} from "./PointedView";
-import {Point} from "../../../model/Point";
-import {Container} from "../../../Container";
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
-import {Rect} from "../../../model/Rect";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {ElementCursor, ElementProperties, ElementView} from '../../ElementView';
+import {PointedView} from './PointedView';
+import {Point} from '../../../model/Point';
+import {Container} from '../../../Container';
+import {ElementType} from '../../../dataSource/constant/ElementType';
+import {MoveDrawable} from '../../../service/tool/draw/type/MoveDrawable';
+import {Rect} from '../../../model/Rect';
 
 export class LineCursor extends ElementCursor {}
 
 export interface LineProperties extends ElementProperties {}
 
 export class LineView extends PointedView implements MoveDrawable {
-  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "line");
+  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, 'line');
   protected override _type: ElementType = ElementType.LINE;
 
   public constructor(container: Container, properties: LineProperties = {}, startPoint: Point = {x: 0, y: 0}, endPoint: Point = {x: 0, y: 0}, ownerId?: string, index?: number) {

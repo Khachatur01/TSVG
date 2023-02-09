@@ -1,5 +1,5 @@
-import {Point} from "../../../../model/Point";
-import {Drawable} from "./Drawable";
+import {Point} from '../../../../model/Point';
+import {Drawable} from './Drawable';
 
 export interface ClickDrawable extends Drawable {
   get points(): Point[];

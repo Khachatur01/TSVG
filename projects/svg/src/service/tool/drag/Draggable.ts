@@ -1,4 +1,5 @@
-import {Point} from "../../../model/Point";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {Point} from '../../../model/Point';
 
 export interface Draggable {
   __drag__(position: Point): void;

@@ -1,16 +1,17 @@
-import {Point} from "../../model/Point";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {Point} from '../../model/Point';
 
 export class Angle {
   public static SNAP_ANGLE = 15;
 
   public static fromThreePoints(A: Point, B: Point, C: Point): number {
-    let AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
-    let BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
-    let AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
+    const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
+    const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
+    const AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
 
     let degree = Angle.radToDeg(Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB)));
     if (C.y > A.y)
-      degree = 360 - degree;
+      {degree = 360 - degree;}
 
     return degree;
   }
@@ -27,14 +28,14 @@ export class Angle {
     const dx = Math.abs(end.x - start.x);
     const dy = Math.abs(end.y - start.y);
 
-    if (dx == 0) {
+    if (dx === 0) {
       if (end.y < start.y) {
         return 90;
       } else {
         return 270;
       }
     }
-    if (dy == 0) {
+    if (dy === 0) {
       if (end.x > start.x) {
         return 0;
       } else {
@@ -42,7 +43,7 @@ export class Angle {
       }
     }
     // Angle of the right-triangle formed by coords
-    const tAngle = Angle.radToDeg(Math.atan(dy / dx))
+    const tAngle = Angle.radToDeg(Math.atan(dy / dx));
 
     let corrected: number;
 

@@ -1,19 +1,19 @@
-import {Container} from "../../../Container";
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {ElementCursor, ElementProperties} from "../../ElementView";
-import {Rect} from "../../../model/Rect";
-import {Cursor} from "../../../dataSource/constant/Cursor";
-import {ForeignView} from "../../type/ForeignView";
-import {Point} from "../../../model/Point";
-import {EllipseView} from "../../shape/circluar/EllipseView";
-import {PathView} from "../../shape/path/PathView";
-import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
-import {ForeignObjectProperties} from "../ForeignObjectView";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {Container} from '../../../Container';
+import {ElementType} from '../../../dataSource/constant/ElementType';
+import {ElementCursor, ElementProperties} from '../../ElementView';
+import {Rect} from '../../../model/Rect';
+import {Cursor} from '../../../dataSource/constant/Cursor';
+import {ForeignView} from '../../type/ForeignView';
+import {Point} from '../../../model/Point';
+import {EllipseView} from '../../shape/circluar/EllipseView';
+import {PathView} from '../../shape/path/PathView';
+import {MoveDrawable} from '../../../service/tool/draw/type/MoveDrawable';
 
 export class TextBoxCursor extends ElementCursor {
   constructor() {
     super();
-    this.cursor[Cursor.DRAW_TEXT_BOX] = "text";
+    this.cursor[Cursor.DRAW_TEXT_BOX] = 'text';
   }
 }
 
@@ -21,14 +21,14 @@ export interface TextProperties extends ElementProperties {}
 
 export class TextView extends ForeignView implements MoveDrawable {
   protected override _type: ElementType = ElementType.TEXT;
-  protected svgElement: SVGElement = document.createElementNS(EllipseView.svgURI, "text");
-  private _text: string = "";
+  protected svgElement: SVGElement = document.createElementNS(EllipseView.svgURI, 'text');
+  private _text = '';
 
   public constructor(
     container: Container,
     properties: TextProperties = {},
     rect: Rect = {x: 0, y: 0, width: 0, height: 0},
-    text: string = "",
+    text: string = '',
     ownerId?: string,
     index?: number
   ) {
@@ -51,8 +51,10 @@ export class TextView extends ForeignView implements MoveDrawable {
   }
 
   public override __correct__(refPoint: Point, lastRefPoint: Point): void {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
+    const delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x === 0 && delta.y === 0) {
+      return;
+    }
     this.__drag__(delta);
   }
   public __drag__(delta: Point): void {
@@ -64,7 +66,7 @@ export class TextView extends ForeignView implements MoveDrawable {
   public __drawSize__(rect: Rect) {
     this.__setRect__(rect);
   }
-  public __setRect__(rect: Rect, delta?: Point): void {
+  public __setRect__(rect: Rect): void {
     if (rect.width < 0) {
       rect.width = -rect.width;
       rect.x -= rect.width;
@@ -85,7 +87,7 @@ export class TextView extends ForeignView implements MoveDrawable {
     });
   }
 
-  public toPath(): PathView { /* todo */
+  public toPath(): PathView { /* TODO */
     return new PathView(this._container);
   }
 
@@ -94,7 +96,7 @@ export class TextView extends ForeignView implements MoveDrawable {
   }
 
   public override toJSON(): any {
-    let json = super.toJSON();
+    const json = super.toJSON();
     json.text = this._text;
     return json;
   }

@@ -1,12 +1,12 @@
-import {Tool} from "../Tool";
-import {Container} from "../../../Container";
-import {RectangleView} from "../../../element/shape/pointed/polygon/rectangle/RectangleView";
-import {Point} from "../../../model/Point";
-import {DragTool} from "../drag/DragTool";
-import {Event} from "../../../dataSource/constant/Event";
-import {Focus} from "../../edit/group/Focus";
-import {Cursor} from "../../../dataSource/constant/Cursor";
-import {ElementView} from "../../../element/ElementView";
+import {Tool} from '../Tool';
+import {Container} from '../../../Container';
+import {RectangleView} from '../../../element/shape/pointed/polygon/rectangle/RectangleView';
+import {Point} from '../../../model/Point';
+import {DragTool} from '../drag/DragTool';
+import {SVGEvent} from '../../../dataSource/constant/SVGEvent';
+import {Focus} from '../../edit/group/Focus';
+import {Cursor} from '../../../dataSource/constant/Cursor';
+import {ElementView} from '../../../element/ElementView';
 
 export class SelectTool extends Tool {
   protected override _cursor: Cursor = Cursor.SELECT;
@@ -14,10 +14,10 @@ export class SelectTool extends Tool {
   private position: Point = {x: 0, y: 0};
   public readonly dragTool: DragTool;
   public focus: Focus;
-  public intersectionColor: string = "green";
-  public fullMatchColor: string = "#1545ff";
+  public intersectionColor = 'green';
+  public fullMatchColor = '#1545ff';
 
-  private elementsOverEvent: {element: ElementView, overEvent: boolean}[] = [];
+  private elementsOverEvent: {element: ElementView; overEvent: boolean}[] = [];
 
   public constructor(container: Container, focus: Focus) {
     super(container);
@@ -25,11 +25,11 @@ export class SelectTool extends Tool {
     this.dragTool = new DragTool(container, focus);
     this.focus = focus;
 
-    this.boundingBox.style.fillColor = "none";
+    this.boundingBox.style.fillColor = 'none';
     this.boundingBox.style.strokeColor = this.fullMatchColor;
-    this.boundingBox.style.strokeWidth = "1";
-    this.boundingBox.style.strokeDashArray = "5 5";
-    this.boundingBox.SVG.style.shapeRendering = "optimizespeed";
+    this.boundingBox.style.strokeWidth = '1';
+    this.boundingBox.style.strokeDashArray = '5 5';
+    this.boundingBox.SVG.style.shapeRendering = 'optimizespeed';
 
     this.boundingBox.removeOverEvent();
 
@@ -39,14 +39,16 @@ export class SelectTool extends Tool {
   }
 
   private mouseDownEvent(event: MouseEvent | TouchEvent) {
-    if (event.target != this._container.HTML) return;
-    this._container.HTML.addEventListener("mousemove", this.mouseMoveEvent);
-    this._container.HTML.addEventListener("touchmove", this.mouseMoveEvent);
-    document.addEventListener("mouseup", this.mouseUpEvent);
-    document.addEventListener("touchend", this.mouseUpEvent);
+    if (event.target !== this._container.HTML) {
+      return;
+    }
+    this._container.HTML.addEventListener('mousemove', this.mouseMoveEvent);
+    this._container.HTML.addEventListener('touchmove', this.mouseMoveEvent);
+    document.addEventListener('mouseup', this.mouseUpEvent);
+    document.addEventListener('touchend', this.mouseUpEvent);
 
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
+    const containerRect = this._container.HTML.getBoundingClientRect();
+    const eventPosition = Container.__eventToPosition__(event);
     this._mouseCurrentPos = {
       x: eventPosition.x - containerRect.left, // x position within the element.
       y: eventPosition.y - containerRect.top // y position within the element.
@@ -56,8 +58,8 @@ export class SelectTool extends Tool {
     this._container.style.changeCursor(Cursor.NO_TOOL);
   };
   private mouseMoveEvent(event: MouseEvent | TouchEvent) {
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
+    const containerRect = this._container.HTML.getBoundingClientRect();
+    const eventPosition = Container.__eventToPosition__(event);
     this._mouseCurrentPos = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
@@ -69,10 +71,10 @@ export class SelectTool extends Tool {
 
     this._container.style.changeCursor(this.cursor);
 
-    this._container.HTML.removeEventListener("mousemove", this.mouseMoveEvent);
-    this._container.HTML.removeEventListener("touchmove", this.mouseMoveEvent);
-    document.removeEventListener("mouseup", this.mouseUpEvent);
-    document.removeEventListener("touchend", this.mouseUpEvent);
+    this._container.HTML.removeEventListener('mousemove', this.mouseMoveEvent);
+    this._container.HTML.removeEventListener('touchmove', this.mouseMoveEvent);
+    document.removeEventListener('mouseup', this.mouseUpEvent);
+    document.removeEventListener('touchend', this.mouseUpEvent);
   };
 
   public makeMouseDown(position: Point, call: boolean = true) {
@@ -81,7 +83,7 @@ export class SelectTool extends Tool {
     */
     this.elementsOverEvent = [];
     this._container.elements.forEach((element: ElementView) => {
-      this.elementsOverEvent.push({element: element, overEvent: element.properties.overEvent || false});
+      this.elementsOverEvent.push({element, overEvent: element.properties.overEvent || false});
       element.removeOverEvent();
     });
 
@@ -96,12 +98,12 @@ export class SelectTool extends Tool {
     this._container.HTML.appendChild(this.boundingBox.SVG);
 
     if (call) {
-      this._container.__call__(Event.SELECT_AREA_MOUSE_DOWN, {position: position});
+      this._container.__call__(SVGEvent.SELECT_AREA_MOUSE_DOWN, {position});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true) {
-    let width = position.x - this.position.x;
-    let height = position.y - this.position.y;
+    const width = position.x - this.position.x;
+    const height = position.y - this.position.y;
 
     if (width > 0) {
       this.boundingBox.style.strokeColor = this.fullMatchColor;
@@ -109,7 +111,7 @@ export class SelectTool extends Tool {
       this.boundingBox.style.strokeColor = this.intersectionColor;
     }
 
-    for (let element of this._container.elements) {
+    for (const element of this._container.elements) {
       if (width > 0) { /* select box drawn from left to right */
         if (ElementView.rectInRect(element.getVisibleRect(), this.boundingBox.getRect())) {
           element.__highlight__();
@@ -128,12 +130,12 @@ export class SelectTool extends Tool {
     this.boundingBox.__drawSize__({
       x: this.position.x,
       y: this.position.y,
-      width: width,
-      height: height
+      width,
+      height
     });
 
     if (call) {
-      this._container.__call__(Event.SELECT_AREA_MOUSE_MOVE, {position: position});
+      this._container.__call__(SVGEvent.SELECT_AREA_MOUSE_MOVE, {position});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true) {
@@ -145,11 +147,11 @@ export class SelectTool extends Tool {
         elementOverEvent.element.setOverEvent();
       }
     });
-    let width = position.x - this.position.x;
+    const width = position.x - this.position.x;
 
     this._container.HTML.removeChild(this.boundingBox.SVG);
 
-    for (let element of this._container.elements) {
+    for (const element of this._container.elements) {
       if (width > 0) { /* select box drawn from left to right */
         if (ElementView.rectInRect(element.getVisibleRect(), this.boundingBox.getRect())) {
           this._container.focus(element, true, undefined, false);
@@ -163,30 +165,36 @@ export class SelectTool extends Tool {
     }
 
     if (call) {
-      this._container.__call__(Event.SELECT_AREA_MOUSE_UP, {position: position});
-      this._container.__call__(Event.ELEMENTS_FOCUSED, {elements: this._container.focused.children});
+      this._container.__call__(SVGEvent.SELECT_AREA_MOUSE_UP, {position});
+      this._container.__call__(SVGEvent.ELEMENTS_FOCUSED, {elements: this._container.focused.children});
     }
   }
 
-  public override on(call: boolean = true): void {
-    super.on(call);
-    this._container.HTML.addEventListener("mousedown", this.mouseDownEvent);
-    this._container.HTML.addEventListener("touchstart", this.mouseDownEvent);
+  public override on(call: boolean = true): boolean {
+    if (!super.on(call)) {
+      return false;
+    }
+    this._container.HTML.addEventListener('mousedown', this.mouseDownEvent);
+    this._container.HTML.addEventListener('touchstart', this.mouseDownEvent);
     this.dragTool.on(false);
 
     this._container.style.changeCursor(this.cursor);
     if (call) {
-      this._container.__call__(Event.SELECT_TOOl_ON);
+      this._container.__call__(SVGEvent.SELECT_TOOl_ON);
     }
+    return true;
   }
-  public override off(call: boolean = true): void {
-    super.off(call);
-    this._container.HTML.removeEventListener("mousedown", this.mouseDownEvent);
-    this._container.HTML.removeEventListener("touchstart", this.mouseDownEvent);
+  public override off(call: boolean = true): boolean {
+    if (!super.off(call)) {
+      return false;
+    }
+    this._container.HTML.removeEventListener('mousedown', this.mouseDownEvent);
+    this._container.HTML.removeEventListener('touchstart', this.mouseDownEvent);
     this.dragTool.off(false);
 
     if (call) {
-      this._container.__call__(Event.SELECT_TOOl_OFF);
+      this._container.__call__(SVGEvent.SELECT_TOOl_OFF);
     }
+    return true;
   }
 }

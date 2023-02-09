@@ -1,11 +1,12 @@
-import {ShapeView} from "../../type/ShapeView";
-import {Point} from "../../../model/Point";
-import {Rect} from "../../../model/Rect";
-import {PathView} from "../path/PathView";
-import {Path} from "../../../model/path/Path";
-import {MoveTo} from "../../../model/path/point/MoveTo";
-import {Arc} from "../../../model/path/curve/arc/Arc";
-import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {ShapeView} from '../../type/ShapeView';
+import {Point} from '../../../model/Point';
+import {Rect} from '../../../model/Rect';
+import {PathView} from '../path/PathView';
+import {Path} from '../../../model/path/Path';
+import {MoveTo} from '../../../model/path/point/MoveTo';
+import {Arc} from '../../../model/path/curve/arc/Arc';
+import {MoveDrawable} from '../../../service/tool/draw/type/MoveDrawable';
 
 export abstract class CircularView extends ShapeView implements MoveDrawable {
   protected abstract override svgElement: SVGGeometryElement;
@@ -34,8 +35,8 @@ export abstract class CircularView extends ShapeView implements MoveDrawable {
     this.__updateView__();
   }
   public override __correct__(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
+    const delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x === 0 && delta.y === 0) {return;}
 
     this.__fixRect__();
     this._rect.x = this._lastRect.x + delta.x;
@@ -46,11 +47,7 @@ export abstract class CircularView extends ShapeView implements MoveDrawable {
   public __drawSize__(rect: Rect) {
     this.__setRect__(rect);
   }
-  public __setRect__(rect: Rect, delta: Point | null = null): void {
-    if (delta) {
-      rect.width = this._lastRect.width * delta.x;
-      rect.height = this._lastRect.height * delta.y;
-    }
+  public __setRect__(rect: Rect): void {
     /* calculate positive position and size if size is negative */
     if (rect.width < 0) {
       rect.x += rect.width;
@@ -66,19 +63,19 @@ export abstract class CircularView extends ShapeView implements MoveDrawable {
   }
 
   public override getVisibleRect(): Rect {
-    let containerRect: Rect = this._container.HTML.getBoundingClientRect();
-    let stoke = parseInt(this.style.strokeWidth);
+    const containerRect: Rect = this._container.HTML.getBoundingClientRect();
+    const stoke = parseInt(this.style.strokeWidth);
 
     /* Google Chrome returns wrong bounding box for rotated elements */
     /* For that, convert ellipse to not rotated path */
-    let pathEllipse: PathView = this.toPath();
+    const pathEllipse: PathView = this.toPath();
     /* Ellipse's path will be transparent */
-    pathEllipse.style.strokeColor = "transparent";
-    pathEllipse.style.fillColor = "none";
+    pathEllipse.style.strokeColor = 'transparent';
+    pathEllipse.style.fillColor = 'none';
     /* set it to screen */
     this._container.add(pathEllipse, false);
     /* get the bounding box */
-    let rotatedBoundingRect: Rect = pathEllipse.SVG.getBoundingClientRect();
+    const rotatedBoundingRect: Rect = pathEllipse.SVG.getBoundingClientRect();
     /* and delete it from screen */
     this._container.remove(pathEllipse, true, false);
 
@@ -95,10 +92,10 @@ export abstract class CircularView extends ShapeView implements MoveDrawable {
   }
 
   public override toPath(): PathView {
-    let path: Path = new Path();
-    let rx = this._lastRect.width / 2;
-    let ry = this._lastRect.height / 2;
-    let points = this.visiblePoints;
+    const path: Path = new Path();
+    const rx = this._lastRect.width / 2;
+    const ry = this._lastRect.height / 2;
+    const points = this.visiblePoints;
 
     path.add(new MoveTo(points[0]));
     path.add(new Arc(rx, ry, this._angle, 0, 1, points[1]));

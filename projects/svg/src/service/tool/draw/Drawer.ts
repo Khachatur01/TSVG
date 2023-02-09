@@ -1,7 +1,7 @@
-import {Point} from "../../../model/Point";
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {DrawTool} from "./DrawTool";
-import {Cursor} from "../../../dataSource/constant/Cursor";
+import {Point} from '../../../model/Point';
+import {ElementType} from '../../../dataSource/constant/ElementType';
+import {DrawTool} from './DrawTool';
+import {Cursor} from '../../../dataSource/constant/Cursor';
 import {Drawable} from "./type/Drawable";
 
 export abstract class Drawer {

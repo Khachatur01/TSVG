@@ -1,9 +1,9 @@
 import {MoveDraw} from "../../../../../mode/MoveDraw";
-import {RectangleView} from "../../../../../../../../element/shape/pointed/polygon/rectangle/RectangleView";
 import {Point} from "../../../../../../../../model/Point";
-import {Event} from "../../../../../../../../dataSource/constant/Event";
-import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
 import {MoveDrawable} from "../../../../../type/MoveDrawable";
+import {RectangleView} from "../../../../../../../../element/shape/pointed/polygon/rectangle/RectangleView";
+import {SVGEvent} from "../../../../../../../../dataSource/constant/SVGEvent";
+import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
 
 export class DrawRectangle extends MoveDraw {
   protected createDrawableElement(position: Point): MoveDrawable {
@@ -14,14 +14,14 @@ export class DrawRectangle extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.RECTANGLE_TOOL_ON);
+      this.drawTool.container.__call__(SVGEvent.RECTANGLE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.RECTANGLE_TOOL_OFF);
+      this.drawTool.container.__call__(SVGEvent.RECTANGLE_TOOL_OFF);
     }
   }
 

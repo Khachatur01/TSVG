@@ -1,5 +1,5 @@
-import {PathCommand} from "../../../PathCommand";
-import {Point} from "../../../../Point";
+import {PathCommand} from '../../../PathCommand';
+import {Point} from '../../../../Point';
 
 export class QBezier extends PathCommand {
   private _cPoint: Point;
@@ -9,10 +9,10 @@ export class QBezier extends PathCommand {
     this._cPoint = cPoint;
   }
 
-  public get string(): string {
-    return "Q " +
-      this._cPoint.x + " " + this._cPoint.y + ", " +
-      this._point.x + " " + this._point.y + (this.close ? " Z" : "");
+  public toString(): string {
+    return 'Q ' +
+      this._cPoint.x + ' ' + this._cPoint.y + ', ' +
+      this._point.x + ' ' + this._point.y + (this.close ? ' Z' : '');
   }
 
   public get cPoint(): Point {

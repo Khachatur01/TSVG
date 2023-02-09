@@ -1,9 +1,9 @@
-import {Point} from "../../../../../../../../model/Point";
+import {MoveDrawable} from '../../../../../type/MoveDrawable';
 import {MoveDraw} from "../../../../../mode/MoveDraw";
+import {Point} from "../../../../../../../../model/Point";
 import {RightTriangleView} from "../../../../../../../../element/shape/pointed/polygon/triangle/RightTriangleView";
-import {Event} from "../../../../../../../../dataSource/constant/Event";
+import {SVGEvent} from "../../../../../../../../dataSource/constant/SVGEvent";
 import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
-import {MoveDrawable} from "../../../../../type/MoveDrawable";
 
 export class DrawRightTriangle extends MoveDraw {
   protected createDrawableElement(position: Point): MoveDrawable {
@@ -14,14 +14,14 @@ export class DrawRightTriangle extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.RIGHT_TRIANGLE_TOOL_ON);
+      this.drawTool.container.__call__(SVGEvent.RIGHT_TRIANGLE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.RIGHT_TRIANGLE_TOOL_OFF);
+      this.drawTool.container.__call__(SVGEvent.RIGHT_TRIANGLE_TOOL_OFF);
     }
   }
 

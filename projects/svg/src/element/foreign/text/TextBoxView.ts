@@ -1,15 +1,15 @@
-import {ForeignObjectProperties, ForeignObjectView} from "../ForeignObjectView";
-import {Container} from "../../../Container";
-import {Event} from "../../../dataSource/constant/Event";
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {ElementCursor, ElementProperties} from "../../ElementView";
-import {Rect} from "../../../model/Rect";
-import {Cursor} from "../../../dataSource/constant/Cursor";
+import {ForeignObjectProperties, ForeignObjectView} from '../ForeignObjectView';
+import {Container} from '../../../Container';
+import {SVGEvent} from '../../../dataSource/constant/SVGEvent';
+import {ElementType} from '../../../dataSource/constant/ElementType';
+import {ElementCursor} from '../../ElementView';
+import {Rect} from '../../../model/Rect';
+import {Cursor} from '../../../dataSource/constant/Cursor';
 
 export class TextBoxCursor extends ElementCursor {
   constructor() {
     super();
-    this.cursor[Cursor.DRAW_TEXT_BOX] = "text";
+    this.cursor[Cursor.DRAW_TEXT_BOX] = 'text';
   }
 }
 
@@ -18,51 +18,45 @@ export interface TextBoxProperties extends ForeignObjectProperties {}
 export class TextBoxView extends ForeignObjectView {
   protected override _type: ElementType = ElementType.TEXT_BOX;
   protected override _content: HTMLTextAreaElement;
-  private _lastCommittedText: string = "";
+  private _lastCommittedText = '';
+  public override defaultOutline = 'thin solid #ddd';
   protected override cutEvent = (event: ClipboardEvent) => {
-    let text = document.getSelection()?.toString();
+    const text = document.getSelection()?.toString();
     if (text) {
       this._container.focused.__clipboard__.text = text;
 
-      this.replaceSelected("");
+      this.replaceSelected('');
       event.preventDefault();
     }
   };
   protected override pasteEvent = (event: ClipboardEvent) => {
-    let paste = this.container.focused.__clipboard__.text;
+    const paste = this.container.focused.__clipboard__.text;
 
     this.replaceSelected(paste);
     event.preventDefault();
   };
 
-  public constructor(container: Container, properties: TextBoxProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, removeOnEmpty: boolean = true, ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: TextBoxProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, {}, rect, ownerId, index);
 
-    this._content = document.createElement("textarea");
-    this._content.style.width = "100%";
-    this._content.style.height = "100%";
-    this._content.style.resize = "none";
-    this._content.style.overflow = "hidden";
-    this._content.style.border = "none";
-    this._content.style.outline = "none";
+    this.svgElement.style.outline = this.defaultOutline;
+    this._content = document.createElement('textarea');
+    this._content.style.width = '100%';
+    this._content.style.height = '100%';
+    this._content.style.resize = 'none';
+    this._content.style.overflow = 'hidden';
+    this._content.style.border = 'none';
+    this._content.style.outline = 'none';
     this._content.spellcheck = false;
-    this.svgElement.innerHTML = "";
+    this.svgElement.innerHTML = '';
     this.svgElement.appendChild(this._content);
     /* prevent from dropping elements inside */
-    this._content.ondrop = () => {return false};
+    this._content.ondrop = () => {return false;};
 
     this.addEditCallBack();
     this.addFocusEvent();
 
     this.safeClipboard = this._container.focused.__clipboard__.isSafe;
-
-    if (removeOnEmpty) {
-      this._container.addCallBack(Event.EDIT_NODE_TOOl_OFF, () => {
-        if (this._content.value == "") {
-          this._container.remove(this);
-        }
-      });
-    }
 
     this.setProperties(properties);
   }
@@ -78,8 +72,8 @@ export class TextBoxView extends ForeignObjectView {
     return this._content;
   }
   public override addEditCallBack() {
-    this._content.addEventListener("input", () => {
-      this._container.__call__(Event.TEXT_TYPING, {text: this._content.value, element: this});
+    this._content.addEventListener('input', () => {
+      this._container.__call__(SVGEvent.TEXT_TYPING, {text: this._content.value, element: this});
     });
 
     this._content.addEventListener('blur', () => {
@@ -89,7 +83,7 @@ export class TextBoxView extends ForeignObjectView {
       }
 
       this._content.scrollTop = 0;
-      if (this._content.value == "") {
+      if (this._content.value === '') {
         this._container.remove(this, true);
         this._container.tools.selectTool.on();
 
@@ -97,17 +91,17 @@ export class TextBoxView extends ForeignObjectView {
       /* Tool already changed to draw free. No need to check */
       /* if last committed text is equals to current text, don't call change callback */
       if (this._container.tools.drawTool.isOn() && this._lastCommittedText !== this._content.value/* && this._container.drawTool.tool == this._container.drawTools.textBox*/) {
-        this._container.__call__(Event.TEXT_TYPING_COMMIT, {text: this._content.value, element: this});
+        this._container.__call__(SVGEvent.TEXT_TYPING_COMMIT, {text: this._content.value, element: this});
         this._lastCommittedText = this._content.value;
       }
     });
   }
 
   public replaceSelected(text: string) {
-    let start = this._content.selectionStart;
-    let end = this._content.selectionEnd;
+    const start = this._content.selectionStart;
+    const end = this._content.selectionEnd;
     this.text = this.text.substring(0, start) + text + this.text.substring(end);
-    let replacedTextEnd = start + text.length;
+    const replacedTextEnd = start + text.length;
     this._content.setSelectionRange(replacedTextEnd, replacedTextEnd);
   }
 
@@ -116,9 +110,9 @@ export class TextBoxView extends ForeignObjectView {
   }
 
   public override toJSON(): any {
-    let json = super.toJSON();
-    json["content"] = undefined;
-    json["text"] = this._content.value;
+    const json = super.toJSON();
+    json.content = undefined;
+    json.text = this._content.value;
     return json;
   }
   public override fromJSON(json: any) {

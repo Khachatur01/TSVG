@@ -5,9 +5,9 @@
     "ng": "ng",
     "start": "ng build SVG",
     "build": "ng build SVG",
-    "build_and_deploy": "ng build SVG && ./deploy.sh",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {

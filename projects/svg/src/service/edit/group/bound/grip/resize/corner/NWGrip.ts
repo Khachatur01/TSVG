@@ -1,7 +1,7 @@
 import {Grip} from "../Grip";
 import {Point} from "../../../../../../../model/Point";
 import {Angle} from "../../../../../../math/Angle";
-import {Event} from "../../../../../../../dataSource/constant/Event";
+import {SVGEvent} from "../../../../../../../dataSource/constant/SVGEvent";
 import {Compass} from "../../../../../../../dataSource/constant/Compass";
 
 export class NWGrip extends Grip {
@@ -28,26 +28,29 @@ export class NWGrip extends Grip {
     );
 
     if (call) {
-      this._container.__call__(Event.RESIZE_MOUSE_DOWN, {position: client, compass: Compass.NW, elements: this.focus.children});
+      this._container.__call__(SVGEvent.RESIZE_MOUSE_DOWN, {position: client, compass: Compass.NW, elements: this.focus.children});
     }
   }
   public override makeMouseMove(client: Point, call: boolean = true): void {
     super.makeMouseMove(client, call);
 
-    let elementRect = this.focus.__lastRect__;
+    const elementRect = this.focus.__lastRect__;
 
     if (this._container.perfect) {
-      let originPoint: Point = {
+      const originPoint: Point = {
         x: elementRect.x + elementRect.width,
         y: elementRect.y + elementRect.height
       };
       let angle = this._lastAngle;
-      if (client.x > originPoint.x && client.y > originPoint.y) /* IV */
+      if (client.x > originPoint.x && client.y > originPoint.y) /* IV */{
         angle = 360 - (180 - angle);
-      else if (client.x > originPoint.x) /* I */
+      }
+      else if (client.x > originPoint.x) /* I */{
         angle = 180 - angle;
-      else if (client.y > originPoint.y) /* III */
+      }
+      else if (client.y > originPoint.y) /* III */{
         angle = 180 - (angle - 180);
+      }
 
       client = Angle.lineFromVector(
         originPoint,
@@ -55,26 +58,26 @@ export class NWGrip extends Grip {
         Angle.lineLength(originPoint, client)
       );
     }
-    let width = (client.x) - (elementRect.x + elementRect.width);
-    let height = (client.y) - (elementRect.y + elementRect.height);
+    const width = (client.x) - (elementRect.x + elementRect.width);
+    const height = (client.y) - (elementRect.y + elementRect.height);
 
     this._lastResize = {
       x: elementRect.x + elementRect.width,
       y: elementRect.y + elementRect.height,
-      width: width,
-      height: height
+      width,
+      height
     };
     this.focus.__setRect__(this._lastResize);
 
     if (call) {
-      this._container.__call__(Event.RESIZE_MOUSE_MOVE, {position: client, compass: Compass.NW});
+      this._container.__call__(SVGEvent.RESIZE_MOUSE_MOVE, {position: client, compass: Compass.NW});
     }
   }
   public override makeMouseUp(client: Point, call: boolean = true): void {
     super.makeMouseUp(client, call);
 
     if (call) {
-      this._container.__call__(Event.RESIZE_MOUSE_UP, {position: client, compass: Compass.NW});
+      this._container.__call__(SVGEvent.RESIZE_MOUSE_UP, {position: client, compass: Compass.NW});
     }
   }
 }

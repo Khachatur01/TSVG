@@ -1,10 +1,11 @@
-import {Point} from "../../../../model/Point";
-import {Rect} from "../../../../model/Rect";
-import {PathView} from "../../../../element/shape/path/PathView";
-import {ElementType} from "../../../../dataSource/constant/ElementType";
-import {Container} from "../../../../Container";
-import {GroupView} from "../../../../element/group/GroupView";
-import {ElementProperties} from "../../../../element/ElementView";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {Point} from '../../../../model/Point';
+import {Rect} from '../../../../model/Rect';
+import {PathView} from '../../../../element/shape/path/PathView';
+import {ElementType} from '../../../../dataSource/constant/ElementType';
+import {Container} from '../../../../Container';
+import {GroupView} from '../../../../element/group/GroupView';
+import {ElementProperties} from '../../../../element/ElementView';
 
 export interface Drawable {
   get properties(): ElementProperties;
@@ -16,7 +17,7 @@ export interface Drawable {
 /**
  * if delta is set, calculate rect width and height by delta
  * */
-  __setRect__(rect: Rect, delta?: Point): void;
+  __setRect__(rect: Rect): void;
 
   __updateView__(): void;
   get visiblePoints(): Point[];

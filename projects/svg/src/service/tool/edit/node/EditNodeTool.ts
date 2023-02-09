@@ -1,19 +1,19 @@
-import {Tool} from "../../Tool";
-import {Container} from "../../../../Container";
-import {PointedView} from "../../../../element/shape/pointed/PointedView";
-import {ElementView} from "../../../../element/ElementView";
-import {Point} from "../../../../model/Point";
-import {Node} from "./Node";
-import {Event} from "../../../../dataSource/constant/Event";
-import {Focus} from "../../../edit/group/Focus";
-import {Cursor} from "../../../../dataSource/constant/Cursor";
+import {Tool} from '../../Tool';
+import {Container} from '../../../../Container';
+import {PointedView} from '../../../../element/shape/pointed/PointedView';
+import {ElementView} from '../../../../element/ElementView';
+import {Point} from '../../../../model/Point';
+import {Node} from './Node';
+import {SVGEvent} from '../../../../dataSource/constant/SVGEvent';
+import {Focus} from '../../../edit/group/Focus';
+import {Cursor} from '../../../../dataSource/constant/Cursor';
 
 export class EditNodeTool extends Tool {
   protected override _cursor: Cursor = Cursor.EDIT_NODE;
   private nodes: Node[] = [];
   private _editableElement: PointedView | null = null;
   public focus: Focus;
-  public showNodes: boolean = true;
+  public showNodes = true;
 
   public constructor(container: Container, focus: Focus) {
     super(container);
@@ -31,17 +31,19 @@ export class EditNodeTool extends Tool {
   }
 
   private set refPoint(refPoint: Point) {
-    this._container.__nodesGroup__.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
+    this._container.__nodesGroup__.style.transformOrigin = refPoint.x + 'px ' + refPoint.y + 'px';
   }
   private rotate(angle: number) {
-    this._container.__nodesGroup__.style.transform = "rotate(" + angle + "deg)";
+    this._container.__nodesGroup__.style.transform = 'rotate(' + angle + 'deg)';
   }
 
   public get editableElement(): PointedView | null {
     return this._editableElement;
   }
   public set editableElement(editableElement: PointedView | null) {
-    if (!editableElement) return;
+    if (!editableElement) {
+      return;
+    }
     this.removeEditableElement();
 
     this.focus.appendChild(editableElement, false, false);
@@ -49,9 +51,9 @@ export class EditNodeTool extends Tool {
     this._editableElement.__onFocus__();
 
     let order = 0;
-    let points = editableElement.points;
-    for (let point of points) {
-      let node: Node = new Node(this._container, this, point, order++);
+    const points = editableElement.points;
+    for (const point of points) {
+      const node: Node = new Node(this._container, this, point, order++);
       node.__on__();
       this.nodes.push(node);
       if (this.showNodes) {
@@ -63,16 +65,20 @@ export class EditNodeTool extends Tool {
     this.rotate(editableElement.angle);
   }
   public removeEditableElement() {
-    this._container.__nodesGroup__.innerHTML = "";
+    this._container.__nodesGroup__.innerHTML = '';
     this.nodes = [];
-    if (!this._editableElement) return;
+    if (!this._editableElement) {
+      return;
+    }
 
     this.focus.removeChild(this._editableElement, false);
     this._editableElement = null;
   }
 
-  public override on(call: boolean = true): void {
-    super.on(call);
+  public override on(call: boolean = true): boolean {
+    if (!super.on(call)) {
+      return false;
+    }
     this.focus.children.forEach((child: ElementView) => {
       if (child instanceof PointedView) {
         this.editableElement = child;
@@ -82,16 +88,20 @@ export class EditNodeTool extends Tool {
 
     this._container.style.changeCursor(this.cursor);
     if (call) {
-      this._container.__call__(Event.EDIT_NODE_TOOl_ON);
+      this._container.__call__(SVGEvent.EDIT_NODE_TOOl_ON);
     }
+    return true;
   }
-  public override off(call: boolean = true): void {
-    super.off();
+  public override off(call: boolean = true): boolean {
+    if (!super.off(call)) {
+      return false;
+    }
     this.focus.clear();
     this.removeEditableElement();
 
     if (call) {
-      this._container.__call__(Event.EDIT_NODE_TOOl_OFF);
+      this._container.__call__(SVGEvent.EDIT_NODE_TOOl_OFF);
     }
+    return true;
   }
 }

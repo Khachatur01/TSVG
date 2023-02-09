@@ -1,5 +1,6 @@
-import {PathCommand} from "../../PathCommand";
-import {Point} from "../../../Point";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {PathCommand} from '../../PathCommand';
+import {Point} from '../../../Point';
 
 export class Arc extends PathCommand {
   private _rx: number;
@@ -15,15 +16,6 @@ export class Arc extends PathCommand {
     this._x_axis_rotation = xAxisRotation;
     this._large_arc_flag = largeArcFlag;
     this._sweep_flag = sweepFlag;
-  }
-
-  public get string(): string {
-    return "A " +
-      this._rx + " " + this._ry + " " +
-      this._x_axis_rotation + " " +
-      this._large_arc_flag + " " +
-      this._sweep_flag + " " +
-      this._point.x + " " + this._point.y + (this.close ? " Z" : "");
   }
 
   public get rx(): number {
@@ -74,5 +66,14 @@ export class Arc extends PathCommand {
       x: this._point.x,
       y: this._point.y
     });
+  }
+
+  public toString(): string {
+    return 'A ' +
+      this._rx + ' ' + this._ry + ' ' +
+      this._x_axis_rotation + ' ' +
+      this._large_arc_flag + ' ' +
+      this._sweep_flag + ' ' +
+      this._point.x + ' ' + this._point.y + (this.close ? ' Z' : '');
   }
 }

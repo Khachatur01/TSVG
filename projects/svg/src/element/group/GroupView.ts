@@ -1,10 +1,10 @@
-import {ElementCursor, ElementProperties, ElementStyle, ElementView} from "../ElementView";
-import {Point} from "../../model/Point";
-import {Rect} from "../../model/Rect";
-import {PathView} from "../shape/path/PathView";
-import {Container} from "../../Container";
-import {ElementType} from "../../dataSource/constant/ElementType";
-import {PolygonProperties} from "../shape/pointed/polygon/PolygonView";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {ElementCursor, ElementProperties, ElementStyle, ElementView} from '../ElementView';
+import {Point} from '../../model/Point';
+import {Rect} from '../../model/Rect';
+import {PathView} from '../shape/path/PathView';
+import {Container} from '../../Container';
+import {ElementType} from '../../dataSource/constant/ElementType';
 
 export class GroupCursor extends ElementCursor {}
 
@@ -90,13 +90,11 @@ export class GroupStyle extends ElementStyle {
 export interface GroupProperties extends ElementProperties {}
 
 export class GroupView extends ElementView {
-  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "g");
+  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, 'g');
   protected override _type: ElementType = ElementType.GROUP;
 
-  /* Model */
   public override readonly style: ElementStyle = new GroupStyle(this);
-  private _elements: Set<ElementView> = new Set<ElementView>()
-  /* Model */
+  private _elements: Set<ElementView> = new Set<ElementView>();
 
   public constructor(container: Container, properties: GroupProperties = {}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
@@ -106,7 +104,7 @@ export class GroupView extends ElementView {
   }
 
   public getElementById(ownerId: string, index: number): ElementView | undefined {
-    for (let element of this._elements) {
+    for (const element of this._elements) {
       if (element instanceof GroupView) {
         return element.getElementById(ownerId, index);
       } else if (element.ownerId === ownerId && element.index === index) {
@@ -118,36 +116,36 @@ export class GroupView extends ElementView {
   public get elements(): Set<ElementView> {
     return this._elements;
   }
-  public addElement(element: ElementView) {
+  public addElement(element: ElementView): void {
     this._elements.add(element);
     element.group = this;
     this.svgElement.appendChild(element.SVG);
     this.recalculateRect();
   }
-  public removeElement(element: ElementView) {
+  public removeElement(element: ElementView): void {
     this._elements.delete(element);
     this.svgElement.removeChild(element.SVG);
     this.recalculateRect();
   }
-  public setElements(elements: Set<ElementView>) {
+  public setElements(elements: Set<ElementView>): void {
     this._elements = elements;
-    this.svgElement.innerHTML = "";
+    this.svgElement.innerHTML = '';
     elements.forEach((element: ElementView) => {
       this.svgElement.appendChild(element.SVG);
       element.group = this;
     });
     this.recalculateRect();
   }
-  public removeElements() {
+  public removeElements(): void {
     this._elements.clear();
-    this.svgElement.innerHTML = "";
+    this.svgElement.innerHTML = '';
 
     this._rect.width = 0;
     this._rect.height = 0;
   }
 
   public override get points(): Point[] {
-    let points: Point[] = [];
+    const points: Point[] = [];
     this._elements.forEach((element: ElementView) => {
       element.points.forEach((point: Point) => {
         points.push(Object.assign({}, point));
@@ -156,7 +154,7 @@ export class GroupView extends ElementView {
     return points;
   }
   public override get visiblePoints(): Point[] {
-    let points: Point[] = [];
+    const points: Point[] = [];
     this._elements.forEach((element: ElementView) => {
       element.visiblePoints.forEach((point: Point) => {
         points.push(Object.assign({}, point));
@@ -164,21 +162,21 @@ export class GroupView extends ElementView {
     });
     return points;
   }
-  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+  public override __correct__(refPoint: Point, lastRefPoint: Point): void {
     this._elements.forEach((child: ElementView) => {
-      child.__correct__(refPoint, lastRefPoint)
+      child.__correct__(refPoint, lastRefPoint);
     });
 
-    let correctionDelta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    const correctionDelta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     this._rect.x += correctionDelta.x;
     this._rect.y += correctionDelta.y;
   }
 
   public override __translate__(delta: Point) {
     this.svgElement.style.transform =
-      "translate(" + delta.x + "px, " + delta.y + "px)";
+      'translate(' + delta.x + 'px, ' + delta.y + 'px)';
   }
-  public __drag__(delta: Point): void {
+  public override __drag__(delta: Point): void {
     this._elements.forEach((element: ElementView) => {
       element.__drag__(delta);
     });
@@ -187,20 +185,20 @@ export class GroupView extends ElementView {
     this._rect.y += delta.y;
   }
 
-  public __setRect__(rect: Rect, delta?: Point): void {
-  }
+  public __setRect__(rect: Rect): void {}
 
-  protected recalculateRect() {
-    let minX, minY;
-    let maxX, maxY;
+  protected recalculateRect(): void {
+    let minX; let minY;
+    let maxX; let maxY;
 
-    let children = Array.from(this._elements);
-    if (children.length < 1)
-      return
+    const children = Array.from(this._elements);
+    if (children.length < 1) {
+      return;
+    }
 
-    let firstChild = children[0];
+    const firstChild = children[0];
 
-    let firstBoundingRect = firstChild.getVisibleRect();
+    const firstBoundingRect = firstChild.getVisibleRect();
 
     minX = firstBoundingRect.x;
     minY = firstBoundingRect.y;
@@ -208,15 +206,19 @@ export class GroupView extends ElementView {
     maxY = firstBoundingRect.height + minY;
 
     for (let i = 1; i < children.length; i++) {
-      let boundingRect = children[i].getVisibleRect();
-      if (boundingRect.x < minX)
+      const boundingRect = children[i].getVisibleRect();
+      if (boundingRect.x < minX) {
         minX = boundingRect.x;
-      if (boundingRect.y < minY)
+      }
+      if (boundingRect.y < minY) {
         minY = boundingRect.y;
-      if (boundingRect.width + boundingRect.x > maxX)
+      }
+      if (boundingRect.width + boundingRect.x > maxX) {
         maxX = boundingRect.width + boundingRect.x;
-      if (boundingRect.height + boundingRect.y > maxY)
+      }
+      if (boundingRect.height + boundingRect.y > maxY) {
         maxY = boundingRect.height + boundingRect.y;
+      }
     }
 
     this._rect = {
@@ -228,7 +230,7 @@ export class GroupView extends ElementView {
   }
 
   public override intersectsRect(rect: Rect): boolean {
-    for (let element of this._elements) {
+    for (const element of this._elements) {
       if (element.intersectsRect(rect)) {
         return true;
       }
@@ -237,17 +239,20 @@ export class GroupView extends ElementView {
   }
 
   public override getAttr(attribute: string): string {
-    let [firstElement] = this._elements;
-    let value = firstElement.SVG.getAttribute(attribute);
-    if (!value)
-      return "0";
+    const [firstElement] = this._elements;
+    const value = firstElement.SVG.getAttribute(attribute);
+    if (!value) {
+      return '0';
+    }
     return value;
   }
   public override setAttr(attributes: object): void {
-    for (let element of this._elements)
-      for (const [key, value] of Object.entries(attributes))
-        if (key && value)
-          element.SVG.setAttribute(key, "" + value);
+    for (const element of this._elements) {
+      for (const [key, value] of Object.entries(attributes)) {
+        if (key && value) {
+          element.SVG.setAttribute(key, '' + value);
+        }
+      }}
   }
 
   public override get refPoint(): Point {
@@ -258,7 +263,7 @@ export class GroupView extends ElementView {
     this._elements.forEach(child => child.refPoint = point);
   }
 
-  public override __rotate__(angle: number) {
+  public override __rotate__(angle: number): void {
     this._angle = angle;
     this._elements.forEach(child =>
       child.__rotate__((angle + child.__lastAngle__ - this._lastAngle) % 360)
@@ -273,14 +278,20 @@ export class GroupView extends ElementView {
     super.__fixAngle__();
     this._elements.forEach(child => child.__fixAngle__());
   }
-  public override __onFocus__() {
+  public override __fixRefPoint__(): void {
+    super.__fixRefPoint__();
+    this._elements.forEach(child => child.__fixRefPoint__());
+  }
+
+  public override __onFocus__(): void {
     this.__highlight__();
   }
-  public override __onBlur__() {
+  public override __onBlur__(): void {
     this.__lowlight__();
   }
 
-  public toPath(): PathView { /* todo */
+  /* TODO - trace a single path object */
+  public toPath(): PathView {
     return new PathView(this._container, this._properties);
   }
 
@@ -288,14 +299,13 @@ export class GroupView extends ElementView {
     return true;
   }
 
-  public __updateView__(): void {
-  }
+  public __updateView__(): void {}
 
   public override toJSON(): any {
-    let json =  super.toJSON();
-    json["children"] = [];
-    for (let element of this._elements) {
-      json["children"].push(element.toJSON());
+    const json =  super.toJSON();
+    json.children = [];
+    for (const element of this._elements) {
+      json.children.push(element.toJSON());
     }
     return json;
   }

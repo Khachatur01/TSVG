@@ -1,6 +1,6 @@
 export interface Ellipse {
-  cx: number,
-  cy: number,
-  rx: number,
-  ry: number
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
 }

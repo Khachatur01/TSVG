@@ -1,9 +1,10 @@
-import {TriangleProperties, TriangleView} from "./TriangleView";
-import {Container} from "../../../../../Container";
-import {Rect} from "../../../../../model/Rect";
-import {MoveDrawable} from "../../../../../service/tool/draw/type/MoveDrawable";
-import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {ElementCursor, ElementProperties, ElementView} from "../../../../ElementView";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {TriangleProperties, TriangleView} from './TriangleView';
+import {Container} from '../../../../../Container';
+import {Rect} from '../../../../../model/Rect';
+import {MoveDrawable} from '../../../../../service/tool/draw/type/MoveDrawable';
+import {ElementType} from '../../../../../dataSource/constant/ElementType';
+import {ElementCursor, ElementView} from '../../../../ElementView';
 
 export class RightTriangleCursor extends ElementCursor {}
 

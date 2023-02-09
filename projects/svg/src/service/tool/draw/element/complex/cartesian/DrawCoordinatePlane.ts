@@ -1,28 +1,37 @@
+import {MoveDraw} from '../../../mode/MoveDraw';
+import {Style} from '../../../../../style/Style';
 import {Point} from "../../../../../../model/Point";
-import {CoordinatePlaneView} from "../../../../../../element/complex/cartesian/CoordinatePlaneView";
-import {MoveDraw} from "../../../mode/MoveDraw";
-import {ElementType} from "../../../../../../dataSource/constant/ElementType";
-import {Event} from "../../../../../../dataSource/constant/Event";
 import {MoveDrawable} from "../../../type/MoveDrawable";
-import {Style} from "../../../../../style/Style";
+import {CoordinatePlaneView} from "../../../../../../element/complex/cartesian/CoordinatePlaneView";
+import {SVGEvent} from "../../../../../../dataSource/constant/SVGEvent";
+import {ElementType} from "../../../../../../dataSource/constant/ElementType";
 
 export class DrawCoordinatePlane extends MoveDraw {
-  public functions: {f: Function, style: Style}[] = [];
+  public graphics: {f: (value: number) => any; style: Style}[] = [];
+  public xAxis = undefined;
+  public yAxis = undefined;
+  public grid = {show: false, byX: 1, byY: 1};
   protected createDrawableElement(position: Point): MoveDrawable {
-    let coordinatePlane = new CoordinatePlaneView(this.drawTool.container, {overEvent: true, globalStyle: false}, {x: position.x, y: position.y, width: 1, height: 1});
-    this.functions.forEach(f => {
-      coordinatePlane.addFunction(f.f, f.style);
-    });
-    return coordinatePlane;
+    return new CoordinatePlaneView(
+      this.drawTool.container,
+      {overEvent: true, globalStyle: true},
+      {x: position.x, y: position.y, width: 1, height: 1},
+      this.xAxis,
+      this.yAxis,
+      this.grid,
+      this.graphics
+    );
   }
 
   protected override onIsNotComplete(call: boolean) {
-    if (!this._drawableElement) return;
+    if (!this._drawableElement) {
+      return;
+    }
     (this._drawableElement as unknown as MoveDrawable).__drawSize__({
-      x: this.startPosition.x - 150,
-      y: this.startPosition.y - 150,
-      width: 300,
-      height: 300
+      x: this.startPosition.x - 200,
+      y: this.startPosition.y - 200,
+      width: 400,
+      height: 400
     });
     this._drawableElement.refPoint = this._drawableElement.center;
   }
@@ -33,14 +42,14 @@ export class DrawCoordinatePlane extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.COORDINATE_PLANE_TOOL_ON);
+      this.drawTool.container.__call__(SVGEvent.COORDINATE_PLANE2_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.COORDINATE_PLANE_TOOL_OFF);
+      this.drawTool.container.__call__(SVGEvent.COORDINATE_PLANE2_TOOL_OFF);
     }
   }
 
@@ -48,6 +57,6 @@ export class DrawCoordinatePlane extends MoveDraw {
     return new DrawCoordinatePlane(this.drawTool);
   }
   public get type(): ElementType {
-    return ElementType.COORDINATE_PLANE;
+    return ElementType.COORDINATE_PLANE2;
   }
 }

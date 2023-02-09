@@ -1,9 +1,9 @@
-import {LineTo} from "../LineTo";
-import {Point} from "../../../Point";
+import {LineTo} from '../LineTo';
+import {Point} from '../../../Point';
 
 export class HLineTo extends LineTo {
-  public override get string(): string {
-    return "H " + this._point.x + (this.close ? " Z" : "");
+  public override toString(): string {
+    return 'H ' + this._point.x + (this.close ? ' Z' : '');
   }
 
   public override get position(): Point {

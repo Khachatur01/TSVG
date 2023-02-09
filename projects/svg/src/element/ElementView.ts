@@ -1,24 +1,25 @@
-import {Point} from "../model/Point";
-import {Resizeable} from "../service/edit/resize/Resizeable";
-import {Rect} from "../model/Rect";
-import {Draggable} from "../service/tool/drag/Draggable";
-import {Matrix} from "../service/math/Matrix";
-import {Container} from "../Container";
-import {PathView} from "./shape/path/PathView";
-import {GroupView} from "./group/GroupView";
-import {Style} from "../service/style/Style";
-import {ElementType} from "../dataSource/constant/ElementType";
-import {Cursor} from "../dataSource/constant/Cursor";
-import {Line} from "../model/Line";
-import {Drawable} from "../service/tool/draw/type/Drawable";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {Point} from '../model/Point';
+import {Resizeable} from '../service/edit/resize/Resizeable';
+import {Rect} from '../model/Rect';
+import {Draggable} from '../service/tool/drag/Draggable';
+import {Matrix} from '../service/math/Matrix';
+import {Container} from '../Container';
+import {PathView} from './shape/path/PathView';
+import {GroupView} from './group/GroupView';
+import {Style} from '../service/style/Style';
+import {ElementType} from '../dataSource/constant/ElementType';
+import {Cursor} from '../dataSource/constant/Cursor';
+import {Line} from '../model/Line';
+import {Drawable} from '../service/tool/draw/type/Drawable';
 
 export class ElementCursor {
   public cursor: any = {};
   constructor() {
-    this.cursor[Cursor.NO_TOOL] = "default";
-    this.cursor[Cursor.SELECT] = "move";
-    this.cursor[Cursor.EDIT_NODE] = "default";
-    this.cursor[Cursor.EDIT_TABLE] = "default";
+    this.cursor[Cursor.NO_TOOL] = 'default';
+    this.cursor[Cursor.SELECT] = 'move';
+    this.cursor[Cursor.EDIT_NODE] = 'default';
+    this.cursor[Cursor.EDIT_TABLE] = 'default';
   }
 }
 
@@ -35,7 +36,7 @@ export class ElementStyle extends Style {
   }
   public override set strokeWidth(width: string) {
     super.strokeWidth = width;
-    this.element.setAttr({"stroke-width": width});
+    this.element.setAttr({'stroke-width': width});
   }
 
   public override get strokeDashArray(): string {
@@ -43,7 +44,7 @@ export class ElementStyle extends Style {
   }
   public override set strokeDashArray(array: string) {
     super.strokeDashArray = array;
-    this.element.setAttr({"stroke-dasharray": array});
+    this.element.setAttr({'stroke-dasharray': array});
   }
 
   public override get strokeColor(): string {
@@ -51,7 +52,7 @@ export class ElementStyle extends Style {
   }
   public override set strokeColor(color: string) {
     super.strokeColor = color;
-    this.element.setAttr({"stroke": color});
+    this.element.setAttr({stroke: color});
   }
 
   public override get fillColor(): string {
@@ -59,7 +60,7 @@ export class ElementStyle extends Style {
   }
   public override set fillColor(color: string) {
     super.fillColor = color;
-    this.element.setAttr({"fill": color});
+    this.element.setAttr({fill: color});
   }
 
   public override get fontSize(): string {
@@ -67,7 +68,7 @@ export class ElementStyle extends Style {
   }
   public override set fontSize(size: string) {
     super.fontSize = size;
-    this.element.HTML.style.fontSize = size + "px";
+    this.element.HTML.style.fontSize = size + 'px';
   }
 
   public override get fontColor(): string {
@@ -87,7 +88,7 @@ export class ElementStyle extends Style {
   }
 
   public setGlobalStyle(): void {
-    let style = this.element.container.style;
+    const style = this.element.container.style;
     this.strokeWidth = style.strokeWidth;
     this.strokeDashArray = style.strokeDashArray;
     this.strokeColor = style.strokeColor;
@@ -99,12 +100,12 @@ export class ElementStyle extends Style {
 }
 
 export interface ElementProperties {
-  overEvent?: boolean,
-  globalStyle?: boolean
+  overEvent?: boolean;
+  globalStyle?: boolean;
 }
 
 export abstract class ElementView implements Resizeable, Draggable, Drawable {
-  public static readonly svgURI: "http://www.w3.org/2000/svg" = "http://www.w3.org/2000/svg";
+  public static readonly svgURI: 'http://www.w3.org/2000/svg' = 'http://www.w3.org/2000/svg';
   protected abstract svgElement: SVGElement;
 
   /* Model */
@@ -115,16 +116,14 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   private _group: GroupView | null = null;
   protected _container: Container;
   protected _rect: Rect = {x: 0, y: 0, width: 0, height: 0};
-  protected _translateDelta: Point = {x: 0, y: 0};
-  protected _angle: number = 0;
+  protected _angle = 0;
   protected _refPoint: Point = {x: 0, y: 0};
   protected _lastRect: Rect = {x: 0, y: 0, width: 0, height: 0};
-  protected _lastAngle: number = 0;
+  protected _lastAngle = 0;
   protected _lastRefPoint: Point = {x: 0, y: 0};
-  protected _selectable: boolean = true;
-  protected _hasOverEvent: boolean = false;
+  protected _selectable = true;
   protected _properties: ElementProperties = {};
-  public rotatable: boolean = true;
+  public rotatable = true;
   /* Model */
 
   private _highlight = this.__highlight__.bind(this);
@@ -139,9 +138,9 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     this._container = container;
 
     /**
-    * One of ownerId and index arguments can't be undefined.
-    * Both should be defined or both should be undefined
-    * */
+     * One of ownerId and index arguments can't be undefined.
+     * Both should be defined or both should be undefined
+     * */
     if (ownerId && index) { /* set defined id to element */
       this._ownerId = ownerId;
       this._index = index;
@@ -149,7 +148,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       this._ownerId = container.ownerId;
       this._index = container.nextElementIndex;
     } else {
-      throw Error("Missing id argument: ownerId{ " + ownerId + " }, index{ " + index + " }");
+      throw Error('Missing id argument: ownerId{ ' + ownerId + ' }, index{ ' + index + ' }');
     }
   }
 
@@ -175,19 +174,20 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     this._refPoint.x = this._lastRefPoint.x + delta.x;
     this._refPoint.y = this._lastRefPoint.y + delta.y;
     this.svgElement.style.transform =
-      "translate(" + delta.x + "px, " + delta.y + "px) rotate(" + this._angle + "deg)";
+      'translate(' + delta.x + 'px, ' + delta.y + 'px) rotate(' + this._angle + 'deg)';
   }
   public abstract __drag__(delta: Point): void;
   public getVisibleRect(): Rect {
     return ElementView.calculateRect(this.visiblePoints);
   };
   public getVisibleRectPoints(): Point[] {
-    let points: Point[] = [
+    const points: Point[] = [
       {x: this._rect.x, y: this._rect.y},
       {x: this._rect.x + this._rect.width, y: this._rect.y},
       {x: this._rect.x + this._rect.width, y: this._rect.y + this._rect.height},
       {x: this._rect.x, y: this._rect.y + this._rect.height}
     ];
+
     return Matrix.rotate(
       points,
       this._refPoint,
@@ -203,9 +203,11 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     };
   };
   /**
-   * if delta is set, calculate rect width and height by delta
+   * change element size
+   * rect x,y is reference point
+   * rect width,height is new size of element
    * */
-  public abstract __setRect__(rect: Rect, delta?: Point): void;
+  public abstract __setRect__(rect: Rect): void;
 
   public abstract __updateView__(): void;
   public get visiblePoints(): Point[] {
@@ -235,6 +237,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
 
   /**
    * check if rect1 fully inside rect2
+   *
    * @param rect1 inside rect
    * @param rect2 outside rect
    * */
@@ -248,8 +251,8 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   }
   public static linesIntersect(line0: Line, line1: Line): boolean {
     /* returns false if lines are overlap */
-    let det, gamma, lambda;
-    det = (line0.p1.x - line0.p0.x) * (line1.p1.y - line1.p0.y) - (line1.p1.x - line1.p0.x) * (line0.p1.y - line0.p0.y);
+    let gamma; let lambda;
+    const det = (line0.p1.x - line0.p0.x) * (line1.p1.y - line1.p0.y) - (line1.p1.x - line1.p0.x) * (line0.p1.y - line0.p0.y);
     if (det === 0) {
       return false;
     } else {
@@ -264,15 +267,15 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       return null;
     }
 
-    let denominator = ((line1.p1.y - line1.p0.y) * (line0.p1.x - line0.p0.x) - (line1.p1.x - line1.p0.x) * (line0.p1.y - line0.p0.y));
+    const denominator = ((line1.p1.y - line1.p0.y) * (line0.p1.x - line0.p0.x) - (line1.p1.x - line1.p0.x) * (line0.p1.y - line0.p0.y));
 
     /* Lines are parallel */
     if (denominator === 0) {
       return null;
     }
 
-    let ua = ((line1.p1.x - line1.p0.x) * (line0.p0.y - line1.p0.y) - (line1.p1.y - line1.p0.y) * (line0.p0.x - line1.p0.x)) / denominator;
-    let ub = ((line0.p1.x - line0.p0.x) * (line0.p0.y - line1.p0.y) - (line0.p1.y - line0.p0.y) * (line0.p0.x - line1.p0.x)) / denominator;
+    const ua = ((line1.p1.x - line1.p0.x) * (line0.p0.y - line1.p0.y) - (line1.p1.y - line1.p0.y) * (line0.p0.x - line1.p0.x)) / denominator;
+    const ub = ((line0.p1.x - line0.p0.x) * (line0.p0.y - line1.p0.y) - (line0.p1.y - line0.p0.y) * (line0.p0.x - line1.p0.x)) / denominator;
 
     /* is the intersection along the segments */
     if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
@@ -298,12 +301,13 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   }
   /**
    * check if polygon created by points, intersects rectangle
+   *
    * @param points points of shape
    * @param rect rectangle, to calculate intersection
    * @param closedShape if shape is closed, calculate intersection as polygon, otherwise as polyline
    * */
   public static pointsIntersectingRect(points: Point[], rect: Rect, closedShape: boolean = true): boolean {
-    let rectSides = ElementView.getRectSides(rect);
+    const rectSides = ElementView.getRectSides(rect);
     for (let i = 0; i < points.length; i++) {
       if (ElementView.pointInRect(points[i], rect)) {
         /* if some point in rect, then element is intersected with rect */
@@ -313,16 +317,16 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       let next;
 
       if (closedShape) {
-        next = i + 1 != points.length ? i + 1 : 0;
-      } else if (i + 1 == points.length) { /* 'i' is last point index */
+        next = i + 1 !== points.length ? i + 1 : 0;
+      } else if (i + 1 === points.length) { /* 'i' is last point index */
         /* if last point is not in rect, then element is not intersected with rect */
         break; /* ends loop to return false */
       } else { /* closedShape is false, and 'i' is not last point index */
         next = i + 1;
       }
 
-      let line = {p0: points[i], p1: points[next]};
-      for (let side of rectSides) {
+      const line = {p0: points[i], p1: points[next]};
+      for (const side of rectSides) {
         if (ElementView.linesIntersect(line, side)) {
           return true;
         }
@@ -331,8 +335,11 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     return false;
   }
 
+  /**
+   * check if this element intersects with given rect
+   * */
   public intersectsRect(rect: Rect): boolean {
-    let points = this.visiblePoints;
+    const points = this.visiblePoints;
     return ElementView.pointsIntersectingRect(points, rect);
   }
 
@@ -343,18 +350,18 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     return this._type;
   }
 
-  public static parseId(id: string): {ownerId: string, index: number} {
-    let idArray = id.split(/(_u|_e)+/);
-    let ownerId: string = idArray[2];
-    let index: number = parseInt(idArray[4]);
+  public static parseId(id: string): {ownerId: string; index: number} {
+    const idArray = id.split(/(_u|_e)+/);
+    const ownerId: string = idArray[2];
+    const index: number = parseInt(idArray[4]);
 
     return {
-      ownerId: ownerId,
-      index: index
-    }
+      ownerId,
+      index
+    };
   }
   public get id(): string {
-    return this._container.idPrefix + "_u" + this._ownerId + "_e" + this._index;
+    return this._container.idPrefix + '_u' + this._ownerId + '_e' + this._index;
   }
   public setId(ownerId: string, index: number) {
     this._ownerId = ownerId;
@@ -386,8 +393,8 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   }
 
   public __correct__(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
+    const delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x === 0 && delta.y === 0) {return;}
 
     this._rect.x = this._rect.x + delta.x;
     this._rect.y = this._rect.y + delta.y;
@@ -396,10 +403,10 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   }
   public __getCorrectionDelta__(refPoint: Point, lastRefPoint: Point) {
     /* calculate delta */
-    let rotatedRefPoint = Matrix.rotate(
+    const rotatedRefPoint = Matrix.rotate(
       [{x: lastRefPoint.x, y: lastRefPoint.y}],
       {x: refPoint.x, y: refPoint.y},
-      this.angle
+      this._angle
     )[0];
     /* correction by delta */
     return {
@@ -416,22 +423,28 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   }
 
   public static calculateRect(points: Point[]): Rect {
-    if (points.length === 0) return {x: 0, y: 0, width: 0, height: 0};
-    let minX = points[0].x;
-    let minY = points[0].y;
-    let maxX = points[0].x;
-    let maxY = points[0].y;
+    if (points.length === 0) {
+      return {x: 0, y: 0, width: 0, height: 0};
+    }
+    let minX: number = points[0].x;
+    let minY: number = points[0].y;
+    let maxX: number = points[0].x;
+    let maxY: number = points[0].y;
 
     for (let i = 1; i < points.length; i++) {
-      if (points[i].x < minX)
+      if (points[i].x < minX) {
         minX = points[i].x;
-      if (points[i].y < minY)
+      }
+      if (points[i].y < minY) {
         minY = points[i].y;
+      }
 
-      if (points[i].x > maxX)
+      if (points[i].x > maxX) {
         maxX = points[i].x;
-      if (points[i].y > maxY)
+      }
+      if (points[i].y > maxY) {
         maxY = points[i].y;
+      }
     }
 
     return {
@@ -442,22 +455,20 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     };
   }
   protected calculateRectByNewPoint(point: Point): Rect {
-    let position = this._rect;
-    let size = this._rect;
+    const position: Rect = this._rect;
+    const size: Rect = this._rect;
 
     if (point.x < position.x) {
       position.width += position.x - point.x;
       position.x = point.x;
-    }
-    else if (point.x > position.x + size.width) {
+    } else if (point.x > position.x + size.width) {
       size.width = point.x - position.x;
     }
 
     if (point.y < position.y) {
       position.height += position.y - point.y;
       position.y = point.y;
-    }
-    else if (point.y > position.y + size.height) {
+    } else if (point.y > position.y + size.height) {
       size.height = point.y - position.y;
     }
 
@@ -466,15 +477,15 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       y: position.y,
       width: size.width,
       height: size.height
-    }
+    };
   }
 
   public get center(): Point {
-    let center = {
+    const center = {
       x: this._rect.x + this._rect.width / 2,
       y: this._rect.y + this._rect.height / 2
-    }
-    if (this._angle == 0) {
+    };
+    if (this._angle === 0) {
       return center;
     } else {
       return Matrix.rotate(
@@ -489,7 +500,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     return this._refPoint;
   }
   public set refPoint(refPoint: Point) {
-    this.svgElement.style.transformOrigin = refPoint.x + "px " + refPoint.y + "px";
+    this.svgElement.style.transformOrigin = refPoint.x + 'px ' + refPoint.y + 'px';
     this._refPoint = refPoint;
   }
 
@@ -497,30 +508,33 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     return this._angle;
   }
   public __rotate__(angle: number): void {
-    this.svgElement.style.transform = "rotate(" + angle + "deg)";
+    this.svgElement.style.transform = 'rotate(' + angle + 'deg)';
     this._angle = angle;
   }
 
   public get SVG(): SVGElement {
     return this.svgElement;
   }
+  public set SVG(svgElement: SVGElement) {
+    this.svgElement = svgElement;
+  }
   public get HTML(): SVGElement | HTMLElement {
     return this.svgElement;
   }
 
   public getAttr(attribute: string): string {
-    let value = this.SVG.getAttribute(attribute);
+    const value = this.SVG.getAttribute(attribute);
     if (!value)
-      return "0";
+      {return '0';}
     return value;
   }
   public setAttr(attributes: object): void {
     for (const [key, value] of Object.entries(attributes))
-      this.SVG.setAttribute(key, "" + value);
+      {this.SVG.setAttribute(key, '' + value);}
   }
   public delAttr(attributes: string[]): void {
     for (const attribute of attributes)
-      this.SVG.removeAttribute(attribute);
+      {this.SVG.removeAttribute(attribute);}
   }
 
   public set cursor(cursor: string) {
@@ -528,17 +542,17 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   }
 
   public setOverEvent(): void {
-    this.svgElement.addEventListener("mouseover", this._highlight);
-    this.svgElement.addEventListener("mouseout", this._lowlight);
+    this.svgElement.addEventListener('mouseover', this._highlight);
+    this.svgElement.addEventListener('mouseout', this._lowlight);
     this._properties.overEvent = true;
   }
   public removeOverEvent(): void {
-    this.svgElement.removeEventListener("mouseover", this._highlight);
-    this.svgElement.removeEventListener("mouseout", this._lowlight);
+    this.svgElement.removeEventListener('mouseover', this._highlight);
+    this.svgElement.removeEventListener('mouseout', this._lowlight);
     this._properties.overEvent = false;
   }
 
-  public __remove__() {
+  public __remove__(): void {
     this.svgElement.parentElement?.removeChild(this.svgElement);
   }
 
@@ -559,16 +573,16 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       return;
     }
     if (this._group && this._group._selectable) { /* if in group and selectable */
-      this._group.SVG.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 1))";
+      this._group.SVG.style.filter = 'drop-shadow(0px 0px 5px rgb(0 0 0 / 1))';
     } else{
-      this.svgElement.style.filter = "drop-shadow(0px 0px 5px rgb(0 0 0 / 1))";
+      this.svgElement.style.filter = 'drop-shadow(0px 0px 5px rgb(0 0 0 / 1))';
     }
   }
   public __lowlight__(): void {
     if (this._group) { /* if in group */
-      this._group.SVG.style.filter = "unset";
+      this._group.SVG.style.filter = 'unset';
     } else{
-      this.svgElement.style.filter = "unset";
+      this.svgElement.style.filter = 'unset';
     }
   }
 
@@ -605,7 +619,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       refPoint: this._refPoint,
       properties: this._properties,
       rotatable: this.rotatable
-    }
+    };
   }
   public fromJSON(json: any) {
     this.style.set = json.style;

@@ -1,13 +1,13 @@
-import {ElementCursor, ElementProperties, ElementView} from "../../ElementView";
-import {PathView} from "../../shape/path/PathView";
-import {Size} from "../../../model/Size";
-import {Rect} from "../../../model/Rect";
-import {Point} from "../../../model/Point";
-import {Container} from "../../../Container";
-import {ForeignView} from "../../type/ForeignView";
-import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {ForeignObjectProperties} from "../ForeignObjectView";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {ElementCursor, ElementProperties, ElementView} from '../../ElementView';
+import {PathView} from '../../shape/path/PathView';
+import {Size} from '../../../model/Size';
+import {Rect} from '../../../model/Rect';
+import {Point} from '../../../model/Point';
+import {Container} from '../../../Container';
+import {ForeignView} from '../../type/ForeignView';
+import {MoveDrawable} from '../../../service/tool/draw/type/MoveDrawable';
+import {ElementType} from '../../../dataSource/constant/ElementType';
 
 export class ImageCursor extends ElementCursor {
   constructor() {
@@ -18,26 +18,26 @@ export class ImageCursor extends ElementCursor {
 export interface ImageProperties extends ElementProperties {}
 
 export class ImageView extends ForeignView implements MoveDrawable {
-  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "image");
+  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, 'image');
   protected override _type: ElementType = ElementType.IMAGE;
 
   /* Model */
-  private _src: string = "";
+  private _src = '';
   /* Model */
 
   public constructor(container: Container, properties: ImageProperties = {}, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement.id = this.id;
 
-    this.svgElement.ondragstart = function () {
+    this.svgElement.ondragstart = function() {
       return false;
-    }
+    };
 
     this.__setRect__(rect);
     this.src = src;
 
     this.setAttr({
-      preserveAspectRatio: "none"
+      preserveAspectRatio: 'none'
     });
 
     this.setProperties(properties);
@@ -61,8 +61,8 @@ export class ImageView extends ForeignView implements MoveDrawable {
 
   public get size(): Size {
     return {
-      width: parseInt(this.getAttr("width")),
-      height: parseInt(this.getAttr("height"))
+      width: parseInt(this.getAttr('width')),
+      height: parseInt(this.getAttr('height'))
     };
   }
   public __drawSize__(rect: Rect) {
@@ -91,7 +91,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
   }
 
   public isComplete(): boolean {
-    let size = this.size;
+    const size = this.size;
     return size.width > 0 && size.height > 0;
   }
 
@@ -100,9 +100,9 @@ export class ImageView extends ForeignView implements MoveDrawable {
   }
 
   public override toJSON(): any {
-    let json = super.toJSON();
-    json["src"] = this._src;
-    json["content"] = undefined;
+    const json = super.toJSON();
+    json.src = this._src;
+    json.content = undefined;
     return json;
   }
   public override fromJSON(json: any) {

@@ -1,8 +1,9 @@
+/* eslint-disable */
 import {ElementView} from "./element/ElementView";
 import {Focus} from "./service/edit/group/Focus";
 import {Drawers} from "./dataSource/Drawers";
 import {Grid} from "./service/grid/Grid";
-import {Event} from "./dataSource/constant/Event";
+import {SVGEvent} from "./dataSource/constant/SVGEvent";
 import {GroupCursor, GroupView} from "./element/group/GroupView";
 import {Style} from "./service/style/Style";
 import {Point} from "./model/Point";
@@ -26,21 +27,20 @@ import {
 import {RectangleCursor, RectangleView} from "./element/shape/pointed/polygon/rectangle/RectangleView";
 import {ImageCursor, ImageView} from "./element/foreign/media/ImageView";
 import {VideoCursor, VideoView} from "./element/foreign/media/VideoView";
-import {CoordinatePlaneCursor, CoordinatePlaneView} from "./element/complex/cartesian/CoordinatePlaneView";
 import {CircleCursor, CircleView} from "./element/shape/circluar/CircleView";
 import {TableCursor, TableView} from "./element/complex/TableView";
 import {Tools} from "./dataSource/Tools";
+import {CoordinatePlaneCursor, CoordinatePlaneView} from "./element/complex/cartesian/CoordinatePlaneView";
 import {NumberLineCursor, NumberLineView} from "./element/complex/cartesian/NumberLineView";
-import {RayCursor, RayView} from "./element/complex/cartesian/RayView";
-import {GraphicCursor, GraphicView} from "./element/complex/cartesian/GraphicView";
 
 class GlobalStyle extends Style {
-  private readonly default: Style;
-  private container: Container;
 
   public readonly cursor: any = {
     element: {}
   };
+
+  private readonly default: Style;
+  private container: Container;
 
   public constructor(container: Container) {
     super();
@@ -79,10 +79,8 @@ class GlobalStyle extends Style {
     this.cursor.element[ElementType.TEXT_BOX] = new TextBoxCursor();
     this.cursor.element[ElementType.IMAGE] = new ImageCursor();
     this.cursor.element[ElementType.VIDEO] = new VideoCursor();
-    this.cursor.element[ElementType.RAY] = new RayCursor();
-    this.cursor.element[ElementType.GRAPHIC] = new GraphicCursor();
-    this.cursor.element[ElementType.COORDINATE_PLANE] = new CoordinatePlaneCursor();
-    this.cursor.element[ElementType.NUMBER_LINE] = new NumberLineCursor();
+    this.cursor.element[ElementType.COORDINATE_PLANE2] = new CoordinatePlaneCursor();
+    this.cursor.element[ElementType.NUMBER_LINE2] = new NumberLineCursor();
     this.cursor.element[ElementType.TABLE] = new TableCursor();
   }
 
@@ -98,7 +96,7 @@ class GlobalStyle extends Style {
         child.style.strokeWidth = width;
       });
     }
-    this.container.__call__(Event.STROKE_WIDTH_CHANGE, {strokeWidth: width});
+    this.container.__call__(SVGEvent.STROKE_WIDTH_CHANGE, {strokeWidth: width});
   }
 
   public override get strokeDashArray(): string {
@@ -113,7 +111,7 @@ class GlobalStyle extends Style {
         child.style.strokeDashArray = array;
       });
     }
-    this.container.__call__(Event.STROKE_DASH_ARRAY_CHANGE, {strokeDashArray: array});
+    this.container.__call__(SVGEvent.STROKE_DASH_ARRAY_CHANGE, {strokeDashArray: array});
   }
 
   public override get strokeColor(): string {
@@ -128,7 +126,7 @@ class GlobalStyle extends Style {
         child.style.strokeColor = color;
       });
     }
-    this.container.__call__(Event.STROKE_COLOR_CHANGE, {strokeColor: color});
+    this.container.__call__(SVGEvent.STROKE_COLOR_CHANGE, {strokeColor: color});
   }
 
   public override get fillColor(): string {
@@ -143,7 +141,7 @@ class GlobalStyle extends Style {
         child.style.fillColor = color;
       });
     }
-    this.container.__call__(Event.FILL_COLOR_CHANGE, {fillColor: color});
+    this.container.__call__(SVGEvent.FILL_COLOR_CHANGE, {fillColor: color});
   }
 
   public override get fontSize(): string {
@@ -158,7 +156,7 @@ class GlobalStyle extends Style {
         child.style.fontSize = size;
       });
     }
-    this.container.__call__(Event.FONT_SIZE_CHANGE, {fontSize: size});
+    this.container.__call__(SVGEvent.FONT_SIZE_CHANGE, {fontSizeMore: size});
   }
 
   public override get fontColor(): string {
@@ -173,7 +171,7 @@ class GlobalStyle extends Style {
         child.style.fontColor = color;
       });
     }
-    this.container.__call__(Event.FONT_COLOR_CHANGE, {fontColor: color});
+    this.container.__call__(SVGEvent.FONT_COLOR_CHANGE, {fontColor: color});
   }
 
   public override get backgroundColor(): string {
@@ -188,14 +186,14 @@ class GlobalStyle extends Style {
         child.style.backgroundColor = color;
       });
     }
-    this.container.__call__(Event.FONT_BACKGROUND_CHANGE, {backgroundColor: color});
+    this.container.__call__(SVGEvent.FONT_BACKGROUND_CHANGE, {backgroundColor: color});
   }
 
   public resetToDefault(call: boolean = true): void {
     this.style.clear();
     this.default.clear();
     if (call) {
-      this.container.__call__(Event.STYLE_CHANGE, {});
+      this.container.__call__(SVGEvent.STYLE_CHANGE, {});
     }
   }
 
@@ -220,7 +218,7 @@ class GlobalStyle extends Style {
     super.fontColor = style.fontColor;
     super.backgroundColor = style.backgroundColor;
     if (call) {
-      this.container.__call__(Event.STYLE_CHANGE, style.object);
+      this.container.__call__(SVGEvent.STYLE_CHANGE, style.object);
     }
   }
 
@@ -253,7 +251,7 @@ export class Container {
   public readonly id: number;
   private readonly _focus: Focus;
   private _elements: Set<ElementView> = new Set<ElementView>();
-  private _callBacks: Map<Event, Function[]> = new Map<Event, Function[]>();
+  private _callBacks: Map<SVGEvent, Function[]> = new Map<SVGEvent, Function[]>();
   private _multiSelect: boolean = false;
   private _perfect: boolean = false;
 
@@ -289,13 +287,13 @@ export class Container {
 
     this.container.addEventListener("mousedown", event => {
       if (event.target == this.container && !this.tools.drawTool.isOn()) {
-        this.__call__(Event.CLICKED_ON_CONTAINER);
+        this.__call__(SVGEvent.CLICKED_ON_CONTAINER);
         this.blur();
       }
     });
     this.container.addEventListener("touchstart", event => {
       if (event.target == this.container && !this.tools.drawTool.isOn()) {
-        this.__call__(Event.CLICKED_ON_CONTAINER);
+        this.__call__(SVGEvent.CLICKED_ON_CONTAINER);
         this.blur();
       }
     });
@@ -316,7 +314,7 @@ export class Container {
     this.container.appendChild(this._focus.SVG); /* bounding box, grips, rotation and reference point */
     this.container.appendChild(this.__pointersGroup__); /* all pointers */
 
-    this.id = Container.nextContainerId
+    this.id = Container.nextContainerId;
     Container.allContainers[Container.nextContainerId] = this;
     Container.nextContainerId++;
   }
@@ -365,13 +363,9 @@ export class Container {
         return new PolylineView(this);
       case ElementType.RECTANGLE:
         return new RectangleView(this);
-      case ElementType.COORDINATE_PLANE:
+      case ElementType.COORDINATE_PLANE2:
         return new CoordinatePlaneView(this);
-      case ElementType.GRAPHIC:
-        return new GraphicView(this, undefined, undefined, undefined, (x: number) => x);
-      case ElementType.RAY:
-        return new RayView(this);
-      case ElementType.NUMBER_LINE:
+      case ElementType.NUMBER_LINE2:
         return new NumberLineView(this);
       case ElementType.GROUP:
         return new GroupView(this);
@@ -399,21 +393,21 @@ export class Container {
     return element;
   }
 
-  public __call__(name: Event, parameters: any = {}): void {
+  public __call__(name: SVGEvent, parameters: any = {}): void {
     let callback = this._callBacks.get(name);
     if (callback)
       callback.forEach((func: Function) => {
         func(parameters);
       });
   }
-  public addCallBack(name: Event, callback: Function) {
+  public addCallBack(name: SVGEvent, callback: Function) {
     let functions = this._callBacks.get(name);
     if (!functions)
       this._callBacks.set(name, []);
 
     this._callBacks.get(name)?.push(callback)
   }
-  public removeCallBack(name: Event, callback: Function) {
+  public removeCallBack(name: SVGEvent, callback: Function) {
     let functions = this._callBacks.get(name);
     if (functions)
       functions.splice(functions.indexOf(callback), 1);
@@ -423,7 +417,7 @@ export class Container {
     if (this.tools.editNodeTool.isOn() && this.tools.editNodeTool.editableElement != element) {
       this.blur();
       if (this.tools.editNodeTool.isOn()) {
-        this.tools.drawTool.drawer = this.drawers.free;
+        this.tools.drawTool.setDrawer(this.drawers.free);
         this.tools.drawTool.on();
       }
       return;
@@ -492,7 +486,8 @@ export class Container {
   public add(element: ElementView, setElementActivity: boolean = true) {
     if (!element) return;
     element.group = null;
-    this.__elementsGroup__.appendChild(element.SVG);
+    /* appendChild creates new node if that node does not belong to any element, so the reference of element can be changed */
+    element.SVG = this.__elementsGroup__.appendChild<SVGElement>(element.SVG);
     this._elements.add(element);
     if(setElementActivity) {
       this.__setElementActivity__(element);
@@ -506,7 +501,7 @@ export class Container {
       this._elements.delete(element);
 
       if (call) {
-        this.__call__(Event.ELEMENTS_DELETED, {elements: new Set<ElementView>([element])});
+        this.__call__(SVGEvent.ELEMENTS_DELETED, {elements: new Set<ElementView>([element.copy])});
       }
     }
   }
@@ -529,12 +524,12 @@ export class Container {
       }
     });
     if (call) {
-      this.__call__(Event.ALL_FOCUSED, {elements: this._elements});
+      this.__call__(SVGEvent.ALL_FOCUSED, {elements: this._elements});
     }
   }
   public focus(element: ElementView, showBounding: boolean = true, changeGlobalStyle: boolean = true, call: boolean = true) {
     if (element.selectable) {
-      this._focus.appendChild(element, showBounding, changeGlobalStyle, call);
+      this._focus.appendChild(element, showBounding, changeGlobalStyle, undefined, call);
     }
   }
   public blur(element?: ElementView, call: boolean = true) {
@@ -566,9 +561,9 @@ export class Container {
     this.tools.drawTool.perfect = perfect;
     this._focus.boundingBox.perfect = perfect;
     if (perfect)
-      this.__call__(Event.PERFECT_MODE_ON);
+      this.__call__(SVGEvent.PERFECT_MODE_ON);
     else
-      this.__call__(Event.PERFECT_MODE_OFF);
+      this.__call__(SVGEvent.PERFECT_MODE_OFF);
   }
 
   public static __eventToPosition__(event: MouseEvent | TouchEvent): Point {

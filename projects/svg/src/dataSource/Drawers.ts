@@ -1,25 +1,23 @@
-import {DrawRectangle} from "../service/tool/draw/element/shape/pointed/polygon/rectangle/DrawRectangle";
-import {DrawLine} from "../service/tool/draw/element/shape/pointed/DrawLine";
-import {DrawPolyline} from "../service/tool/draw/element/shape/pointed/polyline/DrawPolyline";
-import {DrawEllipse} from "../service/tool/draw/element/shape/circular/DrawEllipse";
-import {DrawPolygon} from "../service/tool/draw/element/shape/pointed/polygon/DrawPolygon";
-import {DrawFree} from "../service/tool/draw/mode/DrawFree";
-import {DrawIsoscelesTriangle} from "../service/tool/draw/element/shape/pointed/polygon/triangle/DrawIsoscelesTriangle";
-import {DrawRightTriangle} from "../service/tool/draw/element/shape/pointed/polygon/triangle/DrawRightTriangle";
-import {DrawTextBox} from "../service/tool/draw/element/foreign/DrawTextBox";
+import {DrawRectangle} from '../service/tool/draw/element/shape/pointed/polygon/rectangle/DrawRectangle';
+import {DrawLine} from '../service/tool/draw/element/shape/pointed/DrawLine';
+import {DrawPolyline} from '../service/tool/draw/element/shape/pointed/polyline/DrawPolyline';
+import {DrawEllipse} from '../service/tool/draw/element/shape/circular/DrawEllipse';
+import {DrawPolygon} from '../service/tool/draw/element/shape/pointed/polygon/DrawPolygon';
+import {DrawFree} from '../service/tool/draw/mode/DrawFree';
+import {DrawIsoscelesTriangle} from '../service/tool/draw/element/shape/pointed/polygon/triangle/DrawIsoscelesTriangle';
+import {DrawRightTriangle} from '../service/tool/draw/element/shape/pointed/polygon/triangle/DrawRightTriangle';
+import {DrawTextBox} from '../service/tool/draw/element/foreign/DrawTextBox';
+import {DrawVideo} from '../service/tool/draw/element/foreign/DrawVideo';
+import {DrawImage} from '../service/tool/draw/element/foreign/DrawImage';
+import {DrawForeignObject} from '../service/tool/draw/element/foreign/DrawForeignObject';
+import {ElementType} from './constant/ElementType';
+import {Drawer} from '../service/tool/draw/Drawer';
+import {DrawCircle} from '../service/tool/draw/element/shape/circular/DrawCircle';
+import {DrawTable} from '../service/tool/draw/element/complex/DrawTable';
+import {DrawText} from '../service/tool/draw/element/foreign/DrawText';
+import {DrawTool} from '../service/tool/draw/DrawTool';
 import {DrawCoordinatePlane} from "../service/tool/draw/element/complex/cartesian/DrawCoordinatePlane";
-import {DrawVideo} from "../service/tool/draw/element/foreign/DrawVideo";
-import {DrawImage} from "../service/tool/draw/element/foreign/DrawImage";
-import {DrawForeignObject} from "../service/tool/draw/element/foreign/DrawForeignObject";
-import {ElementType} from "./constant/ElementType";
-import {Drawer} from "../service/tool/draw/Drawer";
-import {DrawCircle} from "../service/tool/draw/element/shape/circular/DrawCircle";
-import {DrawTable} from "../service/tool/draw/element/complex/DrawTable";
-import {DrawText} from "../service/tool/draw/element/foreign/DrawText";
 import {DrawNumberLine} from "../service/tool/draw/element/complex/cartesian/DrawNumberLine";
-import {DrawRay} from "../service/tool/draw/element/complex/cartesian/DrawRay";
-import {DrawGraphic} from "../service/tool/draw/element/complex/cartesian/DrawGraphic";
-import {DrawTool} from "../service/tool/draw/DrawTool";
 
 export class Drawers {
   private readonly drawTool: DrawTool;
@@ -37,8 +35,6 @@ export class Drawers {
   public readonly video: DrawVideo;
   public readonly image: DrawImage;
   public readonly foreignObject: DrawForeignObject;
-  public readonly graphic: DrawGraphic;
-  public readonly ray: DrawRay;
   public readonly coordinatePlane: DrawCoordinatePlane;
   public readonly numberLine: DrawNumberLine;
   public readonly table: DrawTable;
@@ -60,8 +56,6 @@ export class Drawers {
     this.video = new DrawVideo(drawTool);
     this.image = new DrawImage(drawTool);
     this.foreignObject = new DrawForeignObject(drawTool);
-    this.graphic = new DrawGraphic(drawTool);
-    this.ray = new DrawRay(drawTool);
     this.coordinatePlane = new DrawCoordinatePlane(drawTool);
     this.numberLine = new DrawNumberLine(drawTool);
     this.table = new DrawTable(drawTool);
@@ -97,18 +91,14 @@ export class Drawers {
         return this.image;
       case ElementType.VIDEO:
         return this.video;
-      case ElementType.GRAPHIC:
-        return this.graphic;
-      case ElementType.RAY:
-        return this.ray;
-      case ElementType.COORDINATE_PLANE:
+      case ElementType.COORDINATE_PLANE2:
         return this.coordinatePlane;
-      case ElementType.NUMBER_LINE:
+      case ElementType.NUMBER_LINE2:
         return this.numberLine;
       case ElementType.TABLE:
         return this.table;
       default:
-        throw Error("Type is incorrect");
+        throw Error('Type is incorrect');
     }
   }
 }

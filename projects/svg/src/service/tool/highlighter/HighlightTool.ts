@@ -1,22 +1,22 @@
-import {Tool} from "../Tool";
-import {Container} from "../../../Container";
-import {Event} from "../../../dataSource/constant/Event";
-import {PathView} from "../../../element/shape/path/PathView";
-import {Path} from "../../../model/path/Path";
-import {MoveTo} from "../../../model/path/point/MoveTo";
-import {LineTo} from "../../../model/path/line/LineTo";
-import {ElementView} from "../../../element/ElementView";
-import {Point} from "../../../model/Point";
-import {Cursor} from "../../../dataSource/constant/Cursor";
+import {Tool} from '../Tool';
+import {Container} from '../../../Container';
+import {SVGEvent} from '../../../dataSource/constant/SVGEvent';
+import {PathView} from '../../../element/shape/path/PathView';
+import {Path} from '../../../model/path/Path';
+import {MoveTo} from '../../../model/path/point/MoveTo';
+import {LineTo} from '../../../model/path/line/LineTo';
+import {ElementView} from '../../../element/ElementView';
+import {Point} from '../../../model/Point';
+import {Cursor} from '../../../dataSource/constant/Cursor';
 
 export class HighlightTool extends Tool {
   protected override _cursor: Cursor = Cursor.HIGHLIGHTER;
-  private _timeout: number = 3000;
-  private _color: string = "#7efca0AA";
-  private _width: string = "20";
+  private _timeout = 3000;
+  private _color = '#7efca0AA';
+  private _width = '20';
   private path: PathView;
   private group: SVGGElement;
-  private _highlighting: boolean = false;
+  private _highlighting = false;
 
   public constructor(container: Container, group?: SVGGElement) {
     super(container);
@@ -26,8 +26,8 @@ export class HighlightTool extends Tool {
     if (group) {
       this.group = group;
     } else {
-      this.group = document.createElementNS(ElementView.svgURI, "g");
-      this.group.id = "highlight";
+      this.group = document.createElementNS(ElementView.svgURI, 'g');
+      this.group.id = 'highlight';
     }
 
     this.mouseDownEvent = this.mouseDownEvent.bind(this);
@@ -36,16 +36,16 @@ export class HighlightTool extends Tool {
   }
 
   private mouseDownEvent(event: MouseEvent | TouchEvent) {
-    this._container.HTML.addEventListener("mousemove", this.mouseMoveEvent);
-    this._container.HTML.addEventListener("touchmove", this.mouseMoveEvent);
-    document.addEventListener("mouseup", this.mouseUpEvent);
-    document.addEventListener("touchend", this.mouseUpEvent);
+    this._container.HTML.addEventListener('mousemove', this.mouseMoveEvent);
+    this._container.HTML.addEventListener('touchmove', this.mouseMoveEvent);
+    document.addEventListener('mouseup', this.mouseUpEvent);
+    document.addEventListener('touchend', this.mouseUpEvent);
 
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
+    const containerRect = this._container.HTML.getBoundingClientRect();
+    const eventPosition = Container.__eventToPosition__(event);
     this._mouseCurrentPos = eventPosition;
 
-    let startPosition = {
+    const startPosition = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
@@ -53,11 +53,11 @@ export class HighlightTool extends Tool {
     this.makeMouseDown(startPosition);
   };
   private mouseMoveEvent(event: MouseEvent | TouchEvent) {
-    let containerRect = this._container.HTML.getBoundingClientRect();
-    let eventPosition = Container.__eventToPosition__(event);
+    const containerRect = this._container.HTML.getBoundingClientRect();
+    const eventPosition = Container.__eventToPosition__(event);
     this._mouseCurrentPos = eventPosition;
 
-    let movePosition = {
+    const movePosition = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
@@ -65,14 +65,14 @@ export class HighlightTool extends Tool {
     this.makeMouseMove(movePosition);
   };
   private mouseUpEvent() {
-    this._container.HTML.removeEventListener("mousemove", this.mouseMoveEvent);
-    this._container.HTML.removeEventListener("touchmove", this.mouseMoveEvent);
-    document.removeEventListener("mouseup", this.mouseUpEvent);
-    document.removeEventListener("touchend", this.mouseUpEvent);
+    this._container.HTML.removeEventListener('mousemove', this.mouseMoveEvent);
+    this._container.HTML.removeEventListener('touchmove', this.mouseMoveEvent);
+    document.removeEventListener('mouseup', this.mouseUpEvent);
+    document.removeEventListener('touchend', this.mouseUpEvent);
 
-    let containerRect = this._container.HTML.getBoundingClientRect();
+    const containerRect = this._container.HTML.getBoundingClientRect();
 
-    let position = {
+    const position = {
       x: this._mouseCurrentPos.x - containerRect.left,
       y: this._mouseCurrentPos.y - containerRect.top
     };
@@ -83,7 +83,7 @@ export class HighlightTool extends Tool {
     if (this._highlighting) {
       return;
     }
-    let start = new Path();
+    const start = new Path();
     start.add(
       new MoveTo(position)
     );
@@ -97,14 +97,14 @@ export class HighlightTool extends Tool {
     this.path = new PathView(this._container, {overEvent: false, globalStyle: false}, start);
     this.path.style.strokeWidth = this._width;
     this.path.style.strokeColor = this._color;
-    this.path.style.fillColor = "none";
-    this.path.SVG.style.pointerEvents = "none";
+    this.path.style.fillColor = 'none';
+    this.path.SVG.style.pointerEvents = 'none';
 
     this.group.appendChild(this.path.SVG);
 
     this._highlighting = true;
     if (call) {
-      this._container.__call__(Event.HIGHLIGHT_MOUSE_DOWN, {position: position, element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
+      this._container.__call__(SVGEvent.HIGHLIGHT_MOUSE_DOWN, {position, element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
     }
   }
   public makeMouseMove(position: Point, call: boolean = true, path?: string) {
@@ -117,7 +117,7 @@ export class HighlightTool extends Tool {
     }
 
     if (call) {
-      this._container.__call__(Event.HIGHLIGHT_MOUSE_MOVE, {position: position, element: this.path});
+      this._container.__call__(SVGEvent.HIGHLIGHT_MOUSE_MOVE, {position, element: this.path});
     }
   }
   public makeMouseUp(position: Point, call: boolean = true, path?: string) {
@@ -132,15 +132,17 @@ export class HighlightTool extends Tool {
       });
     }
 
-    let pathView = this.path;
+    const pathView = this.path;
     setTimeout(() => {
-      if (pathView) this.group.removeChild(pathView.SVG)
+      if (pathView) {
+        this.group.removeChild(pathView.SVG);
+      }
     }, this._timeout);
 
     this._highlighting = false;
     if (call) {
-      this._container.__call__(Event.HIGHLIGHT_MOUSE_UP, {position: position, element: this.path});
-      this._container.__call__(Event.HIGHLIGHTED, {element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
+      this._container.__call__(SVGEvent.HIGHLIGHT_MOUSE_UP, {position, element: this.path});
+      this._container.__call__(SVGEvent.HIGHLIGHTED, {element: this.path, settings: {timeout: this._timeout, color: this._color, width: this._width}});
     }
   }
   public highlight(path: Path | string) {
@@ -154,14 +156,16 @@ export class HighlightTool extends Tool {
 
     this.path.style.strokeWidth = this._width;
     this.path.style.strokeColor = this._color;
-    this.path.style.fillColor = "none";
-    this.path.SVG.style.pointerEvents = "none";
+    this.path.style.fillColor = 'none';
+    this.path.SVG.style.pointerEvents = 'none';
 
     this.group.appendChild(this.path.SVG);
 
-    let pathView = this.path;
+    const pathView = this.path;
     setTimeout(() => {
-      if (pathView) this.group.removeChild(pathView.SVG)
+      if (pathView) {
+        this.group.removeChild(pathView.SVG);
+      }
     }, this._timeout);
   }
 
@@ -172,35 +176,42 @@ export class HighlightTool extends Tool {
     this._color = color;
   }
   public set width(width: number) {
-    this._width = width + "";
+    this._width = width + '';
   }
 
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   public get SVG(): SVGGElement {
     return this.group;
   }
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   public set SVG(group: SVGGElement) {
     this.group = group;
   }
 
-  public override on(call: boolean = true): void {
-    super.on(call);
-
-    this._container.HTML.addEventListener("mousedown", this.mouseDownEvent);
-    this._container.HTML.addEventListener("touchstart", this.mouseDownEvent);
+  public override on(call: boolean = true): boolean {
+    if (!super.on(call)) {
+      return false;
+    }
+    this._container.HTML.addEventListener('mousedown', this.mouseDownEvent);
+    this._container.HTML.addEventListener('touchstart', this.mouseDownEvent);
     this._container.blur();
 
     this._container.style.changeCursor(this.cursor);
     if (call) {
-      this._container.__call__(Event.HIGHLIGHT_TOOl_ON);
+      this._container.__call__(SVGEvent.HIGHLIGHT_TOOl_ON);
     }
+    return true;
   }
-  public override off(call: boolean = true): void {
-    super.off();
-    this._container.HTML.removeEventListener("mousedown", this.mouseDownEvent);
-    this._container.HTML.removeEventListener("touchstart", this.mouseDownEvent);
+  public override off(call: boolean = true): boolean {
+    if (!super.off(call)) {
+      return false;
+    }
+    this._container.HTML.removeEventListener('mousedown', this.mouseDownEvent);
+    this._container.HTML.removeEventListener('touchstart', this.mouseDownEvent);
 
     if (call) {
-      this._container.__call__(Event.HIGHLIGHT_TOOl_OFF);
+      this._container.__call__(SVGEvent.HIGHLIGHT_TOOl_OFF);
     }
+    return true;
   }
 }

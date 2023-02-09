@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 export enum ElementType {
   ELLIPSE,
   CIRCLE,
@@ -17,9 +19,7 @@ export enum ElementType {
   TEXT,
   IMAGE,
   VIDEO,
-  RAY,
-  GRAPHIC,
-  COORDINATE_PLANE,
-  NUMBER_LINE,
+  COORDINATE_PLANE2,
+  NUMBER_LINE2,
   TABLE
 }

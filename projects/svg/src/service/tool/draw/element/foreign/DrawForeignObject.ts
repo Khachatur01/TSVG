@@ -1,22 +1,24 @@
-import {MoveDraw} from "../../mode/MoveDraw";
-import {Point} from "../../../../../model/Point";
-import {ForeignObjectView} from "../../../../../element/foreign/ForeignObjectView";
-import {Event} from "../../../../../dataSource/constant/Event";
-import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {MoveDrawable} from "../../type/MoveDrawable";
+import {MoveDraw} from '../../mode/MoveDraw';
+import {Point} from '../../../../../model/Point';
+import {ForeignObjectView} from '../../../../../element/foreign/ForeignObjectView';
+import {SVGEvent} from '../../../../../dataSource/constant/SVGEvent';
+import {ElementType} from '../../../../../dataSource/constant/ElementType';
+import {MoveDrawable} from '../../type/MoveDrawable';
 
 export class DrawForeignObject extends MoveDraw {
-  public content: string = "";
-  public contentEditable: boolean = true;
+  public content = '';
+  public contentEditable = true;
 
   protected createDrawableElement(position: Point): MoveDrawable {
-    let videoView = new ForeignObjectView(this.drawTool.container, {overEvent: true, globalStyle: true, contentEditable: this.contentEditable}, {x: position.x, y: position.y, width: 0, height: 0});
+    const videoView = new ForeignObjectView(this.drawTool.container, {overEvent: true, globalStyle: true, contentEditable: this.contentEditable}, {x: position.x, y: position.y, width: 0, height: 0});
     videoView.setContent(this.content);
     return videoView;
   }
 
   protected override onIsNotComplete(call: boolean) {
-    if (!this._drawableElement) return;
+    if (!this._drawableElement) {
+      return;
+    }
     this._drawableElement.__setRect__({
       x: this.startPosition.x,
       y: this.startPosition.y,
@@ -31,14 +33,14 @@ export class DrawForeignObject extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.ASSET_TOOL_ON);
+      this.drawTool.container.__call__(SVGEvent.ASSET_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.ASSET_TOOL_OFF);
+      this.drawTool.container.__call__(SVGEvent.ASSET_TOOL_OFF);
     }
   }
 

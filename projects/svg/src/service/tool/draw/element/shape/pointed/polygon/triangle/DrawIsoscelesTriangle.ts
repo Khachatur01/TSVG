@@ -1,11 +1,11 @@
-import {MoveDraw} from "../../../../../mode/MoveDraw";
+import {MoveDraw} from '../../../../../mode/MoveDraw';
+import {MoveDrawable} from '../../../../../type/MoveDrawable';
 import {Point} from "../../../../../../../../model/Point";
 import {
   IsoscelesTriangleView
 } from "../../../../../../../../element/shape/pointed/polygon/triangle/IsoscelesTriangleView";
-import {Event} from "../../../../../../../../dataSource/constant/Event";
+import {SVGEvent} from "../../../../../../../../dataSource/constant/SVGEvent";
 import {ElementType} from "../../../../../../../../dataSource/constant/ElementType";
-import {MoveDrawable} from "../../../../../type/MoveDrawable";
 
 export class DrawIsoscelesTriangle extends MoveDraw {
   protected createDrawableElement(position: Point): MoveDrawable {
@@ -16,14 +16,14 @@ export class DrawIsoscelesTriangle extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.ISOSCELES_TRIANGLE_TOOL_ON);
+      this.drawTool.container.__call__(SVGEvent.ISOSCELES_TRIANGLE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.ISOSCELES_TRIANGLE_TOOL_OFF);
+      this.drawTool.container.__call__(SVGEvent.ISOSCELES_TRIANGLE_TOOL_OFF);
     }
   }
 

@@ -1,19 +1,20 @@
-import {ElementCursor, ElementProperties, ElementView} from "../../ElementView";
-import {Path} from "../../../model/path/Path";
-import {Point} from "../../../model/Point";
-import {Container} from "../../../Container";
-import {PathCommand} from "../../../model/path/PathCommand";
-import {LineTo} from "../../../model/path/line/LineTo";
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {Rect} from "../../../model/Rect";
-import {ShapeView} from "../../type/ShapeView";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {ElementCursor, ElementProperties, ElementView} from '../../ElementView';
+import {Path} from '../../../model/path/Path';
+import {Point} from '../../../model/Point';
+import {Container} from '../../../Container';
+import {PathCommand} from '../../../model/path/PathCommand';
+import {LineTo} from '../../../model/path/line/LineTo';
+import {ElementType} from '../../../dataSource/constant/ElementType';
+import {Rect} from '../../../model/Rect';
+import {ShapeView} from '../../type/ShapeView';
 
 export class PathCursor extends ElementCursor {}
 
 export interface PathProperties extends ElementProperties {}
 
 export class PathView extends ShapeView {
-  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "path");
+  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, 'path');
   protected override _type: ElementType = ElementType.PATH;
 
   /* Model */
@@ -67,7 +68,7 @@ export class PathView extends ShapeView {
     return this._path.points;
   }
   public override set points(points: Point[]) {
-    let commands = this._path.getAll();
+    const commands = this._path.getAll();
     for (let i = 0; i < commands.length; i++) {
       commands[i].position = points[i];
     }
@@ -88,12 +89,14 @@ export class PathView extends ShapeView {
   }
 
   public override __correct__(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
+    const delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x === 0 && delta.y === 0) {
+      return;
+    }
 
-    let commands = this._path.getAll();
+    const commands = this._path.getAll();
 
-    for (let command of commands) {
+    for (const command of commands) {
       command.position = {
         x: delta.x + command.position.x,
         y: delta.y + command.position.y
@@ -103,35 +106,38 @@ export class PathView extends ShapeView {
     this.__updateView__();
   }
   public override __drag__(delta: Point) {
-    let lastCommands = this._lastPath.getAll();
-    let thisCommands = this._path.getAll();
+    const lastCommands = this._lastPath.getAll();
+    const thisCommands = this._path.getAll();
 
     for (let i = 0; i < lastCommands.length; i++) {
       thisCommands[i].position = {
         x: lastCommands[i].position.x + delta.x,
         y: lastCommands[i].position.y + delta.y
-      }
+      };
     }
 
     this._path.setAll(thisCommands);
     this.__updateView__();
   }
-  public override __setRect__(rect: Rect, delta?: Point): void {
+  public override __setRect__(rect: Rect): void {
     let dw = 1;
     let dh = 1;
 
-    if (this._lastRect.width != 0)
+    if (this._lastRect.width !== 0) {
       dw = rect.width / this._lastRect.width;
-    if (this._lastRect.height != 0)
+    }
+    if (this._lastRect.height !== 0) {
       dh = rect.height / this._lastRect.height;
+    }
 
-    let commands = this.commands;
-    let lastPoints = this._lastPath.points;
+    const commands = this.commands;
+    const lastPoints = this._lastPath.points;
 
     for (let i = 0; i < commands.length; i++) {
       /* points may not be fixed, and this._lastPoints[i] may be undefined */
-      if (!lastPoints[i])
+      if (!lastPoints[i]) {
         lastPoints[i] = {x: 0, y: 0};
+      }
 
       commands[i].position = {
         x: rect.x + Math.abs(lastPoints[i].x - rect.x) * dw,
@@ -169,14 +175,14 @@ export class PathView extends ShapeView {
   }
 
   public override toJSON(): any {
-    let json = super.toJSON();
-    json["path"] = this._path.toString();
+    const json = super.toJSON();
+    json.path = this._path.toString();
     return json;
   }
-  public override fromJSON(json: any) {
+  public override fromJSON(json: any): void {
     super.fromJSON(json);
-    let path = new Path();
-    path.fromString(json.path)
+    const path = new Path();
+    path.fromString(json.path);
     this.path = path;
   };
 }

@@ -1,8 +1,8 @@
-import {ClickDraw} from "../../../../mode/ClickDraw";
-import {PolylineView} from "../../../../../../../element/shape/pointed/polyline/PolylineView";
-import {PointedView} from "../../../../../../../element/shape/pointed/PointedView";
+import {ClickDraw} from '../../../../mode/ClickDraw';
 import {Point} from "../../../../../../../model/Point";
-import {Event} from "../../../../../../../dataSource/constant/Event";
+import {PointedView} from "../../../../../../../element/shape/pointed/PointedView";
+import {PolylineView} from "../../../../../../../element/shape/pointed/polyline/PolylineView";
+import {SVGEvent} from "../../../../../../../dataSource/constant/SVGEvent";
 import {ElementType} from "../../../../../../../dataSource/constant/ElementType";
 
 export class DrawPolyline extends ClickDraw {
@@ -16,14 +16,14 @@ export class DrawPolyline extends ClickDraw {
     super.start(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.POLYLINE_TOOL_ON);
+      this.drawTool.container.__call__(SVGEvent.POLYLINE_TOOL_ON);
     }
   }
   public override stop(call: boolean = true) {
     super.stop(call);
 
     if (call) {
-      this.drawTool.container.__call__(Event.POLYLINE_TOOL_OFF);
+      this.drawTool.container.__call__(SVGEvent.POLYLINE_TOOL_OFF);
     }
   }
 

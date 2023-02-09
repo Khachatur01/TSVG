@@ -1,4 +1,5 @@
-import {ElementView} from "../ElementView";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {ElementView} from '../ElementView';
 
 export abstract class ShapeView extends ElementView {
   override __onFocus__() {

@@ -1,12 +1,13 @@
-import {Point} from "../../../model/Point";
-import {Rect} from "../../../model/Rect";
-import {PathView} from "../path/PathView";
-import {Path} from "../../../model/path/Path";
-import {MoveTo} from "../../../model/path/point/MoveTo";
-import {LineTo} from "../../../model/path/line/LineTo";
-import {ShapeView} from "../../type/ShapeView";
-import {ElementProperties, ElementView} from "../../ElementView";
-import {ClickDrawable} from "../../../service/tool/draw/type/ClickDrawable";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {Point} from '../../../model/Point';
+import {Rect} from '../../../model/Rect';
+import {PathView} from '../path/PathView';
+import {Path} from '../../../model/path/Path';
+import {MoveTo} from '../../../model/path/point/MoveTo';
+import {LineTo} from '../../../model/path/line/LineTo';
+import {ShapeView} from '../../type/ShapeView';
+import {ElementView} from '../../ElementView';
+import {ClickDrawable} from '../../../service/tool/draw/type/ClickDrawable';
 
 export abstract class PointedView extends ShapeView implements ClickDrawable {
   /* Model */
@@ -25,8 +26,9 @@ export abstract class PointedView extends ShapeView implements ClickDrawable {
     this.__updateView__();
   };
   public getPoint(index: number): Point {
-    if (index < 0)
+    if (index < 0) {
       index = this._points.length + index;
+    }
     return this._points[index];
   };
   public pushPoint(point: Point): void {
@@ -35,8 +37,9 @@ export abstract class PointedView extends ShapeView implements ClickDrawable {
     this.__updateView__();
   };
   public removePoint(index: number): void {
-    if (index < 0)
+    if (index < 0) {
       index = this._points.length + index;
+    }
     this._points.splice(index, 1);
 
     this._rect = ElementView.calculateRect(this._points);
@@ -44,8 +47,9 @@ export abstract class PointedView extends ShapeView implements ClickDrawable {
     this.__updateView__();
   };
   public replacePoint(index: number, point: Point): void {
-    if (index < 0)
+    if (index < 0) {
       index = this._points.length + index;
+    }
 
     this._points[index] = point;
     this._rect = ElementView.calculateRect(this._points);
@@ -59,10 +63,18 @@ export abstract class PointedView extends ShapeView implements ClickDrawable {
     });
   }
 
+  public override __translate__(delta: Point) {
+    for (let i = 0; i < this._points.length; ++i) {
+      this._points[i].x = this._lastPoints[i].x + delta.x;
+      this._points[i].y = this._lastPoints[i].y + delta.y;
+    }
+    super.__translate__(delta);
+  }
   public override __drag__(delta: Point) {
     for (let i = 0; i < this._points.length; i++) {
-      if (!this._lastPoints[i])
+      if (!this._lastPoints[i]) {
         this._lastPoints[i] = {x: this._points[i].x, y: this._points[i].y};
+      }
 
       this._points[i].x = (delta.x + this._lastPoints[i].x);
       this._points[i].y = (delta.y + this._lastPoints[i].y);
@@ -78,8 +90,10 @@ export abstract class PointedView extends ShapeView implements ClickDrawable {
     this.__updateView__();
   }
   public override __correct__(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
+    const delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x === 0 && delta.y === 0) {
+      return;
+    }
 
     for (let i = 0; i < this._points.length; i++) {
       this._lastPoints[i] = {x: this._points[i].x, y: this._points[i].y};
@@ -90,23 +104,22 @@ export abstract class PointedView extends ShapeView implements ClickDrawable {
     this._rect = ElementView.calculateRect(this._points);
     this.__updateView__();
   }
-  public override __setRect__(rect: Rect, delta?: Point): void {
+  public override __setRect__(rect: Rect): void {
     let dw = 1;
     let dh = 1;
 
-    if (delta) {
-      dw = delta.x;
-      dh = delta.y;
-    } else {
-      if (this._lastRect.width != 0)
-        dw = rect.width / (this._lastRect.width);
-      if (this._lastRect.height != 0)
-        dh = rect.height / (this._lastRect.height);
+    if (this._lastRect.width !== 0) {
+      dw = rect.width / (this._lastRect.width);
+    }
+    if (this._lastRect.height !== 0) {
+      dh = rect.height / (this._lastRect.height);
     }
 
     for (let i = 0; i < this._points.length; i++) {
       /* points may not be fixed, and this._lastPoints[i] may be undefined */
-      if (!this._lastPoints[i]) this._lastPoints[i] = {x: 0, y: 0};
+      if (!this._lastPoints[i]) {
+        this._lastPoints[i] = {x: 0, y: 0};
+      }
 
       this._points[i].x = rect.x + Math.abs(this._lastPoints[i].x - rect.x) * dw;
       this._points[i].y = rect.y + Math.abs(this._lastPoints[i].y - rect.y) * dh;
@@ -118,19 +131,20 @@ export abstract class PointedView extends ShapeView implements ClickDrawable {
   }
 
   public override toPath(): PathView {
-    let visiblePoints = this.visiblePoints;
-    let path = new Path();
+    const visiblePoints = this.visiblePoints;
+    const path = new Path();
 
     path.add(new MoveTo(visiblePoints[0]));
-    for (let i = 1; i < visiblePoints.length; i++)
+    for (let i = 1; i < visiblePoints.length; i++) {
       path.add(new LineTo(visiblePoints[i]));
+    }
 
     return new PathView(this._container, this._properties, path);
   }
 
   public override toJSON(): any {
-    let json = super.toJSON();
-    json["points"] = this._points;
+    const json = super.toJSON();
+    json.points = this._points;
     return json;
   }
   public override fromJSON(json: any) {

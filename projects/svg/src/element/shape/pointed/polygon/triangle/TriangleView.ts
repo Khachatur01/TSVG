@@ -1,8 +1,8 @@
-import {PolygonProperties, PolygonView} from "../PolygonView";
-import {Container} from "../../../../../Container";
-import {Point} from "../../../../../model/Point";
-import {ElementType} from "../../../../../dataSource/constant/ElementType";
-import {ElementCursor} from "../../../../ElementView";
+import {PolygonProperties, PolygonView} from '../PolygonView';
+import {Container} from '../../../../../Container';
+import {Point} from '../../../../../model/Point';
+import {ElementType} from '../../../../../dataSource/constant/ElementType';
+import {ElementCursor} from '../../../../ElementView';
 
 export class TriangleCursor extends ElementCursor {}
 

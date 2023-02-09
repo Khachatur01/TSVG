@@ -1,5 +1,6 @@
-import {Rect} from "../../../../model/Rect";
-import {Drawable} from "./Drawable";
+/* eslint-disable @typescript-eslint/naming-convention */
+import {Rect} from '../../../../model/Rect';
+import {Drawable} from './Drawable';
 
 export interface MoveDrawable extends Drawable {
   /*

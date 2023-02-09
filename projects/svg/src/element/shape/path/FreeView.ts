@@ -1,14 +1,13 @@
-import {PathCursor, PathProperties, PathView} from "./PathView";
-import {Container} from "../../../Container";
-import {Path} from "../../../model/path/Path";
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {Cursor} from "../../../dataSource/constant/Cursor";
-import {ElementProperties} from "../../ElementView";
+import {PathCursor, PathProperties, PathView} from './PathView';
+import {Container} from '../../../Container';
+import {Path} from '../../../model/path/Path';
+import {ElementType} from '../../../dataSource/constant/ElementType';
+import {Cursor} from '../../../dataSource/constant/Cursor';
 
 export class FreeCursor extends PathCursor {
   constructor() {
     super();
-    this.cursor[Cursor.EDIT_NODE] = "auto";
+    this.cursor[Cursor.EDIT_NODE] = 'auto';
   }
 }
 
