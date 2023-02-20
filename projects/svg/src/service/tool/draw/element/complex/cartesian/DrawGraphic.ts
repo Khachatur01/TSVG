@@ -1,19 +1,20 @@
 import {Point} from "../../../../../../model/Point";
-import {CoordinatePlaneView} from "../../../../../../element/complex/cartesian/CoordinatePlaneView";
 import {MoveDraw} from "../../../mode/MoveDraw";
 import {ElementType} from "../../../../../../dataSource/constant/ElementType";
 import {MoveDrawable} from "../../../type/MoveDrawable";
-import {Style} from "../../../../../style/Style";
+import {GraphicView} from "../../../../../../element/complex/cartesian/GraphicView";
 import {SVGEvent} from "../../../../../../dataSource/constant/SVGEvent";
 
-export class DrawCoordinatePlane extends MoveDraw {
-  public functions: {f: Function, style: Style}[] = [];
+export class DrawGraphic extends MoveDraw {
+  public f: Function = (x: number) => x;
   protected createDrawableElement(position: Point): MoveDrawable {
-    let coordinatePlane = new CoordinatePlaneView(this.drawTool.container, {overEvent: true, globalStyle: false}, {x: position.x, y: position.y, width: 1, height: 1});
-    this.functions.forEach(f => {
-      coordinatePlane.addFunction(f.f, f.style);
-    });
-    return coordinatePlane;
+    return new GraphicView(
+      this.drawTool.container,
+      {overEvent: true, globalStyle: true},
+      {x: position.x, y: position.y, width: 1, height: 1},
+      {x: 1, y: 1},
+      this.f
+    );
   }
 
   protected override onIsNotComplete(call: boolean) {
@@ -33,21 +34,21 @@ export class DrawCoordinatePlane extends MoveDraw {
     super.start(call);
 
     if (call) {
-      this.drawTool.container.__call__(SVGEvent.COORDINATE_PLANE_TOOL_ON);
+      this.drawTool.container.__call__(SVGEvent.GRAPHIC_TOOL_ON);
     }
   }
   public override stop(call: boolean) {
     super.stop(call);
 
     if (call) {
-      this.drawTool.container.__call__(SVGEvent.COORDINATE_PLANE_TOOL_OFF);
+      this.drawTool.container.__call__(SVGEvent.GRAPHIC_TOOL_OFF);
     }
   }
 
-  public _new(): DrawCoordinatePlane {
-    return new DrawCoordinatePlane(this.drawTool);
+  public _new(): DrawGraphic {
+    return new DrawGraphic(this.drawTool);
   }
   public get type(): ElementType {
-    return ElementType.COORDINATE_PLANE;
+    return ElementType.GRAPHIC;
   }
 }

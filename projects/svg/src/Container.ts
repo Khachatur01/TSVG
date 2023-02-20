@@ -30,8 +30,12 @@ import {VideoCursor, VideoView} from "./element/foreign/media/VideoView";
 import {CircleCursor, CircleView} from "./element/shape/circluar/CircleView";
 import {TableCursor, TableView} from "./element/complex/TableView";
 import {Tools} from "./dataSource/Tools";
+import {RayCursor, RayView} from "./element/complex/cartesian/RayView";
+import {GraphicCursor, GraphicView} from "./element/complex/cartesian/GraphicView";
 import {CoordinatePlaneCursor, CoordinatePlaneView} from "./element/complex/cartesian/CoordinatePlaneView";
 import {NumberLineCursor, NumberLineView} from "./element/complex/cartesian/NumberLineView";
+import {NumberLine2Cursor, NumberLineView2} from "./element/complex/cartesian2/NumberLineView2";
+import {CoordinatePlane2Cursor, CoordinatePlaneView2} from "./element/complex/cartesian2/CoordinatePlaneView2";
 
 class GlobalStyle extends Style {
 
@@ -79,8 +83,12 @@ class GlobalStyle extends Style {
     this.cursor.element[ElementType.TEXT_BOX] = new TextBoxCursor();
     this.cursor.element[ElementType.IMAGE] = new ImageCursor();
     this.cursor.element[ElementType.VIDEO] = new VideoCursor();
-    this.cursor.element[ElementType.COORDINATE_PLANE2] = new CoordinatePlaneCursor();
-    this.cursor.element[ElementType.NUMBER_LINE2] = new NumberLineCursor();
+    this.cursor.element[ElementType.RAY] = new RayCursor();
+    this.cursor.element[ElementType.GRAPHIC] = new GraphicCursor();
+    this.cursor.element[ElementType.COORDINATE_PLANE] = new CoordinatePlaneCursor();
+    this.cursor.element[ElementType.COORDINATE_PLANE2] = new CoordinatePlane2Cursor();
+    this.cursor.element[ElementType.NUMBER_LINE] = new NumberLineCursor();
+    this.cursor.element[ElementType.NUMBER_LINE2] = new NumberLine2Cursor();
     this.cursor.element[ElementType.TABLE] = new TableCursor();
   }
 
@@ -363,10 +371,18 @@ export class Container {
         return new PolylineView(this);
       case ElementType.RECTANGLE:
         return new RectangleView(this);
-      case ElementType.COORDINATE_PLANE2:
+      case ElementType.COORDINATE_PLANE:
         return new CoordinatePlaneView(this);
-      case ElementType.NUMBER_LINE2:
+      case ElementType.COORDINATE_PLANE2:
+        return new CoordinatePlaneView2(this);
+      case ElementType.NUMBER_LINE:
         return new NumberLineView(this);
+      case ElementType.NUMBER_LINE2:
+        return new NumberLineView2(this);
+      case ElementType.GRAPHIC:
+        return new GraphicView(this, undefined, undefined, undefined, (x: number) => x);
+      case ElementType.RAY:
+        return new RayView(this);
       case ElementType.GROUP:
         return new GroupView(this);
       case ElementType.TRIANGLE:

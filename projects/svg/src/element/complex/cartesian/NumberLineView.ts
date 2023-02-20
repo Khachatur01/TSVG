@@ -1,82 +1,221 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import {ComplexView} from '../../type/ComplexView';
-import {ElementType} from '../../../dataSource/constant/ElementType';
-import {Point} from '../../../model/Point';
-import {Rect} from '../../../model/Rect';
-import {PathView} from '../../shape/path/PathView';
-import {ElementCursor, ElementProperties, ElementView} from '../../ElementView';
-import {Container} from '../../../Container';
-import {Path} from '../../../model/path/Path';
-import {MoveTo} from '../../../model/path/point/MoveTo';
-import {LineTo} from '../../../model/path/line/LineTo';
-import {MoveDrawable} from '../../../service/tool/draw/type/MoveDrawable';
-import {TextView} from '../../foreign/text/TextView';
-import {RectangleView} from '../../shape/pointed/polygon/rectangle/RectangleView';
-import {SVGEvent} from "../../../dataSource/constant/SVGEvent";
+import {CartesianView} from "./CartesianView";
+import {ElementCursor, ElementProperties, ElementStyle} from "../../ElementView";
+import {ElementType} from "../../../dataSource/constant/ElementType";
+import {PathView} from "../../shape/path/PathView";
+import {Point} from "../../../model/Point";
+import {Container} from "../../../Container";
+import {Rect} from "../../../model/Rect";
+import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
+import {RayView} from "./RayView";
 
 export class NumberLineCursor extends ElementCursor {}
 
-export interface NumberLineProperties extends ElementProperties {}
+export class NumberLineStyle extends ElementStyle {
+  protected override element: NumberLineView;
 
-interface Axis {
-  label: string;
-  min: number;
-  step: number;
-  numberOfSteps: number;
-  linesPerStep: number;
+  public constructor(element: NumberLineView) {
+    super(element);
+    this.element = element;
+  }
+
+  public override get strokeWidth(): string {
+    return super.strokeWidth;
+  }
+  public override set strokeWidth(width: string) {
+    // super.strokeWidth = width;
+  }
+
+  public override get strokeDashArray(): string {
+    return super.strokeDashArray;
+  }
+  public override set strokeDashArray(array: string) {
+    // super.strokeDashArray = array;
+  }
+
+  public override get strokeColor(): string {
+    return super.strokeColor;
+  }
+  public override set strokeColor(color: string) {
+    // super.strokeColor = color;
+  }
+
+  public override get fillColor(): string {
+    return super.fillColor;
+  }
+  public override set fillColor(color: string) {
+    // super.fillColor = color;
+  }
+
+  public override get fontSize(): string {
+    return super.fontSize;
+  }
+  public override set fontSize(size: string) {
+    super.fontSize = size;
+
+  }
+
+  public override get fontColor(): string {
+    return super.fontColor;
+  }
+  public override set fontColor(color: string) {
+    super.fontColor = color;
+
+  }
+
+  public override get backgroundColor(): string {
+    return super.backgroundColor;
+  }
+  public override set backgroundColor(color: string)  {
+    super.backgroundColor = color;
+
+  }
 }
 
-export class NumberLineView extends ComplexView implements MoveDrawable {
-  protected _type: ElementType = ElementType.NUMBER_LINE2;
-  protected svgElement: SVGElement = document.createElementNS(ElementView.svgURI, 'g');
-  public override rotatable = false;
+export interface NumberLineProperties extends ElementProperties {}
 
-  private readonly borderView: RectangleView;
-  private readonly numbersGroup: SVGGElement;
-  private readonly axisGroup: SVGGElement;
+export class NumberLineView extends CartesianView implements MoveDrawable {
+  protected override _type: ElementType = ElementType.NUMBER_LINE;
+  public override readonly style: NumberLineStyle;
 
-  private xAxis: Axis;
+  /* Model */
+  private _negativeAxis: RayView;
+  private _positiveAxis: RayView;
+  public override rotatable: boolean = false;
 
-  private readonly ARROW_LENGTH = 5;
-  private readonly ARROW_MARGIN = 5;
+  private _zoomFactor = 1;
+  /* Model */
 
-  constructor(container: Container,
-              properties: NumberLineProperties = {},
-              rect: Rect = {x: 0, y: 0, width: 1, height: 1},
-              xAxis: Axis = {label: 'X', min: -10, step: 1, numberOfSteps: 20, linesPerStep: 0},
-              ownerId?: string,
-              index?: number) {
-    super(container, ownerId, index);
+  private readonly X_AXIS_COLOR = "#0000FF";
+
+  /**
+   * @param container Container element that should contain this ElementView
+   * @param properties Simple object for element modification before creating {setOverEvent: boolean, setDefaultStyle: boolean}
+   * @param rect this element bounding box size
+   * @param ownerId This element owner id. if not set, will get owner id of Container
+   * @param index This element index. If not set, will generate new numerical value
+   * */
+  public constructor(container: Container,
+                     properties: NumberLineProperties = {},
+                     rect: Rect = {x: 0, y: 0, width: 1, height: 1},
+                     ownerId?: string,
+                     index?: number
+  ) {
+    super(container, properties, rect, ownerId, index);
     this.svgElement.id = this.id;
-    this._rect = rect;
-    this.xAxis = xAxis;
+    this.style = new NumberLineStyle(this);
 
-    this.numbersGroup = document.createElementNS(ElementView.svgURI, 'g');
-    this.numbersGroup.style.shapeRendering = 'optimizespeed';
-    this.axisGroup = document.createElementNS(ElementView.svgURI, 'g');
-    this.axisGroup.style.shapeRendering = 'optimizespeed';
+    this._negativeAxis = new RayView(container,
+      {overEvent: false, globalStyle: false},
+      {numbersDirection: -1, showZero: true},
+      {x: this._origin.x, y: this._origin.y},
+      {x: 0, y: this._origin.y}
+    );
+    this._negativeAxis.style.strokeColor = this.X_AXIS_COLOR;
+    this._negativeAxis.style.strokeWidth = this.AXIS_WIDTH;
+    this._negativeAxis.style.fontColor = this.X_AXIS_COLOR;
+    this._negativeAxis.style.fontSize = this.NUMBER_FONT_SIZE;
+    this._negativeAxis.style.fillColor = "none";
 
-    this.borderView = new RectangleView(this._container, {overEvent: false, globalStyle: false});
-    this.borderView.SVG.style.shapeRendering = 'optimizespeed';
-    this.borderView.style.strokeColor = '#bfbfbf';
-    this.borderView.style.strokeWidth = '1';
+    this._positiveAxis = new RayView(container,
+      {overEvent: false, globalStyle: false},
+      {numbersDirection: 1},
+      {x: this._origin.x, y: this._origin.y},
+      {x: this._rect.width, y: this._origin.y}
+    );
+    this._positiveAxis.style.strokeColor = this.X_AXIS_COLOR;
+    this._positiveAxis.style.strokeWidth = this.AXIS_WIDTH;
+    this._positiveAxis.style.fontColor = this.X_AXIS_COLOR;
+    this._positiveAxis.style.fontSize = this.NUMBER_FONT_SIZE;
+    this._positiveAxis.style.fillColor = "none";
 
-    this.svgElement.appendChild(this.borderView.SVG);
-    this.svgElement.appendChild(this.numbersGroup);
-    this.svgElement.appendChild(this.axisGroup);
+    this._axisGroup.appendChild(this._negativeAxis.SVG);
+    this._axisGroup.appendChild(this._positiveAxis.SVG);
 
     this.__updateView__();
     this.setProperties(properties);
   }
 
+  public __updateView__(): void {
+    this._backgroundView.__drawSize__({x: 0, y: 0, width: this._rect.width, height: this._rect.height});
+    this._negativeAxis.__updateView__();
+    this._positiveAxis.__updateView__();
+
+    this.setAttr({
+      x: this._rect.x,
+      y: this._rect.y,
+      width: this._rect.width,
+      height: this._rect.height
+    });
+  }
+
+  protected override reassignAxis() {
+    this._negativeAxis.setPoints(
+      {x: this._origin.x, y: this._origin.y},
+      {x: 0, y: this._origin.y}
+    );
+    this._positiveAxis.setPoints(
+      {x: this._origin.x, y: this._origin.y},
+      {x: this._rect.width, y: this._origin.y}
+    );
+  }
+
+  public override get points(): Point[] {
+    let points = super.points;
+    points.push(this.center)
+    return points;
+  }
+
+  override __translate__(delta: Point) {
+    this.__drag__(delta);
+  }
   public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
+    this.setAttr({
+      x: this._lastRect.x + delta.x,
+      y: this._lastRect.y + delta.y
+    });
+  }
+
+  public __moveOrigin__(delta: Point): void {
+    this._origin.x = this._lastOrigin.x + delta.x;
+    this.reassignAxis();
     this.__updateView__();
   }
 
-  public __drawSize__(rect: Rect): void {
-    this.__setRect__(rect);
+  public moveOrigin(delta: Point): void {
+    this.__fixRect__();
+    this.__moveOrigin__(delta);
+  }
+
+  public zoomIn(factor: number) {
+    this._negativeAxis.zoomIn(factor);
+    this._positiveAxis.zoomIn(factor);
+  }
+  public zoomOut(factor: number) {
+    this._negativeAxis.zoomOut(factor);
+    this._positiveAxis.zoomOut(factor);
+  }
+
+  public __drawSize__(rect: Rect) {
+    if (rect.width < 0) {
+      rect.width = -rect.width;
+      rect.x -= rect.width;
+    }
+    if (rect.height < 0) {
+      rect.height = -rect.height;
+      rect.y -= rect.height;
+    }
+
+    this._rect = rect;
+    this._origin = {
+      x: rect.width / 2,
+      y: rect.height / 2
+    }
+
+    this.reassignAxis();
+
+    this.__updateView__();
   }
   public __setRect__(rect: Rect): void {
     if (rect.width < 0) {
@@ -88,122 +227,47 @@ export class NumberLineView extends ComplexView implements MoveDrawable {
       rect.y -= rect.height;
     }
 
-    this._rect = {
-      x: rect.x,
-      y: rect.y,
-      width: rect.width,
-      height: rect.height,
-    };
+    this._rect = rect;
+    this._origin.x = this._lastOrigin.x - (this._rect.x - this._lastRect.x);
+    this._origin.y = this._rect.height / 2;
+
+    this.reassignAxis();
+
     this.__updateView__();
   }
 
-  public __updateView__(): void {
-    this.numbersGroup.innerHTML = '';
-    this.axisGroup.innerHTML = '';
-    const rect = { /* rect without arrow and arrow margin */
-      x: this._rect.x + this.ARROW_LENGTH + this.ARROW_MARGIN,
-      y: this._rect.y + this.ARROW_LENGTH + this.ARROW_MARGIN,
-      width: this._rect.width - (this.ARROW_LENGTH + this.ARROW_MARGIN) * 2,
-      height: this._rect.height - (this.ARROW_LENGTH + this.ARROW_MARGIN) * 2
-    };
-
-    const xPhysicalStepSize = rect.width / this.xAxis.numberOfSteps;
-    const xAxisY = this._rect.y + this._rect.height / 2;
-    let numberView;
-    let currentNumber;
-
-    const xAxisPath = new Path();
-    const xAxisArrowsPath = new Path();
-    if (xPhysicalStepSize === 0) {
-      return;
-    }
-
-    const xAxisLabel = new TextView(
-      this._container,
-      {overEvent: false, globalStyle: false},
-      undefined,
-      this.xAxis.label
-    );
-    xAxisLabel.__drag__({x: this._rect.x + this._rect.width - 10, y: xAxisY - 10});
-    xAxisLabel.style.fontSize = '10';
-    xAxisLabel.style.strokeWidth = '1';
-    this.numbersGroup.appendChild(xAxisLabel.SVG);
-
-    /* left arrow */
-    xAxisArrowsPath.add(new MoveTo({x: this._rect.x, y: xAxisY}));
-    xAxisArrowsPath.add(new LineTo({x: this._rect.x + this.ARROW_LENGTH, y: xAxisY - this.ARROW_LENGTH}));
-    xAxisArrowsPath.add(new LineTo({x: this._rect.x + this.ARROW_LENGTH, y: xAxisY + this.ARROW_LENGTH}, true));
-    /* right arrow */
-    xAxisArrowsPath.add(new MoveTo({x: this._rect.x + this._rect.width, y: xAxisY}));
-    xAxisArrowsPath.add(new LineTo({x: this._rect.x + this._rect.width - this.ARROW_LENGTH, y: xAxisY - this.ARROW_LENGTH}));
-    xAxisArrowsPath.add(new LineTo({x: this._rect.x + this._rect.width - this.ARROW_LENGTH, y: xAxisY + this.ARROW_LENGTH}, true));
-
-    xAxisPath.add(new MoveTo({x: this._rect.x + this.ARROW_LENGTH, y: xAxisY}));
-    xAxisPath.add(new LineTo({x: this._rect.x + this._rect.width - this.ARROW_LENGTH, y: xAxisY}));
-
-    currentNumber = this.xAxis.min;
-    for (let i = 0; i < this.xAxis.numberOfSteps; ++i) {
-      const x = rect.x + (i * xPhysicalStepSize);
-      const subStepPhysicalSize = xPhysicalStepSize / (this.xAxis.linesPerStep + 1);
-      for (let subStep = 1; subStep < this.xAxis.linesPerStep + 1; ++subStep) {
-        xAxisPath.add(new MoveTo({x: x + subStep * subStepPhysicalSize, y: xAxisY - 2}));
-        xAxisPath.add(new LineTo({x: x + subStep * subStepPhysicalSize, y: xAxisY + 2}));
-      }
-
-      xAxisPath.add(new MoveTo({x, y: xAxisY - 5}));
-      xAxisPath.add(new LineTo({x, y: xAxisY + 5}));
-      numberView = new TextView(this._container);
-      numberView.__drag__({x, y: xAxisY - 5});
-      numberView.style.fontSize = '10';
-      numberView.style.strokeWidth = '1';
-      numberView.text = currentNumber + '';
-      this.numbersGroup.appendChild(numberView.SVG);
-      currentNumber += this.xAxis.step;
-    }
-
-    const xAxisPathView = new PathView(this._container);
-    xAxisPathView.style.strokeWidth = '1';
-    xAxisPathView.style.fillColor = '#000000';
-    xAxisPathView.path = xAxisPath;
-    this.axisGroup.appendChild(xAxisPathView.SVG);
-
-    const xAxisArrowsPathView = new PathView(this._container);
-    xAxisArrowsPathView.style.strokeWidth = '0';
-    xAxisArrowsPathView.style.fillColor = '#000000';
-    xAxisArrowsPathView.path = xAxisArrowsPath;
-    this.axisGroup.appendChild(xAxisArrowsPathView.SVG);
-
-    this.borderView.__drawSize__(this._rect);
+  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x == 0 && delta.y == 0) return;
+    this.__drag__(delta);
   }
 
-  public get xAxisModel() {
-    return this.xAxis;
-  }
-
-  public edit(xAxis: Axis, call: boolean = true) {
-    this.xAxis = xAxis;
-    this.__updateView__();
-    if (call) {
-      this._container.__call__(SVGEvent.NUMBER_LINE2_EDITED, {element: this});
-    }
+  public override __fixRect__() {
+    super.__fixRect__();
+    this._lastOrigin = Object.assign({}, this._origin);
   }
 
   public isComplete(): boolean {
-    return this._rect.width > 10 && this._rect.height > 10;
+    return this._rect.width >= 50 && this._rect.height >= 30;
   }
 
   public toPath(): PathView {
-    return new PathView(this._container);
-  }
-
-  public override fromJSON(json: any) {
-    super.fromJSON(json);
-    this.edit(json.xAxis, false);
+    let pathView = new PathView(this._container, this._properties);
+    pathView.addPath(this._negativeAxis.toPath().path);
+    pathView.addPath(this._positiveAxis.toPath().path);
+    return pathView;
   }
 
   public override toJSON(): any {
-    const json = super.toJSON();
-    json.xAxis = Object.assign({}, this.xAxis);
+    let json = super.toJSON();
+    json.origin = this._origin;
+    json.zoomFactor = this._zoomFactor;
     return json;
   }
+  public override fromJSON(json: any) {
+    super.fromJSON(json);
+    this._origin = json.origin;
+    this.zoomIn(json.zoomFactor);
+    this.__updateView__();
+  };
 }

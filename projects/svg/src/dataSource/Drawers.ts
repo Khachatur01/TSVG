@@ -7,6 +7,7 @@ import {DrawFree} from '../service/tool/draw/mode/DrawFree';
 import {DrawIsoscelesTriangle} from '../service/tool/draw/element/shape/pointed/polygon/triangle/DrawIsoscelesTriangle';
 import {DrawRightTriangle} from '../service/tool/draw/element/shape/pointed/polygon/triangle/DrawRightTriangle';
 import {DrawTextBox} from '../service/tool/draw/element/foreign/DrawTextBox';
+import {DrawCoordinatePlane} from '../service/tool/draw/element/complex/cartesian/DrawCoordinatePlane';
 import {DrawVideo} from '../service/tool/draw/element/foreign/DrawVideo';
 import {DrawImage} from '../service/tool/draw/element/foreign/DrawImage';
 import {DrawForeignObject} from '../service/tool/draw/element/foreign/DrawForeignObject';
@@ -15,9 +16,12 @@ import {Drawer} from '../service/tool/draw/Drawer';
 import {DrawCircle} from '../service/tool/draw/element/shape/circular/DrawCircle';
 import {DrawTable} from '../service/tool/draw/element/complex/DrawTable';
 import {DrawText} from '../service/tool/draw/element/foreign/DrawText';
+import {DrawNumberLine} from '../service/tool/draw/element/complex/cartesian/DrawNumberLine';
+import {DrawRay} from '../service/tool/draw/element/complex/cartesian/DrawRay';
+import {DrawGraphic} from '../service/tool/draw/element/complex/cartesian/DrawGraphic';
 import {DrawTool} from '../service/tool/draw/DrawTool';
-import {DrawCoordinatePlane} from "../service/tool/draw/element/complex/cartesian/DrawCoordinatePlane";
-import {DrawNumberLine} from "../service/tool/draw/element/complex/cartesian/DrawNumberLine";
+import {DrawCoordinatePlane2} from '../service/tool/draw/element/complex/cartesian2/DrawCoordinatePlane2';
+import {DrawNumberLine2} from '../service/tool/draw/element/complex/cartesian2/DrawNumberLine2';
 
 export class Drawers {
   private readonly drawTool: DrawTool;
@@ -35,8 +39,12 @@ export class Drawers {
   public readonly video: DrawVideo;
   public readonly image: DrawImage;
   public readonly foreignObject: DrawForeignObject;
+  public readonly graphic: DrawGraphic;
+  public readonly ray: DrawRay;
   public readonly coordinatePlane: DrawCoordinatePlane;
   public readonly numberLine: DrawNumberLine;
+  public readonly coordinatePlane2: DrawCoordinatePlane2;
+  public readonly numberLine2: DrawNumberLine2;
   public readonly table: DrawTable;
 
   public constructor(drawTool: DrawTool) {
@@ -56,8 +64,12 @@ export class Drawers {
     this.video = new DrawVideo(drawTool);
     this.image = new DrawImage(drawTool);
     this.foreignObject = new DrawForeignObject(drawTool);
+    this.graphic = new DrawGraphic(drawTool);
+    this.ray = new DrawRay(drawTool);
     this.coordinatePlane = new DrawCoordinatePlane(drawTool);
     this.numberLine = new DrawNumberLine(drawTool);
+    this.coordinatePlane2 = new DrawCoordinatePlane2(drawTool);
+    this.numberLine2 = new DrawNumberLine2(drawTool);
     this.table = new DrawTable(drawTool);
   }
 
@@ -91,14 +103,21 @@ export class Drawers {
         return this.image;
       case ElementType.VIDEO:
         return this.video;
-      case ElementType.COORDINATE_PLANE2:
+      case ElementType.GRAPHIC:
+        return this.graphic;
+      case ElementType.RAY:
+        return this.ray;
+      case ElementType.COORDINATE_PLANE:
         return this.coordinatePlane;
+      case ElementType.NUMBER_LINE:
+      case ElementType.COORDINATE_PLANE2:
+        return this.coordinatePlane2;
       case ElementType.NUMBER_LINE2:
-        return this.numberLine;
+        return this.numberLine2;
       case ElementType.TABLE:
         return this.table;
       default:
-        throw Error('Type is incorrect');
+        throw Error("Type is incorrect");
     }
   }
 }
