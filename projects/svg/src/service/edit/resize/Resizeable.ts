@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {Rect} from '../../../model/Rect';
 
 export interface Resizeable {

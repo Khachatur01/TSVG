@@ -1,12 +1,13 @@
-import {Grip} from "../Grip";
-import {Point} from "../../../../../../../model/Point";
-import {SVGEvent} from "../../../../../../../dataSource/constant/SVGEvent";
-import {Compass} from "../../../../../../../dataSource/constant/Compass";
+import {Grip} from '../Grip';
+import {Point} from '../../../../../../../model/Point';
+import {SVGEvent} from '../../../../../../../dataSource/constant/SVGEvent';
+import {Rect} from '../../../../../../../model/Rect';
+import {Compass} from '../../../../../../../dataSource/constant/Compass';
 
 export class EGrip extends Grip {
   public __setPosition__(points: Point[]): void {
-    const x = (points[2].x + points[1].x) / 2;
-    const y = (points[2].y + points[1].y) / 2;
+    const x: number = (points[2].x + points[1].x) / 2;
+    const y: number = (points[2].y + points[1].y) / 2;
     this.__drag__({
       x: x - this.halfSide,
       y: y - this.halfSide
@@ -22,7 +23,7 @@ export class EGrip extends Grip {
   }
   public override makeMouseMove(client: Point, call: boolean = true): void {
     super.makeMouseMove(client, call);
-    const elementRect = this.focus.__lastRect__;
+    const elementRect: Rect = this.focus.__lastRect__;
 
     this._lastResize = {
       x: elementRect.x,

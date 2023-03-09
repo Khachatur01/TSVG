@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {Container} from '../../../Container';
 import {ElementType} from '../../../dataSource/constant/ElementType';
 import {ElementCursor, ElementProperties} from '../../ElementView';
@@ -22,7 +21,7 @@ export interface TextProperties extends ElementProperties {}
 export class TextView extends ForeignView implements MoveDrawable {
   protected override _type: ElementType = ElementType.TEXT;
   protected svgElement: SVGElement = document.createElementNS(EllipseView.svgURI, 'text');
-  private _text = '';
+  private _text: string = '';
 
   public constructor(
     container: Container,
@@ -51,7 +50,7 @@ export class TextView extends ForeignView implements MoveDrawable {
   }
 
   public override __correct__(refPoint: Point, lastRefPoint: Point): void {
-    const delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    const delta: Point = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x === 0 && delta.y === 0) {
       return;
     }
@@ -63,21 +62,8 @@ export class TextView extends ForeignView implements MoveDrawable {
     this.__updateView__();
   }
 
-  public __drawSize__(rect: Rect) {
+  public __drawSize__(rect: Rect): void {
     this.__setRect__(rect);
-  }
-  public __setRect__(rect: Rect): void {
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
-
-    this._rect = rect;
-    this.__updateView__();
   }
 
   public __updateView__(): void {
@@ -96,11 +82,11 @@ export class TextView extends ForeignView implements MoveDrawable {
   }
 
   public override toJSON(): any {
-    const json = super.toJSON();
+    const json: any = super.toJSON();
     json.text = this._text;
     return json;
   }
-  public override fromJSON(json: any) {
+  public override fromJSON(json: any): void {
     super.fromJSON(json);
     this.text = json.text;
   };

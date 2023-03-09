@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 
 export enum Cursor {
   NO_TOOL,
   SELECT,
+  ERASER,
   EDIT_NODE,
   EDIT_TABLE,
   DRAW,

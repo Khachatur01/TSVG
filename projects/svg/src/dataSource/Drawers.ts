@@ -3,7 +3,7 @@ import {DrawLine} from '../service/tool/draw/element/shape/pointed/DrawLine';
 import {DrawPolyline} from '../service/tool/draw/element/shape/pointed/polyline/DrawPolyline';
 import {DrawEllipse} from '../service/tool/draw/element/shape/circular/DrawEllipse';
 import {DrawPolygon} from '../service/tool/draw/element/shape/pointed/polygon/DrawPolygon';
-import {DrawFree} from '../service/tool/draw/mode/DrawFree';
+import {FreeDrawer} from '../service/tool/draw/mode/FreeDrawer';
 import {DrawIsoscelesTriangle} from '../service/tool/draw/element/shape/pointed/polygon/triangle/DrawIsoscelesTriangle';
 import {DrawRightTriangle} from '../service/tool/draw/element/shape/pointed/polygon/triangle/DrawRightTriangle';
 import {DrawTextBox} from '../service/tool/draw/element/foreign/DrawTextBox';
@@ -25,7 +25,7 @@ import {DrawNumberLine2} from '../service/tool/draw/element/complex/cartesian2/D
 
 export class Drawers {
   private readonly drawTool: DrawTool;
-  public readonly free: DrawFree;
+  public readonly free: FreeDrawer;
   public readonly line: DrawLine;
   public readonly polyline: DrawPolyline;
   public readonly ellipse: DrawEllipse;
@@ -50,7 +50,7 @@ export class Drawers {
   public constructor(drawTool: DrawTool) {
     this.drawTool = drawTool;
 
-    this.free = new DrawFree(drawTool);
+    this.free = new FreeDrawer(drawTool);
     this.line = new DrawLine(drawTool);
     this.polyline = new DrawPolyline(drawTool);
     this.ellipse = new DrawEllipse(drawTool);
@@ -117,7 +117,7 @@ export class Drawers {
       case ElementType.TABLE:
         return this.table;
       default:
-        throw Error("Type is incorrect");
+        throw Error('Type is incorrect');
     }
   }
 }

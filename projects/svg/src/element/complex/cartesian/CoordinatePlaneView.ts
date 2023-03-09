@@ -1,14 +1,14 @@
-import {Rect} from "../../../model/Rect";
-import {Point} from "../../../model/Point";
-import {PathView} from "../../shape/path/PathView";
-import {ElementCursor, ElementProperties, ElementStyle, ElementView} from "../../ElementView";
-import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {Container} from "../../../Container";
-import {CartesianView, ScaleProperties} from "./CartesianView";
-import {RayView} from "./RayView";
-import {GraphicView} from "./GraphicView";
-import {Style} from "../../../service/style/Style";
+import {Rect} from '../../../model/Rect';
+import {Point} from '../../../model/Point';
+import {PathView} from '../../shape/path/PathView';
+import {ElementCursor, ElementProperties, ElementStyle, ElementView} from '../../ElementView';
+import {MoveDrawable} from '../../../service/tool/draw/type/MoveDrawable';
+import {ElementType} from '../../../dataSource/constant/ElementType';
+import {Container} from '../../../Container';
+import {CartesianView, ScaleProperties} from './CartesianView';
+import {RayView} from './RayView';
+import {GraphicFunction, GraphicView} from './GraphicView';
+import {Style} from '../../../service/style/Style';
 
 export class CoordinatePlaneStyle extends ElementStyle {
   protected override element: CoordinatePlaneView;
@@ -19,31 +19,31 @@ export class CoordinatePlaneStyle extends ElementStyle {
   }
 
   public override get strokeWidth(): string {
-    return super.strokeWidth;
+    return this.element.backgroundRect.style.strokeWidth;
   }
   public override set strokeWidth(width: string) {
-    // super.strokeWidth = width;
+    this.element.backgroundRect.style.strokeWidth = width;
   }
 
   public override get strokeDashArray(): string {
-    return super.strokeDashArray;
+    return this.element.backgroundRect.style.strokeDashArray;
   }
   public override set strokeDashArray(array: string) {
-    // super.strokeDashArray = array;
+    this.element.backgroundRect.style.strokeDashArray = array;
   }
 
   public override get strokeColor(): string {
-    return super.strokeColor;
+    return this.element.backgroundRect.style.strokeColor;
   }
   public override set strokeColor(color: string) {
-    // super.strokeColor = color;
+    this.element.backgroundRect.style.strokeColor = color;
   }
 
   public override get fillColor(): string {
-    return super.fillColor;
+    return this.element.backgroundRect.style.fillColor;
   }
   public override set fillColor(color: string) {
-    // super.fillColor = color;
+    this.element.backgroundRect.style.fillColor = color;
   }
 
   public override get fontSize(): string {
@@ -88,10 +88,10 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
   private readonly _graphicGroup: SVGGElement;
   public override rotatable: boolean = false;
 
-  private readonly X_AXIS_COLOR = "#0000FF";
-  private readonly Y_AXIS_COLOR = "#FF0000";
+  private readonly X_AXIS_COLOR: string = '#0000FF';
+  private readonly Y_AXIS_COLOR: string = '#FF0000';
 
-  private _zoomFactor = 1;
+  private _zoomFactor: number = 1;
   private _scaleProperties: ScaleProperties = {
     mainStep: 1,
     mainStepPhysicalUnit: 60,
@@ -124,8 +124,8 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this._origin = origin;
     this.style = new CoordinatePlaneStyle(this);
 
-    this._graphicGroup = document.createElementNS(ElementView.svgURI, "g");
-    this._graphicGroup.id = "graphic";
+    this._graphicGroup = document.createElementNS(ElementView.svgURI, 'g');
+    this._graphicGroup.id = 'graphic';
 
     this._negativeXAxis = new RayView(container,
       {overEvent: false, globalStyle: false},
@@ -138,7 +138,7 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this._negativeXAxis.style.strokeWidth = this.AXIS_WIDTH;
     this._negativeXAxis.style.fontColor = this.X_AXIS_COLOR;
     this._negativeXAxis.style.fontSize = this.NUMBER_FONT_SIZE;
-    this._negativeXAxis.style.fillColor = "none";
+    this._negativeXAxis.style.fillColor = 'none';
 
     this._positiveXAxis = new RayView(container,
       {overEvent: false, globalStyle: false},
@@ -151,7 +151,7 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this._positiveXAxis.style.strokeWidth = this.AXIS_WIDTH;
     this._positiveXAxis.style.fontColor = this.X_AXIS_COLOR;
     this._positiveXAxis.style.fontSize = this.NUMBER_FONT_SIZE;
-    this._positiveXAxis.style.fillColor = "none";
+    this._positiveXAxis.style.fillColor = 'none';
 
     this._negativeYAxis = new RayView(container,
       {overEvent: false, globalStyle: false},
@@ -164,7 +164,7 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this._negativeYAxis.style.strokeWidth = this.AXIS_WIDTH;
     this._negativeYAxis.style.fontColor = this.Y_AXIS_COLOR;
     this._negativeYAxis.style.fontSize = this.NUMBER_FONT_SIZE;
-    this._negativeYAxis.style.fillColor = "none";
+    this._negativeYAxis.style.fillColor = 'none';
 
     this._positiveYAxis = new RayView(container,
       {overEvent: false, globalStyle: false},
@@ -177,7 +177,7 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this._positiveYAxis.style.strokeWidth = this.AXIS_WIDTH;
     this._positiveYAxis.style.fontColor = this.Y_AXIS_COLOR;
     this._positiveYAxis.style.fontSize = this.NUMBER_FONT_SIZE;
-    this._positiveYAxis.style.fillColor = "none";
+    this._positiveYAxis.style.fillColor = 'none';
 
     this._axisGroup.appendChild(this._negativeXAxis.SVG);
     this._axisGroup.appendChild(this._positiveXAxis.SVG);
@@ -198,7 +198,7 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this._negativeYAxis.__updateView__();
     this._positiveYAxis.__updateView__();
 
-    this._graphics.forEach(graphic => {
+    this._graphics.forEach((graphic: GraphicView) => {
       graphic.__updateView__();
     });
 
@@ -209,7 +209,7 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
       height: this._rect.height
     });
   }
-  protected override reassignAxis() {
+  protected override reassignAxis(): void {
     this._negativeXAxis.setPoints(
       {x: this._origin.x, y: this._origin.y},
       {x: 0, y: this._origin.y}
@@ -230,15 +230,15 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
   public get graphics(): GraphicView[] {
     return this._graphics;
   }
-  public get functions(): Function[] {
-    let functions: Function[] = [];
-    this._graphics.forEach(graphic => {
+  public get functions(): GraphicFunction[] {
+    const functions: GraphicFunction[] = [];
+    this._graphics.forEach((graphic: GraphicView) => {
       functions.push(graphic.f);
     });
     return functions;
   }
-  public addFunction(f: Function, style: Style) {
-    let graphicView = new GraphicView(
+  public addFunction(f: GraphicFunction, style: Style): void {
+    const graphicView: GraphicView = new GraphicView(
       this._container,
       {overEvent: true, globalStyle: false},
       {x: 0, y: 0, width: this._rect.width, height: this._rect.height},
@@ -252,40 +252,32 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this._graphics.push(graphicView);
     this._graphicGroup.appendChild(graphicView.SVG);
   }
-  public removeFunction(f: Function) {
-    this._graphics.forEach(graphic => {
+  public removeFunction(f: GraphicFunction): void {
+    this._graphics.forEach((graphic: GraphicView) => {
       if (graphic.f === f) {
         this._graphicGroup.removeChild(graphic.SVG);
         this._graphics.splice(this._graphics.indexOf(graphic), 1);
       }
-    })
+    });
   }
 
   public override get points(): Point[] {
-    let points = super.points;
-    let realCenter: Point = {
+    const points: Point[] = super.points;
+    const realCenter: Point = {
       x: this._origin.x + this._rect.x,
       y: this._origin.y + this._rect.y,
-    }
+    };
     points.push(realCenter);
     return points;
   }
 
-  public override __translate__(delta: Point) {
+  public override __translate__(delta: Point): void {
     this.__drag__(delta);
   }
-  public __drag__(delta: Point): void {
-    this._rect.x = this._lastRect.x + delta.x;
-    this._rect.y = this._lastRect.y + delta.y;
-    this.setAttr({
-      x: this._lastRect.x + delta.x,
-      y: this._lastRect.y + delta.y
-    });
-  }
 
-  public zoomIn(factor: number) {
+  public zoomIn(factor: number): void {
     this._zoomFactor *= factor;
-    this._graphics.forEach(graphic => {
+    this._graphics.forEach((graphic: GraphicView) => {
       graphic.zoomIn(factor);
     });
     this._negativeXAxis.zoomIn(factor);
@@ -293,9 +285,9 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this._negativeYAxis.zoomIn(factor);
     this._positiveYAxis.zoomIn(factor);
   }
-  public zoomOut(factor: number) {
+  public zoomOut(factor: number): void {
     this._zoomFactor /= factor;
-    this._graphics.forEach(graphic => {
+    this._graphics.forEach((graphic: GraphicView) => {
       graphic.zoomOut(factor);
     });
     this._negativeXAxis.zoomOut(factor);
@@ -307,7 +299,7 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this._origin.x = this._lastOrigin.x + delta.x;
     this._origin.y = this._lastOrigin.y + delta.y;
 
-    this._graphics.forEach(graphic => {
+    this._graphics.forEach((graphic: GraphicView) => {
       graphic.__moveOrigin__(delta);
     });
     this.reassignAxis();
@@ -319,15 +311,8 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this.__moveOrigin__(delta);
   }
 
-  public __drawSize__(rect: Rect) {
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
+  public __drawSize__(rect: Rect): void {
+    rect = ElementView.normalizeRect(rect);
 
     this._rect = rect;
     this._origin = {
@@ -335,47 +320,40 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
       y: rect.height / 2
     };
 
-    this._graphics.forEach(graphic => {
+    this._graphics.forEach((graphic: GraphicView) => {
       graphic.__drawSize__({x: 0, y: 0, width: rect.width, height: rect.height});
-    })
+    });
     this.reassignAxis();
     this.__updateView__();
   }
-  public __setRect__(rect: Rect): void {
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
+  public override __setRect__(rect: Rect): void {
+    rect = ElementView.normalizeRect(rect);
 
     this._rect = rect;
     this._origin.x = this._lastOrigin.x - (this._rect.x - this._lastRect.x);
     this._origin.y = this._lastOrigin.y - (this._rect.y - this._lastRect.y);
 
-    this._graphics.forEach(graphic => {
+    this._graphics.forEach((graphic: GraphicView) => {
       graphic.__setRectSilent__({x: 0, y: 0, width: rect.width, height: rect.height});
       graphic.__moveOrigin__({
         x: -(this._rect.x - this._lastRect.x),
         y: -(this._rect.y - this._lastRect.y)
       });
-    })
-    this.reassignAxis();
+    });
 
+    this.reassignAxis();
     this.__updateView__();
   }
 
-  public override __correct__(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
+  public override __correct__(refPoint: Point, lastRefPoint: Point): void {
+    const delta: Point = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x === 0 && delta.y === 0) {return;}
     this.__drag__(delta);
   }
 
-  public override __fixRect__() {
+  public override __fixRect__(): void {
     super.__fixRect__();
-    this._graphics.forEach(graphic => {
+    this._graphics.forEach((graphic: GraphicView) => {
       graphic.__fixRect__();
     });
     this._negativeXAxis.__fixRect__();
@@ -390,8 +368,8 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
   }
 
   public toPath(): PathView {
-    let pathView = new PathView(this._container, this._properties);
-    this._graphics.forEach(graphic => {
+    const pathView: PathView = new PathView(this._container, this._properties);
+    this._graphics.forEach((graphic: GraphicView) => {
       pathView.addPath(graphic.toPath().path);
     });
     pathView.addPath(this._negativeXAxis.toPath().path);
@@ -402,9 +380,9 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
   }
 
   public override toJSON(): any {
-    let json = super.toJSON();
+    const json: any = super.toJSON();
     json.graphics = [];
-    this._graphics.forEach(graphic => {
+    this._graphics.forEach((graphic: GraphicView) => {
       json.graphics.push({
         f: graphic.f.toString(),
         style: graphic.style
@@ -414,7 +392,7 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     json.zoomFactor = this._zoomFactor;
     return json;
   }
-  public override fromJSON(json: any) {
+  public override fromJSON(json: any): void {
     super.fromJSON(json);
     this._origin = json.origin;
     this.zoomIn(json.zoomFactor);
@@ -422,7 +400,8 @@ export class CoordinatePlaneView extends CartesianView implements MoveDrawable {
     this.reassignAxis();
 
     this._graphics = [];
-    for (let graphic of json.graphics) {
+    for (const graphic of json.graphics) {
+      // eslint-disable-next-line no-eval
       this.addFunction(eval(graphic.f), graphic.style);
     }
   };

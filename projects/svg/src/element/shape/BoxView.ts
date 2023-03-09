@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {ElementCursor, ElementProperties, ElementView} from '../ElementView';
 import {Point} from '../../model/Point';
 import {Rect} from '../../model/Rect';
@@ -37,19 +36,6 @@ export class BoxView extends ShapeView {
   public __drag__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
-    this.__updateView__();
-  }
-  public __setRect__(rect: Rect): void {
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
-
-    this._rect = rect;
     this.__updateView__();
   }
 

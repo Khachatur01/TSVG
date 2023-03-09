@@ -1,4 +1,4 @@
-import {MoveDraw} from '../../mode/MoveDraw';
+import {MoveDrawer} from '../../mode/MoveDrawer';
 import {Point} from '../../../../../model/Point';
 import {ElementView} from '../../../../../element/ElementView';
 import {SVGEvent} from '../../../../../dataSource/constant/SVGEvent';
@@ -6,13 +6,13 @@ import {VideoView} from '../../../../../element/foreign/media/VideoView';
 import {ElementType} from '../../../../../dataSource/constant/ElementType';
 import {MoveDrawable} from '../../type/MoveDrawable';
 
-export class DrawVideo extends MoveDraw {
-  public src = '';
+export class DrawVideo extends MoveDrawer {
+  public src: string = '';
   createDrawableElement(position: Point): MoveDrawable {
     return new VideoView(this.drawTool.container, {overEvent: true, globalStyle: true}, this.src, {x: position.x, y: position.y, width: 0, height: 0});
   }
 
-  protected override onIsNotComplete(call: boolean) {
+  protected override onIsNotComplete(call: boolean): void {
     if (!this._drawableElement) {
       return;
     }
@@ -24,7 +24,7 @@ export class DrawVideo extends MoveDraw {
     });
     this._drawableElement.refPoint = this._drawableElement?.center;
   }
-  protected override onEnd(call: boolean) {
+  protected override onEnd(call: boolean): void {
     if (call) {
       this.drawTool.container.tools.selectTool.on();
       if (this._drawableElement) {
@@ -33,14 +33,14 @@ export class DrawVideo extends MoveDraw {
     }
   }
 
-  public override start(call: boolean) {
+  public override start(call: boolean): void {
     super.start(call);
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.VIDEO_TOOL_ON);
     }
   }
-  public override stop(call: boolean) {
+  public override stop(call: boolean): void {
     super.stop(call);
 
     if (call) {

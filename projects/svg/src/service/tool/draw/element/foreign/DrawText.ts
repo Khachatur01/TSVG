@@ -1,4 +1,4 @@
-import {MoveDraw} from '../../mode/MoveDraw';
+import {MoveDrawer} from '../../mode/MoveDrawer';
 import {Point} from '../../../../../model/Point';
 import {SVGEvent} from '../../../../../dataSource/constant/SVGEvent';
 import {ElementType} from '../../../../../dataSource/constant/ElementType';
@@ -7,19 +7,19 @@ import {TextView} from '../../../../../element/foreign/text/TextView';
 import {MoveDrawable} from '../../type/MoveDrawable';
 import {DrawTool} from '../../DrawTool';
 
-export class DrawText extends MoveDraw {
-  public text = '';
+export class DrawText extends MoveDrawer {
+  public text: string = '';
   public constructor(drawTool: DrawTool) {
     super(drawTool);
     this.cursor = Cursor.DRAW_TEXT_BOX;
   }
   protected createDrawableElement(position: Point): MoveDrawable {
-    const text = new TextView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0}, this.text);
+    const text: TextView = new TextView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0}, this.text);
     text.__onFocus__();
     return text;
   }
 
-  protected override onIsNotComplete(call: boolean) {
+  protected override onIsNotComplete(call: boolean): void {
     if (!this._drawableElement) {
       return;
     }
@@ -32,14 +32,14 @@ export class DrawText extends MoveDraw {
     this._drawableElement.refPoint = this._drawableElement?.center;
   }
 
-  public override start(call: boolean) {
+  public override start(call: boolean): void {
     super.start(call);
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.TEXT_TOOL_ON);
     }
   }
-  public override stop(call: boolean) {
+  public override stop(call: boolean): void {
     super.stop(call);
 
     if (call) {

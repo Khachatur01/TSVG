@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {PathCommand} from '../../../PathCommand';
 import {Point} from '../../../../Point';
 

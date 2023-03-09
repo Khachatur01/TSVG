@@ -1,4 +1,3 @@
-import {Drawer} from '../Drawer';
 import {ElementView} from '../../../../element/ElementView';
 import {Container} from '../../../../Container';
 import {Point} from '../../../../model/Point';
@@ -6,10 +5,11 @@ import {MoveDrawable} from '../type/MoveDrawable';
 import {SVGEvent} from '../../../../dataSource/constant/SVGEvent';
 import {ElementType} from '../../../../dataSource/constant/ElementType';
 import {DrawTool} from '../DrawTool';
+import {Drawer} from '../Drawer';
 
-export abstract class MoveDraw extends Drawer {
-  protected startPosition: Point = {x: 0, y: 0};
+export abstract class MoveDrawer extends Drawer {
   protected _drawableElement: MoveDrawable | undefined = undefined;
+  protected startPosition: Point = {x: 0, y: 0};
 
   public constructor(drawTool: DrawTool) {
     super(drawTool);
@@ -19,39 +19,7 @@ export abstract class MoveDraw extends Drawer {
     this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
 
-  protected mouseDownEvent(event: MouseEvent | TouchEvent) {
-    document.addEventListener('mousemove', this.mouseMoveEvent);
-    document.addEventListener('touchmove', this.mouseMoveEvent);
-    document.addEventListener('mouseup', this.mouseUpEvent);
-    document.addEventListener('touchend', this.mouseUpEvent);
-
-    const containerRect = this.drawTool.container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
-    this.drawTool.__mouseCurrentPos__ = {
-      x: eventPosition.x - containerRect.left, //x position within the element.
-      y: eventPosition.y - containerRect.top  //y position within the element.
-    };
-
-    this.makeMouseDown(this.drawTool.mouseCurrentPos);
-  };
-  protected mouseMoveEvent(event: MouseEvent | TouchEvent) {
-    if (!this._drawableElement) {
-      return;
-    }
-    const containerRect = this.drawTool.container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
-    this.drawTool.__mouseCurrentPos__ = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-
-    this.makeMouseMove(this.drawTool.mouseCurrentPos);
-  };
-  protected mouseUpEvent() {
-    this.stopDrawing();
-  };
-
-  public makeMouseDown(position: Point, call: boolean = true) {
+  public makeMouseDown(position: Point, call: boolean = true, parameter?: any): void {
     if (this.drawTool.isDrawing) {
       return;
     }
@@ -68,12 +36,12 @@ export abstract class MoveDraw extends Drawer {
       this.drawTool.container.__call__(SVGEvent.DRAW_MOUSE_DOWN, {position: this.startPosition, element: this._drawableElement});
     }
   }
-  public makeMouseMove(position: Point, call: boolean = true) {
-    let width = position.x - this.startPosition.x;
-    let height = position.y - this.startPosition.y;
+  public makeMouseMove(position: Point, call: boolean = true, parameter?: any): void {
+    let width: number = position.x - this.startPosition.x;
+    let height: number = position.y - this.startPosition.y;
 
     if (this.drawTool.perfect) {
-      const averageSize = (Math.abs(width) + Math.abs(height)) / 2;
+      const averageSize: number = (Math.abs(width) + Math.abs(height)) / 2;
       if (width < 0) {
         width = -averageSize;
       }
@@ -89,7 +57,7 @@ export abstract class MoveDraw extends Drawer {
     }
 
     if (this.drawTool.container.grid.isSnapOn()) {
-      const snapPoint = this.drawTool.container.grid.getSnapPoint({
+      const snapPoint: Point = this.drawTool.container.grid.getSnapPoint({
         x: this.startPosition.x + width,
         y: this.startPosition.y + height
       });
@@ -109,7 +77,7 @@ export abstract class MoveDraw extends Drawer {
       this.drawTool.container.__call__(SVGEvent.DRAW_MOUSE_MOVE, {position, element: this._drawableElement});
     }
   }
-  public makeMouseUp(position: Point, call: boolean = true) {
+  public makeMouseUp(position: Point, call: boolean = true, parameter?: any): void {
     if (!this._drawableElement) {
       return;
     }
@@ -133,22 +101,31 @@ export abstract class MoveDraw extends Drawer {
     }
   }
 
-  public abstract override _new(): MoveDraw;
+  /* mouseDownEvent method defined in parent class */
+  protected mouseMoveEvent(event: MouseEvent | TouchEvent): void {
+    if (!this._drawableElement) {
+      return;
+    }
+    const containerRect: DOMRect = this.drawTool.container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
+    this.drawTool.__mouseCurrentPos__ = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+
+    this.makeMouseMove(this.drawTool.mouseCurrentPos);
+  };
+  protected mouseUpEvent(event: MouseEvent | TouchEvent): void {
+    this.stopDrawing();
+  };
+
+  public abstract override _new(): MoveDrawer;
   public abstract override get type(): ElementType;
   public get drawableElement(): MoveDrawable | undefined {
     return this._drawableElement;
   }
 
-  protected abstract createDrawableElement(position: Point): MoveDrawable;
-
-  protected onEnd(call: boolean) {}
-  protected onIsNotComplete(call: boolean) {
-    if (this._drawableElement) {
-      this.drawTool.container.remove(this._drawableElement as unknown as ElementView, true, false);
-    }
-  }
-
-  public override stopDrawing(call?: boolean) {
+  public override stopDrawing(call?: boolean): void {
     this.drawTool.container.tools.drawTool.__drawingEnd__();
 
     document.removeEventListener('mousemove', this.mouseMoveEvent);
@@ -157,6 +134,15 @@ export abstract class MoveDraw extends Drawer {
     document.removeEventListener('touchend', this.mouseUpEvent);
 
     this.makeMouseUp(this.drawTool.mouseCurrentPos, call);
+  }
+
+  protected abstract createDrawableElement(position: Point): MoveDrawable;
+
+  protected onEnd(call: boolean): void {}
+  protected onIsNotComplete(call: boolean): void {
+    if (this._drawableElement) {
+      this.drawTool.container.remove(this._drawableElement as unknown as ElementView, true, false);
+    }
   }
 
   public start(call: boolean = true): void {

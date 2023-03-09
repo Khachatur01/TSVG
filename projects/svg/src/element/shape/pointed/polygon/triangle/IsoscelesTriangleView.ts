@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {TriangleProperties, TriangleView} from './TriangleView';
 import {Container} from '../../../../../Container';
 import {Rect} from '../../../../../model/Rect';

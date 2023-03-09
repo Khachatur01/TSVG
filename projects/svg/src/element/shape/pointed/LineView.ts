@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {ElementCursor, ElementProperties, ElementView} from '../../ElementView';
 import {PointedView} from './PointedView';
 import {Point} from '../../../model/Point';
@@ -33,7 +32,7 @@ export class LineView extends PointedView implements MoveDrawable {
     });
   }
 
-  public __drawSize__(rect: Rect) {
+  public __drawSize__(rect: Rect): void {
     this.__setRect__(rect);
   }
 

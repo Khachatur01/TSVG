@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {ElementCursor, ElementProperties, ElementView} from '../../../ElementView';
 import {Point} from '../../../../model/Point';
 import {PointedView} from '../PointedView';
@@ -23,8 +22,8 @@ export class PolygonView extends PointedView {
     this.setProperties(properties);
   }
 
-  public override __updateView__() {
-    let str = '';
+  public override __updateView__(): void {
+    let str: string = '';
 
     this._points.forEach((point: Point) => {
       str += point.x + ',' + point.y + ' ';
@@ -38,7 +37,7 @@ export class PolygonView extends PointedView {
   }
 
   public override toPath(): PathView {
-    const path = super.toPath();
+    const path: PathView = super.toPath();
     path.commands[path.commands.length - 1].close = true;
     return path;
   }

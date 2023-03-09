@@ -1,28 +1,31 @@
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {Point} from "../../../model/Point";
-import {Rect} from "../../../model/Rect";
-import {ElementCursor, ElementProperties} from "../../ElementView";
-import {PathView} from "../../shape/path/PathView";
-import {Container} from "../../../Container";
-import {Path} from "../../../model/path/Path";
-import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
-import {MoveTo} from "../../../model/path/point/MoveTo";
-import {LineTo} from "../../../model/path/line/LineTo";
-import {ScaleProperties} from "./CartesianView";
+import {ElementType} from '../../../dataSource/constant/ElementType';
+import {Point} from '../../../model/Point';
+import {Rect} from '../../../model/Rect';
+import {ElementCursor, ElementProperties, ElementView} from '../../ElementView';
+import {PathView} from '../../shape/path/PathView';
+import {Container} from '../../../Container';
+import {Path} from '../../../model/path/Path';
+import {MoveDrawable} from '../../../service/tool/draw/type/MoveDrawable';
+import {MoveTo} from '../../../model/path/point/MoveTo';
+import {LineTo} from '../../../model/path/line/LineTo';
+import {ScaleProperties} from './CartesianView';
+import {CartesianEditable} from './CartesianEditable';
+
+export type GraphicFunction = (x: number) => number;
 
 export class GraphicCursor extends ElementCursor {}
 
 export interface GraphicProperties extends ElementProperties {}
 
-export class GraphicView extends PathView implements MoveDrawable {
+export class GraphicView extends PathView implements MoveDrawable, CartesianEditable {
   protected override _type: ElementType = ElementType.GRAPHIC;
 
   private _origin: Point;
   private _lastOrigin: Point;
-  private _f: Function;
-  private _zoomFactor = 1;
+  private _f: GraphicFunction;
+  private _zoomFactor: number = 1;
 
-  protected _physicalUnitLimits = {min: 60, max: 120};
+  protected _physicalUnitLimits: {min: number; max: number} = {min: 60, max: 120};
   protected _mainStep: number = 1;
   protected _mainStepMultiplier: number = 10;
   protected _mainStepPhysicalUnit: number = 60; /* px - CHANGING on zoom */
@@ -31,7 +34,7 @@ export class GraphicView extends PathView implements MoveDrawable {
               properties: GraphicProperties = {},
               rect: Rect = {x: 0, y: 0, width: 1, height: 1},
               origin: Point = {x: 0, y: 0},
-              f: Function,
+              f: GraphicFunction,
               scale?: ScaleProperties,
               ownerId?: string,
               index?: number
@@ -41,6 +44,7 @@ export class GraphicView extends PathView implements MoveDrawable {
     this._origin = origin;
     this._lastOrigin = origin;
     this._rect = rect;
+
     if (scale) {
       this._mainStep = scale.mainStep;
       this._mainStepPhysicalUnit = scale.mainStepPhysicalUnit;
@@ -54,50 +58,50 @@ export class GraphicView extends PathView implements MoveDrawable {
   }
 
   private createGraphic(): Path {
-    let path = new Path();
-    let widthByUnit = (this._rect.width / this._mainStepPhysicalUnit) * this._mainStep;
-    let originXByUnit = (this._origin.x / this._mainStepPhysicalUnit) * this._mainStep;
-    let minX = -originXByUnit;
-    let maxX = widthByUnit - originXByUnit;
-    let step = 0.01 * this._mainStep;
+    const path: Path = new Path();
+    const widthByUnit: number = (this._rect.width / this._mainStepPhysicalUnit) * this._mainStep;
+    const originXByUnit: number = (this._origin.x / this._mainStepPhysicalUnit) * this._mainStep;
+    const minX: number = -originXByUnit;
+    const maxX: number = widthByUnit - originXByUnit;
+    const step: number = 0.01 * this._mainStep;
 
     let yWasInVisibleArea: boolean = false;
-    let point = {
+    const firstPoint: Point = {
       x: minX * this._mainStepPhysicalUnit / this._mainStep + this._origin.x + this._rect.x,
       y: -this._f(minX) * this._mainStepPhysicalUnit / this._mainStep + this._origin.y + this._rect.y
     };
-    if (point.y >= this._rect.y && point.y <= this._rect.height) { /* in visible area */
-      path.add(new MoveTo(point));
+    if (firstPoint.y >= this._rect.y && firstPoint.y <= this._rect.height) { /* in visible area */
+      path.add(new MoveTo(firstPoint));
       yWasInVisibleArea = true;
     }
 
-    for (let x = minX; x < maxX; x += step) {
-      let point = {
+    for (let x: number = minX; x < maxX; x += step) {
+      const nextPoint: Point = {
         x: x * this._mainStepPhysicalUnit / this._mainStep + this._origin.x + this._rect.x,
         y: -this._f(x) * this._mainStepPhysicalUnit / this._mainStep + this._origin.y + this._rect.y
       };
 
-      let topBorder = this._rect.y;
-      let bottomBorder = this._rect.y + this._rect.height;
+      const topBorder: number = this._rect.y;
+      const bottomBorder: number = this._rect.y + this._rect.height;
 
-      if (!yWasInVisibleArea && point.y >= topBorder && point.y <= bottomBorder) { /* from not visible area to visible area */
-        path.add(new MoveTo(point));
+      if (!yWasInVisibleArea && nextPoint.y >= topBorder && nextPoint.y <= bottomBorder) { /* from not visible area to visible area */
+        path.add(new MoveTo(nextPoint));
         yWasInVisibleArea = true;
-      } else  if (yWasInVisibleArea && point.y < topBorder || point.y > bottomBorder) { /* from visible area to not visible area */
+      } else  if (yWasInVisibleArea && nextPoint.y < topBorder || nextPoint.y > bottomBorder) { /* from visible area to not visible area */
         yWasInVisibleArea = false;
-      } else if (!yWasInVisibleArea && point.y < topBorder || point.y > bottomBorder) { /* in not visible area */
+      } else if (!yWasInVisibleArea && nextPoint.y < topBorder || nextPoint.y > bottomBorder) { /* in not visible area */
 
-      } else if (yWasInVisibleArea && point.y >= topBorder && point.y <= bottomBorder) { /* in visible area */
-        path.add(new LineTo(point));
+      } else if (yWasInVisibleArea && nextPoint.y >= topBorder && nextPoint.y <= bottomBorder) { /* in visible area */
+        path.add(new LineTo(nextPoint));
       }
     }
     return path;
   }
 
-  public get f(): Function {
+  public get f(): GraphicFunction {
     return this._f;
   }
-  public set f(f: Function) {
+  public set f(f: GraphicFunction) {
     this._f = f;
     this.path = this.createGraphic();
   }
@@ -108,21 +112,14 @@ export class GraphicView extends PathView implements MoveDrawable {
     super.__drag__(delta);
   }
 
-  public override __correct__(refPoint: Point, lastRefPoint: Point) {
+  public override __correct__(refPoint: Point, lastRefPoint: Point): void {
     super.__correct__(refPoint, lastRefPoint);
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    const delta: Point = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     this._rect.x += delta.x;
     this._rect.y += delta.y;
   }
-  public __drawSize__(rect: Rect) {
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
+  public __drawSize__(rect: Rect): void {
+    rect = ElementView.normalizeRect(rect);
 
     this._rect = rect;
     this._origin = {
@@ -137,21 +134,14 @@ export class GraphicView extends PathView implements MoveDrawable {
     this.path = this.createGraphic();
   }
   /** don't updates view */
-  public __setRectSilent__(rect: Rect, delta?: Point) {
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
+  public __setRectSilent__(rect: Rect, delta?: Point): void {
+    rect = ElementView.normalizeRect(rect);
 
     this._rect = rect;
     this._origin.x = this._lastOrigin.x - (this._rect.x - this._lastRect.x);
     this._origin.y = this._lastOrigin.y - (this._rect.y - this._lastRect.y);
   }
-  public zoomIn(factor: number) {
+  public zoomIn(factor: number): void {
     this._zoomFactor *= factor;
     this._mainStepPhysicalUnit *= factor;
     if (this._mainStepPhysicalUnit > this._physicalUnitLimits.max) {
@@ -160,7 +150,7 @@ export class GraphicView extends PathView implements MoveDrawable {
     }
     this.path = this.createGraphic();
   }
-  public zoomOut(factor: number) {
+  public zoomOut(factor: number): void {
     this._zoomFactor /= factor;
     this._mainStepPhysicalUnit /= factor;
     if (this._mainStepPhysicalUnit < this._physicalUnitLimits.min) {
@@ -186,19 +176,19 @@ export class GraphicView extends PathView implements MoveDrawable {
     this.path = this.createGraphic();
   }
 
-  public override __updateView__() {
-    let rect = Object.assign({}, this._rect);
+  public override __updateView__(): void {
+    const rect: Rect = Object.assign({}, this._rect);
     super.__updateView__();
     this._rect = rect;
   }
 
-  public override __fixRect__() {
+  public override __fixRect__(): void {
     super.__fixRect__();
     this._lastOrigin = Object.assign({}, this._origin);
   }
 
   public override toJSON(): any {
-    let json = super.toJSON();
+    const json: any = super.toJSON();
     json.f = this._f.toString();
     json.origin = this._origin;
     json.physicalUnitLimits = this._physicalUnitLimits;
@@ -208,8 +198,9 @@ export class GraphicView extends PathView implements MoveDrawable {
     json.zoomFactor = this._zoomFactor;
     return json;
   }
-  public override fromJSON(json: any) {
+  public override fromJSON(json: any): void {
     super.fromJSON(json);
+    // eslint-disable-next-line no-eval
     this._f = eval(json.f);
     this._origin = json.origin;
     this._physicalUnitLimits = json.physicalUnitLimits;

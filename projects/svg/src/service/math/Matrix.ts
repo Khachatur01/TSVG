@@ -3,7 +3,7 @@ import {Point} from '../../model/Point';
 export class Matrix {
   public static rotate(points: Point[], refPoint: Point, angle: number): Point[] {
     angle = -angle * (Math.PI / 180);
-    const R = [
+    const R: number[][] = [
       [Math.cos(angle), -Math.sin(angle)],
       [Math.sin(angle), Math.cos(angle)]
     ];
@@ -14,11 +14,11 @@ export class Matrix {
       pointsArr[1].push(point.y - refPoint.y);
     }
 
-    const rotatedPointsArr = this.multiply(R, pointsArr);
+    const rotatedPointsArr: number[][] = this.multiply(R, pointsArr);
 
     const result: Point[] = [];
 
-    for (let i = 0; i < pointsArr[0].length; i++) {
+    for (let i: number = 0; i < pointsArr[0].length; i++) {
       result.push({
         x: rotatedPointsArr[0][i] + refPoint.x,
         y: rotatedPointsArr[1][i] + refPoint.y
@@ -27,15 +27,16 @@ export class Matrix {
 
     return result;
   }
-  public static multiply(a: number[][], b: number[][]) {
-    const aNumRows = a.length; const aNumCols = a[0].length;
-    const bNumCols = b[0].length;
-    const m = new Array(aNumRows);  // initialize array of rows
-    for (let r = 0; r < aNumRows; ++r) {
+  public static multiply(a: number[][], b: number[][]): number[][] {
+    const aNumRows: number = a.length;
+    const aNumCols: number = a[0].length;
+    const bNumCols: number = b[0].length;
+    const m: number[][] = new Array(aNumRows);  // initialize array of rows
+    for (let r: number = 0; r < aNumRows; ++r) {
       m[r] = new Array(bNumCols); // initialize the current row
-      for (let c = 0; c < bNumCols; ++c) {
+      for (let c: number = 0; c < bNumCols; ++c) {
         m[r][c] = 0;             // initialize the current cell
-        for (let i = 0; i < aNumCols; ++i) {
+        for (let i: number = 0; i < aNumCols; ++i) {
           m[r][c] += a[r][i] * b[i][c];
         }
       }

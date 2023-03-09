@@ -1,4 +1,3 @@
-import {Drawer} from '../Drawer';
 import {FreeView} from '../../../../element/shape/path/FreeView';
 import {Container} from '../../../../Container';
 import {Point} from '../../../../model/Point';
@@ -10,10 +9,11 @@ import {ElementType} from '../../../../dataSource/constant/ElementType';
 import {ElementView} from '../../../../element/ElementView';
 import {Cursor} from '../../../../dataSource/constant/Cursor';
 import {DrawTool} from '../DrawTool';
+import {Drawer} from '../Drawer';
 
-export class DrawFree extends Drawer {
+export class FreeDrawer extends Drawer {
   private _drawableElement: FreeView | undefined = undefined;
-  public snappable = false;
+  public snappable: boolean = false;
 
   public constructor(drawTool: DrawTool) {
     super(drawTool);
@@ -24,7 +24,7 @@ export class DrawFree extends Drawer {
     this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
 
-  public makeMouseDown(position: Point, call: boolean = true) {
+  public makeMouseDown(position: Point, call: boolean = true, parameter?: any): void {
     if (this.drawTool.isDrawing) {
       return;
     }
@@ -32,7 +32,7 @@ export class DrawFree extends Drawer {
       position = this.drawTool.container.grid.getSnapPoint(position);
     }
 
-    const pathObject = new Path();
+    const pathObject: Path = new Path();
     pathObject.add(new MoveTo(position));
     this._drawableElement = new FreeView(this.drawTool.container, {overEvent: true, globalStyle: true}, pathObject);
     this.drawTool.__drawing__();
@@ -43,14 +43,14 @@ export class DrawFree extends Drawer {
       this.drawTool.container.__call__(SVGEvent.DRAW_MOUSE_DOWN, {position, element: this._drawableElement});
     }
   }
-  public makeMouseMove(position: Point, call: boolean = true, additional?: any) {
+  public makeMouseMove(position: Point, call: boolean = true, parameter?: any): void {
     if (!this._drawableElement) {
       return;
     }
 
-    if (additional) {
+    if (parameter) {
       this._drawableElement.setAttr({
-        d: additional.path
+        d: parameter.path
       });
     } else {
       if (this.snappable && this.drawTool.container.grid.isSnapOn()) {
@@ -73,13 +73,13 @@ export class DrawFree extends Drawer {
       this.drawTool.container.__call__(SVGEvent.DRAW_MOUSE_MOVE, {position, element: this._drawableElement});
     }
   }
-  public makeMouseUp(position: Point, call: boolean = true, additional?: any) {
+  public makeMouseUp(position: Point, call: boolean = true, parameter?: any): void {
     if (!this._drawableElement) {
       return;
     }
 
-    if (additional) {
-      this._drawableElement.pathString = additional.path;
+    if (parameter) {
+      this._drawableElement.pathString = parameter.path;
     }
     if (!this._drawableElement.isComplete()) {
       this.drawTool.container.remove(this._drawableElement, true, false);
@@ -95,8 +95,22 @@ export class DrawFree extends Drawer {
     }
   }
 
-  public _new(): DrawFree {
-    return new DrawFree(this.drawTool);
+  /* mouseDownEvent method defined in parent class */
+  protected mouseMoveEvent(event: MouseEvent | TouchEvent): void {
+    const containerRect: DOMRect = this.drawTool.container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
+    this.drawTool.__mouseCurrentPos__ = {
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
+    };
+    this.makeMouseMove(this.drawTool.mouseCurrentPos);
+  }
+  protected mouseUpEvent(event: MouseEvent | TouchEvent): void {
+    this.stopDrawing();
+  }
+
+  public override _new(): FreeDrawer {
+    return new FreeDrawer(this.drawTool);
   }
   public get type(): ElementType {
     return ElementType.FREE;
@@ -105,34 +119,7 @@ export class DrawFree extends Drawer {
     return this._drawableElement;
   }
 
-  private mouseDownEvent(event: MouseEvent | TouchEvent) {
-    document.addEventListener('mousemove', this.mouseMoveEvent);
-    document.addEventListener('touchmove', this.mouseMoveEvent);
-    document.addEventListener('mouseup', this.mouseUpEvent);
-    document.addEventListener('touchend', this.mouseUpEvent);
-
-    const containerRect = this.drawTool.container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
-    this.drawTool.__mouseCurrentPos__ = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-    this.makeMouseDown(this.drawTool.mouseCurrentPos);
-  }
-  private mouseMoveEvent(event: MouseEvent | TouchEvent): void {
-    const containerRect = this.drawTool.container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
-    this.drawTool.__mouseCurrentPos__ = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
-    this.makeMouseMove(this.drawTool.mouseCurrentPos);
-  }
-  private mouseUpEvent() {
-    this.stopDrawing();
-  }
-
-  public override stopDrawing(call?: boolean) {
+  public override stopDrawing(call?: boolean): void {
     document.removeEventListener('mousemove', this.mouseMoveEvent);
     document.removeEventListener('touchmove', this.mouseMoveEvent);
     document.removeEventListener('mouseup', this.mouseUpEvent);

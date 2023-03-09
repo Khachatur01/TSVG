@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {Tool} from '../../Tool';
 import {Point} from '../../../../model/Point';
 import {Cursor} from '../../../../dataSource/constant/Cursor';
@@ -9,10 +8,11 @@ import {ElementView} from '../../../../element/ElementView';
 import {SVGEvent} from '../../../../dataSource/constant/SVGEvent';
 import {TableGrip} from './TableGrip';
 import {Table} from '../../../../dataSource/constant/Table';
+import {LineView} from '../../../../element/shape/pointed/LineView';
 
 export class EditTableTool extends Tool {
   public focus: Focus;
-  public showGrips = true;
+  public showGrips: boolean = true;
   protected override _cursor: Cursor = Cursor.EDIT_NODE;
   public __topBorderGrip__: TableGrip | undefined;
   public __leftBorderGrip__: TableGrip | undefined;
@@ -100,10 +100,10 @@ export class EditTableTool extends Tool {
       this._container.__nodesGroup__.appendChild(this.__topBorderGrip__.SVG);
     }
 
-    for (let i = 0; i < this._editableElement.rows.length; i++) {
-      const line = this._editableElement.rows[i].line;
+    for (let i: number = 0; i < this._editableElement.rows.length; i++) {
+      const line: LineView | undefined = this._editableElement.rows[i].line;
       if (line) {
-        const tableGrip = new TableGrip(this._container, this, Table.ROW, i, line);
+        const tableGrip: TableGrip = new TableGrip(this._container, this, Table.ROW, i, line);
         this.__rowGrips__.push(tableGrip);
         if (this.showGrips) {
           this._container.__nodesGroup__.appendChild(tableGrip.SVG);
@@ -111,10 +111,10 @@ export class EditTableTool extends Tool {
       }
       this.__rowGrips__[i].__on__();
     }
-    for (let i = 0; i < this._editableElement.cols.length; i++) {
-      const line = this._editableElement.cols[i].line;
+    for (let i: number = 0; i < this._editableElement.cols.length; i++) {
+      const line: LineView | undefined = this._editableElement.cols[i].line;
       if (line) {
-        const tableGrip = new TableGrip(this._container, this, Table.COL, i, line);
+        const tableGrip: TableGrip = new TableGrip(this._container, this, Table.COL, i, line);
         this.__colGrips__.push(tableGrip);
         if (this.showGrips) {
           this._container.__nodesGroup__.appendChild(tableGrip.SVG);
@@ -123,14 +123,14 @@ export class EditTableTool extends Tool {
       this.__colGrips__[i].__on__();
     }
   }
-  public removeEditableElement() {
+  public removeEditableElement(): void {
     this._container.__nodesGroup__.innerHTML = '';
     this.__topBorderGrip__?.__off__();
     this.__leftBorderGrip__?.__off__();
-    this.__rowGrips__.forEach(rowGrip => {
+    this.__rowGrips__.forEach((rowGrip: TableGrip) => {
       rowGrip.__off__();
     });
-    this.__colGrips__.forEach(colGrip => {
+    this.__colGrips__.forEach((colGrip: TableGrip) => {
       colGrip.__off__();
     });
     this.__rowGrips__ = [];

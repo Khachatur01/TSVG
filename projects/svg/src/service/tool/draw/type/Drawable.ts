@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {Point} from '../../../../model/Point';
 import {Rect} from '../../../../model/Rect';
 import {PathView} from '../../../../element/shape/path/PathView';
@@ -6,6 +5,7 @@ import {ElementType} from '../../../../dataSource/constant/ElementType';
 import {Container} from '../../../../Container';
 import {GroupView} from '../../../../element/group/GroupView';
 import {ElementProperties} from '../../../../element/ElementView';
+import {Line} from '../../../../model/Line';
 
 export interface Drawable {
   get properties(): ElementProperties;
@@ -28,6 +28,7 @@ export interface Drawable {
   isComplete(): boolean;
 
   intersectsRect(rect: Rect): boolean;
+  intersectsLine(line: Line): boolean;
 
   __onFocus__(): void;
   __onBlur__(): void;

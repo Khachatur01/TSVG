@@ -1,12 +1,12 @@
-import {CartesianView} from "./CartesianView";
-import {ElementCursor, ElementProperties, ElementStyle} from "../../ElementView";
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {PathView} from "../../shape/path/PathView";
-import {Point} from "../../../model/Point";
-import {Container} from "../../../Container";
-import {Rect} from "../../../model/Rect";
-import {MoveDrawable} from "../../../service/tool/draw/type/MoveDrawable";
-import {RayView} from "./RayView";
+import {CartesianView} from './CartesianView';
+import {ElementCursor, ElementProperties, ElementStyle, ElementView} from '../../ElementView';
+import {ElementType} from '../../../dataSource/constant/ElementType';
+import {PathView} from '../../shape/path/PathView';
+import {Point} from '../../../model/Point';
+import {Container} from '../../../Container';
+import {Rect} from '../../../model/Rect';
+import {MoveDrawable} from '../../../service/tool/draw/type/MoveDrawable';
+import {RayView} from './RayView';
 
 export class NumberLineCursor extends ElementCursor {}
 
@@ -82,10 +82,10 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
   private _positiveAxis: RayView;
   public override rotatable: boolean = false;
 
-  private _zoomFactor = 1;
+  private _zoomFactor: number = 1;
   /* Model */
 
-  private readonly X_AXIS_COLOR = "#0000FF";
+  private readonly X_AXIS_COLOR: string = '#0000FF';
 
   /**
    * @param container Container element that should contain this ElementView
@@ -114,7 +114,7 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
     this._negativeAxis.style.strokeWidth = this.AXIS_WIDTH;
     this._negativeAxis.style.fontColor = this.X_AXIS_COLOR;
     this._negativeAxis.style.fontSize = this.NUMBER_FONT_SIZE;
-    this._negativeAxis.style.fillColor = "none";
+    this._negativeAxis.style.fillColor = 'none';
 
     this._positiveAxis = new RayView(container,
       {overEvent: false, globalStyle: false},
@@ -126,7 +126,7 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
     this._positiveAxis.style.strokeWidth = this.AXIS_WIDTH;
     this._positiveAxis.style.fontColor = this.X_AXIS_COLOR;
     this._positiveAxis.style.fontSize = this.NUMBER_FONT_SIZE;
-    this._positiveAxis.style.fillColor = "none";
+    this._positiveAxis.style.fillColor = 'none';
 
     this._axisGroup.appendChild(this._negativeAxis.SVG);
     this._axisGroup.appendChild(this._positiveAxis.SVG);
@@ -148,7 +148,7 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
     });
   }
 
-  protected override reassignAxis() {
+  protected override reassignAxis(): void {
     this._negativeAxis.setPoints(
       {x: this._origin.x, y: this._origin.y},
       {x: 0, y: this._origin.y}
@@ -160,21 +160,13 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
   }
 
   public override get points(): Point[] {
-    let points = super.points;
-    points.push(this.center)
+    const points: Point[] = super.points;
+    points.push(this.center);
     return points;
   }
 
-  override __translate__(delta: Point) {
+  override __translate__(delta: Point): void {
     this.__drag__(delta);
-  }
-  public __drag__(delta: Point): void {
-    this._rect.x = this._lastRect.x + delta.x;
-    this._rect.y = this._lastRect.y + delta.y;
-    this.setAttr({
-      x: this._lastRect.x + delta.x,
-      y: this._lastRect.y + delta.y
-    });
   }
 
   public __moveOrigin__(delta: Point): void {
@@ -188,61 +180,43 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
     this.__moveOrigin__(delta);
   }
 
-  public zoomIn(factor: number) {
+  public zoomIn(factor: number): void {
     this._negativeAxis.zoomIn(factor);
     this._positiveAxis.zoomIn(factor);
   }
-  public zoomOut(factor: number) {
+  public zoomOut(factor: number): void {
     this._negativeAxis.zoomOut(factor);
     this._positiveAxis.zoomOut(factor);
   }
 
-  public __drawSize__(rect: Rect) {
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
-
+  public __drawSize__(rect: Rect): void {
+    rect = ElementView.normalizeRect(rect);
     this._rect = rect;
     this._origin = {
       x: rect.width / 2,
       y: rect.height / 2
-    }
+    };
 
     this.reassignAxis();
-
     this.__updateView__();
   }
-  public __setRect__(rect: Rect): void {
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
-
+  public override __setRect__(rect: Rect): void {
+    rect = ElementView.normalizeRect(rect);
     this._rect = rect;
     this._origin.x = this._lastOrigin.x - (this._rect.x - this._lastRect.x);
     this._origin.y = this._rect.height / 2;
 
     this.reassignAxis();
-
     this.__updateView__();
   }
 
-  public override __correct__(refPoint: Point, lastRefPoint: Point) {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
+  public override __correct__(refPoint: Point, lastRefPoint: Point): void {
+    const delta: Point = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x === 0 && delta.y === 0) {return;}
     this.__drag__(delta);
   }
 
-  public override __fixRect__() {
+  public override __fixRect__(): void {
     super.__fixRect__();
     this._lastOrigin = Object.assign({}, this._origin);
   }
@@ -252,19 +226,19 @@ export class NumberLineView extends CartesianView implements MoveDrawable {
   }
 
   public toPath(): PathView {
-    let pathView = new PathView(this._container, this._properties);
+    const pathView: PathView = new PathView(this._container, this._properties);
     pathView.addPath(this._negativeAxis.toPath().path);
     pathView.addPath(this._positiveAxis.toPath().path);
     return pathView;
   }
 
   public override toJSON(): any {
-    let json = super.toJSON();
+    const json: any = super.toJSON();
     json.origin = this._origin;
     json.zoomFactor = this._zoomFactor;
     return json;
   }
-  public override fromJSON(json: any) {
+  public override fromJSON(json: any): void {
     super.fromJSON(json);
     this._origin = json.origin;
     this.zoomIn(json.zoomFactor);

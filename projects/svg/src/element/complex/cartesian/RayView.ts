@@ -1,18 +1,19 @@
-import {ElementType} from "../../../dataSource/constant/ElementType";
-import {Point} from "../../../model/Point";
-import {Rect} from "../../../model/Rect";
-import {ElementCursor, ElementProperties, ElementStyle, ElementView} from "../../ElementView";
-import {PathView} from "../../shape/path/PathView";
-import {ComplexView} from "../../type/ComplexView";
-import {Container} from "../../../Container";
-import {Path} from "../../../model/path/Path";
-import {MoveTo} from "../../../model/path/point/MoveTo";
-import {LineTo} from "../../../model/path/line/LineTo";
-import {Angle} from "../../../service/math/Angle";
-import {Matrix} from "../../../service/math/Matrix";
-import {TextView} from "../../foreign/text/TextView";
-import {ClickDrawable} from "../../../service/tool/draw/type/ClickDrawable";
-import {ScaleProperties} from "./CartesianView";
+import {ElementType} from '../../../dataSource/constant/ElementType';
+import {Point} from '../../../model/Point';
+import {Rect} from '../../../model/Rect';
+import {ElementCursor, ElementProperties, ElementStyle, ElementView} from '../../ElementView';
+import {PathView} from '../../shape/path/PathView';
+import {ComplexView} from '../../type/ComplexView';
+import {Container} from '../../../Container';
+import {Path} from '../../../model/path/Path';
+import {MoveTo} from '../../../model/path/point/MoveTo';
+import {LineTo} from '../../../model/path/line/LineTo';
+import {Angle} from '../../../service/math/Angle';
+import {Matrix} from '../../../service/math/Matrix';
+import {TextView} from '../../foreign/text/TextView';
+import {ClickDrawable} from '../../../service/tool/draw/type/ClickDrawable';
+import {ScaleProperties} from './CartesianView';
+import {CartesianEditable} from './CartesianEditable';
 
 export class RayCursor extends ElementCursor {}
 
@@ -69,7 +70,7 @@ export class RayStyle extends ElementStyle {
   }
   public override set fontColor(color: string) {
     super.fontColor = color;
-    this.element.numbersGroup.setAttribute("fill", color);
+    this.element.numbersGroup.setAttribute('fill', color);
   }
 
   public override get backgroundColor(): string {
@@ -89,8 +90,8 @@ export interface RayViewEffects {
   numbersDirection?: 1 | -1;
 }
 
-export class RayView extends ComplexView implements ClickDrawable {
-  protected svgElement: SVGElement = document.createElementNS(ElementView.svgURI, "g");
+export class RayView extends ComplexView implements ClickDrawable, CartesianEditable {
+  protected svgElement: SVGElement = document.createElementNS(ElementView.svgURI, 'g');
   protected _type: ElementType = ElementType.RAY;
 
   public override readonly style: RayStyle;
@@ -105,7 +106,7 @@ export class RayView extends ComplexView implements ClickDrawable {
     showZero: false,
     numbersDirection: 1,
   };
-  private _zoomFactor = 1;
+  private _zoomFactor: number = 1;
 
   private _lastStartPoint: Point = {x: 0, y: 0};
   private _lastEndPoint: Point = {x: 0, y: 0};
@@ -113,16 +114,16 @@ export class RayView extends ComplexView implements ClickDrawable {
   private _endPoint: Point = {x: 0, y: 0};
 
   protected _mainStepDivisors: number[] = [1, 2, 4, 5];
-  protected _currentDivisor = this._mainStepDivisors[0];
+  protected _currentDivisor: number = this._mainStepDivisors[0];
 
-  protected _physicalUnitLimits = {min: 60, max: 120};
+  protected _physicalUnitLimits: {min: number; max: number} = {min: 60, max: 120};
   protected _mainStep: number = 1;
   protected _mainStepMultiplier: number = 10;
   protected _mainStepPhysicalUnit: number = 60; /* px - CHANGING on zoom */
 
-  protected readonly STEP_VIEW_SIZE = 6;
-  protected readonly SUB_STEP_VIEW_SIZE = 3;
-  protected readonly SUB_STEPS_COUNT = 4;
+  protected readonly STEP_VIEW_SIZE: number = 6;
+  protected readonly SUB_STEP_VIEW_SIZE: number = 3;
+  protected readonly SUB_STEPS_COUNT: number = 4;
 
   constructor(container: Container,
               properties: RayProperties = {},
@@ -141,9 +142,9 @@ export class RayView extends ComplexView implements ClickDrawable {
     this._endPoint = endPoint;
 
     this._rayPathView = new PathView(container, {overEvent: false, globalStyle: false});
-    this._numbersGroup = document.createElementNS(ElementView.svgURI, "g");
-    this._numbersGroup.setAttribute("stroke-width", "0");
-    this._numbersGroup.id = "numbers";
+    this._numbersGroup = document.createElementNS(ElementView.svgURI, 'g');
+    this._numbersGroup.setAttribute('stroke-width', '0');
+    this._numbersGroup.id = 'numbers';
 
     this.svgElement.appendChild(this._rayPathView.SVG);
     this.svgElement.appendChild(this._numbersGroup);
@@ -155,6 +156,7 @@ export class RayView extends ComplexView implements ClickDrawable {
       this._physicalUnitLimits.min = scale.physicalUnitLimits.min;
       this._physicalUnitLimits.max = scale.physicalUnitLimits.max;
     }
+
     this.setProperties(properties);
     this.viewEffects = viewEffects;
   }
@@ -168,7 +170,7 @@ export class RayView extends ComplexView implements ClickDrawable {
     } else if (index === 1) {
       return this._endPoint;
     } else {
-      throw Error("No such point index");
+      throw Error('No such point index');
     }
   }
   public pushPoint(point: Point): void {}
@@ -182,10 +184,16 @@ export class RayView extends ComplexView implements ClickDrawable {
     } else if (index === 1) {
       this._endPoint = point;
     } else {
-      throw Error("No such point index");
+      throw Error('No such point index');
     }
     this._rect = ElementView.calculateRect(this._rayPathView.points);
-    this.__updateView__()
+    this.__updateView__();
+  }
+  public override get points(): Point[] {
+    return [
+      this._startPoint,
+      this._endPoint
+    ];
   }
   public setPoints(start: Point, end: Point): void {
     this._startPoint = start;
@@ -202,11 +210,11 @@ export class RayView extends ComplexView implements ClickDrawable {
   }
 
   private isInRange(divisor: number): boolean {
-    const physicalUnit = this._mainStepPhysicalUnit / divisor;
+    const physicalUnit: number = this._mainStepPhysicalUnit / divisor;
     return physicalUnit <= this._physicalUnitLimits.max && physicalUnit >= this._physicalUnitLimits.min;
   }
 
-  public zoomIn(factor: number) {
+  public zoomIn(factor: number): void {
     this._zoomFactor *= factor;
     this._mainStepPhysicalUnit *= factor;
 
@@ -218,11 +226,11 @@ export class RayView extends ComplexView implements ClickDrawable {
 
     this.__updateView__();
   }
-  public zoomOut(factor: number) {
+  public zoomOut(factor: number): void {
     this._zoomFactor /= factor;
     this._mainStepPhysicalUnit /= factor;
 
-    let filteredDivisors = this._mainStepDivisors.filter(this.isInRange.bind(this));
+    let filteredDivisors: number[] = this._mainStepDivisors.filter(this.isInRange.bind(this));
     while (filteredDivisors.length === 0) {
       this._mainStep *= 10;
       this._mainStepPhysicalUnit *= 10;
@@ -234,23 +242,27 @@ export class RayView extends ComplexView implements ClickDrawable {
     this.__updateView__();
   }
 
-  private createSubStepPath(physicalStep: number, physicalSubStep: number, mainStepPosition: Point, angle: number, maxLength?: number): Path {
-    let path: Path = new Path();
-    let subStepPhysicalLength = Angle.lineLength(this._startPoint, mainStepPosition);
+  public __moveOrigin__(delta: Point): void {}
+  public moveOrigin(delta: Point): void {}
+  public setOrigin(origin: Point): void {}
 
-    for (let subStepLength = physicalSubStep; subStepLength < physicalStep; subStepLength += physicalSubStep) {
-      let subStepPosition = Angle.lineFromVector(mainStepPosition, angle, subStepLength);
+  private createSubStepPath(physicalStep: number, physicalSubStep: number, mainStepPosition: Point, angle: number, maxLength?: number): Path {
+    const path: Path = new Path();
+    const subStepPhysicalLength: number = Angle.lineLength(this._startPoint, mainStepPosition);
+
+    for (let subStepLength: number = physicalSubStep; subStepLength < physicalStep; subStepLength += physicalSubStep) {
+      const subStepPosition: Point = Angle.lineFromVector(mainStepPosition, angle, subStepLength);
 
       /* if sub steps position is outer from ray */
-      if (maxLength != undefined && (subStepPhysicalLength + subStepLength > maxLength)) {
+      if (maxLength !== undefined && (subStepPhysicalLength + subStepLength > maxLength)) {
         break;
       }
 
-      let points = [
+      let points: Point[] = [
         {x: subStepPosition.x, y: subStepPosition.y - this.SUB_STEP_VIEW_SIZE},
         {x: subStepPosition.x, y: subStepPosition.y + this.SUB_STEP_VIEW_SIZE}
-      ]
-      if (angle != 0 && angle != 360) {
+      ];
+      if (angle !== 0 && angle !== 360) {
         points = Matrix.rotate(points, subStepPosition, angle);
       }
 
@@ -260,38 +272,38 @@ export class RayView extends ComplexView implements ClickDrawable {
 
     return path;
   }
-  private createNumber(position: Point, number: number): TextView {
-    let visibleNumber: any = Math.round(number * 100_000) / 100_000;
-    if (visibleNumber != 0 && (Math.abs(visibleNumber) <= 0.0001 || Math.abs(visibleNumber) > 9_999)) {
-      visibleNumber = number.toExponential(4);
+  private createNumber(position: Point, value: number): TextView {
+    let visibleNumber: number | string = Math.round(value * 100_000) / 100_000;
+    if (visibleNumber !== 0 && (Math.abs(visibleNumber) <= 0.0001 || Math.abs(visibleNumber) > 9_999)) {
+      visibleNumber = value.toExponential(4);
     }
 
     return new TextView(this._container,
       {overEvent: false, globalStyle: false},
       {x: position.x + 3, y: position.y - 3, width: 0, height: 0},
-      visibleNumber + "");
+      visibleNumber + '');
   }
 
   public __updateView__(): void {
-    let path = new Path();
+    const path: Path = new Path();
     path.add(new MoveTo(this._startPoint));
     path.add(new LineTo(this._endPoint));
 
-    let angle = Angle.fromTwoPoints(this._startPoint, this._endPoint);
-    const physicalStep = this._mainStepPhysicalUnit / this._currentDivisor;
-    let physicalSubStep = physicalStep / this.SUB_STEPS_COUNT;
-    let lineLength = Angle.lineLength(this._startPoint, this._endPoint);
+    const angle: number = Angle.fromTwoPoints(this._startPoint, this._endPoint);
+    const physicalStep: number = this._mainStepPhysicalUnit / this._currentDivisor;
+    const physicalSubStep: number = physicalStep / this.SUB_STEPS_COUNT;
+    const lineLength: number = Angle.lineLength(this._startPoint, this._endPoint);
 
     if (this._viewEffects.showSteps) {
       /* add sub steps before first step */
       path.addPath(this.createSubStepPath(physicalStep, physicalSubStep, this._startPoint, angle, lineLength));
-      for (let stepLength = physicalStep; stepLength < lineLength; stepLength += physicalStep) {
-        let stepPosition = Angle.lineFromVector(this._startPoint, angle, stepLength);
-        let points = [
+      for (let stepLength: number = physicalStep; stepLength < lineLength; stepLength += physicalStep) {
+        const stepPosition: Point = Angle.lineFromVector(this._startPoint, angle, stepLength);
+        let points: Point[] = [
           {x: stepPosition.x, y: stepPosition.y - this.STEP_VIEW_SIZE},
           {x: stepPosition.x, y: stepPosition.y + this.STEP_VIEW_SIZE}
-        ]
-        if (angle != 0 && angle != 360) {
+        ];
+        if (angle !== 0 && angle !== 360) {
           points = Matrix.rotate(points, stepPosition, angle);
         }
 
@@ -304,13 +316,13 @@ export class RayView extends ComplexView implements ClickDrawable {
     }
 
     /* arrow */
-    let arrowCenterVertex = {x: this._endPoint.x, y: this._endPoint.y};
-    let arrowSideVertexes = [
+    const arrowCenterVertex: Point = {x: this._endPoint.x, y: this._endPoint.y};
+    let arrowSideVertexes: Point[] = [
       {x: this._endPoint.x - this.STEP_VIEW_SIZE, y: this._endPoint.y - this.STEP_VIEW_SIZE},
       {x: this._endPoint.x - this.STEP_VIEW_SIZE, y: this._endPoint.y + this.STEP_VIEW_SIZE}
     ];
 
-    if (angle != 0 && angle != 360) {
+    if (angle !== 0 && angle !== 360) {
       arrowSideVertexes = Matrix.rotate(arrowSideVertexes, arrowCenterVertex, angle);
     }
 
@@ -321,30 +333,31 @@ export class RayView extends ComplexView implements ClickDrawable {
     this._rayPathView.path = path;
 
     if (this._viewEffects.showNumbers) {
-      this._numbersGroup.innerHTML = "";
+      this._numbersGroup.innerHTML = '';
 
       if (this._viewEffects.showZero) {
-        let numberView = this.createNumber(this._startPoint, 0);
+        const numberView: TextView = this.createNumber(this._startPoint, 0);
         this._numberViews.push(numberView);
         this._numbersGroup.appendChild(numberView.SVG);
       }
 
-      let step = this._mainStep / this._currentDivisor * (this._viewEffects.numbersDirection || 1);
-      let number = step;
-      for (let stepLength = physicalStep; stepLength < lineLength; stepLength += physicalStep) {
-        let stepPosition = Angle.lineFromVector(this._startPoint, angle, stepLength);
-        let numberView = this.createNumber(stepPosition, number);
+      const step: number = this._mainStep / this._currentDivisor * (this._viewEffects.numbersDirection || 1);
+      /* number value of step */
+      let value: number = step;
+      for (let stepLength: number = physicalStep; stepLength < lineLength; stepLength += physicalStep) {
+        const stepPosition: Point = Angle.lineFromVector(this._startPoint, angle, stepLength);
+        const numberView: TextView = this.createNumber(stepPosition, value);
         this._numberViews.push(numberView);
         this._numbersGroup.appendChild(numberView.SVG);
-        number += step;
+        value += step;
       }
     }
   }
 
   public set viewEffects(effects: RayViewEffects) {
-    let effectsAny: any = effects;
-    let thisEffectsAny: any = this._viewEffects;
-    for (let key in effectsAny) {
+    const effectsAny: any = effects;
+    const thisEffectsAny: any = this._viewEffects;
+    for (const key in effectsAny) {
       if (effectsAny[key] !== undefined) {
         thisEffectsAny[key] = effectsAny[key];
       }
@@ -354,8 +367,8 @@ export class RayView extends ComplexView implements ClickDrawable {
   }
 
   public override __correct__(refPoint: Point, lastRefPoint: Point): void {
-    let delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
-    if (delta.x == 0 && delta.y == 0) return;
+    const delta: Point = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    if (delta.x === 0 && delta.y === 0) {return;}
 
     this.__fixRect__();
     this.__drag__({x: delta.x, y: delta.y});
@@ -374,29 +387,29 @@ export class RayView extends ComplexView implements ClickDrawable {
     };
 
     this._rayPathView.__drag__(delta);
-    this._numberViews.forEach(numberView => {
+    this._numberViews.forEach((numberView: TextView) => {
       numberView.__drag__(delta);
     });
   }
 
-  public __setRect__(rect: Rect, delta?: Point): void {
-    let dw = 1;
-    let dh = 1;
+  public override __setRect__(rect: Rect, delta?: Point): void {
+    let dw: number = 1;
+    let dh: number = 1;
 
     if (delta) {
       dw = delta.x;
       dh = delta.y;
     } else {
-      if (this._lastRect.width != 0)
-        dw = rect.width / (this._lastRect.width);
-      if (this._lastRect.height != 0)
-        dh = rect.height / (this._lastRect.height);
+      if (this._lastRect.width !== 0)
+        {dw = rect.width / (this._lastRect.width);}
+      if (this._lastRect.height !== 0)
+        {dh = rect.height / (this._lastRect.height);}
     }
 
-    let points = [this._startPoint, this._endPoint];
-    let lastPoints = [this._lastStartPoint, this._lastEndPoint];
+    const points: Point[] = [this._startPoint, this._endPoint];
+    const lastPoints: Point[] = [this._lastStartPoint, this._lastEndPoint];
 
-    for (let i = 0; i < points.length; i++) {
+    for (let i: number = 0; i < points.length; i++) {
       /* points may not be fixed, and this._lastPoints[i] may be undefined */
 
       points[i].x = rect.x + Math.abs(lastPoints[i].x - rect.x) * dw;
@@ -407,10 +420,10 @@ export class RayView extends ComplexView implements ClickDrawable {
     this.__updateView__();
   }
 
-  public override __fixRect__() {
+  public override __fixRect__(): void {
     super.__fixRect__();
     this._rayPathView.__fixRect__();
-    this._numberViews.forEach(numberView => {
+    this._numberViews.forEach((numberView: TextView) => {
       numberView.__fixRect__();
     });
     this._lastStartPoint = Object.assign({}, this._startPoint);
@@ -425,7 +438,7 @@ export class RayView extends ComplexView implements ClickDrawable {
     return new PathView(this._container);
   }
   public override toJSON(): any {
-    let json = super.toJSON();
+    const json: any = super.toJSON();
     json.startPoint = Object.assign({}, this._startPoint);
     json.endPoint = Object.assign({}, this._endPoint);
     json.currentDivisor = this._currentDivisor;
@@ -437,7 +450,7 @@ export class RayView extends ComplexView implements ClickDrawable {
     json.zoomFactor = this._zoomFactor;
     return json;
   }
-  public override fromJSON(json: any) {
+  public override fromJSON(json: any): void {
     this._startPoint = Object.assign({}, json.startPoint);
     this._endPoint = Object.assign({}, json.endPoint);
     this._currentDivisor = json.currentDivisor;

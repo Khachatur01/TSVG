@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {ElementCursor, ElementProperties, ElementStyle, ElementView} from '../ElementView';
 import {Container} from '../../Container';
 import {Point} from '../../model/Point';
@@ -91,30 +90,31 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   protected _content: HTMLElement;
   public readonly editOutline: string = 'thin solid #999';
   public readonly defaultOutline: string = '';
-  private _lastCommittedHTML = '';
+  private _lastCommittedHTML: string = '';
+  public override erasable: boolean = false;
 
-  protected copyEvent = (event: ClipboardEvent) => {
-    const text = document.getSelection()?.toString();
+  protected copyEvent: (event: ClipboardEvent) => void = (event: ClipboardEvent) => {
+    const text: string | undefined = document.getSelection()?.toString();
     if (text) {
       this._container.focused.__clipboard__.text = text;
     }
     event.preventDefault();
   };
-  protected cutEvent = (event: ClipboardEvent) => {
-    const text = document.getSelection()?.toString();
+  protected cutEvent: (event: ClipboardEvent) => void = (event: ClipboardEvent) => {
+    const text: string | undefined = document.getSelection()?.toString();
     if (text) {
       this._container.focused.__clipboard__.text = text;
-      const selection = window.getSelection();
+      const selection: Selection | null = window.getSelection();
       if (selection?.rangeCount) {
         selection.deleteFromDocument();
       }
     }
     event.preventDefault();
   };
-  protected pasteEvent = (event: ClipboardEvent) => {
-    const paste = this.container.focused.__clipboard__.text;
+  protected pasteEvent: (event: ClipboardEvent) => void = (event: ClipboardEvent) => {
+    const paste: string = this.container.focused.__clipboard__.text;
 
-    const selection = window.getSelection();
+    const selection: Selection | null = window.getSelection();
     if (!selection?.rangeCount || paste === '') {
       return;
     }
@@ -127,7 +127,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   /* Model */
 
   /* this flag will be used when content blurred, and no need to call blur event's callback */
-  protected callBlurEvent = true;
+  protected callBlurEvent: boolean = true;
 
   public constructor(
     container: Container,
@@ -145,7 +145,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content = document.createElement('div');
     this._content.style.height = '100%';
     /* prevent from dropping elements inside */
-    this._content.ondrop = () => {return false;};
+    this._content.ondrop = () => false;
 
     this.addEditCallBack();
     this.addFocusEvent();
@@ -159,7 +159,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.setProperties(properties);
   }
 
-  public override setProperties(properties: ForeignObjectProperties) {
+  public override setProperties(properties: ForeignObjectProperties): void {
     super.setProperties(properties);
     if (properties.contentEditable !== undefined) {
       this._content.contentEditable = properties.contentEditable + '';
@@ -183,19 +183,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._rect.y = this._lastRect.y + delta.y;
     this.__updateView__();
   }
-  public __setRect__(rect: Rect): void {
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
-    this._rect = rect;
-    this.__updateView__();
-  }
-  public __drawSize__(rect: Rect) {
+  public __drawSize__(rect: Rect): void {
     this.__setRect__(rect);
   }
   public __updateView__(): void {
@@ -207,7 +195,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     });
   }
 
-  protected addEditCallBack() {
+  protected addEditCallBack(): void {
     this._content.addEventListener('input', () => {
       this._container.__call__(SVGEvent.ASSET_EDIT, {element: this});
     });
@@ -224,15 +212,15 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     });
   }
 
-  public override __onFocus__() {
+  public override __onFocus__(): void {
     this.svgElement.style.outline = this.editOutline;
   }
-  public override __onBlur__() {
+  public override __onBlur__(): void {
     this.svgElement.style.outline = this.defaultOutline;
   }
 
   protected addFocusEvent(): void {
-    this._content.addEventListener('focus', (event) => {
+    this._content.addEventListener('focus', () => {
       if (this._selectable && this._container.tools.drawTool.isOn() && this._container.tools.drawTool.getDrawer() === this._container.drawers.textBox) {
         this._container.blur(undefined, false);
         this._container.focus(this, false, undefined, false);
@@ -269,11 +257,11 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   }
 
   public get boundingRect(): Rect {
-    const points = this.points;
+    const points: Point[] = this.points;
     return ElementView.calculateRect(points);
   }
   public get visibleBoundingRect(): Rect {
-    const points = this.visiblePoints;
+    const points: Point[] = this.visiblePoints;
     return ElementView.calculateRect(points);
   }
 
@@ -285,11 +273,11 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   }
 
   public override toJSON(): any {
-    const json = super.toJSON();
+    const json: any = super.toJSON();
     json.content = encodeURIComponent(this._content.outerHTML);
     return json;
   }
-  public override fromJSON(json: any) {
+  public override fromJSON(json: any): void {
     super.fromJSON(json);
     if (json.content) {
       this.svgElement.innerHTML = decodeURIComponent(json.content);

@@ -14,8 +14,9 @@ export class SelectTool extends Tool {
   private position: Point = {x: 0, y: 0};
   public readonly dragTool: DragTool;
   public focus: Focus;
-  public intersectionColor = 'green';
-  public fullMatchColor = '#1545ff';
+  public intersectionColor: string = 'green';
+  public fullMatchColor: string = '#1545ff';
+  private elementsClickEvents: {element: ElementView; callback: () => void}[] = [];
 
   private elementsOverEvent: {element: ElementView; overEvent: boolean}[] = [];
 
@@ -36,9 +37,38 @@ export class SelectTool extends Tool {
     this.mouseDownEvent = this.mouseDownEvent.bind(this);
     this.mouseMoveEvent = this.mouseMoveEvent.bind(this);
     this.mouseUpEvent = this.mouseUpEvent.bind(this);
+
+    this.clickEvent = this.clickEvent.bind(this);
+
+    this._container.addCallBack(SVGEvent.ELEMENT_ADDED, ({element}: any) => {
+      /* if select tool is on, add click event to newly added element */
+      if (this._isOn) {
+        const callback = this.clickEvent.bind(this, element);
+        element.SVG.addEventListener('mousedown', callback);
+        element.SVG.addEventListener('touchstart', callback);
+        this.elementsClickEvents.push({element, callback});
+      }
+    });
   }
 
-  private mouseDownEvent(event: MouseEvent | TouchEvent) {
+  private clickEvent(element: ElementView): void {
+    if (element.group) {
+      element = element.group;
+    }
+
+    const hasChild: boolean = this.focus.hasChild(element);
+    if (!this._container.isMultiselect && hasChild) {return;}
+
+    if (!this._container.isMultiselect && !hasChild) {
+      this._container.blur();
+      this._container.focus(element);
+    } else if (hasChild) {
+      this._container.blur(element);
+    } else {
+      this._container.focus(element);
+    }
+  }
+  private mouseDownEvent(event: MouseEvent | TouchEvent): void {
     if (event.target !== this._container.HTML) {
       return;
     }
@@ -47,26 +77,26 @@ export class SelectTool extends Tool {
     document.addEventListener('mouseup', this.mouseUpEvent);
     document.addEventListener('touchend', this.mouseUpEvent);
 
-    const containerRect = this._container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
+    const containerRect: DOMRect = this._container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
     this._mouseCurrentPos = {
-      x: eventPosition.x - containerRect.left, // x position within the element.
-      y: eventPosition.y - containerRect.top // y position within the element.
+      x: eventPosition.x - containerRect.left,
+      y: eventPosition.y - containerRect.top
     };
     this.makeMouseDown(this._mouseCurrentPos);
 
     this._container.style.changeCursor(Cursor.NO_TOOL);
   };
-  private mouseMoveEvent(event: MouseEvent | TouchEvent) {
-    const containerRect = this._container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
+  private mouseMoveEvent(event: MouseEvent | TouchEvent): void {
+    const containerRect: DOMRect = this._container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
     this._mouseCurrentPos = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
     this.makeMouseMove(this._mouseCurrentPos);
   };
-  private mouseUpEvent() {
+  private mouseUpEvent(): void {
     this.makeMouseUp(this._mouseCurrentPos);
 
     this._container.style.changeCursor(this.cursor);
@@ -77,10 +107,8 @@ export class SelectTool extends Tool {
     document.removeEventListener('touchend', this.mouseUpEvent);
   };
 
-  public makeMouseDown(position: Point, call: boolean = true) {
-    /*
-    * Remove all elements over event, because when selecting element calls highlight event
-    */
+  public makeMouseDown(position: Point, call: boolean = true): void {
+    /* Remove all elements over event, because when selecting element calls highlight event*/
     this.elementsOverEvent = [];
     this._container.elements.forEach((element: ElementView) => {
       this.elementsOverEvent.push({element, overEvent: element.properties.overEvent || false});
@@ -101,9 +129,9 @@ export class SelectTool extends Tool {
       this._container.__call__(SVGEvent.SELECT_AREA_MOUSE_DOWN, {position});
     }
   }
-  public makeMouseMove(position: Point, call: boolean = true) {
-    const width = position.x - this.position.x;
-    const height = position.y - this.position.y;
+  public makeMouseMove(position: Point, call: boolean = true): void {
+    const width: number = position.x - this.position.x;
+    const height: number = position.y - this.position.y;
 
     if (width > 0) {
       this.boundingBox.style.strokeColor = this.fullMatchColor;
@@ -138,16 +166,14 @@ export class SelectTool extends Tool {
       this._container.__call__(SVGEvent.SELECT_AREA_MOUSE_MOVE, {position});
     }
   }
-  public makeMouseUp(position: Point, call: boolean = true) {
-    /*
-    * Recover elements over event. (Over event removed in makeMouseDown method)
-    */
-    this.elementsOverEvent.forEach((elementOverEvent) => {
+  public makeMouseUp(position: Point, call: boolean = true): void {
+    /* Recover elements over event. (Over event removed in makeMouseDown method) */
+    this.elementsOverEvent.forEach((elementOverEvent: {element: ElementView; overEvent: boolean}) => {
       if (elementOverEvent.overEvent) {
         elementOverEvent.element.setOverEvent();
       }
     });
-    const width = position.x - this.position.x;
+    const width: number = position.x - this.position.x;
 
     this._container.HTML.removeChild(this.boundingBox.SVG);
 
@@ -176,6 +202,14 @@ export class SelectTool extends Tool {
     }
     this._container.HTML.addEventListener('mousedown', this.mouseDownEvent);
     this._container.HTML.addEventListener('touchstart', this.mouseDownEvent);
+    this.elementsClickEvents = [];
+    this._container.elementsDeep.forEach((element: ElementView) => {
+      const clickEvent = this.clickEvent.bind(this, element);
+      element.SVG.addEventListener('mousedown', clickEvent);
+      element.SVG.addEventListener('touchstart', clickEvent);
+      this.elementsClickEvents.push({element, callback: clickEvent});
+    });
+
     this.dragTool.on(false);
 
     this._container.style.changeCursor(this.cursor);
@@ -190,6 +224,11 @@ export class SelectTool extends Tool {
     }
     this._container.HTML.removeEventListener('mousedown', this.mouseDownEvent);
     this._container.HTML.removeEventListener('touchstart', this.mouseDownEvent);
+    this.elementsClickEvents.forEach((elementCallback: {element: ElementView; callback: () => void}) => {
+      elementCallback.element.SVG.removeEventListener('mousedown', elementCallback.callback);
+      elementCallback.element.SVG.removeEventListener('touchstart', elementCallback.callback);
+    });
+
     this.dragTool.off(false);
 
     if (call) {

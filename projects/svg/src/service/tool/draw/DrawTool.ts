@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {Drawer} from './Drawer';
 import {Container} from '../../../Container';
 import {Tool} from '../Tool';
@@ -6,26 +5,27 @@ import {Point} from '../../../model/Point';
 import {ElementType} from '../../../dataSource/constant/ElementType';
 import {ElementView} from '../../../element/ElementView';
 import {Cursor} from '../../../dataSource/constant/Cursor';
-import {DrawFree} from './mode/DrawFree';
+import {FreeDrawer} from './mode/FreeDrawer';
 import {SVGEvent} from '../../../dataSource/constant/SVGEvent';
+import {Drawable} from './type/Drawable';
 
 export class DrawTool extends Tool {
   private _drawer: Drawer;
-  private _isDrawing = false;
-  public perfect = false;
+  private _isDrawing: boolean = false;
+  public perfect: boolean = false;
 
   public constructor(container: Container) {
     super(container);
-    this._drawer = new DrawFree(this);
+    this._drawer = new FreeDrawer(this);
   }
 
-  public makeMouseDown(position: Point, call: boolean = true, parameter?: any) {
+  public makeMouseDown(position: Point, call: boolean = true, parameter?: any): void {
     this._drawer?.makeMouseDown(position, call, parameter);
   }
-  public makeMouseMove(position: Point, call: boolean = true, parameter?: any) {
+  public makeMouseMove(position: Point, call: boolean = true, parameter?: any): void {
     this._drawer?.makeMouseMove(position, call, parameter);
   }
-  public makeMouseUp(position: Point, call: boolean = true, parameter?: any) {
+  public makeMouseUp(position: Point, call: boolean = true, parameter?: any): void {
     this._drawer?.makeMouseUp(position, call, parameter);
   }
 
@@ -36,13 +36,13 @@ export class DrawTool extends Tool {
   public getDrawer(): Drawer {
     return this._drawer;
   }
-  public setDrawer(drawer: Drawer, call: boolean = true) {
+  public setDrawer(drawer: Drawer, call: boolean = true): void {
     if (!drawer) {
       return;
     }
     this._drawer.stop();
     drawer.drawTool = this;
-    const oldDrawer = this._drawer;
+    const oldDrawer: Drawer = this._drawer;
     this._drawer = drawer;
     if (call) {
       this._container.__call__(SVGEvent.DRAWER_CHANGED, {oldDrawer, newDrawer: drawer});
@@ -89,7 +89,7 @@ export class DrawTool extends Tool {
     return this._drawer?.type;
   }
   public get drawableElement(): ElementView | undefined {
-    const drawableElement = this._drawer?.drawableElement; /* drawableElement may be null */
+    const drawableElement: Drawable | undefined = this._drawer?.drawableElement;
     if (drawableElement) {
       return drawableElement as ElementView;
     } else {

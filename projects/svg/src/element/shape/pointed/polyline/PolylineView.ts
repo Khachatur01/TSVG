@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {ElementCursor, ElementProperties, ElementView} from '../../../ElementView';
 import {Point} from '../../../../model/Point';
 import {PointedView} from '../PointedView';
 import {Container} from '../../../../Container';
 import {ElementType} from '../../../../dataSource/constant/ElementType';
 import {Rect} from '../../../../model/Rect';
+import {Line} from '../../../../model/Line';
 
 export class PolylineCursor extends ElementCursor {}
 
@@ -23,8 +23,8 @@ export class PolylineView extends PointedView {
     this.setProperties(properties);
   }
 
-  public override __updateView__() {
-    let str = '';
+  public override __updateView__(): void {
+    let str: string = '';
     this._points.forEach((point: Point) => {
       str += point.x + ' ' + point.y + ' ';
     });
@@ -33,8 +33,12 @@ export class PolylineView extends PointedView {
   }
 
   public override intersectsRect(rect: Rect): boolean {
-    const points = this.visiblePoints;
+    const points: Point[] = this.visiblePoints;
     return ElementView.pointsIntersectingRect(points, rect, false);
+  }
+  public override intersectsLine(line: Line): boolean {
+    const points: Point[] = this.visiblePoints;
+    return ElementView.pointsIntersectingSides(points, [line], false);
   }
 
   public override isComplete(): boolean {

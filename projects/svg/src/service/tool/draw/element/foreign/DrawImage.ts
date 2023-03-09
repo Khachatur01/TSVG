@@ -1,17 +1,17 @@
-import {MoveDraw} from '../../mode/MoveDraw';
+import {MoveDrawer} from '../../mode/MoveDrawer';
 import {Point} from '../../../../../model/Point';
 import {SVGEvent} from '../../../../../dataSource/constant/SVGEvent';
 import {ImageView} from '../../../../../element/foreign/media/ImageView';
 import {ElementType} from '../../../../../dataSource/constant/ElementType';
 import {MoveDrawable} from '../../type/MoveDrawable';
 
-export class DrawImage extends MoveDraw {
-  public src = '';
+export class DrawImage extends MoveDrawer {
+  public src: string = '';
   protected createDrawableElement(position: Point): MoveDrawable {
     return new ImageView(this.drawTool.container, {overEvent: true, globalStyle: true}, this.src, {x: position.x, y: position.y, width: 0, height: 0});
   }
 
-  protected override onIsNotComplete(call: boolean) {
+  protected override onIsNotComplete(call: boolean): void {
     if (!this._drawableElement) {
       return;
     }
@@ -23,17 +23,17 @@ export class DrawImage extends MoveDraw {
     });
     this._drawableElement.refPoint = this._drawableElement?.center;
   }
-  protected override onEnd(call: boolean) {
+  protected override onEnd(call: boolean): void {
   }
 
-  public override start(call: boolean) {
+  public override start(call: boolean): void {
     super.start(call);
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.IMAGE_TOOL_ON);
     }
   }
-  public override stop(call: boolean) {
+  public override stop(call: boolean): void {
     super.stop(call);
 
     if (call) {

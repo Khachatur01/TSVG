@@ -2,7 +2,7 @@ import {Point} from '../Point';
 
 export abstract class PathCommand {
   protected _point: Point;
-  public close = false;
+  public close: boolean = false;
 
   public constructor(point: Point, close: boolean = false) {
     this._point = point;

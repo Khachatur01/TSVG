@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {EditTableTool} from './EditTableTool';
 import {Container} from '../../../../Container';
 import {LineView} from '../../../../element/shape/pointed/LineView';
 import {Point} from '../../../../model/Point';
 import {SVGEvent} from '../../../../dataSource/constant/SVGEvent';
 import {Matrix} from '../../../math/Matrix';
-import {Rect} from '../../../../model/Rect';
 import {Table} from '../../../../dataSource/constant/Table';
 import {PathView} from '../../../../element/shape/path/PathView';
 import {Path} from '../../../../model/path/Path';
@@ -19,7 +17,7 @@ export class TableGrip {
   private readonly _container: Container;
   private readonly lineView: LineView;
   private readonly _grip: PathView;
-  private size = 0;
+  private size: number = 0;
 
   protected mouseCurrentPos: Point = {x: 0, y: 0};
 
@@ -30,12 +28,12 @@ export class TableGrip {
     this._container = container;
     this.lineView = lineView;
 
-    const points = this.lineView.points;
+    const points: Point[] = this.lineView.points;
     const lineCenter: Point = {
       x: (points[0].x + points[1].x) / 2,
       y: (points[0].y + points[1].y) / 2,
     };
-    const path = this.createGripPath(lineCenter, type);
+    const path: Path = this.createGripPath(lineCenter, type);
     this._grip = new PathView(this._container,{overEvent: false, globalStyle: false}, path);
     this._grip.style.strokeColor = '#FFFFFF';
     this._grip.style.strokeWidth = '1';
@@ -49,7 +47,7 @@ export class TableGrip {
     this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
 
-  private mouseDownEvent(event: MouseEvent | TouchEvent) {
+  private mouseDownEvent(event: MouseEvent | TouchEvent): void {
     this.editTool.container.HTML.addEventListener('mousemove', this.mouseMoveEvent);
     this.editTool.container.HTML.addEventListener('touchmove', this.mouseMoveEvent);
     document.addEventListener('mouseup', this.mouseUpEvent);
@@ -58,17 +56,17 @@ export class TableGrip {
     this._grip.SVG.style.cursor = 'grabbing';
     this._container.HTML.style.cursor = 'grabbing';
 
-    const containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
+    const containerRect: DOMRect = this.editTool.container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
     this.mouseCurrentPos = this._container.grid.getSnapPoint({
       x: eventPosition.x - containerRect.x,
       y: eventPosition.y - containerRect.y
     });
     this.makeMouseDown(this.mouseCurrentPos);
   };
-  private mouseMoveEvent(event: MouseEvent | TouchEvent) {
-    const containerRect: Rect = this.editTool.container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
+  private mouseMoveEvent(event: MouseEvent | TouchEvent): void {
+    const containerRect: DOMRect = this.editTool.container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
     this.mouseCurrentPos = this._container.grid.getSnapPoint({
       x: eventPosition.x - containerRect.x,
       y: eventPosition.y - containerRect.y
@@ -78,14 +76,14 @@ export class TableGrip {
 
     this.editTool.__topBorderGrip__?.__updatePosition__();
     this.editTool.__leftBorderGrip__?.__updatePosition__();
-    this.editTool.__rowGrips__.forEach(rowGrip => {
+    this.editTool.__rowGrips__.forEach((rowGrip: TableGrip) => {
       rowGrip.__updatePosition__();
     });
-    this.editTool.__colGrips__.forEach(colGrip => {
+    this.editTool.__colGrips__.forEach((colGrip: TableGrip) => {
       colGrip.__updatePosition__();
     });
   };
-  private mouseUpEvent() {
+  private mouseUpEvent(): void {
     this.editTool.container.HTML.removeEventListener('mousemove', this.mouseMoveEvent);
     this.editTool.container.HTML.removeEventListener('touchmove', this.mouseMoveEvent);
     document.removeEventListener('mouseup', this.mouseUpEvent);
@@ -101,34 +99,34 @@ export class TableGrip {
     if (!this.editTool.editableElement) {
       return new Path();
     }
-    const MARGIN = 1 + parseInt(this.editTool.editableElement.style.strokeWidth) / 2;
-    const TRIANGLE_POINT = 10;
-    const path = new Path();
+    const MARGIN: number = 1 + parseInt(this.editTool.editableElement.style.strokeWidth) / 2;
+    const TRIANGLE_POINT: number = 10;
+    const path: Path = new Path();
     switch (type) {
       case Table.ROW:
-        path.add(new MoveTo({x: center.x - (TRIANGLE_POINT / 2), y: center.y - MARGIN}));
-        path.add(new LineTo({x: center.x,                        y: center.y - (TRIANGLE_POINT / 2) - MARGIN}));
-        path.add(new LineTo({x: center.x + TRIANGLE_POINT / 2,   y: center.y - MARGIN}, true));
+        path.add(new MoveTo({x: center.x - (TRIANGLE_POINT / 2),            y: center.y - MARGIN}));
+        path.add(new LineTo({x: center.x,                                   y: center.y - (TRIANGLE_POINT / 2) - MARGIN}));
+        path.add(new LineTo({x: center.x + TRIANGLE_POINT / 2,              y: center.y - MARGIN}, true));
 
-        path.add(new MoveTo({x: center.x - (TRIANGLE_POINT / 2), y: center.y + MARGIN}));
-        path.add(new LineTo({x: center.x,                        y: center.y + (TRIANGLE_POINT / 2) + MARGIN}));
-        path.add(new LineTo({x: center.x + TRIANGLE_POINT / 2,   y: center.y + MARGIN}, true));
+        path.add(new MoveTo({x: center.x - (TRIANGLE_POINT / 2),            y: center.y + MARGIN}));
+        path.add(new LineTo({x: center.x,                                   y: center.y + (TRIANGLE_POINT / 2) + MARGIN}));
+        path.add(new LineTo({x: center.x + TRIANGLE_POINT / 2,              y: center.y + MARGIN}, true));
         break;
       case Table.COL:
-        path.add(new MoveTo({x: center.x - MARGIN,                        y: center.y - (TRIANGLE_POINT / 2)}));
-        path.add(new LineTo({x: center.x - (TRIANGLE_POINT / 2) - MARGIN, y: center.y}));
-        path.add(new LineTo({x: center.x - MARGIN,                        y: center.y + (TRIANGLE_POINT / 2)}, true));
+        path.add(new MoveTo({x: center.x - MARGIN,                          y: center.y - (TRIANGLE_POINT / 2)}));
+        path.add(new LineTo({x: center.x - (TRIANGLE_POINT / 2) - MARGIN,   y: center.y}));
+        path.add(new LineTo({x: center.x - MARGIN,                          y: center.y + (TRIANGLE_POINT / 2)}, true));
 
-        path.add(new MoveTo({x: center.x + MARGIN,                        y: center.y - (TRIANGLE_POINT / 2)}));
-        path.add(new LineTo({x: center.x + (TRIANGLE_POINT / 2) + MARGIN, y: center.y}));
-        path.add(new LineTo({x: center.x + MARGIN,                        y: center.y + (TRIANGLE_POINT / 2)}, true));
+        path.add(new MoveTo({x: center.x + MARGIN,                          y: center.y - (TRIANGLE_POINT / 2)}));
+        path.add(new LineTo({x: center.x + (TRIANGLE_POINT / 2) + MARGIN,   y: center.y}));
+        path.add(new LineTo({x: center.x + MARGIN,                          y: center.y + (TRIANGLE_POINT / 2)}, true));
         break;
     }
     return path;
   }
 
   public __updatePosition__(): void {
-    const points = this.lineView.points;
+    const points: Point[] = this.lineView.points;
     const lineCenter: Point = {
       x: (points[0].x + points[1].x) / 2,
       y: (points[0].y + points[1].y) / 2,
@@ -163,14 +161,14 @@ export class TableGrip {
     return this.editTool.editableElement?.cols[this.order + 1].line;
   }
 
-  public makeMouseDown(position: Point, call: boolean = true) {
+  public makeMouseDown(position: Point, call: boolean = true): void {
     if (call) {
       this._container.__call__(SVGEvent.TABLE_EDIT_MOUSE_DOWN, {type: this.type, order: this.order, position, element: this.editTool.editableElement});
     }
   }
-  public makeMouseMove(position: Point, call: boolean = true) {
+  public makeMouseMove(position: Point, call: boolean = true): void {
     if (!this.editTool.editableElement) {return;}
-    const rotatedPosition = Matrix.rotate(
+    const rotatedPosition: Point = Matrix.rotate(
       [position],
       this.editTool.editableElement.refPoint,
       this.editTool.editableElement.angle
@@ -202,7 +200,7 @@ export class TableGrip {
       this._container.__call__(SVGEvent.TABLE_EDIT_MOUSE_MOVE, {type: this.type, order: this.order, position, element: this.editTool.editableElement});
     }
   }
-  public makeMouseUp(position: Point, call: boolean = true) {
+  public makeMouseUp(position: Point, call: boolean = true): void {
     this.makeMouseMove(position, false);
     if (call) {
       this._container.__call__(SVGEvent.TABLE_EDIT_MOUSE_UP, {type: this.type, order: this.order, position, element: this.editTool.editableElement});
@@ -210,7 +208,7 @@ export class TableGrip {
     }
   }
 
-  public __on__() {
+  public __on__(): void {
     this._grip.SVG.addEventListener('mousedown', this.mouseDownEvent);
     this._grip.SVG.addEventListener('touchstart', this.mouseDownEvent);
     this.lineView.SVG.addEventListener('mousedown', this.mouseDownEvent);
@@ -218,7 +216,7 @@ export class TableGrip {
     this._grip.SVG.style.cursor = 'grab';
     this.lineView.SVG.style.cursor = 'grab';
   }
-  public __off__() {
+  public __off__(): void {
     this._grip.SVG.removeEventListener('mousedown', this.mouseDownEvent);
     this._grip.SVG.removeEventListener('touchstart', this.mouseDownEvent);
     this.lineView.SVG.removeEventListener('mousedown', this.mouseDownEvent);

@@ -18,10 +18,12 @@ export interface TextBoxProperties extends ForeignObjectProperties {}
 export class TextBoxView extends ForeignObjectView {
   protected override _type: ElementType = ElementType.TEXT_BOX;
   protected override _content: HTMLTextAreaElement;
-  private _lastCommittedText = '';
-  public override defaultOutline = 'thin solid #ddd';
-  protected override cutEvent = (event: ClipboardEvent) => {
-    const text = document.getSelection()?.toString();
+  private _lastCommittedText: string = '';
+  public override defaultOutline: string = 'thin solid #ddd';
+  public override erasable: boolean = true;
+
+  protected override cutEvent: (event: ClipboardEvent) => void = (event: ClipboardEvent) => {
+    const text: string | undefined = document.getSelection()?.toString();
     if (text) {
       this._container.focused.__clipboard__.text = text;
 
@@ -29,8 +31,8 @@ export class TextBoxView extends ForeignObjectView {
       event.preventDefault();
     }
   };
-  protected override pasteEvent = (event: ClipboardEvent) => {
-    const paste = this.container.focused.__clipboard__.text;
+  protected override pasteEvent: (event: ClipboardEvent) => void = (event: ClipboardEvent) => {
+    const paste: string = this.container.focused.__clipboard__.text;
 
     this.replaceSelected(paste);
     event.preventDefault();
@@ -51,7 +53,7 @@ export class TextBoxView extends ForeignObjectView {
     this.svgElement.innerHTML = '';
     this.svgElement.appendChild(this._content);
     /* prevent from dropping elements inside */
-    this._content.ondrop = () => {return false;};
+    this._content.ondrop = () => false;
 
     this.addEditCallBack();
     this.addFocusEvent();
@@ -71,7 +73,7 @@ export class TextBoxView extends ForeignObjectView {
   public override get content(): HTMLTextAreaElement {
     return this._content;
   }
-  public override addEditCallBack() {
+  public override addEditCallBack(): void {
     this._content.addEventListener('input', () => {
       this._container.__call__(SVGEvent.TEXT_TYPING, {text: this._content.value, element: this});
     });
@@ -97,11 +99,11 @@ export class TextBoxView extends ForeignObjectView {
     });
   }
 
-  public replaceSelected(text: string) {
-    const start = this._content.selectionStart;
-    const end = this._content.selectionEnd;
+  public replaceSelected(text: string): void {
+    const start: number = this._content.selectionStart;
+    const end: number = this._content.selectionEnd;
     this.text = this.text.substring(0, start) + text + this.text.substring(end);
-    const replacedTextEnd = start + text.length;
+    const replacedTextEnd: number = start + text.length;
     this._content.setSelectionRange(replacedTextEnd, replacedTextEnd);
   }
 
@@ -110,12 +112,12 @@ export class TextBoxView extends ForeignObjectView {
   }
 
   public override toJSON(): any {
-    const json = super.toJSON();
+    const json: any = super.toJSON();
     json.content = undefined;
     json.text = this._content.value;
     return json;
   }
-  public override fromJSON(json: any) {
+  public override fromJSON(json: any): void {
     super.fromJSON(json);
     this.text = json.text;
   };

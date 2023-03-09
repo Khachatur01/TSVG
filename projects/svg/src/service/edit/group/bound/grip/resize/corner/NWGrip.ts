@@ -1,11 +1,12 @@
-import {Grip} from "../Grip";
-import {Point} from "../../../../../../../model/Point";
-import {Angle} from "../../../../../../math/Angle";
-import {SVGEvent} from "../../../../../../../dataSource/constant/SVGEvent";
-import {Compass} from "../../../../../../../dataSource/constant/Compass";
+import {Grip} from '../Grip';
+import {Point} from '../../../../../../../model/Point';
+import {Angle} from '../../../../../../math/Angle';
+import {SVGEvent} from '../../../../../../../dataSource/constant/SVGEvent';
+import {Compass} from '../../../../../../../dataSource/constant/Compass';
+import {Rect} from '../../../../../../../model/Rect';
 
 export class NWGrip extends Grip {
-  public __setPosition__(points: Point[]) {
+  public __setPosition__(points: Point[]): void {
     this.__drag__({
       x: points[0].x - this.halfSide,
       y: points[0].y - this.halfSide
@@ -34,14 +35,14 @@ export class NWGrip extends Grip {
   public override makeMouseMove(client: Point, call: boolean = true): void {
     super.makeMouseMove(client, call);
 
-    const elementRect = this.focus.__lastRect__;
+    const elementRect: Rect = this.focus.__lastRect__;
 
     if (this._container.perfect) {
       const originPoint: Point = {
         x: elementRect.x + elementRect.width,
         y: elementRect.y + elementRect.height
       };
-      let angle = this._lastAngle;
+      let angle: number = this._lastAngle;
       if (client.x > originPoint.x && client.y > originPoint.y) /* IV */{
         angle = 360 - (180 - angle);
       }
@@ -58,8 +59,8 @@ export class NWGrip extends Grip {
         Angle.lineLength(originPoint, client)
       );
     }
-    const width = (client.x) - (elementRect.x + elementRect.width);
-    const height = (client.y) - (elementRect.y + elementRect.height);
+    const width: number = (client.x) - (elementRect.x + elementRect.width);
+    const height: number = (client.y) - (elementRect.y + elementRect.height);
 
     this._lastResize = {
       x: elementRect.x + elementRect.width,

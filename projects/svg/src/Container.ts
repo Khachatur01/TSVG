@@ -1,41 +1,42 @@
-/* eslint-disable */
-import {ElementView} from "./element/ElementView";
-import {Focus} from "./service/edit/group/Focus";
-import {Drawers} from "./dataSource/Drawers";
-import {Grid} from "./service/grid/Grid";
-import {SVGEvent} from "./dataSource/constant/SVGEvent";
-import {GroupCursor, GroupView} from "./element/group/GroupView";
-import {Style} from "./service/style/Style";
-import {Point} from "./model/Point";
-import {TextBoxCursor, TextBoxView} from "./element/foreign/text/TextBoxView";
-import {Cursor} from "./dataSource/constant/Cursor";
-import {ForeignObjectCursor, ForeignObjectView} from "./element/foreign/ForeignObjectView";
-import {ElementType} from "./dataSource/constant/ElementType";
-import {EllipseCursor, EllipseView} from "./element/shape/circluar/EllipseView";
-import {BoxCursor, BoxView} from "./element/shape/BoxView";
-import {PathCursor, PathView} from "./element/shape/path/PathView";
-import {LineCursor, LineView} from "./element/shape/pointed/LineView";
-import {FreeCursor, FreeView} from "./element/shape/path/FreeView";
-import {PolylineCursor, PolylineView} from "./element/shape/pointed/polyline/PolylineView";
-import {PolygonCursor, PolygonView} from "./element/shape/pointed/polygon/PolygonView";
-import {TriangleCursor, TriangleView} from "./element/shape/pointed/polygon/triangle/TriangleView";
-import {RightTriangleCursor, RightTriangleView} from "./element/shape/pointed/polygon/triangle/RightTriangleView";
+import {ElementView} from './element/ElementView';
+import {Focus} from './service/edit/group/Focus';
+import {Drawers} from './dataSource/Drawers';
+import {Grid} from './service/grid/Grid';
+import {SVGEvent} from './dataSource/constant/SVGEvent';
+import {GroupCursor, GroupView} from './element/group/GroupView';
+import {Style} from './service/style/Style';
+import {Point} from './model/Point';
+import {TextBoxCursor, TextBoxView} from './element/foreign/text/TextBoxView';
+import {Cursor} from './dataSource/constant/Cursor';
+import {ForeignObjectCursor, ForeignObjectView} from './element/foreign/ForeignObjectView';
+import {ElementType} from './dataSource/constant/ElementType';
+import {EllipseCursor, EllipseView} from './element/shape/circluar/EllipseView';
+import {BoxCursor, BoxView} from './element/shape/BoxView';
+import {PathCursor, PathView} from './element/shape/path/PathView';
+import {LineCursor, LineView} from './element/shape/pointed/LineView';
+import {FreeCursor, FreeView} from './element/shape/path/FreeView';
+import {PolylineCursor, PolylineView} from './element/shape/pointed/polyline/PolylineView';
+import {PolygonCursor, PolygonView} from './element/shape/pointed/polygon/PolygonView';
+import {TriangleCursor, TriangleView} from './element/shape/pointed/polygon/triangle/TriangleView';
+import {RightTriangleCursor, RightTriangleView} from './element/shape/pointed/polygon/triangle/RightTriangleView';
 import {
   IsoscelesTriangleCursor,
   IsoscelesTriangleView
-} from "./element/shape/pointed/polygon/triangle/IsoscelesTriangleView";
-import {RectangleCursor, RectangleView} from "./element/shape/pointed/polygon/rectangle/RectangleView";
-import {ImageCursor, ImageView} from "./element/foreign/media/ImageView";
-import {VideoCursor, VideoView} from "./element/foreign/media/VideoView";
-import {CircleCursor, CircleView} from "./element/shape/circluar/CircleView";
-import {TableCursor, TableView} from "./element/complex/TableView";
-import {Tools} from "./dataSource/Tools";
-import {RayCursor, RayView} from "./element/complex/cartesian/RayView";
-import {GraphicCursor, GraphicView} from "./element/complex/cartesian/GraphicView";
-import {CoordinatePlaneCursor, CoordinatePlaneView} from "./element/complex/cartesian/CoordinatePlaneView";
-import {NumberLineCursor, NumberLineView} from "./element/complex/cartesian/NumberLineView";
-import {NumberLine2Cursor, NumberLineView2} from "./element/complex/cartesian2/NumberLineView2";
-import {CoordinatePlane2Cursor, CoordinatePlaneView2} from "./element/complex/cartesian2/CoordinatePlaneView2";
+} from './element/shape/pointed/polygon/triangle/IsoscelesTriangleView';
+import {RectangleCursor, RectangleView} from './element/shape/pointed/polygon/rectangle/RectangleView';
+import {ImageCursor, ImageView} from './element/foreign/media/ImageView';
+import {VideoCursor, VideoView} from './element/foreign/media/VideoView';
+import {CircleCursor, CircleView} from './element/shape/circluar/CircleView';
+import {TableCursor, TableView} from './element/complex/TableView';
+import {Tools} from './dataSource/Tools';
+import {RayCursor, RayView} from './element/complex/cartesian/RayView';
+import {GraphicCursor, GraphicView} from './element/complex/cartesian/GraphicView';
+import {CoordinatePlaneCursor, CoordinatePlaneView} from './element/complex/cartesian/CoordinatePlaneView';
+import {NumberLineCursor, NumberLineView} from './element/complex/cartesian/NumberLineView';
+import {NumberLine2Cursor, NumberLineView2} from './element/complex/cartesian2/NumberLineView2';
+import {CoordinatePlane2Cursor, CoordinatePlaneView2} from './element/complex/cartesian2/CoordinatePlaneView2';
+
+export type SVGCallback = (parameters: any) => void;
 
 class GlobalStyle extends Style {
 
@@ -51,20 +52,21 @@ class GlobalStyle extends Style {
     this.container = container;
     this.default = new Style();
 
-    this.cursor[Cursor.NO_TOOL] = "default";
-    this.cursor[Cursor.DRAW] = "crosshair";
-    this.cursor[Cursor.DRAW_FREE] = "crosshair";
-    this.cursor[Cursor.DRAW_TEXT_BOX] = "crosshair";
-    this.cursor[Cursor.SELECT] = "default";
-    this.cursor[Cursor.EDIT_NODE] = "default";
-    this.cursor[Cursor.EDIT_TABLE] = "default";
-    this.cursor[Cursor.POINTER] = "none";
-    this.cursor[Cursor.HIGHLIGHTER] = "crosshair";
-    this.cursor[Cursor.BOUNDING_BOX] = "move";
-    this.cursor[Cursor.GRIP] = "crosshair";
-    this.cursor[Cursor.REFERENCE_POINT] = "crosshair";
-    this.cursor[Cursor.ROTATE_POINT] = "crosshair";
-    this.cursor[Cursor.NODE] = "move";
+    this.cursor[Cursor.NO_TOOL] = 'default';
+    this.cursor[Cursor.DRAW] = 'crosshair';
+    this.cursor[Cursor.DRAW_FREE] = 'crosshair';
+    this.cursor[Cursor.DRAW_TEXT_BOX] = 'crosshair';
+    this.cursor[Cursor.SELECT] = 'default';
+    this.cursor[Cursor.ERASER] = 'crosshair';
+    this.cursor[Cursor.EDIT_NODE] = 'default';
+    this.cursor[Cursor.EDIT_TABLE] = 'default';
+    this.cursor[Cursor.POINTER] = 'none';
+    this.cursor[Cursor.HIGHLIGHTER] = 'crosshair';
+    this.cursor[Cursor.BOUNDING_BOX] = 'move';
+    this.cursor[Cursor.GRIP] = 'crosshair';
+    this.cursor[Cursor.REFERENCE_POINT] = 'crosshair';
+    this.cursor[Cursor.ROTATE_POINT] = 'crosshair';
+    this.cursor[Cursor.NODE] = 'move';
 
     this.cursor.element[ElementType.ELLIPSE] = new EllipseCursor();
     this.cursor.element[ElementType.CIRCLE] = new CircleCursor();
@@ -97,7 +99,7 @@ class GlobalStyle extends Style {
   }
   public override set strokeWidth(width: string) {
     super.strokeWidth = width;
-    if (this.container.focused.children.size == 0) {
+    if (this.container.focused.children.size === 0) {
       this.default.strokeWidth = width;
     } else {
       this.container.focused.children.forEach((child: ElementView) => {
@@ -112,7 +114,7 @@ class GlobalStyle extends Style {
   }
   public override set strokeDashArray(array: string) {
     super.strokeDashArray = array;
-    if (this.container.focused.children.size == 0) {
+    if (this.container.focused.children.size === 0) {
       this.default.strokeDashArray = array;
     } else {
       this.container.focused.children.forEach((child: ElementView) => {
@@ -127,7 +129,7 @@ class GlobalStyle extends Style {
   }
   public override set strokeColor(color: string) {
     super.strokeColor = color;
-    if (this.container.focused.children.size == 0) {
+    if (this.container.focused.children.size === 0) {
       this.default.strokeColor = color;
     } else {
       this.container.focused.children.forEach((child: ElementView) => {
@@ -142,7 +144,7 @@ class GlobalStyle extends Style {
   }
   public override set fillColor(color: string) {
     super.fillColor = color;
-    if (this.container.focused.children.size == 0) {
+    if (this.container.focused.children.size === 0) {
       this.default.fillColor = color;
     } else {
       this.container.focused.children.forEach((child: ElementView) => {
@@ -157,7 +159,7 @@ class GlobalStyle extends Style {
   }
   public override set fontSize(size: string) {
     super.fontSize = size;
-    if (this.container.focused.children.size == 0) {
+    if (this.container.focused.children.size === 0) {
       this.default.fontSize = size;
     } else {
       this.container.focused.children.forEach((child: ElementView) => {
@@ -172,7 +174,7 @@ class GlobalStyle extends Style {
   }
   public override set fontColor(color: string) {
     super.fontColor = color;
-    if (this.container.focused.children.size == 0) {
+    if (this.container.focused.children.size === 0) {
       this.default.fontColor = color;
     } else {
       this.container.focused.children.forEach((child: ElementView) => {
@@ -187,7 +189,7 @@ class GlobalStyle extends Style {
   }
   public override set backgroundColor(color: string) {
     super.backgroundColor = color;
-    if (this.container.focused.children.size == 0) {
+    if (this.container.focused.children.size === 0) {
       this.default.backgroundColor = color;
     } else {
       this.container.focused.children.forEach((child: ElementView) => {
@@ -205,10 +207,10 @@ class GlobalStyle extends Style {
     }
   }
 
-  public __recoverGlobalStyle__(call: boolean = true) {
+  public __recoverGlobalStyle__(call: boolean = true): void {
     this.__setGlobalStyle__(this.default, call);
   }
-  public __fixGlobalStyle__() {
+  public __fixGlobalStyle__(): void {
     this.default.strokeWidth = this.strokeWidth;
     this.default.strokeColor = this.strokeColor;
     this.default.fillColor = this.fillColor;
@@ -217,7 +219,7 @@ class GlobalStyle extends Style {
     this.default.backgroundColor = this.backgroundColor;
   }
 
-  public __setGlobalStyle__(style: Style, call: boolean = true) {
+  public __setGlobalStyle__(style: Style, call: boolean = true): void {
     super.strokeWidth = style.strokeWidth;
     super.strokeDashArray = style.strokeDashArray;
     super.strokeColor = style.strokeColor;
@@ -230,7 +232,7 @@ class GlobalStyle extends Style {
     }
   }
 
-  public changeCursor(cursorType: Cursor) {
+  public changeCursor(cursorType: Cursor): void {
     this.container.HTML.style.cursor = this.container.style.cursor[cursorType];
 
     if (this.container.elements.size === 0) {
@@ -248,7 +250,7 @@ class GlobalStyle extends Style {
 
 export class Container {
   private static allContainers: Container[] = [];
-  private static nextContainerId = 0;
+  private static nextContainerId: number = 0;
 
   private readonly container: HTMLElement;
   public readonly __elementsGroup__: SVGGElement;
@@ -259,7 +261,7 @@ export class Container {
   public readonly id: number;
   private readonly _focus: Focus;
   private _elements: Set<ElementView> = new Set<ElementView>();
-  private _callBacks: Map<SVGEvent, Function[]> = new Map<SVGEvent, Function[]>();
+  private _callBacks: Map<SVGEvent, SVGCallback[]> = new Map<SVGEvent, SVGCallback[]>();
   private _multiSelect: boolean = false;
   private _perfect: boolean = false;
 
@@ -274,16 +276,17 @@ export class Container {
   public __activeCursor__: Cursor = Cursor.NO_TOOL;
   /* Model */
 
-  public constructor(containerId: string, ownerId: string, idPrefix: string = "", elementIndex: number = 0) {
+  public constructor(containerId: string, ownerId: string, idPrefix: string = '', elementIndex: number = 0) {
     this.idPrefix = idPrefix;
     this.ownerId = ownerId;
     this.elementIndex = elementIndex;
 
-    let container = document.getElementById(containerId);
-    if (container)
+    const container: HTMLElement | null = document.getElementById(containerId);
+    if (container) {
       this.container = container;
-    else
-      throw new DOMException("Can't create container", "Container not found");
+    } else {
+      throw new DOMException('Can\'t create container', 'Container not found');
+    }
 
     this.style = new GlobalStyle(this);
     this._focus = new Focus(this);
@@ -293,27 +296,27 @@ export class Container {
     this.grid = new Grid(this);
     this.style = new GlobalStyle(this);
 
-    this.container.addEventListener("mousedown", event => {
-      if (event.target == this.container && !this.tools.drawTool.isOn()) {
+    this.container.addEventListener('mousedown', (event: MouseEvent) => {
+      if (event.target === this.container && !this.tools.drawTool.isOn()) {
         this.__call__(SVGEvent.CLICKED_ON_CONTAINER);
         this.blur();
       }
     });
-    this.container.addEventListener("touchstart", event => {
-      if (event.target == this.container && !this.tools.drawTool.isOn()) {
+    this.container.addEventListener('touchstart', (event: TouchEvent) => {
+      if (event.target === this.container && !this.tools.drawTool.isOn()) {
         this.__call__(SVGEvent.CLICKED_ON_CONTAINER);
         this.blur();
       }
     });
 
-    this.__elementsGroup__ = document.createElementNS(ElementView.svgURI, "g");
-    this.__elementsGroup__.id = "elements";
+    this.__elementsGroup__ = document.createElementNS(ElementView.svgURI, 'g');
+    this.__elementsGroup__.id = 'elements';
 
-    this.__pointersGroup__ = document.createElementNS(ElementView.svgURI, "g");
-    this.__pointersGroup__.id = "pointers";
+    this.__pointersGroup__ = document.createElementNS(ElementView.svgURI, 'g');
+    this.__pointersGroup__.id = 'pointers';
 
-    this.__nodesGroup__ = document.createElementNS(ElementView.svgURI, "g");
-    this.__nodesGroup__.id = "nodes";
+    this.__nodesGroup__ = document.createElementNS(ElementView.svgURI, 'g');
+    this.__nodesGroup__.id = 'nodes';
 
     this.container.appendChild(this.grid.__group__); /* grid path */
     this.container.appendChild(this.__elementsGroup__); /* all elements */
@@ -339,15 +342,19 @@ export class Container {
    @param index target element index
    @param deep for searching inside group elements also
    */
-  public getElementById(ownerId: string, index: number, deep: boolean = false): ElementView | undefined {
-    for (let element of this._elements) {
+  public getElementById(ownerId: string, index: number, deep: boolean = false): ElementView | null {
+    for (const element of this._elements) {
       if (deep && element instanceof GroupView) {
-        return element.getElementById(ownerId, index);
+        /* if found element in group, return immediately, otherwise continue search */
+        const foundElement: ElementView | undefined = element.getElementById(ownerId, index);
+        if (foundElement) {
+          return foundElement;
+        }
       } else if (element.ownerId === ownerId && element.index === index) {
         return element;
       }
     }
-    return undefined;
+    return null;
   }
   public createElementByType(type: ElementType): ElementView {
     switch (type) {
@@ -394,77 +401,42 @@ export class Container {
       case ElementType.TEXT_BOX:
         return new TextBoxView(this);
       case ElementType.IMAGE:
-        return new ImageView(this, undefined, "");
+        return new ImageView(this, undefined, '');
       case ElementType.VIDEO:
-        return new VideoView(this, undefined, "");
+        return new VideoView(this, undefined, '');
       case ElementType.TABLE:
         return new TableView(this);
       default:
-        throw Error("Unknown element type");
+        throw Error('Unknown element type');
     }
   }
   public createElementFromJSON(elementJSON: any): ElementView {
-    let element = this.createElementByType(elementJSON.type);
+    const element: ElementView = this.createElementByType(elementJSON.type);
     element.fromJSON(elementJSON);
     return element;
   }
 
   public __call__(name: SVGEvent, parameters: any = {}): void {
-    let callback = this._callBacks.get(name);
-    if (callback)
-      callback.forEach((func: Function) => {
-        func(parameters);
+    const callbacks: SVGCallback[] | undefined = this._callBacks.get(name);
+    if (callbacks) {
+      callbacks.forEach((callback: SVGCallback) => {
+        callback(parameters);
       });
+    }
   }
-  public addCallBack(name: SVGEvent, callback: Function) {
-    let functions = this._callBacks.get(name);
-    if (!functions)
+  public addCallBack(name: SVGEvent, callback: SVGCallback): void {
+    const callbacks: SVGCallback[] | undefined = this._callBacks.get(name);
+    if (!callbacks) {
       this._callBacks.set(name, []);
-
-    this._callBacks.get(name)?.push(callback)
-  }
-  public removeCallBack(name: SVGEvent, callback: Function) {
-    let functions = this._callBacks.get(name);
-    if (functions)
-      functions.splice(functions.indexOf(callback), 1);
-  }
-
-  private clickEvent(element: ElementView) {
-    if (this.tools.editNodeTool.isOn() && this.tools.editNodeTool.editableElement != element) {
-      this.blur();
-      if (this.tools.editNodeTool.isOn()) {
-        this.tools.drawTool.setDrawer(this.drawers.free);
-        this.tools.drawTool.on();
-      }
-      return;
-    }
-    if (!this.tools.selectTool.isOn()) {
-      return;
     }
 
-    if (element.group) /* if element has grouped, then select group */
-      element = element.group;
-
-    let hasChild = this._focus.hasChild(element);
-    if (!this._multiSelect && hasChild) return;
-
-    if (!this._multiSelect && !hasChild) {
-      this.blur();
-      this.focus(element);
-    } else if (hasChild) {
-      this.blur(element);
-    } else {
-      this.focus(element);
-    }
+    this._callBacks.get(name)?.push(callback);
   }
-  public __setElementActivity__(element: ElementView) {
-    if (element instanceof GroupView) return;
-    element.SVG.addEventListener("mousedown", () => {
-      this.clickEvent(element);
-    });
-    element.SVG.addEventListener("touchstart", () => {
-      this.clickEvent(element);
-    });
+  public removeCallBack(name: SVGEvent, callback: SVGCallback): void {
+    const callbacks: SVGCallback[] | undefined = this._callBacks.get(name);
+    if (callbacks) {
+      callbacks.splice(callbacks.indexOf(callback), 1);
+    }
   }
 
   public __setElementCursor__(element: ElementView, cursorType?: Cursor): void {
@@ -473,7 +445,7 @@ export class Container {
       cursorType = this.__activeCursor__;
     }
 
-    if (!element.selectable && this.style.cursor.element[element.type].cursor[cursorType] != "none" && (cursorType === Cursor.SELECT || cursorType === Cursor.NO_TOOL)) {
+    if (!element.selectable && this.style.cursor.element[element.type].cursor[cursorType] !== 'none' && (cursorType === Cursor.SELECT || cursorType === Cursor.NO_TOOL)) {
       cursorType = this.tools.activeTool?.cursor || Cursor.NO_TOOL;
       cursor = this.style.cursor[cursorType];
     } else if (this.style.cursor.element[element.type].cursor[cursorType]) {
@@ -492,6 +464,33 @@ export class Container {
     this.__activeCursor__ = cursorType;
   }
 
+  private breakGroup(group: GroupView): Set<ElementView> {
+    const children: Set<ElementView> = new Set();
+    group.elements.forEach((child: ElementView) => {
+      if (child instanceof GroupView) {
+        this.breakGroup(child).forEach((childChild: ElementView) => {
+          children.add(childChild);
+        });
+      } else {
+        children.add(child);
+      }
+    });
+    return children;
+  }
+  /* get all elements, if element is a group, then ungroup and get children */
+  public get elementsDeep(): Set<ElementView> {
+    const elements: Set<ElementView> = new Set();
+    this._elements.forEach((element: ElementView) => {
+      if (element instanceof GroupView) {
+        this.breakGroup(element).forEach((child: ElementView) => {
+          elements.add(child);
+        });
+      } else {
+        elements.add(element);
+      }
+    });
+    return elements;
+  }
   public get elements(): Set<ElementView> {
     return this._elements;
   }
@@ -499,32 +498,36 @@ export class Container {
     this._elements = elements;
   }
 
-  public add(element: ElementView, setElementActivity: boolean = true) {
-    if (!element) return;
+  public add(element: ElementView, call: boolean = true): void {
+    if (!element) {return;}
+
     element.group = null;
     /* appendChild creates new node if that node does not belong to any element, so the reference of element can be changed */
     element.SVG = this.__elementsGroup__.appendChild<SVGElement>(element.SVG);
     this._elements.add(element);
-    if(setElementActivity) {
-      this.__setElementActivity__(element);
-    }
 
     this.__setElementCursor__(element /* this.activeTool?.cursor*/);
+
+    if (call) {
+      this.__call__(SVGEvent.ELEMENT_ADDED, {element});
+    }
   }
-  public remove(element: ElementView, force: boolean = false, call: boolean = true) {
-    if (force || this.tools.selectTool.isOn()) { /* if force don't check if select tool is on */
+  public remove(element: ElementView, force: boolean = false, call: boolean = true): void {
+    /* if force don't check if select tool is on */
+    if (force || this.tools.selectTool.isOn()) {
+      const copy: ElementView = element.copy;
       element?.__remove__();
       this._elements.delete(element);
 
       if (call) {
-        this.__call__(SVGEvent.ELEMENTS_DELETED, {elements: new Set<ElementView>([element.copy])});
+        this.__call__(SVGEvent.ELEMENTS_DELETED, {elements: new Set<ElementView>([copy])});
       }
     }
   }
-  public clear() {
+  public clear(): void {
     this._focus.clear();
     this._elements.clear();
-    this.__elementsGroup__.innerHTML = "";
+    this.__elementsGroup__.innerHTML = '';
     this.tools.drawTool.stopDrawing(false);
   }
 
@@ -532,7 +535,7 @@ export class Container {
     return this.container;
   }
 
-  public focusAll(showBounding: boolean = true, call: boolean = true) {
+  public focusAll(showBounding: boolean = true, call: boolean = true): void {
     this.tools.selectTool.on();
     this._elements.forEach((element: ElementView) => {
       if (element.selectable) {
@@ -543,12 +546,12 @@ export class Container {
       this.__call__(SVGEvent.ALL_FOCUSED, {elements: this._elements});
     }
   }
-  public focus(element: ElementView, showBounding: boolean = true, changeGlobalStyle: boolean = true, call: boolean = true) {
+  public focus(element: ElementView, showBounding: boolean = true, changeGlobalStyle: boolean = true, call: boolean = true): void {
     if (element.selectable) {
       this._focus.appendChild(element, showBounding, changeGlobalStyle, undefined, call);
     }
   }
-  public blur(element?: ElementView, call: boolean = true) {
+  public blur(element?: ElementView, call: boolean = true): void {
     if (element) {
       this._focus.removeChild(element, call);
     } else {
@@ -560,6 +563,9 @@ export class Container {
     return this._focus;
   }
 
+  public get isMultiselect(): boolean {
+    return this._multiSelect;
+  }
   public multiSelect(): void {
     this._multiSelect = true;
     this._focus.boundingBox.__transparentClick__ = true;
@@ -576,10 +582,11 @@ export class Container {
     this._perfect = perfect;
     this.tools.drawTool.perfect = perfect;
     this._focus.boundingBox.perfect = perfect;
-    if (perfect)
+    if (perfect) {
       this.__call__(SVGEvent.PERFECT_MODE_ON);
-    else
+    } else {
       this.__call__(SVGEvent.PERFECT_MODE_OFF);
+    }
   }
 
   public static __eventToPosition__(event: MouseEvent | TouchEvent): Point {
@@ -588,12 +595,12 @@ export class Container {
         x: event.clientX,
         y: event.clientY
       };
-    } else if(event.touches[0])
+    } else if (event.touches[0]) {
       return {
         x: event.touches[0].clientX,
         y: event.touches[0].clientY
       };
-    else { /* on touch end */
+    } else { /* on touch end */
       return {
         x: event.changedTouches[0].pageX,
         y: event.changedTouches[0].pageY

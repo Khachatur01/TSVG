@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {ElementCursor, ElementProperties, ElementView} from '../../ElementView';
 import {PathView} from '../../shape/path/PathView';
 import {Size} from '../../../model/Size';
@@ -22,16 +21,14 @@ export class ImageView extends ForeignView implements MoveDrawable {
   protected override _type: ElementType = ElementType.IMAGE;
 
   /* Model */
-  private _src = '';
+  private _src: string = '';
   /* Model */
 
   public constructor(container: Container, properties: ImageProperties = {}, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement.id = this.id;
 
-    this.svgElement.ondragstart = function() {
-      return false;
-    };
+    this.svgElement.ondragstart = () => false;
 
     this.__setRect__(rect);
     this.src = src;
@@ -65,21 +62,8 @@ export class ImageView extends ForeignView implements MoveDrawable {
       height: parseInt(this.getAttr('height'))
     };
   }
-  public __drawSize__(rect: Rect) {
+  public __drawSize__(rect: Rect): void {
     this.__setRect__(rect);
-  }
-  public __setRect__(rect: Rect): void {
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
-
-    this._rect = rect;
-    this.__updateView__();
   }
 
   public get src(): string {
@@ -91,7 +75,7 @@ export class ImageView extends ForeignView implements MoveDrawable {
   }
 
   public isComplete(): boolean {
-    const size = this.size;
+    const size: Size = this.size;
     return size.width > 0 && size.height > 0;
   }
 
@@ -100,12 +84,12 @@ export class ImageView extends ForeignView implements MoveDrawable {
   }
 
   public override toJSON(): any {
-    const json = super.toJSON();
+    const json: any = super.toJSON();
     json.src = this._src;
     json.content = undefined;
     return json;
   }
-  public override fromJSON(json: any) {
+  public override fromJSON(json: any): void {
     super.fromJSON(json);
     this.src = json.src;
   };

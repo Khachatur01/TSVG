@@ -1,8 +1,8 @@
-import {Grip} from "../Grip";
-import {Point} from "../../../../../../../model/Point";
-import {Angle} from "../../../../../../math/Angle";
-import {SVGEvent} from "../../../../../../../dataSource/constant/SVGEvent";
-import {Compass} from "../../../../../../../dataSource/constant/Compass";
+import {Grip} from '../Grip';
+import {Point} from '../../../../../../../model/Point';
+import {Angle} from '../../../../../../math/Angle';
+import {SVGEvent} from '../../../../../../../dataSource/constant/SVGEvent';
+import {Compass} from '../../../../../../../dataSource/constant/Compass';
 
 export class SEGrip extends Grip {
   public __setPosition__(points: Point[]): void {
@@ -26,10 +26,10 @@ export class SEGrip extends Grip {
   }
   public override makeMouseMove(client: Point, call: boolean = true): void {
     super.makeMouseMove(client, call);
-    const position = this.focus.__lastRect__;
+    const position: Point = this.focus.__lastRect__;
 
     if (this._container.perfect) {
-      let angle = this._lastAngle;
+      let angle: number = this._lastAngle;
       if (client.x < position.x && client.y < position.y) /* II */{
         angle = 180 - (360 - angle);
       }
@@ -46,8 +46,8 @@ export class SEGrip extends Grip {
         Angle.lineLength(position, client)
       );
     }
-    const width = client.x - position.x;
-    const height = client.y - position.y;
+    const width: number = client.x - position.x;
+    const height: number = client.y - position.y;
 
     this._lastResize = {
       x: position.x,

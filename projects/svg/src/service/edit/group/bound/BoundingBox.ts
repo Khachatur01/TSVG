@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {Rect} from '../../../../model/Rect';
 import {Grip} from './grip/resize/Grip';
 import {NWGrip} from './grip/resize/corner/NWGrip';
@@ -20,7 +19,7 @@ import {Compass} from '../../../../dataSource/constant/Compass';
 import {Cursor} from '../../../../dataSource/constant/Cursor';
 
 export class BoundingBox extends BoxView {
-  public perfect = false; /* for rotate point */
+  public perfect: boolean = false; /* for rotate point */
 
   private _grips: Grip[] = [];
   private referencePoint: RefPoint;
@@ -80,14 +79,14 @@ export class BoundingBox extends BoxView {
     return this._refPointGroup;
   }
 
-  public override __fixRefPoint__() {
+  public override __fixRefPoint__(): void {
     this.referencePoint.__fixPosition__();
   }
   public get __lastRefPoint__(): Point {
     return this.referencePoint.__lastPosition__;
   }
 
-  public __singleFocus__(rotatable: boolean = true) {
+  public __singleFocus__(rotatable: boolean = true): void {
     this.svgElement.style.display = 'block';
     for (const grip of this._grips) {
       grip.__show__();
@@ -101,9 +100,9 @@ export class BoundingBox extends BoxView {
       this.rotatePoint.__hide__();
     }
   }
-  public __onlyCircleFocus__(rotatable: boolean = true) {
+  public __onlyCircleFocus__(rotatable: boolean = true): void {
     this.svgElement.style.display = 'block';
-    for (let i = 0; i < this._grips.length; i += 2) {
+    for (let i: number = 0; i < this._grips.length; i += 2) {
       this._grips[i].__show__();
     }
 
@@ -115,7 +114,7 @@ export class BoundingBox extends BoxView {
       this.rotatePoint.__hide__();
     }
   }
-  public __multipleFocus__(rotatable: boolean = true) {
+  public __multipleFocus__(rotatable: boolean = true): void {
     this.svgElement.style.display = 'block';
     /* more effective than with one loop and condition */
     // for(let i = 0; i < this._grips.length; i += 2) {
@@ -137,7 +136,7 @@ export class BoundingBox extends BoxView {
     }
   }
 
-  public __blur__() {
+  public __blur__(): void {
     this.__rotate__(0);
     this.svgElement.style.display = 'none';
     for (const grip of this._grips) {
@@ -152,11 +151,11 @@ export class BoundingBox extends BoxView {
     return super.points;
   }
 
-  public __positionGrips__() {
+  public __positionGrips__(): void {
     this._rect.width = Math.abs(this._rect.width);
     this._rect.height = Math.abs(this._rect.height);
 
-    const points = this.points;
+    const points: Point[] = this.points;
     if (/*!points || */!this._grips) {return;}
     for (const grip of this._grips) {
       grip.__setPosition__(points);
@@ -168,8 +167,8 @@ export class BoundingBox extends BoxView {
     });
   }
 
-  public override __correct__(refPoint: Point, lastRefPoint: Point) {
-    const delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+  public override __correct__(refPoint: Point, lastRefPoint: Point): void {
+    const delta: Point = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     this.__drag__(delta);
     this.__positionGrips__();
   }
@@ -194,44 +193,44 @@ export class BoundingBox extends BoxView {
     this._angle = angle;
   }
 
-  public makeResizeMouseDown(position: Point, compass: number, call: boolean = true) {
+  public makeResizeMouseDown(position: Point, compass: number, call: boolean = true): void {
     this._grips[compass].makeMouseDown(position, call);
   }
-  public makeResizeMouseMove(position: Point, compass: number, call: boolean = true) {
+  public makeResizeMouseMove(position: Point, compass: number, call: boolean = true): void {
     this._grips[compass].makeMouseMove(position, call);
   }
-  public makeResizeMouseUp(position: Point, compass: number, call: boolean = true) {
+  public makeResizeMouseUp(position: Point, compass: number, call: boolean = true): void {
     this._grips[compass].makeMouseUp(position, call);
   }
 
-  public makeRefPointMouseDown(position: Point, call: boolean = true) {
+  public makeRefPointMouseDown(position: Point, call: boolean = true): void {
     this.referencePoint.makeMouseDown(position, call);
   }
-  public makeRefPointMouseMove(position: Point, call: boolean = true) {
+  public makeRefPointMouseMove(position: Point, call: boolean = true): void {
     this.referencePoint.makeMouseMove(position, call);
   }
-  public makeRefPointMouseUp(position: Point, call: boolean = true) {
+  public makeRefPointMouseUp(position: Point, call: boolean = true): void {
     this.referencePoint.makeMouseUp(position, call);
   }
 
-  public makeRotateMouseDown(position: Point, call: boolean = true) {
+  public makeRotateMouseDown(position: Point, call: boolean = true): void {
     this.rotatePoint.makeMouseDown(position, call);
   }
-  public makeRotateMouseMove(position: Point, call: boolean = true) {
+  public makeRotateMouseMove(position: Point, call: boolean = true): void {
     this.rotatePoint.makeMouseMove(position, call);
   }
-  public makeRotateMouseUp(position: Point, call: boolean = true) {
+  public makeRotateMouseUp(position: Point, call: boolean = true): void {
     this.rotatePoint.makeMouseUp(position, call);
   }
 
-  public __on__() {
+  public __on__(): void {
     this.rotatePoint.__on__();
     this.referencePoint.__on__();
     this._grips.forEach((grip: Grip) => {
       grip.__on__();
     });
   }
-  public __off__() {
+  public __off__(): void {
     this.rotatePoint.__off__();
     this.referencePoint.__off__();
     this._grips.forEach((grip: Grip) => {

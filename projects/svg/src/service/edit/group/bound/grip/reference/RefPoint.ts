@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import {SVGEvent} from "../../../../../../dataSource/constant/SVGEvent";
-import {PathView} from "../../../../../../element/shape/path/PathView";
-import {Point} from "../../../../../../model/Point";
-import {Focus} from "../../../Focus";
-import {Tool} from "../../../../../tool/Tool";
-import {Container} from "../../../../../../Container";
-import {Cursor} from "../../../../../../dataSource/constant/Cursor";
-import {Arc} from "../../../../../../model/path/curve/arc/Arc";
-import {MoveTo} from "../../../../../../model/path/point/MoveTo";
-import {LineTo} from "../../../../../../model/path/line/LineTo";
+import {PathView} from '../../../../../../element/shape/path/PathView';
+import {Point} from '../../../../../../model/Point';
+import {Focus} from '../../../Focus';
+import {Tool} from '../../../../../tool/Tool';
+import {Container} from '../../../../../../Container';
+import {Cursor} from '../../../../../../dataSource/constant/Cursor';
+import {SVGEvent} from '../../../../../../dataSource/constant/SVGEvent';
+import {LineTo} from '../../../../../../model/path/line/LineTo';
+import {MoveTo} from '../../../../../../model/path/point/MoveTo';
+import {Arc} from '../../../../../../model/path/curve/arc/Arc';
 
 export class RefPoint extends PathView {
   private readonly _r: number = 5; /* radius */
@@ -17,7 +16,7 @@ export class RefPoint extends PathView {
   private focus: Focus;
   private mouseCurrentPos: Point = {x: 0, y: 0};
   private _lastActiveTool: Tool | null = null;
-  private moving = false;
+  private moving: boolean = false;
 
   public constructor(container: Container, focus: Focus, x: number = 0, y: number = 0) {
     super(container, {});
@@ -37,7 +36,7 @@ export class RefPoint extends PathView {
     this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
 
-  private mouseDownEvent(event: MouseEvent | TouchEvent) {
+  private mouseDownEvent(event: MouseEvent | TouchEvent): void {
     this._lastActiveTool = this._container.tools.activeTool;
     this._container.tools.activeTool?.off();
 
@@ -47,24 +46,24 @@ export class RefPoint extends PathView {
     document.addEventListener('touchend', this.mouseUpEvent);
     this.moving = true;
 
-    const containerRect = this._container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
+    const containerRect: DOMRect = this._container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
     this.mouseCurrentPos = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
     this.makeMouseDown(this.mouseCurrentPos);
   };
-  private mouseMoveEvent(event: MouseEvent | TouchEvent) {
-    const containerRect = this._container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
+  private mouseMoveEvent(event: MouseEvent | TouchEvent): void {
+    const containerRect: DOMRect = this._container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
     this.mouseCurrentPos = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
     this.makeMouseMove(this.mouseCurrentPos);
   };
-  private mouseUpEvent() {
+  private mouseUpEvent(): void {
     this._lastActiveTool?.on();
     if (!this.moving) {
       return;
@@ -79,7 +78,7 @@ export class RefPoint extends PathView {
     this.makeMouseUp(this.mouseCurrentPos);
   };
 
-  public makeMouseDown(position: Point, call: boolean = true) {
+  public makeMouseDown(position: Point, call: boolean = true): void {
     this.focus.__fixRect__();
     this.focus.__fixRefPoint__();
     this._lastRect = Object.assign({}, this._rect);
@@ -91,7 +90,7 @@ export class RefPoint extends PathView {
       this._container.__call__(SVGEvent.REF_POINT_VIEW_MOUSE_DOWN, {position, elements: this.focus.children});
     }
   }
-  public makeMouseMove(position: Point, call: boolean = true) {
+  public makeMouseMove(position: Point, call: boolean = true): void {
     position = this._container.grid.getSnapPoint(position);
     this.focus.__refPointView__ = Object.assign({}, position);
 
@@ -99,9 +98,9 @@ export class RefPoint extends PathView {
       this._container.__call__(SVGEvent.REF_POINT_VIEW_MOUSE_MOVE, {position});
     }
   }
-  public makeMouseUp(position: Point, call: boolean = true) {
+  public makeMouseUp(position: Point, call: boolean = true): void {
     this.makeMouseMove(position);
-    const refPoint = this._container.grid.getSnapPoint(position);
+    const refPoint: Point = this._container.grid.getSnapPoint(position);
     this.focus.__refPoint__ = refPoint;
     this.focus.__correct__(refPoint);
     if (call) {
@@ -110,13 +109,13 @@ export class RefPoint extends PathView {
     }
   }
 
-  public __fixPosition__() {
+  public __fixPosition__(): void {
     this._lastCenter = Object.assign({}, this._center);
   }
   public get __lastPosition__(): Point {
     return this._lastCenter;
   }
-  public __setPosition__(position: Point) {
+  public __setPosition__(position: Point): void {
     this._center = position;
     this.drawPoint(position);
   }
@@ -126,8 +125,8 @@ export class RefPoint extends PathView {
   }
 
   private drawPoint(point: Point): void {
-    const x = point.x;
-    const y = point.y;
+    const x: number = point.x;
+    const y: number = point.y;
     this._path.setAll([
       new MoveTo({x: x - this._r, y}),
       new Arc(this._r, this._r, 0, 0, 1, {x: x + this._r, y}),
@@ -142,18 +141,18 @@ export class RefPoint extends PathView {
     });
   }
 
-  public __show__() {
+  public __show__(): void {
     this.svgElement.style.display = 'block';
   }
-  public __hide__() {
+  public __hide__(): void {
     this.svgElement.style.display = 'none';
   }
 
-  public __on__() {
+  public __on__(): void {
     this.svgElement.addEventListener('mousedown', this.mouseDownEvent);
     this.svgElement.addEventListener('touchstart', this.mouseDownEvent);
   }
-  public __off__() {
+  public __off__(): void {
     this.svgElement.removeEventListener('mousedown', this.mouseDownEvent);
     this.svgElement.removeEventListener('touchstart', this.mouseDownEvent);
   }

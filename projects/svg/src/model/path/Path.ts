@@ -32,7 +32,7 @@ export class Path {
   public getAll(): PathCommand[] {
     return this.commands;
   }
-  public setAll(commands: PathCommand[]) {
+  public setAll(commands: PathCommand[]): void {
     this.commands = commands;
   }
 
@@ -43,7 +43,7 @@ export class Path {
 
     return this.commands[index];
   }
-  public set(index: number, command: PathCommand) {
+  public set(index: number, command: PathCommand): void {
     if (index < 0) {
       index = this.commands.length + index;
     }
@@ -51,36 +51,36 @@ export class Path {
     this.commands[index] = command;
   }
 
-  public add(command: PathCommand) {
+  public add(command: PathCommand): void {
     this.commands.push(command);
   }
-  public addAll(commands: PathCommand[]) {
-    commands.forEach(command => {
+  public addAll(commands: PathCommand[]): void {
+    commands.forEach((command: PathCommand) => {
       this.commands.push(command);
     });
   }
-  public addPath(path: Path) {
-    path.commands.forEach(command => {
+  public addPath(path: Path): void {
+    path.commands.forEach((command: PathCommand) => {
       this.commands.push(command);
     });
   }
-  public remove(index: number) {
+  public remove(index: number): void {
     if (index < 0) {
       index = this.commands.length + index;
     }
 
-    const command = this.commands[index];
+    const command: PathCommand = this.commands[index];
     this.commands = this.commands.splice(this.commands.indexOf(command), 1);
   }
 
-  public replace(index: number, point: Point) {
+  public replace(index: number, point: Point): void {
     if (index < 0) {
       index = this.commands.length + index;
     }
 
     this.commands[index].position = point;
   }
-  public replaceCommand(index: number, command: PathCommand) {
+  public replaceCommand(index: number, command: PathCommand): void {
     if (index < 0) {
       index = this.commands.length + index;
     }
@@ -89,31 +89,30 @@ export class Path {
   }
 
   public toString(close: boolean = false): string {
-    let result = '';
+    let result: string = '';
     for (const command of this.commands) {
       result += command.toString() + ' ';
     }
     if (close) {
       return result + 'Z';
-    }
-    else {
-      return result.trimRight();
+    } else {
+      return result.trimEnd();
     }
   }
-  public fromString(pathString: string) {
+  public fromString(pathString: string): void {
     this.commands = [];
 
-    const pathArray = pathString
+    const pathArray: IterableIterator<RegExpMatchArray> = pathString
       .replace(/\s*,\s*/g, ' ')
       .matchAll(/[MmLlHhVvCcSsQqTtAaZz][\s.\-\d]*/g);
 
     for (const commandString of pathArray) {
-      const commandArray = commandString.toString().trim().split(' ');
+      const commandArray: string[] = commandString.toString().trim().split(' ');
 
       switch (commandArray[0]) {
         case 'M':
         case 'm':
-          const moveTo = new MoveTo({
+          const moveTo: MoveTo = new MoveTo({
             x: parseFloat(commandArray[1]),
             y: parseFloat(commandArray[2])
           });
@@ -122,7 +121,7 @@ export class Path {
 
         case 'L':
         case 'l':
-          const lineTo = new LineTo({
+          const lineTo: LineTo = new LineTo({
             x: parseFloat(commandArray[1]),
             y: parseFloat(commandArray[2])
           });
@@ -131,7 +130,7 @@ export class Path {
 
         case 'H':
         case 'h':
-          const hLineTo = new HLineTo({
+          const hLineTo: HLineTo = new HLineTo({
             x: parseFloat(commandArray[1]),
             y: 0
           });
@@ -140,7 +139,7 @@ export class Path {
 
         case 'V':
         case 'v':
-          const vLineTo = new VLineTo({
+          const vLineTo: VLineTo = new VLineTo({
             x: 0,
             y: parseFloat(commandArray[1])
           });
@@ -149,7 +148,7 @@ export class Path {
 
         case 'C':
         case 'c':
-          const cBezier = new CBezier({
+          const cBezier: CBezier = new CBezier({
             x: parseFloat(commandArray[1]),
             y: parseFloat(commandArray[2])
           },{
@@ -164,7 +163,7 @@ export class Path {
 
         case 'S':
         case 's':
-          const sCBezier = new SCBezier({
+          const sCBezier: SCBezier = new SCBezier({
             x: parseFloat(commandArray[1]),
             y: parseFloat(commandArray[2])
           },{
@@ -176,7 +175,7 @@ export class Path {
 
         case 'Q':
         case 'q':
-          const qBezier = new QBezier({
+          const qBezier: QBezier = new QBezier({
             x: parseFloat(commandArray[1]),
             y: parseFloat(commandArray[2])
           },{
@@ -188,7 +187,7 @@ export class Path {
 
         case 'T':
         case 't':
-          const sQBezier = new SQBezier({
+          const sQBezier: SQBezier = new SQBezier({
             x: parseFloat(commandArray[1]),
             y: parseFloat(commandArray[2])
           });
@@ -197,7 +196,7 @@ export class Path {
 
         case 'A':
         case 'a':
-          const arc = new Arc(
+          const arc: Arc = new Arc(
             parseFloat(commandArray[1]),
             parseFloat(commandArray[2]),
             parseFloat(commandArray[3]),

@@ -1,16 +1,16 @@
-import {MoveDraw} from '../../../mode/MoveDraw';
+import {MoveDrawer} from '../../../mode/MoveDrawer';
 import {Style} from '../../../../../style/Style';
-import {Point} from "../../../../../../model/Point";
-import {MoveDrawable} from "../../../type/MoveDrawable";
-import {CoordinatePlaneView2} from "../../../../../../element/complex/cartesian2/CoordinatePlaneView2";
-import {SVGEvent} from "../../../../../../dataSource/constant/SVGEvent";
-import {ElementType} from "../../../../../../dataSource/constant/ElementType";
+import {MoveDrawable} from '../../../type/MoveDrawable';
+import {Axis, CoordinatePlaneView2, Grid} from '../../../../../../element/complex/cartesian2/CoordinatePlaneView2';
+import {Point} from '../../../../../../model/Point';
+import {SVGEvent} from '../../../../../../dataSource/constant/SVGEvent';
+import {ElementType} from '../../../../../../dataSource/constant/ElementType';
 
-export class DrawCoordinatePlane2 extends MoveDraw {
-  public graphics: {f: (value: number) => any; style: Style}[] = [];
-  public xAxis = undefined;
-  public yAxis = undefined;
-  public grid = {show: false, byX: 1, byY: 1};
+export class DrawCoordinatePlane2 extends MoveDrawer {
+  public functions: {f: (value: number) => any; style: Style}[] = [];
+  public xAxis: Axis | undefined = undefined;
+  public yAxis: Axis | undefined = undefined;
+  public grid: Grid = {show: false, byX: 1, byY: 1};
   protected createDrawableElement(position: Point): MoveDrawable {
     return new CoordinatePlaneView2(
       this.drawTool.container,
@@ -19,11 +19,11 @@ export class DrawCoordinatePlane2 extends MoveDraw {
       this.xAxis,
       this.yAxis,
       this.grid,
-      this.graphics
+      this.functions
     );
   }
 
-  protected override onIsNotComplete(call: boolean) {
+  protected override onIsNotComplete(call: boolean): void {
     if (!this._drawableElement) {
       return;
     }
@@ -35,17 +35,17 @@ export class DrawCoordinatePlane2 extends MoveDraw {
     });
     this._drawableElement.refPoint = this._drawableElement.center;
   }
-  protected override onEnd(call: boolean) {
+  protected override onEnd(call: boolean): void {
   }
 
-  public override start(call: boolean) {
+  public override start(call: boolean): void {
     super.start(call);
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.COORDINATE_PLANE2_TOOL_ON);
     }
   }
-  public override stop(call: boolean) {
+  public override stop(call: boolean): void {
     super.stop(call);
 
     if (call) {

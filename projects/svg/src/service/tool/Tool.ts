@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {Container} from '../../Container';
 import {Point} from '../../model/Point';
 import {Cursor} from '../../dataSource/constant/Cursor';
@@ -7,7 +6,7 @@ import {SVGEvent} from '../../dataSource/constant/SVGEvent';
 export abstract class Tool {
   protected _cursor: Cursor = Cursor.NO_TOOL;
   protected readonly _container: Container;
-  protected _isOn = false;
+  protected _isOn: boolean = false;
   protected _mouseCurrentPos: Point = {x: 0, y: 0}; /* current position needed for touch end event, because touch end event can't catch end position */
 
   protected constructor(container: Container) {
@@ -18,7 +17,7 @@ export abstract class Tool {
   abstract makeMouseMove(position: Point, call?: boolean, additional?: any): void;
   abstract makeMouseUp(position: Point, call?: boolean, additional?: any): void;
 
-  public get container() {
+  public get container(): Container {
     return this._container;
   }
 
@@ -27,9 +26,10 @@ export abstract class Tool {
   }
 
   public on(call: boolean = true, checkIfTheSameTool: boolean = true): boolean {
+    /* don't turn on tool, if already turned on */
     if (checkIfTheSameTool && this === this._container.tools.activeTool) {
       return false;
-    } /* don't turn on tool, if already turned on */
+    }
     this._container.tools.activeTool?.off(call);
     this._container.tools.activeTool = this;
     this._isOn = true;
@@ -39,7 +39,8 @@ export abstract class Tool {
     return true;
   }
   public off(call: boolean = true): boolean {
-    if (this === this._container.tools.activeTool) { /* if this is the active tool, make active tool null */
+    /* if this is the active tool, make active tool null */
+    if (this === this._container.tools.activeTool) {
       this._container.tools.activeTool = null;
     }
     this._container.style.changeCursor(Cursor.NO_TOOL);
@@ -54,10 +55,10 @@ export abstract class Tool {
     return this._isOn;
   }
 
-  get mouseCurrentPos(): Point {
+  public get mouseCurrentPos(): Point {
     return this._mouseCurrentPos;
   }
-  set __mouseCurrentPos__(position: Point) {
+  public set __mouseCurrentPos__(position: Point) {
     this._mouseCurrentPos = position;
   }
 }

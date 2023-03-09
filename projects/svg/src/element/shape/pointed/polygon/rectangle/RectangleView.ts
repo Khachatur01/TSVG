@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {PolygonProperties, PolygonView} from '../PolygonView';
 import {Rect} from '../../../../../model/Rect';
 import {Container} from '../../../../../Container';
@@ -20,7 +19,7 @@ export interface RectangleProperties extends PolygonProperties {}
 export class RectangleView extends PolygonView implements MoveDrawable {
   protected override _type: ElementType = ElementType.RECTANGLE;
 
-  public constructor(container: Container, properties: RectangleProperties = {}, rect = {x: 0, y: 0, width: 1, height: 1}, ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: RectangleProperties = {}, rect: Rect = {x: 0, y: 0, width: 1, height: 1}, ownerId?: string, index?: number) {
     super(container, {}, [
       /* 0 */                                                                         /* 1 */
       {x: rect.x, y: rect.y},                             {x: rect.width + rect.x, y: rect.y},
@@ -31,7 +30,7 @@ export class RectangleView extends PolygonView implements MoveDrawable {
     this.setProperties(properties);
   }
 
-  public __drawSize__(rect: Rect) {
+  public __drawSize__(rect: Rect): void {
     this._points = [];
     this._points.push({ /* 0 */
       x: rect.x,

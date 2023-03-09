@@ -1,8 +1,9 @@
-import {Grip} from "../Grip";
-import {Point} from "../../../../../../../model/Point";
-import {Angle} from "../../../../../../math/Angle";
-import {SVGEvent} from "../../../../../../../dataSource/constant/SVGEvent";
-import {Compass} from "../../../../../../../dataSource/constant/Compass";
+import {Grip} from '../Grip';
+import {Point} from '../../../../../../../model/Point';
+import {Angle} from '../../../../../../math/Angle';
+import {SVGEvent} from '../../../../../../../dataSource/constant/SVGEvent';
+import {Compass} from '../../../../../../../dataSource/constant/Compass';
+import {Rect} from '../../../../../../../model/Rect';
 
 export class SWGrip extends Grip {
   public __setPosition__(points: Point[]): void {
@@ -29,14 +30,14 @@ export class SWGrip extends Grip {
   }
   public override makeMouseMove(client: Point, call: boolean = true): void {
     super.makeMouseMove(client, call);
-    const elementRect = this.focus.__lastRect__;
+    const elementRect: Rect = this.focus.__lastRect__;
 
     if (this._container.perfect) {
       const originPoint: Point = {
         x: elementRect.x + elementRect.width,
         y: elementRect.y
       };
-      let angle = this._lastAngle;
+      let angle: number = this._lastAngle;
       if (client.x > originPoint.x && client.y < elementRect.y) /* I */{
         angle = (angle - 180);
       }
@@ -53,8 +54,8 @@ export class SWGrip extends Grip {
         Angle.lineLength(originPoint, client)
       );
     }
-    const width = (client.x) - (elementRect.x + elementRect.width);
-    const height = client.y - (elementRect.y);
+    const width: number = (client.x) - (elementRect.x + elementRect.width);
+    const height: number = client.y - (elementRect.y);
 
     this._lastResize = {
       x: elementRect.x + elementRect.width,

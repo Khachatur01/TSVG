@@ -1,12 +1,12 @@
-import {Point} from "../../../../../../model/Point";
-import {MoveDraw} from "../../../mode/MoveDraw";
-import {ElementType} from "../../../../../../dataSource/constant/ElementType";
-import {MoveDrawable} from "../../../type/MoveDrawable";
-import {GraphicView} from "../../../../../../element/complex/cartesian/GraphicView";
-import {SVGEvent} from "../../../../../../dataSource/constant/SVGEvent";
+import {MoveDrawer} from '../../../mode/MoveDrawer';
+import {GraphicFunction, GraphicView} from '../../../../../../element/complex/cartesian/GraphicView';
+import {Point} from '../../../../../../model/Point';
+import {MoveDrawable} from '../../../type/MoveDrawable';
+import {ElementType} from '../../../../../../dataSource/constant/ElementType';
+import {SVGEvent} from '../../../../../../dataSource/constant/SVGEvent';
 
-export class DrawGraphic extends MoveDraw {
-  public f: Function = (x: number) => x;
+export class DrawGraphic extends MoveDrawer {
+  public f: GraphicFunction = (x: number) => x;
   protected createDrawableElement(position: Point): MoveDrawable {
     return new GraphicView(
       this.drawTool.container,
@@ -17,8 +17,8 @@ export class DrawGraphic extends MoveDraw {
     );
   }
 
-  protected override onIsNotComplete(call: boolean) {
-    if (!this._drawableElement) return;
+  protected override onIsNotComplete(call: boolean): void {
+    if (!this._drawableElement) {return;}
     (this._drawableElement as unknown as MoveDrawable).__drawSize__({
       x: this.startPosition.x - 150,
       y: this.startPosition.y - 150,
@@ -27,17 +27,17 @@ export class DrawGraphic extends MoveDraw {
     });
     this._drawableElement.refPoint = this._drawableElement.center;
   }
-  protected override onEnd(call: boolean) {
+  protected override onEnd(call: boolean): void {
   }
 
-  public override start(call: boolean) {
+  public override start(call: boolean): void {
     super.start(call);
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.GRAPHIC_TOOL_ON);
     }
   }
-  public override stop(call: boolean) {
+  public override stop(call: boolean): void {
     super.stop(call);
 
     if (call) {

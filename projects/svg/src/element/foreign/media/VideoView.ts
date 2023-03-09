@@ -20,7 +20,7 @@ export class VideoView extends ForeignObjectView {
   protected override readonly _content: HTMLVideoElement;
 
   /* Model */
-  private _src = '';
+  private _src: string = '';
   /* Model */
 
   public constructor(container: Container, properties: VideoProperties = {}, src: string, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
@@ -45,7 +45,6 @@ export class VideoView extends ForeignObjectView {
   public get src(): string {
     return this._src;
   }
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   public set src(URI: string) {
     this.source.setAttribute('src', !URI ? '' : URI);
     this._src = URI;
@@ -60,12 +59,12 @@ export class VideoView extends ForeignObjectView {
   }
 
   public override toJSON(): any {
-    const json = super.toJSON();
+    const json: any = super.toJSON();
     json.src = this._src;
     json.content = undefined;
     return json;
   }
-  public override fromJSON(json: any) {
+  public override fromJSON(json: any): void {
     super.fromJSON(json);
     this.src = json.src;
   };

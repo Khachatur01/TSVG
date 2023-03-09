@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {TriangleProperties, TriangleView} from './TriangleView';
 import {Container} from '../../../../../Container';
 import {Rect} from '../../../../../model/Rect';
@@ -23,7 +22,7 @@ export class RightTriangleView extends TriangleView implements MoveDrawable {
     this.setProperties(properties);
   }
 
-  public __drawSize__(rect: Rect) {
+  public __drawSize__(rect: Rect): void {
     this._points = [];
     this._points.push({ /* A */
       x: rect.x,

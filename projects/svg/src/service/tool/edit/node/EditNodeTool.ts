@@ -13,27 +13,37 @@ export class EditNodeTool extends Tool {
   private nodes: Node[] = [];
   private _editableElement: PointedView | null = null;
   public focus: Focus;
-  public showNodes = true;
+  public showNodes: boolean = true;
 
   public constructor(container: Container, focus: Focus) {
     super(container);
     this.focus = focus;
+
+    this.addMouseEvents = this.addMouseEvents.bind(this);
+    this.removeMouseEvents = this.removeMouseEvents.bind(this);
+
+    this._container.addCallBack(SVGEvent.ELEMENT_ADDED, ({element}: any) => {
+      /* if edit node tool is on, add click event to newly added element */
+      if (this._isOn) {
+        this.addMouseEvents(element);
+      }
+    });
   }
 
-  public makeMouseDown(position: Point, call: boolean, order: number) {
+  public makeMouseDown(position: Point, call: boolean, order: number): void {
     this.nodes[order].makeMouseDown(position, call);
   }
-  public makeMouseMove(position: Point, call: boolean, order: number) {
+  public makeMouseMove(position: Point, call: boolean, order: number): void {
     this.nodes[order].makeMouseMove(position, call);
   }
-  public makeMouseUp(position: Point, call: boolean, order: number) {
+  public makeMouseUp(position: Point, call: boolean, order: number): void {
     this.nodes[order].makeMouseUp(position, call);
   }
 
   private set refPoint(refPoint: Point) {
     this._container.__nodesGroup__.style.transformOrigin = refPoint.x + 'px ' + refPoint.y + 'px';
   }
-  private rotate(angle: number) {
+  private rotate(angle: number): void {
     this._container.__nodesGroup__.style.transform = 'rotate(' + angle + 'deg)';
   }
 
@@ -50,8 +60,8 @@ export class EditNodeTool extends Tool {
     this._editableElement = editableElement;
     this._editableElement.__onFocus__();
 
-    let order = 0;
-    const points = editableElement.points;
+    let order: number = 0;
+    const points: Point[] = editableElement.points;
     for (const point of points) {
       const node: Node = new Node(this._container, this, point, order++);
       node.__on__();
@@ -64,7 +74,7 @@ export class EditNodeTool extends Tool {
     this.refPoint = editableElement.refPoint;
     this.rotate(editableElement.angle);
   }
-  public removeEditableElement() {
+  public removeEditableElement(): void {
     this._container.__nodesGroup__.innerHTML = '';
     this.nodes = [];
     if (!this._editableElement) {
@@ -75,10 +85,34 @@ export class EditNodeTool extends Tool {
     this._editableElement = null;
   }
 
+  private clickEvent(event: MouseEvent | TouchEvent): void {
+    const elementId: {ownerId: string; index: number} | null = ElementView.parseId((event.target as SVGElement).id);
+    const element: ElementView | null = elementId && this._container.getElementById(elementId.ownerId, elementId.index, true);
+
+    if (this._editableElement !== element) {
+      this._container.blur();
+      if (this._isOn) {
+        this._container.tools.drawTool.setDrawer(this._container.drawers.free);
+        this._container.tools.drawTool.on();
+      }
+      return;
+    }
+  }
+  private addMouseEvents(element: ElementView): void {
+    element.SVG.addEventListener('mousedown', this.clickEvent);
+    element.SVG.addEventListener('touchstart', this.clickEvent);
+  }
+  private removeMouseEvents(element: ElementView): void {
+    element.SVG.removeEventListener('mousedown', this.clickEvent);
+    element.SVG.removeEventListener('touchstart', this.clickEvent);
+  }
+
   public override on(call: boolean = true): boolean {
     if (!super.on(call)) {
       return false;
     }
+
+    this._container.elementsDeep.forEach(this.addMouseEvents);
     this.focus.children.forEach((child: ElementView) => {
       if (child instanceof PointedView) {
         this.editableElement = child;
@@ -96,6 +130,8 @@ export class EditNodeTool extends Tool {
     if (!super.off(call)) {
       return false;
     }
+
+    this._container.elementsDeep.forEach(this.removeMouseEvents);
     this.focus.clear();
     this.removeEditableElement();
 

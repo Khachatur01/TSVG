@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {Rect} from '../../../model/Rect';
 import {ElementCursor, ElementProperties, ElementView} from '../../ElementView';
 import {Container} from '../../../Container';
 import {ElementType} from '../../../dataSource/constant/ElementType';
 import {CircularView} from './CircularView';
 import {Cursor} from '../../../dataSource/constant/Cursor';
+import {Line} from '../../../model/Line';
+import {Point} from '../../../model/Point';
 
 export class CircleCursor extends ElementCursor {
   constructor() {
@@ -45,14 +46,14 @@ export class CircleView extends CircularView {
   }
 
   public override intersectsRect(rect: Rect): boolean {
-    const circleRect = this.getVisibleRect();
-    const cx = circleRect.x + circleRect.width / 2;
-    const cy = circleRect.y + circleRect.height / 2;
-    const r = circleRect.width / 2;
-    let intersects;
+    const circleRect: Rect = this.getVisibleRect();
+    const cx: number = circleRect.x + circleRect.width / 2;
+    const cy: number = circleRect.y + circleRect.height / 2;
+    const r: number = circleRect.width / 2;
+    let intersects: boolean;
 
-    const distX = Math.abs(cx - rect.x - rect.width / 2);
-    const distY = Math.abs(cy - rect.y - rect.height / 2);
+    const distX: number = Math.abs(cx - rect.x - rect.width / 2);
+    const distY: number = Math.abs(cy - rect.y - rect.height / 2);
 
     if (distX > (rect.width / 2 + r)) {
       intersects = false;
@@ -63,14 +64,14 @@ export class CircleView extends CircularView {
     } else if (distY <= (rect.height / 2)) {
       intersects = true;
     } else {
-      const dx = distX - rect.width / 2;
-      const dy = distY - rect.height / 2;
+      const dx: number = distX - rect.width / 2;
+      const dy: number = distY - rect.height / 2;
       intersects = dx * dx + dy * dy <= r * r;
     }
 
     if (intersects) {
-      const inscribedSquareSide = Math.sqrt(Math.pow(2 * r, 2) / 2);
-      const inscribedSquareRect = {
+      const inscribedSquareSide: number = Math.sqrt(Math.pow(2 * r, 2) / 2);
+      const inscribedSquareRect: Rect = {
         x: cx - inscribedSquareSide / 2,
         y: cy - inscribedSquareSide / 2,
         width: inscribedSquareSide,
@@ -83,10 +84,53 @@ export class CircleView extends CircularView {
     return intersects;
   }
 
+  public override intersectsLine(line: Line): boolean {
+    line = JSON.parse(JSON.stringify(line));
+    const circleRect: Rect = this.getVisibleRect();
+    const cx: number = circleRect.x + circleRect.width / 2;
+    const cy: number = circleRect.y + circleRect.height / 2;
+    const r: number = circleRect.width / 2;
+
+    line.p0.x -= cx;
+    line.p1.x -= cx;
+    line.p0.y -= cy;
+    line.p1.y -= cy;
+
+    const dx: number = line.p1.x - line.p0.x;
+    const dy: number = line.p1.y - line.p0.y;
+    const dr: number = Math.sqrt(dx*dx + dy*dy);
+
+    /*
+    * |x1  x2|
+    * |y1  y2|
+    */
+    /* matrix determinant */
+    const D: number = line.p0.x * line.p1.y - line.p1.x * line.p0.y;
+
+    const firstPoint: Point = {
+      x: (D*dy + CircleView.sign(dy) * dx * Math.sqrt(r*r * dr*dr - D*D)) / (dr*dr),
+      y: (-D*dx + Math.abs(dy) * Math.sqrt(r*r * dr*dr - D*D)) / (dr*dr)
+    };
+    const secondPoint: Point = {
+      x: (D*dy - CircleView.sign(dy) * dx * Math.sqrt(r*r * dr*dr - D*D)) / (dr*dr),
+      y: (-D*dx - Math.abs(dy) * Math.sqrt(r*r * dr*dr - D*D)) / (dr*dr)
+    };
+
+    if (firstPoint.x && firstPoint.y && secondPoint.x && secondPoint.y) {
+      return  ElementView.pointDistanceFromSegment(firstPoint, line) <= 5 ||
+              ElementView.pointDistanceFromSegment(secondPoint, line) <= 5;
+    }
+    return false;
+  }
+
+  private static sign(num: number): number {
+    return num < 0 ? -1 : 1;
+  }
+
   public override __setRect__(rect: Rect): void {
 
-    const widthSign = rect.width < 0 ? -1 : 1;
-    const heightSign = rect.height < 0 ? -1 : 1;
+    const widthSign: number = rect.width < 0 ? -1 : 1;
+    const heightSign: number = rect.height < 0 ? -1 : 1;
     rect.width = rect.height = (Math.abs(rect.width) + Math.abs(rect.height)) / 2;
     rect.width *= widthSign;
     rect.height *= heightSign;

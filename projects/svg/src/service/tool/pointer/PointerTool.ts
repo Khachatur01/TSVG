@@ -11,7 +11,7 @@ export class PointerTool extends Tool {
   protected override _cursor: Cursor = Cursor.POINTER;
   private _pointerPath: PathView;
   private readonly _pointer: SVGElement;
-  private _isVisible = false;
+  private _isVisible: boolean = false;
 
   public constructor(container: Container, path?: Path) {
     super(container);
@@ -22,20 +22,20 @@ export class PointerTool extends Tool {
     this.mouseMoveEvent = this.mouseMoveEvent.bind(this);
   }
 
-  private mouseMoveEvent(event: TouchEvent | MouseEvent) {
-    const containerRect = this._container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
+  private mouseMoveEvent(event: TouchEvent | MouseEvent): void {
+    const containerRect: DOMRect = this._container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
     this._mouseCurrentPos = eventPosition;
 
-    const movePosition = {
+    const movePosition: Point = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
     this.makeMouseMove(movePosition);
   };
 
-  public makeMouseDown(position: Point, call: boolean = true) {}
-  public makeMouseMove(position: Point, call: boolean = true) {
+  public makeMouseDown(position: Point, call: boolean = true): void {}
+  public makeMouseMove(position: Point, call: boolean = true): void {
     this._pointer.setAttribute('x', position.x + '');
     this._pointer.setAttribute('y', position.y + '');
 
@@ -43,12 +43,12 @@ export class PointerTool extends Tool {
       this._container.__call__(SVGEvent.POINTER_MOVE, {position});
     }
   }
-  public makeMouseUp(position: Point, call: boolean = true) {}
+  public makeMouseUp(position: Point, call: boolean = true): void {}
 
   public getStrokeWidth(): string {
     return this._pointerPath.style.strokeWidth;
   }
-  public setStrokeWidth(width: string, call: boolean = true) {
+  public setStrokeWidth(width: string, call: boolean = true): void {
     this._pointerPath.style.strokeWidth = width;
     if (call) {
       this._container.__call__(SVGEvent.POINTER_STROKE_WIDTH_CHANGE, {strokeWidth: width});
@@ -57,7 +57,7 @@ export class PointerTool extends Tool {
   public getStrokeDasharray(): string {
     return this._pointerPath.style.strokeDashArray;
   }
-  public setStrokeDasharray(dashArray: string, call: boolean = true) {
+  public setStrokeDasharray(dashArray: string, call: boolean = true): void {
     this._pointerPath.style.strokeDashArray = dashArray;
     if (call) {
       this._container.__call__(SVGEvent.POINTER_STROKE_DASH_ARRAY_CHANGE, {strokeDashArray: dashArray});
@@ -66,7 +66,7 @@ export class PointerTool extends Tool {
   public getStrokeColor(): string {
     return this._pointerPath.style.strokeColor;
   }
-  public setStrokeColor(color: string, call: boolean = true) {
+  public setStrokeColor(color: string, call: boolean = true): void {
     this._pointerPath.style.strokeColor = color;
     if (call) {
       this._container.__call__(SVGEvent.POINTER_STROKE_COLOR_CHANGE, {strokeColor: color});
@@ -75,7 +75,7 @@ export class PointerTool extends Tool {
   public getFillColor(): string {
     return this._pointerPath.style.fillColor;
   }
-  public setFillColor(color: string, call: boolean = true) {
+  public setFillColor(color: string, call: boolean = true): void {
     this._pointerPath.style.fillColor = color;
     if (call) {
       this._container.__call__(SVGEvent.POINTER_FILL_COLOR_CHANGE, {fillColor: color});
@@ -86,11 +86,11 @@ export class PointerTool extends Tool {
     return this._isVisible;
   }
 
-  public add() {
+  public add(): void {
     this._container.__pointersGroup__.appendChild(this._pointer);
     this._isVisible = true;
   }
-  public remove() {
+  public remove(): void {
     try {
       this._container.__pointersGroup__.removeChild(this._pointer);
       this._isVisible = false;
@@ -100,7 +100,7 @@ export class PointerTool extends Tool {
   public getPath(): Path {
     return this._pointerPath.path;
   }
-  public setPath(path: Path, call: boolean = true) {
+  public setPath(path: Path, call: boolean = true): void {
     this._pointerPath = new PathView(this._container, {}, path);
 
     if (call) {

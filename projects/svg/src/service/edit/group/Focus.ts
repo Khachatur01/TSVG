@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {ElementProperties, ElementView} from '../../../element/ElementView';
 import {Draggable} from '../../tool/drag/Draggable';
 import {Point} from '../../../model/Point';
@@ -29,9 +28,9 @@ export class Focus implements Draggable, Resizeable {
   private readonly svgGroup: SVGGElement;
   private readonly svgBounding: SVGGElement;
 
-  private _lastAngle = 0;
+  private _lastAngle: number = 0;
 
-  private pasteCount = 0;
+  private pasteCount: number = 0;
 
   public constructor(container: Container) {
     this.container = container;
@@ -64,8 +63,8 @@ export class Focus implements Draggable, Resizeable {
         this.container.style.__setGlobalStyle__(element.style);
       }
     } else { /* more than one element */
-      const elementRefPoint = Object.assign({}, element.refPoint);
-      const refPoint = Object.assign({}, this.__refPoint__);
+      const elementRefPoint: Point = Object.assign({}, element.refPoint);
+      const refPoint: Point = Object.assign({}, this.__refPoint__);
       element.refPoint = refPoint;
       element.__correct__(refPoint, elementRefPoint);
       if (showBounding) {
@@ -108,7 +107,7 @@ export class Focus implements Draggable, Resizeable {
     this.__fit__();
   }
   public clear(call: boolean = true): void {
-    const thereIsElement = this._children.size > 0;
+    const thereIsElement: boolean = this._children.size > 0;
     this.__blur__(call && thereIsElement); /* call blur callback function only when there is focused element */
     this.container.style.__recoverGlobalStyle__(call && thereIsElement); /* call style change callback function only when there is focused element */
     this._children.forEach((child: ElementView) => {
@@ -151,9 +150,9 @@ export class Focus implements Draggable, Resizeable {
   public orderUp(call: boolean = true): void {}
   public orderDown(call: boolean = true): void {}
   public orderBottom(call: boolean = true): void {
-    const newElements = new Set<ElementView>();
+    const newElements: Set<ElementView> = new Set<ElementView>();
 
-    const firstChild = this.container.__elementsGroup__.firstChild;
+    const firstChild: ChildNode | null = this.container.__elementsGroup__.firstChild;
     this._children.forEach((child: ElementView) => {
       this.container.__elementsGroup__.insertBefore(child.SVG, firstChild);
       this.container.elements.delete(child);
@@ -189,7 +188,7 @@ export class Focus implements Draggable, Resizeable {
     }
 
     const children: Set<ElementView> = new Set<ElementView>();
-    const group = new GroupView(this.container);
+    const group: GroupView = new GroupView(this.container);
     this._children.forEach((element: ElementView) => {
       this.container.elements.delete(element);
       children.add(element);
@@ -200,8 +199,8 @@ export class Focus implements Draggable, Resizeable {
     this._children.add(group);
     group.setElements(children);
 
-    const lastRefPoint = this.__refPoint__;
-    const refPoint = Object.assign({}, group.center);
+    const lastRefPoint: Point = this.__refPoint__;
+    const refPoint: Point = Object.assign({}, group.center);
     this.__refPoint__ = refPoint;
     this.__refPointView__ = refPoint;
     group.__correct__(refPoint, lastRefPoint);
@@ -216,7 +215,7 @@ export class Focus implements Draggable, Resizeable {
 
     return group;
   }
-  public ungroup(call: boolean = true) {
+  public ungroup(call: boolean = true): void {
     if (this._children.size > 1) {
       return;
     }
@@ -258,13 +257,13 @@ export class Focus implements Draggable, Resizeable {
   }
 
   public __translate__(delta: Point): void {
-    this._children.forEach(child => child.__translate__(delta));
+    this._children.forEach((child: ElementView) => child.__translate__(delta));
     this.svgGroup.style.transform = ' translate(' + delta.x + 'px, ' + delta.y + 'px)';
   }
   public __drag__(delta: Point): void {
-    this._children.forEach(child => child.__drag__(delta));
+    this._children.forEach((child: ElementView) => child.__drag__(delta));
 
-    const refPoint = {
+    const refPoint: Point = {
       x: this.__lastRefPoint__.x + delta.x,
       y: this.__lastRefPoint__.y + delta.y
     };
@@ -319,7 +318,7 @@ export class Focus implements Draggable, Resizeable {
   }
 
   public get visibleCenter(): Point {
-    const rect = this.getVisibleRect();
+    const rect: Rect = this.getVisibleRect();
 
     return {
       x: rect.x + rect.width / 2,
@@ -327,7 +326,7 @@ export class Focus implements Draggable, Resizeable {
     };
   }
   public get center(): Point {
-    const rect = this.getRect();
+    const rect: Rect = this.getRect();
 
     return {
       x: rect.x + rect.width / 2,
@@ -337,9 +336,9 @@ export class Focus implements Draggable, Resizeable {
 
   public __setRect__(rect: Rect): void {
     if (this._children.size === 1) {
-      this._children.forEach(child => child.__setRect__(rect));
+      this._children.forEach((child: ElementView) => child.__setRect__(rect));
     } else {
-      this._children.forEach(child => child.__setRect__(rect));
+      this._children.forEach((child: ElementView) => child.__setRect__(rect));
     }
     this.__fit__();
   }
@@ -369,7 +368,7 @@ export class Focus implements Draggable, Resizeable {
     let maxX: number = firstRect.width + minX;
     let maxY: number = firstRect.height + minY;
 
-    for (let i = 1; i < children.length; i++) {
+    for (let i: number = 1; i < children.length; i++) {
       const rect: Rect = visible ? children[i].getVisibleRect() : children[i].getRect();
       if (rect.x < minX) {
         minX = rect.x;
@@ -397,7 +396,7 @@ export class Focus implements Draggable, Resizeable {
     return this.boundingBox.getRect();
   }
   public getVisibleRect(): Rect {
-    const rect = this.boundingBox.getRect();
+    const rect: Rect = this.boundingBox.getRect();
     let points: Point[] = [
       {x: rect.x, y: rect.y},
       {x: rect.x + rect.width, y: rect.y},
@@ -440,9 +439,9 @@ export class Focus implements Draggable, Resizeable {
     return this._children.has(xElement);
   }
 
-  public recenterRefPoint(call: boolean = true) {
+  public recenterRefPoint(call: boolean = true): void {
     this.__fixRefPoint__();
-    let center;
+    let center: Point;
     if (this._children.size > 1) {
       center = this.visibleCenter;
     } else {
@@ -466,7 +465,7 @@ export class Focus implements Draggable, Resizeable {
     return this.boundingBox.refPoint;
   }
   public set __refPoint__(point: Point) {
-    this._children.forEach(child => child.refPoint = point);
+    this._children.forEach((child: ElementView) => child.refPoint = point);
     this.boundingBox.refPoint = point;
     this.boundingBox.__refPointView__ = point;
   }
@@ -488,9 +487,9 @@ export class Focus implements Draggable, Resizeable {
   }
   public __rotate__(angle: number): void {
     if (this._children.size === 1) {
-      this._children.forEach(child => child.__rotate__(angle));
+      this._children.forEach((child: ElementView) => child.__rotate__(angle));
     } else {
-      this._children.forEach(child =>
+      this._children.forEach((child: ElementView) =>
         child.__rotate__((angle + child.__lastAngle__ - this._lastAngle) % 360)
       );
     }
@@ -501,7 +500,7 @@ export class Focus implements Draggable, Resizeable {
    * @param toAngle rotate focused element to this angle from fromAngle
    * @param fromAngle rotate focused elements from this angle to toAngle
    * */
-  public rotate(toAngle: number, fromAngle: number = 0) {
+  public rotate(toAngle: number, fromAngle: number = 0): void {
     this._lastAngle = fromAngle;
     this._children.forEach((child: ElementView) => {
       child.__fixAngle__();
@@ -510,7 +509,7 @@ export class Focus implements Draggable, Resizeable {
   }
 
   public __fit__(angle?: number): void {
-    let visible = false;
+    let visible: boolean = false;
     if (!angle) {
       if (this._children.size === 1) {
         const [singleChild] = this._children;
@@ -535,7 +534,7 @@ export class Focus implements Draggable, Resizeable {
   }
 
   public __focus__(): void {
-    let rotatable = true;
+    let rotatable: boolean = true;
     for (const child of this._children) {
       if (!child.rotatable) {
         rotatable = false;
@@ -576,9 +575,9 @@ export class Focus implements Draggable, Resizeable {
 
   public toPath(properties: ElementProperties = {overEvent: true}): void {
     if (this._children.size === 0) {return;}
-    const refPoint = Object.assign({}, this.__refPoint__);
+    const refPoint: Point = Object.assign({}, this.__refPoint__);
 
-    const path = new PathView(this.container, properties);
+    const path: PathView = new PathView(this.container, properties);
     this._children.forEach((child: ElementView) => {
       path.addPath(child.toPath().path);
     });
@@ -615,7 +614,7 @@ export class Focus implements Draggable, Resizeable {
   public cut(call: boolean = true): void {
     const childrenCopy: Set<ElementView> = new Set<ElementView>();
     this._children.forEach((child: ElementView) => {
-      const copy = child.copy;
+      const copy: ElementView = child.copy;
       copy.setId(child.ownerId, child.index);
       childrenCopy.add(child);
     });
@@ -642,17 +641,32 @@ export class Focus implements Draggable, Resizeable {
       element.__fixRect__();
       if (element instanceof GroupView) {
         element.elements.forEach((child: ElementView) => {
-          this.container.__setElementActivity__(child);
           child.container = this.container;
           child.ownerId = this.container.ownerId;
           child.index = this.container.nextElementIndex;
         });
       }
 
-      element.__drag__({
-        x: this.pasteCount * 10,
-        y: this.pasteCount * 10
-      });
+      const preferredPastePosition: Point = element.getVisibleRect();
+      preferredPastePosition.x += (this.pasteCount - 1) * 10;
+      preferredPastePosition.y += (this.pasteCount - 1) * 10;
+
+      /* iterate over all elements in container and check if there is any element in preferred paste position */
+      let preferredPositionIsBusy = false;
+      for (const child of Array.from(this.container.elements)) {
+        const childPosition: Point = child.getVisibleRect();
+        if (preferredPastePosition.x === childPosition.x && preferredPastePosition.y === childPosition.y) {
+          preferredPositionIsBusy = true;
+          break;
+        }
+      }
+
+      if (preferredPositionIsBusy) {
+        element.__drag__({
+          x: this.pasteCount * 10,
+          y: this.pasteCount * 10
+        });
+      }
       this.container.add(element);
 
       /* do not call SVGEvent.ELEMENTS_FOCUSED event now, to call after sending SVGEvent.PASTE event */

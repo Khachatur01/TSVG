@@ -1,12 +1,12 @@
-import {MoveDraw} from '../../../mode/MoveDraw';
-import {Point} from "../../../../../../model/Point";
-import {MoveDrawable} from "../../../type/MoveDrawable";
-import {NumberLineView2} from "../../../../../../element/complex/cartesian2/NumberLineView2";
-import {SVGEvent} from "../../../../../../dataSource/constant/SVGEvent";
-import {ElementType} from "../../../../../../dataSource/constant/ElementType";
+import {MoveDrawer} from '../../../mode/MoveDrawer';
+import {Axis, NumberLineView2} from '../../../../../../element/complex/cartesian2/NumberLineView2';
+import {Point} from '../../../../../../model/Point';
+import {MoveDrawable} from '../../../type/MoveDrawable';
+import {SVGEvent} from '../../../../../../dataSource/constant/SVGEvent';
+import {ElementType} from '../../../../../../dataSource/constant/ElementType';
 
-export class DrawNumberLine2 extends MoveDraw {
-  public xAxis = undefined;
+export class DrawNumberLine2 extends MoveDrawer {
+  public xAxis: Axis | undefined = undefined;
   protected createDrawableElement(position: Point): MoveDrawable {
     return new NumberLineView2(
       this.drawTool.container,
@@ -16,7 +16,7 @@ export class DrawNumberLine2 extends MoveDraw {
     );
   }
 
-  protected override onIsNotComplete(call: boolean) {
+  protected override onIsNotComplete(call: boolean): void {
     if (!this._drawableElement) {
       return;
     }
@@ -28,17 +28,17 @@ export class DrawNumberLine2 extends MoveDraw {
     });
     this._drawableElement.refPoint = this._drawableElement.center;
   }
-  protected override onEnd(call: boolean) {
+  protected override onEnd(call: boolean): void {
   }
 
-  public override start(call: boolean) {
+  public override start(call: boolean): void {
     super.start(call);
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.NUMBER_LINE_TOOL2_ON);
     }
   }
-  public override stop(call: boolean) {
+  public override stop(call: boolean): void {
     super.stop(call);
 
     if (call) {

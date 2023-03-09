@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {Point} from '../../model/Point';
 
 export class Angle {
-  public static SNAP_ANGLE = 15;
+  public static SNAP_ANGLE: number = 15;
 
   public static fromThreePoints(A: Point, B: Point, C: Point): number {
-    const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
-    const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
-    const AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
+    const AB: number = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
+    const BC: number = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
+    const AC: number = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
 
-    let degree = Angle.radToDeg(Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB)));
+    let degree: number = Angle.radToDeg(Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB)));
     if (C.y > A.y)
       {degree = 360 - degree;}
 
@@ -17,16 +16,16 @@ export class Angle {
   }
   // Returns snapped end coordinates - { x2, y2 }
   public static snapLineEnd(start: Point, end: Point): Point {
-    const length = Angle.lineLength(start, end);
-    const snapAngle = Angle.snapAngleFromCoords(start, end);
+    const length: number = Angle.lineLength(start, end);
+    const snapAngle: number = Angle.snapAngleFromCoords(start, end);
 
     return Angle.lineFromVector(start, snapAngle, length);
   }
 
   // Angle is calculated by vector coordinates within 360°
   public static fromTwoPoints(start: Point, end: Point): number {
-    const dx = Math.abs(end.x - start.x);
-    const dy = Math.abs(end.y - start.y);
+    const dx: number = Math.abs(end.x - start.x);
+    const dy: number = Math.abs(end.y - start.y);
 
     if (dx === 0) {
       if (end.y < start.y) {
@@ -43,7 +42,7 @@ export class Angle {
       }
     }
     // Angle of the right-triangle formed by coords
-    const tAngle = Angle.radToDeg(Math.atan(dy / dx));
+    const tAngle: number = Angle.radToDeg(Math.atan(dy / dx));
 
     let corrected: number;
 
@@ -66,10 +65,10 @@ export class Angle {
   }
 
   public static snapAngleFromCoords(start: Point, end: Point): number {
-    const realAngle = Angle.fromTwoPoints(start, end);
-    const rem = realAngle % Angle.SNAP_ANGLE;
+    const realAngle: number = Angle.fromTwoPoints(start, end);
+    const rem: number = realAngle % Angle.SNAP_ANGLE;
 
-    let quot = Math.floor(realAngle / Angle.SNAP_ANGLE);
+    let quot: number = Math.floor(realAngle / Angle.SNAP_ANGLE);
     if (rem > Angle.SNAP_ANGLE / 2) {
       quot++;
     }
@@ -80,13 +79,13 @@ export class Angle {
   public static lineFromVector(start: Point, angle: number, length: number): Point {
 
     // Rounding 360°+ angles and normalize negatives
-    const rAngle = angle % 360;
-    const nAngle = rAngle >= 0 ? rAngle : 360 + rAngle;
+    const rAngle: number = angle % 360;
+    const nAngle: number = rAngle >= 0 ? rAngle : 360 + rAngle;
 
-    const quad = Math.floor(nAngle / 90) + 1;
+    const quad: number = Math.floor(nAngle / 90) + 1;
 
     // Delta angle of right-triangle
-    let dAngle = nAngle % 90;
+    let dAngle: number = nAngle % 90;
     switch (quad) {
       case 2: {
         dAngle = 180 - nAngle;
@@ -101,15 +100,15 @@ export class Angle {
       }
     }
 
-    const dAngleRad = Angle.degToRad(dAngle);
+    const dAngleRad: number = Angle.degToRad(dAngle);
 
     // Negative length is ignored - delta is always positive
-    const dx = Math.cos(dAngleRad) * Math.abs(length);
-    const dy = Math.sin(dAngleRad) * Math.abs(length);
+    const dx: number = Math.cos(dAngleRad) * Math.abs(length);
+    const dy: number = Math.sin(dAngleRad) * Math.abs(length);
 
     // Quadrant IV by default
-    let x2 = start.x + dx;
-    let y2 = start.y + dy;
+    let x2: number = start.x + dx;
+    let y2: number = start.y + dy;
 
     // Switch by quadrants if other than IV
     switch (quad) {

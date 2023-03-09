@@ -1,4 +1,4 @@
-import {MoveDraw} from '../../mode/MoveDraw';
+import {MoveDrawer} from '../../mode/MoveDrawer';
 import {Point} from '../../../../../model/Point';
 import {ElementView} from '../../../../../element/ElementView';
 import {TextBoxView} from '../../../../../element/foreign/text/TextBoxView';
@@ -8,14 +8,14 @@ import {Cursor} from '../../../../../dataSource/constant/Cursor';
 import {MoveDrawable} from '../../type/MoveDrawable';
 import {DrawTool} from '../../DrawTool';
 
-export class DrawTextBox extends MoveDraw {
-  private overdraw = false;
+export class DrawTextBox extends MoveDrawer {
+  private overdraw: boolean = false;
   public constructor(drawTool: DrawTool) {
     super(drawTool);
     this.cursor = Cursor.DRAW_TEXT_BOX;
   }
   protected createDrawableElement(position: Point): MoveDrawable {
-    const textBox = new TextBoxView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
+    const textBox: TextBoxView = new TextBoxView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
     textBox.__onFocus__();
     return textBox;
   }
@@ -23,8 +23,8 @@ export class DrawTextBox extends MoveDraw {
   protected override mouseDownEvent(event: MouseEvent | TouchEvent): void {
     /* turn on text edit mode when clicking to text box element */
     if (event.target instanceof HTMLElement && event.target.parentElement instanceof SVGForeignObjectElement) {
-      const targetElementId = ElementView.parseId(event.target.parentElement.id);
-      const targetElement: ElementView | undefined = this.drawTool.container.getElementById(targetElementId.ownerId, targetElementId.index, true);
+      const targetElementId: {index: number; ownerId: string} | null = ElementView.parseId(event.target.parentElement.id);
+      const targetElement: ElementView | null = targetElementId && this.drawTool.container.getElementById(targetElementId.ownerId, targetElementId.index, true);
       /* if target element is selectable, turn on text edit mode,
        * or if it cannot be created over other text boxes - do nothing.
        * */
@@ -53,7 +53,7 @@ export class DrawTextBox extends MoveDraw {
   protected override onEnd(call: boolean): void {
     if (call) {
       if (this._drawableElement) {
-        const textBox = (this._drawableElement as TextBoxView);
+        const textBox: TextBoxView = (this._drawableElement as TextBoxView);
         this.drawTool.container.focus(textBox, false, undefined /* set default */, false);
         textBox.content.focus();
       }

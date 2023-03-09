@@ -21,7 +21,7 @@ export class DragTool extends Tool {
     this.mouseUpEvent = this.mouseUpEvent.bind(this);
   }
 
-  private mouseDownEvent(event: MouseEvent | TouchEvent) {
+  private mouseDownEvent(event: MouseEvent | TouchEvent): void {
     if (event.target === this._container.HTML || this.focus.children.size === 0) {
       return;
     }
@@ -30,24 +30,24 @@ export class DragTool extends Tool {
     document.addEventListener('mouseup', this.mouseUpEvent);
     document.addEventListener('touchend', this.mouseUpEvent);
 
-    const containerRect = this.container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
+    const containerRect: DOMRect = this.container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
     this._mouseCurrentPos = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
     this.makeMouseDown(this._mouseCurrentPos);
   };
-  private mouseMoveEvent(event: MouseEvent | TouchEvent) {
-    const containerRect = this.container.HTML.getBoundingClientRect();
-    const eventPosition = Container.__eventToPosition__(event);
+  private mouseMoveEvent(event: MouseEvent | TouchEvent): void {
+    const containerRect: DOMRect = this.container.HTML.getBoundingClientRect();
+    const eventPosition: Point = Container.__eventToPosition__(event);
     this._mouseCurrentPos = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
     };
     this.makeMouseMove(this._mouseCurrentPos);
   };
-  private mouseUpEvent() {
+  private mouseUpEvent(): void {
     this._container.HTML.removeEventListener('mousemove', this.mouseMoveEvent);
     this._container.HTML.removeEventListener('touchmove', this.mouseMoveEvent);
     document.removeEventListener('mouseup', this.mouseUpEvent);
@@ -56,7 +56,7 @@ export class DragTool extends Tool {
     this.makeMouseUp(this._mouseCurrentPos);
   };
 
-  public makeMouseDown(position: Point, call: boolean = true) {
+  public makeMouseDown(position: Point, call: boolean = true): void {
     this.mouseStartPos = position;
     this.focus.__fixRect__();
     this.focus.__fixRefPoint__();
@@ -68,7 +68,7 @@ export class DragTool extends Tool {
       this._container.__call__(SVGEvent.DRAG_MOUSE_DOWN, {position, elements: this.focus.children});
     }
   }
-  public makeMouseMove(position: Point, call: boolean = true) {
+  public makeMouseMove(position: Point, call: boolean = true): void {
     this.focus.__translate__({
       x: position.x - this.mouseStartPos.x,
       y: position.y - this.mouseStartPos.y
@@ -78,7 +78,7 @@ export class DragTool extends Tool {
       this._container.__call__(SVGEvent.DRAG_MOUSE_MOVE, {position});
     }
   }
-  public makeMouseUp(position: Point, call: boolean = true) {
+  public makeMouseUp(position: Point, call: boolean = true): void {
     this.focus.__translate__({
       x: 0,
       y: 0

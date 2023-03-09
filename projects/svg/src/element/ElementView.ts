@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {Point} from '../model/Point';
 import {Resizeable} from '../service/edit/resize/Resizeable';
 import {Rect} from '../model/Rect';
@@ -88,7 +87,7 @@ export class ElementStyle extends Style {
   }
 
   public setGlobalStyle(): void {
-    const style = this.element.container.style;
+    const style: Style = this.element.container.style;
     this.strokeWidth = style.strokeWidth;
     this.strokeDashArray = style.strokeDashArray;
     this.strokeColor = style.strokeColor;
@@ -116,18 +115,19 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   private _group: GroupView | null = null;
   protected _container: Container;
   protected _rect: Rect = {x: 0, y: 0, width: 0, height: 0};
-  protected _angle = 0;
+  protected _angle: number = 0;
   protected _refPoint: Point = {x: 0, y: 0};
   protected _lastRect: Rect = {x: 0, y: 0, width: 0, height: 0};
-  protected _lastAngle = 0;
+  protected _lastAngle: number = 0;
   protected _lastRefPoint: Point = {x: 0, y: 0};
-  protected _selectable = true;
+  protected _selectable: boolean = true;
   protected _properties: ElementProperties = {};
-  public rotatable = true;
+  public rotatable: boolean = true;
+  public erasable: boolean = true;
   /* Model */
 
-  private _highlight = this.__highlight__.bind(this);
-  private _lowlight = this.__lowlight__.bind(this);
+  private _highlight: () => void = this.__highlight__.bind(this);
+  private _lowlight: () => void = this.__lowlight__.bind(this);
 
   /**
    * @param container Container element that should contain this ElementView
@@ -155,7 +155,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   public get properties(): ElementProperties {
     return this._properties;
   }
-  public setProperties(properties: ElementProperties) {
+  public setProperties(properties: ElementProperties): void {
     this._properties = Object.assign({}, properties);
     this._properties.globalStyle = undefined; /* global style property should be set only in creation time */
     if (properties.overEvent) {
@@ -168,7 +168,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     }
   }
 
-  public __translate__(delta: Point) {
+  public __translate__(delta: Point): void {
     this._rect.x = this._lastRect.x + delta.x;
     this._rect.y = this._lastRect.y + delta.y;
     this._refPoint.x = this._lastRefPoint.x + delta.x;
@@ -181,12 +181,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     return ElementView.calculateRect(this.visiblePoints);
   };
   public getVisibleRectPoints(): Point[] {
-    const points: Point[] = [
-      {x: this._rect.x, y: this._rect.y},
-      {x: this._rect.x + this._rect.width, y: this._rect.y},
-      {x: this._rect.x + this._rect.width, y: this._rect.y + this._rect.height},
-      {x: this._rect.x, y: this._rect.y + this._rect.height}
-    ];
+    const points: Point[] = Object.assign([], this.points);
 
     return Matrix.rotate(
       points,
@@ -207,7 +202,25 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
    * rect x,y is reference point
    * rect width,height is new size of element
    * */
-  public abstract __setRect__(rect: Rect): void;
+  public __setRect__(rect: Rect): void {
+    rect = ElementView.normalizeRect(rect);
+
+    this._rect = rect;
+    this.__updateView__();
+  }
+
+  public static normalizeRect(rect: Rect): Rect {
+    if (rect.width < 0) {
+      rect.width = -rect.width;
+      rect.x -= rect.width;
+    }
+    if (rect.height < 0) {
+      rect.height = -rect.height;
+      rect.y -= rect.height;
+    }
+
+    return rect;
+  }
 
   public abstract __updateView__(): void;
   public get visiblePoints(): Point[] {
@@ -249,10 +262,26 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     return (point.x > rect.x) && (point.x < rect.x + rect.width) &&
       (point.y > rect.y) && (point.y < rect.y + rect.height);
   }
+  public static pointInLine(point: Point, line: Line): boolean {
+    const crossProduct: number = (point.y - line.p0.y) * (line.p1.x - line.p0.x) - (point.x - line.p0.x) * (line.p1.y - line.p0.y);
+    if (Math.abs(crossProduct) > Number.EPSILON) {
+      return false;
+    }
+
+    const dotProduct: number = (point.x - line.p0.x) * (line.p1.x - line.p0.x) + (point.y - line.p0.y) * (line.p1.y - line.p0.y);
+
+    if (dotProduct < 0) {
+      return false;
+    }
+
+    const lineSquareLength: number = (line.p1.x - line.p0.x) * (line.p1.x - line.p0.x) + (line.p1.y - line.p0.y) * (line.p1.y - line.p0.y);
+
+    return dotProduct <= lineSquareLength;
+  }
   public static linesIntersect(line0: Line, line1: Line): boolean {
     /* returns false if lines are overlap */
-    let gamma; let lambda;
-    const det = (line0.p1.x - line0.p0.x) * (line1.p1.y - line1.p0.y) - (line1.p1.x - line1.p0.x) * (line0.p1.y - line0.p0.y);
+    let gamma: number; let lambda: number;
+    const det: number = (line0.p1.x - line0.p0.x) * (line1.p1.y - line1.p0.y) - (line1.p1.x - line1.p0.x) * (line0.p1.y - line0.p0.y);
     if (det === 0) {
       return false;
     } else {
@@ -267,15 +296,15 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       return null;
     }
 
-    const denominator = ((line1.p1.y - line1.p0.y) * (line0.p1.x - line0.p0.x) - (line1.p1.x - line1.p0.x) * (line0.p1.y - line0.p0.y));
+    const denominator: number = ((line1.p1.y - line1.p0.y) * (line0.p1.x - line0.p0.x) - (line1.p1.x - line1.p0.x) * (line0.p1.y - line0.p0.y));
 
     /* Lines are parallel */
     if (denominator === 0) {
       return null;
     }
 
-    const ua = ((line1.p1.x - line1.p0.x) * (line0.p0.y - line1.p0.y) - (line1.p1.y - line1.p0.y) * (line0.p0.x - line1.p0.x)) / denominator;
-    const ub = ((line0.p1.x - line0.p0.x) * (line0.p0.y - line1.p0.y) - (line0.p1.y - line0.p0.y) * (line0.p0.x - line1.p0.x)) / denominator;
+    const ua: number = ((line1.p1.x - line1.p0.x) * (line0.p0.y - line1.p0.y) - (line1.p1.y - line1.p0.y) * (line0.p0.x - line1.p0.x)) / denominator;
+    const ub: number = ((line0.p1.x - line0.p0.x) * (line0.p0.y - line1.p0.y) - (line0.p1.y - line0.p0.y) * (line0.p0.x - line1.p0.x)) / denominator;
 
     /* is the intersection along the segments */
     if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
@@ -299,22 +328,49 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       { p0: {x: rect.x, y: rect.y + rect.height},               p1: {x: rect.x, y: rect.y}                            }
     ];
   }
+  public static pointDistanceFromSegment(point: Point, line: Line): number {
+    const A: number = point.x - line.p0.x;
+    const B: number = point.y - line.p0.y;
+    const C: number = line.p1.x - line.p0.x;
+    const D: number = line.p1.y - line.p0.y;
+
+    const dot: number = A * C + B * D;
+    const squareLength: number = C * C + D * D;
+    let param: number = -1;
+    if (squareLength !== 0) {
+      param = dot / squareLength;
+    }
+
+    let xx: number;
+    let yy: number;
+
+    if (param < 0) {
+      xx = line.p0.x;
+      yy = line.p0.y;
+    } else if (param > 1) {
+      xx = line.p1.x;
+      yy = line.p1.y;
+    } else {
+      xx = line.p0.x + param * C;
+      yy = line.p0.y + param * D;
+    }
+
+    const dx: number = point.x - xx;
+    const dy: number = point.y - yy;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+
   /**
-   * check if polygon created by points, intersects rectangle
+   * check if polygon created by points, intersects some lines
    *
    * @param points points of shape
-   * @param rect rectangle, to calculate intersection
+   * @param sides sides, to calculate intersection
    * @param closedShape if shape is closed, calculate intersection as polygon, otherwise as polyline
    * */
-  public static pointsIntersectingRect(points: Point[], rect: Rect, closedShape: boolean = true): boolean {
-    const rectSides = ElementView.getRectSides(rect);
-    for (let i = 0; i < points.length; i++) {
-      if (ElementView.pointInRect(points[i], rect)) {
-        /* if some point in rect, then element is intersected with rect */
-        return true;
-      }
-
-      let next;
+  public static pointsIntersectingSides(points: Point[], sides: Line[], closedShape: boolean = true): boolean {
+    for (let i: number = 0; i < points.length; i++) {
+      let next: number;
 
       if (closedShape) {
         next = i + 1 !== points.length ? i + 1 : 0;
@@ -325,8 +381,8 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
         next = i + 1;
       }
 
-      const line = {p0: points[i], p1: points[next]};
-      for (const side of rectSides) {
+      const line: Line = {p0: points[i], p1: points[next]};
+      for (const side of sides) {
         if (ElementView.linesIntersect(line, side)) {
           return true;
         }
@@ -334,13 +390,36 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     }
     return false;
   }
+  /**
+   * check if polygon created by points, intersects rectangle
+   *
+   * @param points points of shape
+   * @param rect rectangle, to calculate intersection
+   * @param closedShape if shape is closed, calculate intersection as polygon, otherwise as polyline
+   * */
+  public static pointsIntersectingRect(points: Point[], rect: Rect, closedShape: boolean = true): boolean {
+    let pointInRect: boolean = false;
+    /* if some point in rect, then element is intersected with rect */
+    for (const point of points) {
+      if (ElementView.pointInRect(point, rect)) {
+        pointInRect = true;
+        break;
+      }
+    }
+    const rectSides: Line[] = ElementView.getRectSides(rect);
+    return pointInRect || ElementView.pointsIntersectingSides(points, rectSides, closedShape);
+  }
 
   /**
    * check if this element intersects with given rect
    * */
   public intersectsRect(rect: Rect): boolean {
-    const points = this.visiblePoints;
+    const points: Point[] = this.visiblePoints;
     return ElementView.pointsIntersectingRect(points, rect);
+  }
+  public intersectsLine(line: Line): boolean {
+    const points: Point[] = this.visiblePoints;
+    return ElementView.pointsIntersectingSides(points, [line]);
   }
 
   public abstract __onFocus__(): void;
@@ -350,10 +429,14 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     return this._type;
   }
 
-  public static parseId(id: string): {ownerId: string; index: number} {
-    const idArray = id.split(/(_u|_e)+/);
+  public static parseId(id: string): {ownerId: string; index: number} | null {
+    const idArray: string[] = id.split(/(_u|_e)+/);
     const ownerId: string = idArray[2];
     const index: number = parseInt(idArray[4]);
+
+    if (!ownerId || !index) {
+      return null;
+    }
 
     return {
       ownerId,
@@ -363,7 +446,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   public get id(): string {
     return this._container.idPrefix + '_u' + this._ownerId + '_e' + this._index;
   }
-  public setId(ownerId: string, index: number) {
+  public setId(ownerId: string, index: number): void {
     this._ownerId = ownerId;
     this._index = index;
     this.svgElement.id = this.id;
@@ -392,8 +475,8 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     this._container = container;
   }
 
-  public __correct__(refPoint: Point, lastRefPoint: Point) {
-    const delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+  public __correct__(refPoint: Point, lastRefPoint: Point): void {
+    const delta: Point = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x === 0 && delta.y === 0) {return;}
 
     this._rect.x = this._rect.x + delta.x;
@@ -401,9 +484,9 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
 
     this.__updateView__();
   }
-  public __getCorrectionDelta__(refPoint: Point, lastRefPoint: Point) {
+  public __getCorrectionDelta__(refPoint: Point, lastRefPoint: Point): Point {
     /* calculate delta */
-    const rotatedRefPoint = Matrix.rotate(
+    const rotatedRefPoint: Point = Matrix.rotate(
       [{x: lastRefPoint.x, y: lastRefPoint.y}],
       {x: refPoint.x, y: refPoint.y},
       this._angle
@@ -431,7 +514,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     let maxX: number = points[0].x;
     let maxY: number = points[0].y;
 
-    for (let i = 1; i < points.length; i++) {
+    for (let i: number = 1; i < points.length; i++) {
       if (points[i].x < minX) {
         minX = points[i].x;
       }
@@ -481,7 +564,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   }
 
   public get center(): Point {
-    const center = {
+    const center: Point = {
       x: this._rect.x + this._rect.width / 2,
       y: this._rect.y + this._rect.height / 2
     };
@@ -523,9 +606,10 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   }
 
   public getAttr(attribute: string): string {
-    const value = this.SVG.getAttribute(attribute);
-    if (!value)
-      {return '0';}
+    const value: string | null = this.SVG.getAttribute(attribute);
+    if (!value) {
+      return '0';
+    }
     return value;
   }
   public setAttr(attributes: object): void {
@@ -621,7 +705,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       rotatable: this.rotatable
     };
   }
-  public fromJSON(json: any) {
+  public fromJSON(json: any): void {
     this.style.set = json.style;
     this.setId(json.ownerId, json.index);
     if (this._group) {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {ComplexView} from '../type/ComplexView';
 import {ElementType} from '../../dataSource/constant/ElementType';
 import {Point} from '../../model/Point';
@@ -42,7 +41,7 @@ export class TableView extends ComplexView implements MoveDrawable {
 
   public constructor(container: Container,
                      properties: TableProperties = {},
-                     rect = {x: 0, y: 0, width: 1, height: 1},
+                     rect: Rect = {x: 0, y: 0, width: 1, height: 1},
                      cols: number = 0, rows: number = 0,
                      ownerId?: string, index?: number) {
 
@@ -51,10 +50,16 @@ export class TableView extends ComplexView implements MoveDrawable {
 
     this.background = new RectangleView(this._container, {overEvent: false, globalStyle: false}, rect);
     this.background.style.strokeWidth = '0';
-    this._topBorderLine = new LineView(this._container, {overEvent: false, globalStyle: false},
-      {x: rect.x, y: rect.y}, {x: rect.x + rect.width, y: rect.y});
-    this._leftBorderLine = new LineView(this._container, {overEvent: false, globalStyle: false},
-      {x: rect.x, y: rect.y}, {x: rect.x, y: rect.y + rect.height});
+    this._topBorderLine = new LineView(
+      this._container,
+      {overEvent: false, globalStyle: false},
+      {x: rect.x, y: rect.y}, {x: rect.x + rect.width, y: rect.y}
+    );
+    this._leftBorderLine = new LineView(
+      this._container,
+      {overEvent: false, globalStyle: false},
+      {x: rect.x, y: rect.y}, {x: rect.x, y: rect.y + rect.height}
+    );
 
     this.recreate(rect, rows, cols, false);
 
@@ -68,7 +73,7 @@ export class TableView extends ComplexView implements MoveDrawable {
   }
 
   public override __correct__(refPoint: Point, lastRefPoint: Point): void {
-    const delta = this.__getCorrectionDelta__(refPoint, lastRefPoint);
+    const delta: Point = this.__getCorrectionDelta__(refPoint, lastRefPoint);
     if (delta.x === 0 && delta.y === 0) {
       return;
     }
@@ -85,16 +90,16 @@ export class TableView extends ComplexView implements MoveDrawable {
     this.background.__drag__(delta);
     this._topBorderLine.__drag__(delta);
     this._leftBorderLine.__drag__(delta);
-    this._rows.forEach(row => {
+    this._rows.forEach((row: TableRow) => {
       row.line?.__drag__(delta);
     });
-    this._cols.forEach(col => {
+    this._cols.forEach((col: TableCol) => {
       col.line?.__drag__(delta);
     });
   }
 
   public getRowsHeight(from: number = 0, to: number = this._rows.length): number {
-    let height = 0;
+    let height: number = 0;
     if (from > to) {
       while (from <= to) {
         if (this._rows[from]) {
@@ -113,7 +118,7 @@ export class TableView extends ComplexView implements MoveDrawable {
     return height;
   }
   public getColsWidth(from: number = 0, to: number = this._cols.length): number {
-    let width = 0;
+    let width: number = 0;
     while (from <= to) {
       width += this._cols[from].width;
       from++;
@@ -150,7 +155,7 @@ export class TableView extends ComplexView implements MoveDrawable {
       this._container.__call__(SVGEvent.ADD_TABLE_ROW, {height, after, element: this});
     }
   }
-  public removeRow(index?: number, call: boolean = true) {
+  public removeRow(index?: number, call: boolean = true): void {
     if (this._rows.length > 0) {
       if (!index || index > this._rows.length - 1) {
         index = this._rows.length - 1;
@@ -186,7 +191,7 @@ export class TableView extends ComplexView implements MoveDrawable {
       this._container.__call__(SVGEvent.ADD_TABLE_COL, {width, after, element: this});
     }
   }
-  public removeCol(index?: number, call: boolean = true) {
+  public removeCol(index?: number, call: boolean = true): void {
     if (this._cols.length > 0) {
       if (!index || index > this._cols.length - 1) {
         index = this._cols.length - 1;
@@ -209,8 +214,8 @@ export class TableView extends ComplexView implements MoveDrawable {
     const minHeight: number = parseInt(this.style.strokeWidth) + 2;
     if (index === -1) { /* modify top border */
       if (height > minHeight) {
-        const oldHeight = this._rows[index + 1].height;
-        const deltaHeight = height - oldHeight;
+        const oldHeight: number = this._rows[index + 1].height;
+        const deltaHeight: number = height - oldHeight;
         this._rows[index + 1].height = height;
         this._rect.y -= deltaHeight;
         this._rect.height += deltaHeight;
@@ -221,9 +226,9 @@ export class TableView extends ComplexView implements MoveDrawable {
       const oldHeight: number = this._rows[index].height;
       const deltaHeight: number = height - oldHeight;
 
-      const previousRowY = index === 0 ? this._rect.y : this._rows[index - 1].line?.getPoint(0).y;
-      const thisRowY = this._rows[index].line?.getPoint(0).y;
-      const nextRowY = index === this._rows.length - 1 ? this._rect.y + this._rect.height : this._rows[index + 1].line?.getPoint(0).y;
+      const previousRowY: number | undefined = index === 0 ? this._rect.y : this._rows[index - 1].line?.getPoint(0).y;
+      const thisRowY: number | undefined = this._rows[index].line?.getPoint(0).y;
+      const nextRowY: number | undefined = index === this._rows.length - 1 ? this._rect.y + this._rect.height : this._rows[index + 1].line?.getPoint(0).y;
 
       if (!(previousRowY && thisRowY && nextRowY)) {
         return this._rows[index].height;
@@ -246,8 +251,8 @@ export class TableView extends ComplexView implements MoveDrawable {
     const minWidth: number = parseInt(this.style.strokeWidth) + 2;
     if (index === -1) { /* modify left border */
       if (width > minWidth) {
-        const oldWidth = this._cols[index + 1].width;
-        const deltaWidth = width - oldWidth;
+        const oldWidth: number = this._cols[index + 1].width;
+        const deltaWidth: number = width - oldWidth;
         this._cols[index + 1].width = width;
         this._rect.x -= deltaWidth;
         this._rect.width += deltaWidth;
@@ -258,9 +263,9 @@ export class TableView extends ComplexView implements MoveDrawable {
       const oldWidth: number = this._cols[index].width;
       const deltaWidth: number = width - oldWidth;
 
-      const previousRowX = index === 0 ? this._rect.x : this._cols[index - 1].line?.getPoint(0).x;
-      const thisColX = this._cols[index].line?.getPoint(0).x;
-      const nextColX = index === this._cols.length - 1 ? this._rect.x + this._rect.width : this._cols[index + 1].line?.getPoint(0).x;
+      const previousRowX: number | undefined = index === 0 ? this._rect.x : this._cols[index - 1].line?.getPoint(0).x;
+      const thisColX: number | undefined = this._cols[index].line?.getPoint(0).x;
+      const nextColX: number | undefined = index === this._cols.length - 1 ? this._rect.x + this._rect.width : this._cols[index + 1].line?.getPoint(0).x;
 
       if (!(previousRowX && thisColX && nextColX)) {
         return this._cols[index].width;
@@ -284,26 +289,19 @@ export class TableView extends ComplexView implements MoveDrawable {
     this._rows = [];
     this._cols = [];
 
-    if (rect.width < 0) {
-      rect.width = -rect.width;
-      rect.x -= rect.width;
-    }
-    if (rect.height < 0) {
-      rect.height = -rect.height;
-      rect.y -= rect.height;
-    }
+    rect = ElementView.normalizeRect(rect);
 
     this._rect = rect;
 
     if (rows > 0) {
-      const height = rect.height / rows;
-      for (let i = 0; i < rows; i++) {
+      const height: number = rect.height / rows;
+      for (let i: number = 0; i < rows; i++) {
         this._rows.push({height});
       }
     }
     if (cols > 0) {
-      const width = rect.width / cols;
-      for (let i = 0; i < cols; i++) {
+      const width: number = rect.width / cols;
+      for (let i: number = 0; i < cols; i++) {
         this._cols.push({width});
       }
     }
@@ -329,9 +327,9 @@ export class TableView extends ComplexView implements MoveDrawable {
     this.recreate(rect, this._rows.length, this._cols.length, false);
   }
 
-  public __setRect__(rect: Rect): void {
-    let dw = 1;
-    let dh = 1;
+  public override __setRect__(rect: Rect): void {
+    let dw: number = 1;
+    let dh: number = 1;
 
     if (this._lastRect.width !== 0) {
       dw = rect.width / (this._lastRect.width);
@@ -340,10 +338,10 @@ export class TableView extends ComplexView implements MoveDrawable {
       dh = rect.height / (this._lastRect.height);
     }
 
-    for (let i = 0; i < this._lastRows.length; i++) {
+    for (let i: number = 0; i < this._lastRows.length; i++) {
       this._rows[i].height = Math.abs(this._lastRows[i].height * dh);
     }
-    for (let i = 0; i < this._lastCols.length; i++) {
+    for (let i: number = 0; i < this._lastCols.length; i++) {
       this._cols[i].width = Math.abs(this._lastCols[i].width * dw);
     }
 
@@ -386,10 +384,10 @@ export class TableView extends ComplexView implements MoveDrawable {
     this._leftBorderLine.replacePoint(0, {x: this._rect.x, y: this._rect.y});
     this._leftBorderLine.replacePoint(1, {x: this._rect.x, y: this._rect.y + this._rect.height});
 
-    let currentHeight = 0;
+    let currentHeight: number = 0;
     for (const item of this._rows) {
       currentHeight += item.height;
-      const line = new LineView(this._container,
+      const line: LineView = new LineView(this._container,
         {overEvent: false, globalStyle: false},
         {x: this._rect.x, y: currentHeight + this._rect.y},
         {x: this._rect.x + this._rect.width, y: currentHeight + this._rect.y});
@@ -397,10 +395,10 @@ export class TableView extends ComplexView implements MoveDrawable {
       this.svgElement.appendChild(line.SVG);
     }
 
-    let currentWidth = 0;
+    let currentWidth: number = 0;
     for (const item of this._cols) {
       currentWidth += item.width;
-      const line = new LineView(this._container,
+      const line: LineView = new LineView(this._container,
         {overEvent: false, globalStyle: false},
         {x: currentWidth + this._rect.x, y: this._rect.y},
         {x: currentWidth + this._rect.x, y: this._rect.y + this._rect.height});
@@ -416,14 +414,14 @@ export class TableView extends ComplexView implements MoveDrawable {
     this._leftBorderLine.replacePoint(0, {x: this._rect.x, y: this._rect.y});
     this._leftBorderLine.replacePoint(1, {x: this._rect.x, y: this._rect.y + this._rect.height});
 
-    let currentHeight = 0;
+    let currentHeight: number = 0;
     for (const item of this._rows) {
       currentHeight += item.height;
       item.line?.replacePoint(0, {x: this._rect.x, y: currentHeight + this._rect.y});
       item.line?.replacePoint(1, {x: this._rect.x + this._rect.width, y: currentHeight + this._rect.y});
     }
 
-    let currentWidth = 0;
+    let currentWidth: number = 0;
     for (const item of this._cols) {
       currentWidth += item.width;
       item.line?.replacePoint(0, {x: currentWidth + this._rect.x, y: this._rect.y});
@@ -433,12 +431,12 @@ export class TableView extends ComplexView implements MoveDrawable {
 
   public override set cursor(cursor: string) {
     this.svgElement.style.cursor = cursor;
-    this._rows.forEach(row => {
+    this._rows.forEach((row: TableRow) => {
       if (row.line?.SVG.style) {
         row.line.SVG.style.cursor = cursor;
       }
     });
-    this._cols.forEach(col => {
+    this._cols.forEach((col: TableCol) => {
       if (col.line?.SVG.style) {
         col.line.SVG.style.cursor = cursor;
       }
@@ -466,14 +464,14 @@ export class TableView extends ComplexView implements MoveDrawable {
 
   public get copyRows(): TableRow[] {
     const rowsCopy: TableRow[] = [];
-    this._rows.forEach(row => {
+    this._rows.forEach((row: TableRow) => {
       rowsCopy.push({height: row.height});
     });
     return rowsCopy;
   }
   public get copyCols(): TableCol[] {
     const colsCopy: TableCol[] = [];
-    this._cols.forEach(col => {
+    this._cols.forEach((col: TableCol) => {
       colsCopy.push({width: col.width});
     });
     return colsCopy;
@@ -489,7 +487,7 @@ export class TableView extends ComplexView implements MoveDrawable {
   }
 
   public override toJSON(): any {
-    const json = super.toJSON();
+    const json: any = super.toJSON();
     json.rows = this.copyRows;
     json._cols = this.copyCols;
     return json;

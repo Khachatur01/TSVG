@@ -2,7 +2,7 @@ export class Style {
   protected style: Map<string, string> = new Map<string, string>();
 
   public get strokeWidth(): string {
-    let width = this.style.get('stroke-width');
+    let width: string | undefined = this.style.get('stroke-width');
     if (!width) {
       width = '2';
     }
@@ -13,7 +13,7 @@ export class Style {
   }
 
   public get strokeColor(): string {
-    let color = this.style.get('stroke');
+    let color: string | undefined = this.style.get('stroke');
     if (!color) {
       color = '#000000';
     }
@@ -25,7 +25,7 @@ export class Style {
   }
 
   public get strokeDashArray(): string {
-    let array = this.style.get('stroke-dasharray');
+    let array: string | undefined = this.style.get('stroke-dasharray');
     if (!array) {
       array = '0';
     }
@@ -37,7 +37,7 @@ export class Style {
   }
 
   public get fillColor(): string {
-    let color = this.style.get('fill');
+    let color: string | undefined = this.style.get('fill');
     if(!color) {
       color = 'none';
     }
@@ -49,7 +49,7 @@ export class Style {
   }
 
   public get fontSize(): string {
-    let fontSize = this.style.get('font-size');
+    let fontSize: string | undefined = this.style.get('font-size');
     if (!fontSize) {
       fontSize = '16';
     }
@@ -61,7 +61,7 @@ export class Style {
   }
 
   public get fontColor(): string {
-    let color = this.style.get('color');
+    let color: string | undefined = this.style.get('color');
     if (!color) {
       color = '#000000';
     }
@@ -73,7 +73,7 @@ export class Style {
   }
 
   public get backgroundColor(): string {
-    let color = this.style.get('background-color');
+    let color: string | undefined = this.style.get('background-color');
     if (!color) {
       color = 'transparent';
     }
@@ -112,7 +112,7 @@ export class Style {
     this.style.clear();
   }
 
-  public get object() {
+  public get object(): any {
     return {
       strokeWidth: this.strokeWidth,
       strokeColor: this.strokeColor,

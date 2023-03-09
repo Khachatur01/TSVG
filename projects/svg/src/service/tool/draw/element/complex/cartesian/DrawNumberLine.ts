@@ -1,11 +1,11 @@
-import {Point} from "../../../../../../model/Point";
-import {MoveDraw} from "../../../mode/MoveDraw";
-import {ElementType} from "../../../../../../dataSource/constant/ElementType";
-import {NumberLineView} from "../../../../../../element/complex/cartesian/NumberLineView";
-import {MoveDrawable} from "../../../type/MoveDrawable";
-import {SVGEvent} from "../../../../../../dataSource/constant/SVGEvent";
+import {MoveDrawer} from '../../../mode/MoveDrawer';
+import {Point} from '../../../../../../model/Point';
+import {MoveDrawable} from '../../../type/MoveDrawable';
+import {NumberLineView} from '../../../../../../element/complex/cartesian/NumberLineView';
+import {SVGEvent} from '../../../../../../dataSource/constant/SVGEvent';
+import {ElementType} from '../../../../../../dataSource/constant/ElementType';
 
-export class DrawNumberLine extends MoveDraw {
+export class DrawNumberLine extends MoveDrawer {
   protected createDrawableElement(position: Point): MoveDrawable {
     return new NumberLineView(this.drawTool.container, {overEvent: true, globalStyle: false}, {
       x: position.x,
@@ -15,8 +15,8 @@ export class DrawNumberLine extends MoveDraw {
     });
   }
 
-  protected override onIsNotComplete(call: boolean) {
-    if (!this._drawableElement) return;
+  protected override onIsNotComplete(call: boolean): void {
+    if (!this._drawableElement) {return;}
     (this._drawableElement as unknown as MoveDrawable).__drawSize__({
       x: this.startPosition.x - 150,
       y: this.startPosition.y - 25,
@@ -25,17 +25,17 @@ export class DrawNumberLine extends MoveDraw {
     });
     this._drawableElement.refPoint = this._drawableElement.center;
   }
-  protected override onEnd(call: boolean) {
+  protected override onEnd(call: boolean): void {
   }
 
-  public override start(call: boolean) {
+  public override start(call: boolean): void {
     super.start(call);
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.NUMBER_LINE_TOOL_ON);
     }
   }
-  public override stop(call: boolean) {
+  public override stop(call: boolean): void {
     super.stop(call);
 
     if (call) {
