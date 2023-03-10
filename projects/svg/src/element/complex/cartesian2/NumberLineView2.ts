@@ -103,11 +103,6 @@ export class NumberLineView2 extends CartesianView2 implements MoveDrawable {
   protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, 'g');
   public override rotatable: boolean = false;
 
-  private readonly _background: RectangleView;
-  private readonly numbersGroup: SVGGElement;
-  private readonly axisGroup: SVGGElement;
-  private readonly labelsGroup: SVGGElement;
-
   public readonly _xAxisView: PathView;
 
   private _xAxis: Axis;
@@ -128,23 +123,9 @@ export class NumberLineView2 extends CartesianView2 implements MoveDrawable {
     this._xAxis = xAxis;
     this.style = new NumberLine2Style(this);
 
-    this.numbersGroup = document.createElementNS(ElementView.svgURI, 'g');
-    this.numbersGroup.style.shapeRendering = 'optimizespeed';
-    this.numbersGroup.id = 'numbers';
-    this.axisGroup = document.createElementNS(ElementView.svgURI, 'g');
-    this.axisGroup.style.shapeRendering = 'optimizespeed';
-    this.axisGroup.id = 'axis';
-    this.labelsGroup = document.createElementNS(ElementView.svgURI, 'g');
-    this.labelsGroup.style.shapeRendering = 'optimizespeed';
-    this.labelsGroup.id = 'axis';
-
-    this._background = new RectangleView(this._container, {overEvent: false, globalStyle: false});
-    this._background.SVG.style.shapeRendering = 'optimizespeed';
-    this._background.style.strokeColor = '#bfbfbf';
-    this._background.style.fillColor = 'none';
-
     this._xAxisView = new PathView(this._container);
     this.axisGroup.appendChild(this._xAxisView.SVG);
+    this.hideBorder();
 
     this.svgElement.appendChild(this._background.SVG);
     this.svgElement.appendChild(this.numbersGroup);
@@ -153,8 +134,6 @@ export class NumberLineView2 extends CartesianView2 implements MoveDrawable {
 
     this.__updateView__();
     this.setProperties(properties);
-
-    this.style.strokeWidth = '1';
   }
 
   public get background(): RectangleView {
@@ -265,10 +244,19 @@ export class NumberLineView2 extends CartesianView2 implements MoveDrawable {
     const xPhysicalStepSize: number = rect.width / (this._xAxis.numberOfSteps - 1);
 
     let currentNumber: number = this._xAxis.min;
+    const stepLineSize: number = parseInt(this.style.strokeWidth);
+
     for (let i: number = 0; i < this._xAxis.numberOfSteps; ++i) {
       const x: number = rect.x + (i * xPhysicalStepSize);
       const numberView: TextView = super.xAxisNumber(x, xAxisY, currentNumber);
+      numberView.__drag__({x, y: xAxisY + 15 + stepLineSize});
+      if (currentNumber < 0) {
+        numberView.SVG.style.textAnchor = 'start';
+      } else {
+        numberView.SVG.style.textAnchor = 'end';
+      }
       this.numbersGroup.appendChild(numberView.SVG);
+
       currentNumber += this._xAxis.step;
     }
     this._numbersVisible = true;
@@ -290,16 +278,18 @@ export class NumberLineView2 extends CartesianView2 implements MoveDrawable {
     return this._xAxis;
   }
 
-  public edit(xAxis: Axis, showNumbers?: boolean, showBorder?: boolean, call: boolean = true): void {
+  public edit(xAxis: Axis, numberSize: number, showNumbers?: boolean, showBorder?: boolean, call: boolean = true): void {
     if ( /* return if nothing changed */
       JSON.stringify(this._xAxis) === JSON.stringify(xAxis) &&
       this._numbersVisible === showNumbers &&
-      this._borderVisible === showBorder
+      this._borderVisible === showBorder &&
+      this._numberSize === numberSize
     ) {
       return;
     }
 
     this._xAxis = xAxis;
+    this._numberSize = numberSize;
 
     if (showNumbers !== undefined) {
       this._numbersVisible = showNumbers;
@@ -325,12 +315,13 @@ export class NumberLineView2 extends CartesianView2 implements MoveDrawable {
   public override toJSON(): any {
     const json: any = super.toJSON();
     json.xAxis = Object.assign({}, this._xAxis);
+    json.numberSize = this._numberSize;
     json.showNumbers = this._numbersVisible;
     json.showBorder = this._borderVisible;
     return json;
   }
   public override fromJSON(json: any): void {
     super.fromJSON(json);
-    this.edit(json.xAxis, json.showNumbers, json.showBorder, false);
+    this.edit(json.xAxis, json.numberSize, json.showNumbers, json.showBorder, false);
   }
 }

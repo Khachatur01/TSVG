@@ -6,6 +6,7 @@ import {SVGEvent} from '../../../../dataSource/constant/SVGEvent';
 import {ElementType} from '../../../../dataSource/constant/ElementType';
 import {DrawTool} from '../DrawTool';
 import {Drawer} from '../Drawer';
+import {Rect} from '../../../../model/Rect';
 
 export abstract class MoveDrawer extends Drawer {
   protected _drawableElement: MoveDrawable | undefined = undefined;
@@ -37,40 +38,32 @@ export abstract class MoveDrawer extends Drawer {
     }
   }
   public makeMouseMove(position: Point, call: boolean = true, parameter?: any): void {
-    let width: number = position.x - this.startPosition.x;
-    let height: number = position.y - this.startPosition.y;
+    let rect: Rect = {
+      x: position.x,
+      y: position.y,
+      width: position.x - this.startPosition.x,
+      height: position.y - this.startPosition.y
+    };
 
     if (this.drawTool.perfect) {
-      const averageSize: number = (Math.abs(width) + Math.abs(height)) / 2;
-      if (width < 0) {
-        width = -averageSize;
-      }
-      else {
-        width = averageSize;
-      }
-      if (height < 0) {
-        height = -averageSize;
-      }
-      else {
-        height = averageSize;
-      }
+      rect = ElementView.rectToSquare(rect);
     }
 
     if (this.drawTool.container.grid.isSnapOn()) {
       const snapPoint: Point = this.drawTool.container.grid.getSnapPoint({
-        x: this.startPosition.x + width,
-        y: this.startPosition.y + height
+        x: this.startPosition.x + rect.width,
+        y: this.startPosition.y + rect.height
       });
-      width = snapPoint.x - this.startPosition.x;
-      height = snapPoint.y - this.startPosition.y;
+      rect.width = snapPoint.x - this.startPosition.x;
+      rect.height = snapPoint.y - this.startPosition.y;
     }
 
     /* if _drawableElement instance of MoveDrawable, set drawSize */ /* TODO - change drawable element type from ElementView to MoveDrawable */
     (this._drawableElement as unknown as MoveDrawable).__drawSize__({
       x: this.startPosition.x,
       y: this.startPosition.y,
-      width,
-      height
+      width: rect.width,
+      height: rect.height
     });
 
     if (call) {

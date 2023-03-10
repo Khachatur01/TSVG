@@ -10,7 +10,7 @@ export class DrawCoordinatePlane2 extends MoveDrawer {
   public functions: {f: (value: number) => any; style: Style}[] = [];
   public xAxis: Axis | undefined = undefined;
   public yAxis: Axis | undefined = undefined;
-  public grid: Grid = {show: false, byX: 1, byY: 1};
+  public grid: Grid = {show: true, byX: 1, byY: 1};
   protected createDrawableElement(position: Point): MoveDrawable {
     return new CoordinatePlaneView2(
       this.drawTool.container,

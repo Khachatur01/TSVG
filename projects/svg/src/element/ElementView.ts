@@ -221,6 +221,20 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
 
     return rect;
   }
+  public static rectToSquare(rect: Rect): Rect {
+    const averageSize: number = (Math.abs(rect.width) + Math.abs(rect.height)) / 2;
+    if (rect.width < 0) {
+      rect.width = -averageSize;
+    } else {
+      rect.width = averageSize;
+    }
+    if (rect.height < 0) {
+      rect.height = -averageSize;
+    } else {
+      rect.height = averageSize;
+    }
+    return rect;
+  }
 
   public abstract __updateView__(): void;
   public get visiblePoints(): Point[] {

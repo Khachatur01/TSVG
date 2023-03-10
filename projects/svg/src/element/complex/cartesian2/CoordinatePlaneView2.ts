@@ -29,6 +29,7 @@ export class CoordinatePlane2Style extends ElementStyle {
     this.style.set('stroke-width', width);
     this.element.xAxisView.style.strokeWidth = width;
     this.element.yAxisView.style.strokeWidth = width;
+    this.element.__updateView__();
   }
 
   public override get strokeDashArray(): string {
@@ -99,17 +100,13 @@ export interface Grid {
 }
 
 export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable {
-  protected override _type: ElementType = ElementType.COORDINATE_PLANE2;
+  protected _type: ElementType = ElementType.COORDINATE_PLANE2;
   public override readonly style: CoordinatePlane2Style;
-  protected override svgElement: SVGElement = document.createElementNS(ElementView.svgURI, 'g');
+  protected svgElement: SVGElement = document.createElementNS(ElementView.svgURI, 'g');
   public override rotatable: boolean = false;
 
-  private readonly _background: RectangleView;
-  private readonly numbersGroup: SVGGElement;
   private readonly graphicsGroup: SVGGElement;
   private readonly gridGroup: SVGGElement;
-  private readonly axisGroup: SVGGElement;
-  private readonly labelsGroup: SVGGElement;
 
   public readonly _xAxisView: PathView;
   public readonly _yAxisView: PathView;
@@ -139,27 +136,12 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
     this._graphics = graphics;
     this.style = new CoordinatePlane2Style(this);
 
-    this.numbersGroup = document.createElementNS(ElementView.svgURI, 'g');
-    this.numbersGroup.style.shapeRendering = 'optimizespeed';
-    this.numbersGroup.id = 'numbers';
     this.graphicsGroup = document.createElementNS(ElementView.svgURI, 'g');
     this.graphicsGroup.style.shapeRendering = 'optimizespeed';
     this.graphicsGroup.id = 'graphics';
     this.gridGroup = document.createElementNS(ElementView.svgURI, 'g');
     this.gridGroup.style.shapeRendering = 'optimizespeed';
     this.gridGroup.id = 'grid';
-    this.axisGroup = document.createElementNS(ElementView.svgURI, 'g');
-    this.axisGroup.style.shapeRendering = 'optimizespeed';
-    this.axisGroup.id = 'axis';
-    this.labelsGroup = document.createElementNS(ElementView.svgURI, 'g');
-    this.labelsGroup.style.shapeRendering = 'optimizespeed';
-    this.labelsGroup.id = 'axis';
-
-    this._background = new RectangleView(this._container, {overEvent: false, globalStyle: false});
-    this._background.SVG.style.shapeRendering = 'optimizespeed';
-    this._background.style.strokeColor = '#000000';
-    this._background.style.fillColor = 'none';
-    this._background.style.strokeWidth = '1';
 
     this._xAxisView = new PathView(this._container);
     this.axisGroup.appendChild(this._xAxisView.SVG);
@@ -176,8 +158,6 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
 
     this.__updateView__();
     this.setProperties(properties);
-
-    this.style.strokeWidth = '1';
   }
 
   public addGraphic(graphic: {f: (value: number) => any; style: Style}): void {
@@ -250,9 +230,10 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
         undefined,
         this._xAxis.label
       );
-      xAxisLabel.__drag__({x: this._rect.x + this._rect.width - 10, y: xAxisY - 10});
+      xAxisLabel.__drag__({x: this._rect.x + this._rect.width - 10, y: xAxisY - 15});
       xAxisLabel.style.fontSize = '10';
       xAxisLabel.style.strokeWidth = '1';
+      xAxisLabel.SVG.style.direction = 'rtl';
       this.labelsGroup.appendChild(xAxisLabel.SVG);
     }
 
@@ -264,28 +245,34 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
         undefined,
         this._yAxis.label
       );
-      yAxisLabel.__drag__({x: yAxisX - 15, y: this._rect.y + 15});
+      yAxisLabel.__drag__({x: yAxisX + 15, y: this._rect.y + 15});
       yAxisLabel.style.fontSize = '10';
       yAxisLabel.style.strokeWidth = '1';
       this.labelsGroup.appendChild(yAxisLabel.SVG);
     }
 
     /* grid */
-    const gridPath: Path = new Path();
-    const gridPathView: PathView = new PathView(this._container, {overEvent: false, globalStyle: false});
-
     if (this._grid.show) {
+      const gridPath: Path = new Path();
+      const gridPathView: PathView = new PathView(this._container, {overEvent: false, globalStyle: false});
+
+      /* vertical lines */
       const realXAxisMin: number = this._xAxis.min - Math.floor((this.ARROW_LENGTH + this.ARROW_MARGIN) / xPhysicalStepSize) * this._xAxis.step;
       const realXNumberOfSteps: number = (
-          (this._rect.x + this._rect.width) -
-          (rect.x + ((realXAxisMin - this._xAxis.min) / this._xAxis.step) * xPhysicalStepSize)
-        ) / xPhysicalStepSize;
+        (this._rect.x + this._rect.width) - /* right border position */
+        (rect.x + ((realXAxisMin - this._xAxis.min) / this._xAxis.step) * xPhysicalStepSize)
+      ) / xPhysicalStepSize;
       for (let i: number = realXAxisMin; i < realXAxisMin + realXNumberOfSteps * this._xAxis.step; i += this._grid.byX) {
         const x: number = rect.x + ((i - this._xAxis.min) / this._xAxis.step) * xPhysicalStepSize;
+        /* prevent from drawing grid on border */
+        if (x - this._rect.x <= 1 || this._rect.x + this._rect.width - x <= 1) {
+          continue;
+        }
         gridPath.add(new MoveTo({x, y: this._rect.y}));
         gridPath.add(new LineTo({x, y: this._rect.y + this._rect.height}));
       }
 
+      /* horizontal lines */
       const realYAxisMin: number = this._yAxis.min - Math.floor((this.ARROW_LENGTH + this.ARROW_MARGIN) / yPhysicalStepSize) * this._yAxis.step;
       const realYNumberOfSteps: number = (
         (rect.y + rect.height - ((realYAxisMin - this._yAxis.min) / this._yAxis.step) * yPhysicalStepSize)
@@ -293,17 +280,24 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
       ) / yPhysicalStepSize;
       for (let i: number = realYAxisMin; i < realYAxisMin + realYNumberOfSteps * this._yAxis.step; i += this._grid.byY) {
         const y: number = rect.y + rect.height - (((i - this._yAxis.min) / this._yAxis.step) * yPhysicalStepSize);
+        /* prevent from drawing grid on border */
+        if (y - this._rect.y <= 1 || this._rect.y + this._rect.height - y <= 1) {
+          continue;
+        }
         gridPath.add(new MoveTo({x: this._rect.x, y}));
         gridPath.add(new LineTo({x: this._rect.x + this._rect.width, y}));
       }
+
+      gridPathView.path = gridPath;
+      gridPathView.style.strokeWidth = '1';
+      gridPathView.style.strokeColor = '#bfbfbf';
+      this.gridGroup.appendChild(gridPathView.SVG);
     }
-    gridPathView.path = gridPath;
-    gridPathView.style.strokeWidth = '1';
-    gridPathView.style.strokeColor = '#bfbfbf';
-    this.gridGroup.appendChild(gridPathView.SVG);
 
     if (this._numbersVisible) {
-      this.showNumbers(xAxisY, yAxisX);
+      if (xAxisY && yAxisX) {
+        this.showNumbers(xAxisY, yAxisX);
+      }
     } else {
       this.hideNumbers();
     }
@@ -376,19 +370,21 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
 
     /* x steps */
     const subStepPhysicalSize: number = xPhysicalStepSize / (this._xAxis.linesPerStep + 1);
+    const subStepLineSize: number = parseInt(this.style.strokeWidth);
+
     for (let i: number = 0; i < this._xAxis.numberOfSteps; ++i) {
       const x: number = rect.x + (i * xPhysicalStepSize);
       /* pass final step */
       if (i !== this._xAxis.numberOfSteps - 1) {
         /* x sub steps */
         for (let subStep: number = 1; subStep < this._xAxis.linesPerStep + 1; ++subStep) {
-          xAxisPath.add(new MoveTo({x: x + subStep * subStepPhysicalSize, y: xAxisY - 2}));
-          xAxisPath.add(new LineTo({x: x + subStep * subStepPhysicalSize, y: xAxisY + 2}));
+          xAxisPath.add(new MoveTo({x: x + subStep * subStepPhysicalSize, y: xAxisY - subStepLineSize}));
+          xAxisPath.add(new LineTo({x: x + subStep * subStepPhysicalSize, y: xAxisY + subStepLineSize}));
         }
       }
 
-      xAxisPath.add(new MoveTo({x, y: xAxisY - 5}));
-      xAxisPath.add(new LineTo({x, y: xAxisY + 5}));
+      xAxisPath.add(new MoveTo({x, y: xAxisY - (subStepLineSize * 2)}));
+      xAxisPath.add(new LineTo({x, y: xAxisY + (subStepLineSize * 2)}));
     }
 
     xAxisPath.addPath(xAxisArrowsPath);
@@ -419,14 +415,16 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
     /* y steps */
     let currentNumber = this._yAxis.min;
     const subStepPhysicalSize: number = yPhysicalStepSize / (this._yAxis.linesPerStep + 1);
+    const subStepLineSize: number = parseInt(this.style.strokeWidth);
+
     for (let i: number = 0; i < this._yAxis.numberOfSteps; ++i) {
       const y: number = rect.y + rect.height - (i * yPhysicalStepSize);
       /* pass final step */
       if (i !== this._yAxis.numberOfSteps - 1) {
         /* y sub steps */
         for (let subStep: number = 1; subStep < this._yAxis.linesPerStep + 1; ++subStep) {
-          yAxisPath.add(new MoveTo({x: yAxisX - 2, y: y - subStep * subStepPhysicalSize}));
-          yAxisPath.add(new LineTo({x: yAxisX + 2, y: y - subStep * subStepPhysicalSize}));
+          yAxisPath.add(new MoveTo({x: yAxisX - subStepLineSize, y: y - subStep * subStepPhysicalSize}));
+          yAxisPath.add(new LineTo({x: yAxisX + subStepLineSize, y: y - subStep * subStepPhysicalSize}));
         }
       }
 
@@ -435,15 +433,15 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
         continue;
       }
 
-      yAxisPath.add(new MoveTo({x: yAxisX - 5, y}));
-      yAxisPath.add(new LineTo({x: yAxisX + 5, y}));
+      yAxisPath.add(new MoveTo({x: yAxisX - (subStepLineSize * 2), y}));
+      yAxisPath.add(new LineTo({x: yAxisX + (subStepLineSize * 2), y}));
     }
 
     yAxisPath.addPath(yAxisArrowsPath);
     return yAxisPath;
   }
 
-  private showNumbers(xAxisY: number | undefined, yAxisX: number | undefined): void {
+  private showNumbers(xAxisY: number, yAxisX: number): void {
     this.hideNumbers();
 
     const rect: Rect = this.getAreaRect();
@@ -451,35 +449,39 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
     const yPhysicalStepSize: number = rect.height / (this._yAxis.numberOfSteps - 1);
 
     let currentNumber: number = this._xAxis.min;
-    if (xAxisY) {
-      for (let i: number = 0; i < this._xAxis.numberOfSteps; ++i) {
-        const x: number = rect.x + (i * xPhysicalStepSize);
-        let numberView: TextView;
-        if (currentNumber === 0) {
-          numberView = super.xAxisNumber(x, xAxisY, currentNumber, false);
-          numberView.__drag__({x: x - 10, y: xAxisY - 5});
+    const stepLineSize: number = parseInt(this.style.strokeWidth);
+
+    for (let i: number = 0; i < this._xAxis.numberOfSteps; ++i) {
+      const x: number = rect.x + (i * xPhysicalStepSize);
+      const numberView: TextView = super.xAxisNumber(x, xAxisY, currentNumber);
+      if (currentNumber === 0) {
+        numberView.__drag__({x: x + 10, y: xAxisY - 5});
+      } else {
+        numberView.__drag__({x, y: xAxisY + this._numberSize + stepLineSize});
+        if (currentNumber < 0) {
+          numberView.SVG.style.textAnchor = 'start';
         } else {
-          numberView = super.xAxisNumber(x, xAxisY, currentNumber);
+          numberView.SVG.style.textAnchor = 'end';
         }
-        this.numbersGroup.appendChild(numberView.SVG);
-        currentNumber += this._xAxis.step;
       }
+      this.numbersGroup.appendChild(numberView.SVG);
+      currentNumber += this._xAxis.step;
     }
 
-    if (yAxisX) {
-      currentNumber = this._yAxis.min;
-      for (let i: number = 0; i < this._yAxis.numberOfSteps; ++i) {
-        const y: number = rect.y + rect.height - (i * yPhysicalStepSize);
-        if (currentNumber !== 0) {
-          const numberView: TextView = new TextView(this._container);
-          numberView.__drag__({x: yAxisX + 5, y});
-          numberView.style.fontSize = '10';
-          numberView.style.strokeWidth = '1';
-          numberView.text = currentNumber + '';
-          this.numbersGroup.appendChild(numberView.SVG);
+    currentNumber = this._yAxis.min;
+    for (let i: number = 0; i < this._yAxis.numberOfSteps; ++i) {
+      const y: number = rect.y + rect.height - (i * yPhysicalStepSize);
+      if (currentNumber !== 0) {
+        const numberView: TextView = this.yAxisNumber(y, yAxisX, currentNumber);
+        if (currentNumber < 0) {
+          numberView.__drag__({x: yAxisX - 10 - stepLineSize, y: y + 10});
+        } else {
+          numberView.__drag__({x: yAxisX - 10 - stepLineSize, y});
         }
-        currentNumber += this._yAxis.step;
+        numberView.SVG.style.textAnchor = 'end';
+        this.numbersGroup.appendChild(numberView.SVG);
       }
+      currentNumber += this._yAxis.step;
     }
     this._numbersVisible = true;
   }
@@ -509,13 +511,14 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
     return this._graphics;
   }
 
-  public edit(xAxis: Axis, yAxis: Axis, grid: Grid, showNumbers?: boolean, showBorder?: boolean, call: boolean = true): void {
+  public edit(xAxis: Axis, yAxis: Axis, grid: Grid, numberSize: number, showNumbers?: boolean, showBorder?: boolean, call: boolean = true): void {
     if ( /* return if nothing changed */
       JSON.stringify(this._xAxis) === JSON.stringify(xAxis) &&
       JSON.stringify(this._yAxis) === JSON.stringify(yAxis) &&
       JSON.stringify(this._grid) === JSON.stringify(grid) &&
       this._numbersVisible === showNumbers &&
-      this._borderVisible === showBorder
+      this._borderVisible === showBorder &&
+      this._numberSize === numberSize
     ) {
       return;
     }
@@ -523,6 +526,7 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
     this._xAxis = xAxis;
     this._yAxis = yAxis;
     this._grid = grid;
+    this._numberSize = numberSize;
 
     if (showNumbers !== undefined) {
       this._numbersVisible = showNumbers;
@@ -593,6 +597,7 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
     json.xAxis = Object.assign({}, this._xAxis);
     json.yAxis = Object.assign({}, this._yAxis);
     json.grid = Object.assign({}, this._grid);
+    json.numberSize = this._numberSize;
     json.showNumbers = this._numbersVisible;
     json.showBorder = this._borderVisible;
     json.graphics = [];
@@ -614,6 +619,6 @@ export class CoordinatePlaneView2 extends CartesianView2 implements MoveDrawable
         style: graphic.style
       });
     }
-    this.edit(json.xAxis, json.yAxis, json.grid, json.showNumbers, json.showBorder, false);
+    this.edit(json.xAxis, json.yAxis, json.grid, json.numberSize, json.showNumbers, json.showBorder, false);
   }
 }
