@@ -32,7 +32,6 @@ export class DrawTextBox extends MoveDrawer {
         return; /* will focus text box for editing (if selectable) */
       }
     } else if (this.drawTool.container.focused.children.size !== 0) { /* clicked outside of text box */
-      this.drawTool.container.blur();
       return;
     }
     super.mouseDownEvent(event);
