@@ -16,6 +16,7 @@ import {QBezier} from '../../../../model/path/curve/bezier/quadratic/QBezier';
 
 export class FreeDrawer extends Drawer {
   private _drawableElement: FreeView | undefined = undefined;
+  private points: Point[] = [];
   public snappable: boolean = false;
 
   public constructor(drawTool: DrawTool) {
@@ -34,6 +35,7 @@ export class FreeDrawer extends Drawer {
     if (this.snappable) {
       position = this.drawTool.container.grid.getSnapPoint(position);
     }
+    this.points = [];
 
     const pathObject: Path = new Path();
     pathObject.add(new MoveTo(position));
@@ -68,7 +70,13 @@ export class FreeDrawer extends Drawer {
           /* lastPoint may be undefined */
         }
       } else {
+        this.points.push(position);
         this._drawableElement.pushPoint(position);
+        if (this.drawTool.smooth.isOn && this.drawTool.smooth.realTime) {
+          if (this.points.length > 1) {
+            this._drawableElement.path = this.smoothQuadratic(this.points, this.drawTool.smooth.coefficient);
+          }
+        }
       }
     }
 
@@ -91,8 +99,10 @@ export class FreeDrawer extends Drawer {
     }
     this.drawTool.__drawingEnd__();
 
-    const points: Point[] = this._drawableElement.points;
-    this._drawableElement.path = this.smoothQuadratic(points, 2);
+    if (this.drawTool.smooth.isOn && !this.drawTool.smooth.realTime) {
+      const points: Point[] = this._drawableElement.points;
+      this._drawableElement.path = this.smoothQuadratic(points, this.drawTool.smooth.coefficient);
+    }
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.DRAW_MOUSE_UP, {position, element: this._drawableElement});
@@ -113,6 +123,47 @@ export class FreeDrawer extends Drawer {
   }
   protected mouseUpEvent(event: MouseEvent | TouchEvent): void {
     this.stopDrawing();
+  }
+
+  private smoothQuadratic(points: Point[], skip: number = 0): Path {
+    const path: Path = new Path();
+    const even: boolean = points.length - skip - (1 % 2) === 0;
+
+    /* set starting point */
+    path.add(new MoveTo(points[0]));
+
+    /* split 1st line segment */
+    let middlePoint: Point = {
+      x: (points[0].x + points[1].x) / 2,
+      y: (points[0].y + points[1].y) / 2
+    };
+    path.add(new LineTo(middlePoint));
+
+    for (let i = 1; i < points.length; i += 1 + skip) {
+      const nextPoint: Point = points[i + 1 + skip] ?
+        points[i + 1 + skip] :
+        points[points.length - 1];
+
+      middlePoint = {
+        x: (points[i].x + nextPoint.x) / 2,
+        y: (points[i].y + nextPoint.y) / 2
+      };
+
+      if (i > 1) {
+        path.add(new SQBezier(middlePoint));
+      } else {
+        path.add(new QBezier(points[i], middlePoint));
+      }
+    }
+
+    /* add last line if odd number of segments */
+    if (!even) {
+      path.add(new LineTo({
+        x: points[points.length - 1].x,
+        y: points[points.length - 1].y
+      }));
+    }
+    return path;
   }
 
   public override _new(): FreeDrawer {
@@ -152,47 +203,5 @@ export class FreeDrawer extends Drawer {
     if (call) {
       this.drawTool.container.__call__(SVGEvent.FREE_HAND_TOOL_OFF);
     }
-  }
-
-
-  private smoothQuadratic(points: Point[], skip: number = 0): Path {
-    const path: Path = new Path();
-    const even = points.length - skip - (1 % 2) === 0;
-
-    /* set starting point */
-    path.add(new MoveTo(points[0]));
-
-    /* split 1st line segment */
-    let middlePoint: Point = {
-      x: (points[0].x + points[1].x) / 2,
-      y: (points[0].y + points[1].y) / 2
-    };
-    path.add(new LineTo(middlePoint));
-
-    for (let i = 1; i < points.length; i += 1 + skip) {
-      const nextPoint: Point = points[i + 1 + skip] ?
-        points[i + 1 + skip] :
-        points[points.length - 1];
-
-      middlePoint = {
-        x: (points[i].x + nextPoint.x) / 2,
-        y: (points[i].y + nextPoint.y) / 2
-      };
-
-      if (i > 1) {
-        path.add(new SQBezier(middlePoint));
-      } else {
-        path.add(new QBezier(points[i], middlePoint));
-      }
-    }
-
-    /* add last line if odd number of segments */
-    if (!even) {
-      path.add(new LineTo({
-        x: points[points.length - 1].x,
-        y: points[points.length - 1].y
-      }));
-    }
-    return path;
   }
 }
