@@ -8,8 +8,8 @@ export class Arc extends PathCommand {
   private _large_arc_flag: number;
   private _sweep_flag: number;
 
-  public constructor(rx: number, ry: number, xAxisRotation: number, largeArcFlag: number, sweepFlag: number, point: Point) {
-    super(point);
+  public constructor(rx: number, ry: number, xAxisRotation: number, largeArcFlag: number, sweepFlag: number, point: Point, close: boolean = false, absolute: boolean = false) {
+    super(point, close, absolute);
     this._rx = rx;
     this._ry = ry;
     this._x_axis_rotation = xAxisRotation;
@@ -68,7 +68,7 @@ export class Arc extends PathCommand {
   }
 
   public toString(): string {
-    return 'A ' +
+    return (this.absolute ? 'a ' : 'A ') +
       this._rx + ' ' + this._ry + ' ' +
       this._x_axis_rotation + ' ' +
       this._large_arc_flag + ' ' +

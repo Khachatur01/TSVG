@@ -2,8 +2,11 @@ import {PathCommand} from '../../../PathCommand';
 import {Point} from '../../../../Point';
 
 export class SQBezier extends PathCommand {
+  constructor(point: Point, close: boolean = false, absolute: boolean = false) {
+    super(point, close, absolute);
+  }
   public toString(): string {
-    return 'T ' +
+    return (this.absolute ? 't ' : 'T ') +
       this._point.x + ' ' + this._point.y + (this.close ? ' Z' : '');
   }
 

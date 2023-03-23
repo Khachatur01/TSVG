@@ -5,14 +5,14 @@ export class CBezier extends PathCommand {
   private _cPoint0: Point;
   private _cPoint1: Point;
 
-  public constructor(cPoint0: Point, cPoint1: Point, point: Point) {
-    super(point);
+  public constructor(cPoint0: Point, cPoint1: Point, point: Point, close: boolean = false, absolute: boolean = false) {
+    super(point, close, absolute);
     this._cPoint0 = cPoint0;
     this._cPoint1 = cPoint1;
   }
 
   public toString(): string {
-    return 'C ' +
+    return (this.absolute ? 'c ' : 'C ') +
       this._cPoint0.x + ' ' + this._cPoint0.y + ', ' +
       this._cPoint1.x + ' ' + this._cPoint1.y + ', ' +
       this._point.x + ' ' + this._point.y + (this.close ? ' Z' : '');

@@ -115,7 +115,10 @@ export class Path {
           const moveTo: MoveTo = new MoveTo({
             x: parseFloat(commandArray[1]),
             y: parseFloat(commandArray[2])
-          });
+          },
+          false,
+            commandArray[0] === 'm'
+          );
           this.add(moveTo);
           break;
 
@@ -124,7 +127,10 @@ export class Path {
           const lineTo: LineTo = new LineTo({
             x: parseFloat(commandArray[1]),
             y: parseFloat(commandArray[2])
-          });
+          },
+            false,
+            commandArray[0] === 'l'
+          );
           this.add(lineTo);
           break;
 
@@ -133,7 +139,10 @@ export class Path {
           const hLineTo: HLineTo = new HLineTo({
             x: parseFloat(commandArray[1]),
             y: 0
-          });
+          },
+            false,
+            commandArray[0] === 'h'
+          );
           this.add(hLineTo);
           break;
 
@@ -142,7 +151,10 @@ export class Path {
           const vLineTo: VLineTo = new VLineTo({
             x: 0,
             y: parseFloat(commandArray[1])
-          });
+          },
+            false,
+            commandArray[0] === 'v'
+          );
           this.add(vLineTo);
           break;
 
@@ -157,7 +169,10 @@ export class Path {
           },{
             x: parseFloat(commandArray[5]),
             y: parseFloat(commandArray[6])
-          });
+          },
+            false,
+            commandArray[0] === 'c'
+          );
           this.add(cBezier);
           break;
 
@@ -169,7 +184,10 @@ export class Path {
           },{
             x: parseFloat(commandArray[3]),
             y: parseFloat(commandArray[4])
-          });
+          },
+            false,
+            commandArray[0] === 's'
+          );
           this.add(sCBezier);
           break;
 
@@ -181,7 +199,10 @@ export class Path {
           },{
             x: parseFloat(commandArray[3]),
             y: parseFloat(commandArray[4])
-          });
+          },
+            false,
+            commandArray[0] === 'q'
+          );
           this.add(qBezier);
           break;
 
@@ -190,7 +211,10 @@ export class Path {
           const sQBezier: SQBezier = new SQBezier({
             x: parseFloat(commandArray[1]),
             y: parseFloat(commandArray[2])
-          });
+          },
+            false,
+            commandArray[0] === 't'
+          );
           this.add(sQBezier);
           break;
 
@@ -204,7 +228,10 @@ export class Path {
             parseFloat(commandArray[5]), {
             x: parseFloat(commandArray[6]),
             y: parseFloat(commandArray[7])
-          });
+          },
+            false,
+            commandArray[0] === 'a'
+          );
           this.add(arc);
           break;
 

@@ -4,13 +4,13 @@ import {Point} from '../../../../Point';
 export class SCBezier extends PathCommand {
   private _cPoint1: Point;
 
-  public constructor(cPoint1: Point, point: Point) {
-    super(point);
+  public constructor(cPoint1: Point, point: Point, close: boolean = false, absolute: boolean = false) {
+    super(point, close, absolute);
     this._cPoint1 = cPoint1;
   }
 
   public toString(): string {
-    return 'S ' +
+    return (this.absolute ? 's ' : 'S ') +
       this._cPoint1.x + ' ' + this._cPoint1.y + ', ' +
       this._point.x + ' ' + this._point.y + (this.close ? ' Z' : '');
   }

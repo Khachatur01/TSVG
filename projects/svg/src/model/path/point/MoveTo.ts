@@ -2,8 +2,13 @@ import {PathCommand} from '../PathCommand';
 import {Point} from '../../Point';
 
 export class MoveTo extends PathCommand {
+  constructor(point: Point, close: boolean = false, absolute: boolean = false) {
+    super(point, close, absolute);
+  }
+
   public toString(): string {
-    return 'M ' + this._point.x + ' ' + this._point.y + (this.close ? ' Z' : '');
+    return (this.absolute ? 'm ' : 'M ') +
+      this._point.x + ' ' + this._point.y + (this.close ? ' Z' : '');
   }
 
   public override get position(): Point {

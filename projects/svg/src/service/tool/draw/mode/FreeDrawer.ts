@@ -10,6 +10,9 @@ import {ElementView} from '../../../../element/ElementView';
 import {Cursor} from '../../../../dataSource/constant/Cursor';
 import {DrawTool} from '../DrawTool';
 import {Drawer} from '../Drawer';
+import {LineTo} from '../../../../model/path/line/LineTo';
+import {SQBezier} from '../../../../model/path/curve/bezier/quadratic/SQBezier';
+import {QBezier} from '../../../../model/path/curve/bezier/quadratic/QBezier';
 
 export class FreeDrawer extends Drawer {
   private _drawableElement: FreeView | undefined = undefined;
@@ -86,7 +89,10 @@ export class FreeDrawer extends Drawer {
     } else {
       this._drawableElement.refPoint = this._drawableElement.center;
     }
-    this.drawTool.__drawing__();
+    this.drawTool.__drawingEnd__();
+
+    const points: Point[] = this._drawableElement.points;
+    this._drawableElement.path = this.smoothQuadratic(points, 2);
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.DRAW_MOUSE_UP, {position, element: this._drawableElement});
@@ -146,5 +152,47 @@ export class FreeDrawer extends Drawer {
     if (call) {
       this.drawTool.container.__call__(SVGEvent.FREE_HAND_TOOL_OFF);
     }
+  }
+
+
+  private smoothQuadratic(points: Point[], skip: number = 0): Path {
+    const path: Path = new Path();
+    const even = points.length - skip - (1 % 2) === 0;
+
+    /* set starting point */
+    path.add(new MoveTo(points[0]));
+
+    /* split 1st line segment */
+    let middlePoint: Point = {
+      x: (points[0].x + points[1].x) / 2,
+      y: (points[0].y + points[1].y) / 2
+    };
+    path.add(new LineTo(middlePoint));
+
+    for (let i = 1; i < points.length; i += 1 + skip) {
+      const nextPoint: Point = points[i + 1 + skip] ?
+        points[i + 1 + skip] :
+        points[points.length - 1];
+
+      middlePoint = {
+        x: (points[i].x + nextPoint.x) / 2,
+        y: (points[i].y + nextPoint.y) / 2
+      };
+
+      if (i > 1) {
+        path.add(new SQBezier(middlePoint));
+      } else {
+        path.add(new QBezier(points[i], middlePoint));
+      }
+    }
+
+    /* add last line if odd number of segments */
+    if (!even) {
+      path.add(new LineTo({
+        x: points[points.length - 1].x,
+        y: points[points.length - 1].y
+      }));
+    }
+    return path;
   }
 }

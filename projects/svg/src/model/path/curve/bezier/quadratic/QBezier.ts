@@ -4,13 +4,13 @@ import {Point} from '../../../../Point';
 export class QBezier extends PathCommand {
   private _cPoint: Point;
 
-  public constructor(cPoint: Point, point: Point) {
-    super(point);
+  public constructor(cPoint: Point, point: Point, close: boolean = false, absolute: boolean = false) {
+    super(point, close, absolute);
     this._cPoint = cPoint;
   }
 
   public toString(): string {
-    return 'Q ' +
+    return (this.absolute ? 'q ' : 'Q ') +
       this._cPoint.x + ' ' + this._cPoint.y + ', ' +
       this._point.x + ' ' + this._point.y + (this.close ? ' Z' : '');
   }

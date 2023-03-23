@@ -2,11 +2,13 @@ import {Point} from '../Point';
 
 export abstract class PathCommand {
   protected _point: Point;
-  public close: boolean = false;
+  public close: boolean;
+  public absolute: boolean;
 
-  public constructor(point: Point, close: boolean = false) {
+  public constructor(point: Point, close: boolean = false, absolute: boolean = false) {
     this._point = point;
     this.close = close;
+    this.absolute = absolute;
   }
 
   public get position(): Point {
