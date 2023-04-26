@@ -5,12 +5,13 @@ import {Point} from '../../../model/Point';
 import {ElementView} from '../../../element/ElementView';
 import {Container} from '../../../Container';
 import {SVGEvent} from '../../../dataSource/constant/SVGEvent';
-import {Line} from '../../../model/Line';
+import {Size} from '../../../model/Size';
+import {Rect} from '../../../model/Rect';
 
 export class EraserTool extends Tool {
   protected override _cursor: Cursor = Cursor.ERASER;
   public focus: Focus;
-  public override _mouseCurrentPos: Point = {x: 0, y: 0};
+  public eraserSize: Size = {width: 10, height: 10};
   private elementsClickEvents: {element: ElementView; callback: () => void}[] = [];
 
   public constructor(container: Container, focus: Focus) {
@@ -47,31 +48,24 @@ export class EraserTool extends Tool {
     this._container.HTML.addEventListener('touchmove', this.mouseMoveEvent);
     document.addEventListener('mouseup', this.mouseUpEvent);
     document.addEventListener('touchend', this.mouseUpEvent);
-
-    const containerRect: DOMRect = this._container.HTML.getBoundingClientRect();
-    const eventPosition: Point = Container.__eventToPosition__(event);
-    this._mouseCurrentPos = {
-      x: eventPosition.x - containerRect.left,
-      y: eventPosition.y - containerRect.top
-    };
   };
   private mouseMoveEvent(event: MouseEvent | TouchEvent): void {
-    const mousePreviousPos: Point = this._mouseCurrentPos;
     const containerRect: DOMRect = this._container.HTML.getBoundingClientRect();
     const eventPosition: Point = Container.__eventToPosition__(event);
-    this._mouseCurrentPos = {
+    const mousePosition: Point = {
       x: eventPosition.x - containerRect.left,
       y: eventPosition.y - containerRect.top
-    };
-
-    const line: Line = {
-      p0: mousePreviousPos,
-      p1: this._mouseCurrentPos
     };
 
     const elements: Set<ElementView> = new Set<ElementView>(this._container.elements);
     elements.forEach((element: ElementView) => {
-      if (element.erasable && element.selectable && element.intersectsLine(line)) {
+      const eraserRect: Rect = {
+        x: mousePosition.x - this.eraserSize.width / 2,
+        y: mousePosition.y - this.eraserSize.height / 2,
+        width: this.eraserSize.width,
+        height: this.eraserSize.height
+      };
+      if (element.erasable && element.selectable && element.intersectsRect(eraserRect)) {
         this._container.remove(element, true);
       }
     });
