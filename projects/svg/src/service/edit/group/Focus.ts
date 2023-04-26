@@ -111,6 +111,9 @@ export class Focus implements Draggable, Resizeable {
     this.__blur__(call && thereIsElement); /* call blur callback function only when there is focused element */
     this.container.style.__recoverGlobalStyle__(call && thereIsElement); /* call style change callback function only when there is focused element */
     this._children.forEach((child: ElementView) => {
+      if (child instanceof ForeignObjectView) {
+        child.content.blur();
+      }
       child.__onBlur__();
     });
     this._children.clear();

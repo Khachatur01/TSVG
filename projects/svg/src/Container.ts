@@ -297,13 +297,13 @@ export class Container {
     this.style = new GlobalStyle(this);
 
     this.container.addEventListener('mousedown', (event: MouseEvent) => {
-      if (event.target === this.container && !this.tools.drawTool.isOn()) {
+      if (event.target === this.container) {
         this.__call__(SVGEvent.CLICKED_ON_CONTAINER);
         this.blur();
       }
     });
     this.container.addEventListener('touchstart', (event: TouchEvent) => {
-      if (event.target === this.container && !this.tools.drawTool.isOn()) {
+      if (event.target === this.container) {
         this.__call__(SVGEvent.CLICKED_ON_CONTAINER);
         this.blur();
       }

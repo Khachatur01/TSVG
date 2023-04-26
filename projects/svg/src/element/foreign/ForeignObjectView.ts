@@ -126,8 +126,8 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   };
   /* Model */
 
-  /* this flag will be used when content blurred, and no need to call blur event's callback */
-  protected callBlurEvent: boolean = true;
+  // /* this flag will be used when content blurred, and no need to call blur event's callback */
+  // protected callBlurEvent: boolean = true;
 
   public constructor(
     container: Container,
@@ -200,11 +200,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       this._container.__call__(SVGEvent.ASSET_EDIT, {element: this});
     });
     this._content.addEventListener('blur', () => {
-      if (!this.callBlurEvent) {
-        this.callBlurEvent = true;
-        return;
-      }
-
       if (this._content.outerHTML !== this._lastCommittedHTML) {
         this._container.__call__(SVGEvent.ASSET_EDIT_COMMIT, {element: this});
         this._lastCommittedHTML = this._content.outerHTML;
@@ -221,13 +216,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
   protected addFocusEvent(): void {
     this._content.addEventListener('focus', () => {
-      if (this._selectable && this._container.tools.drawTool.isOn() && this._container.tools.drawTool.getDrawer() === this._container.drawers.textBox) {
-        this._container.blur(undefined, false);
-        this._container.focus(this, false, undefined, false);
-        this._content.focus();
-        this.__onFocus__();
-      } else {
-        this.callBlurEvent = false;
+      if (
+        !this._selectable ||
+        !this._container.tools.drawTool.isOn() || this._container.tools.drawTool.getDrawer() !== this._container.drawers.textBox
+      ) {
         this._content.blur();
         this.__onBlur__();
       }
