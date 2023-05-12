@@ -13,10 +13,11 @@ import {PointedView} from '../../../element/shape/pointed/PointedView';
 import {CircleView} from '../../../element/shape/circluar/CircleView';
 import {TableView} from '../../../element/complex/TableView';
 import {ForeignObjectView} from '../../../element/foreign/ForeignObjectView';
+import {SVGClipboard} from "../../../../../../src/app/modules/svg/model/SVGClipboard";
 
 export class Focus implements Draggable, Resizeable {
 
-  public __clipboard__: {elements: Set<ElementView>; text: string; isSafe: boolean} = {
+  public __clipboard__: SVGClipboard = {
     elements: new Set<ElementView>(),
     text: '',
     isSafe: false, /* if in safe mode, then will be used this clipboard, to prevent clipboard sharing with browser clipboard */
@@ -595,6 +596,9 @@ export class Focus implements Draggable, Resizeable {
     this.__refPoint__ = refPoint;
   }
 
+  public set clipboard(clipboard: SVGClipboard) {
+    this.__clipboard__ = clipboard;
+  }
   public set safeClipboard(isSafe: boolean) {
     this.__clipboard__.isSafe = isSafe;
     this._children.forEach((child: ElementView) => {

@@ -8,6 +8,7 @@ import {ForeignView} from '../type/ForeignView';
 import {MoveDrawable} from '../../service/tool/draw/type/MoveDrawable';
 import {ElementType} from '../../dataSource/constant/ElementType';
 import {Cursor} from '../../dataSource/constant/Cursor';
+import {SVGClipboard} from "../../../../../src/app/modules/svg/model/SVGClipboard";
 
 export class ForeignObjectCursor extends ElementCursor {
   constructor() {
@@ -165,7 +166,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       this._content.contentEditable = properties.contentEditable + '';
     }
   }
-
   public set safeClipboard(isSafe: boolean) {
     if (isSafe) {
       this._content.addEventListener('copy', this.copyEvent);
