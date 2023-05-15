@@ -24,24 +24,20 @@ export class DrawTextBox extends MoveDrawer {
   }
 
   protected override mouseDownEvent(event: MouseEvent | TouchEvent): void {
-    this.drawTool.container.elements.forEach((element: ElementView): void => {
-      if (element instanceof ForeignObjectView) {
-        element.content.blur();
-      }
-      element.__onBlur__();
-    });
+    let parentElement: ForeignObjectView | undefined;
+    if (event.target instanceof HTMLElement) {
+      parentElement = this.findParentForeignObject(event.target as HTMLElement);
+    }
 
     /* turn on text edit mode when clicking to text box element */
-    if (event.target instanceof HTMLElement && event.target.parentElement instanceof SVGForeignObjectElement) {
-      const targetElementId: {index: number; ownerId: string} | null = ElementView.parseId(event.target.parentElement.id);
-      const targetElement: ElementView | null = targetElementId && this.drawTool.container.getElementById(targetElementId.ownerId, targetElementId.index, true);
+    if (parentElement) {
       /*
        * if target element is selectable, or it cannot be created over other text boxes, turn on text edit mode,
        * */
-      if (targetElement instanceof ForeignObjectView && targetElement.selectable) {
+      if (parentElement.selectable) {
         this._isInEditMode = true;
-        targetElement.content.focus();
-        targetElement.__onFocus__();
+        parentElement.content.focus();
+        parentElement.__onFocus__();
         return;
       } else if (!this.overdraw) {
         return;
@@ -101,5 +97,28 @@ export class DrawTextBox extends MoveDrawer {
   }
   public get type(): ElementType {
     return ElementType.TEXT_BOX;
+  }
+
+  private findParentForeignObject(htmlElement: HTMLElement): ForeignObjectView | undefined {
+    let parentElement: HTMLElement = htmlElement;
+    let foreignObjectId: {ownerId: string; index: number} | null = null;
+    let isAllElementsChecked: boolean = false;
+
+    do {
+      if (parentElement.parentElement) {
+        parentElement = parentElement.parentElement;
+      } else {
+        break;
+      }
+
+      foreignObjectId = ElementView.parseId(parentElement.id);
+      isAllElementsChecked = parentElement.id === 'elements';
+    } while (!isAllElementsChecked && !foreignObjectId || !(parentElement instanceof SVGForeignObjectElement));
+
+    if (foreignObjectId) {
+      return this.drawTool.container.getElementById(foreignObjectId.ownerId, foreignObjectId.index, true) as ForeignObjectView;
+    }
+
+    return undefined;
   }
 }

@@ -200,9 +200,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       this._container.__call__(SVGEvent.ASSET_EDIT, {element: this});
     });
     this._content.addEventListener('blur', () => {
-      if (this._content.outerHTML !== this._lastCommittedHTML) {
+      this._content.scrollTop = 0;
+      if (this._content.innerHTML !== this._lastCommittedHTML) {
         this._container.__call__(SVGEvent.ASSET_EDIT_COMMIT, {element: this});
-        this._lastCommittedHTML = this._content.outerHTML;
+        this._lastCommittedHTML = this._content.innerHTML;
       }
     });
   }
@@ -246,6 +247,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content.style.outline = 'none';
     this.svgElement.innerHTML = '';
     this.svgElement.appendChild(this._content);
+    this._lastCommittedHTML = content;
   }
 
   public get boundingRect(): Rect {

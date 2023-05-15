@@ -85,7 +85,7 @@ export class TextBoxView extends ForeignObjectView {
         this._container.__call__(SVGEvent.TEXT_BOX_REMOVED, {element: this});
       }
 
-      /* Tool already changed to draw free. No need to check */
+
       /* if last committed text is equals to current text, don't call change callback */
       if (this._lastCommittedText !== this._content.value) {
         this._container.__call__(SVGEvent.TEXT_TYPING_COMMIT, {text: this._content.value, element: this});
