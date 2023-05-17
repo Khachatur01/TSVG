@@ -26,11 +26,16 @@ export class SCBezier extends PathCommand {
     return super.position;
   }
   public override set position(position: Point) {
+    const delta: Point = {
+      x: position.x - this._point.x,
+      y: position.y - this._point.y,
+    };
+
     this._point.x = position.x;
     this._point.y = position.y;
 
-    this._cPoint1.x = position.x;
-    this._cPoint1.y = position.y;
+    this._cPoint1.x += delta.x;
+    this._cPoint1.y += delta.y;
   }
 
   public get copy(): SCBezier {
