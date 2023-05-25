@@ -8,7 +8,6 @@ import {ForeignView} from '../type/ForeignView';
 import {MoveDrawable} from '../../service/tool/draw/type/MoveDrawable';
 import {ElementType} from '../../dataSource/constant/ElementType';
 import {Cursor} from '../../dataSource/constant/Cursor';
-import {SVGClipboard} from "../../../../../src/app/modules/svg/model/SVGClipboard";
 
 export class ForeignObjectCursor extends ElementCursor {
   constructor() {
@@ -125,10 +124,20 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
     event.preventDefault();
   };
-  /* Model */
+  protected inputEvent: () => void = () => {
+    this._container.__call__(SVGEvent.ASSET_EDIT, {element: this});
+  };
+  protected blurEvent: () => void = () => {
+    this._content.blur();
+    this.__onBlur__();
 
-  // /* this flag will be used when content blurred, and no need to call blur event's callback */
-  // protected callBlurEvent: boolean = true;
+    this._content.scrollTop = 0;
+    if (this._content.innerHTML !== this._lastCommittedHTML) {
+      this._container.__call__(SVGEvent.ASSET_EDIT_COMMIT, {element: this});
+      this._lastCommittedHTML = this._content.innerHTML;
+    }
+  };
+  /* Model */
 
   public constructor(
     container: Container,
@@ -148,7 +157,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     /* prevent from dropping elements inside */
     this._content.ondrop = () => false;
 
-    this.addEditCallBack();
     this.addFocusEvent();
     this.safeClipboard = this._container.focused.__clipboard__.isSafe;
 
@@ -166,6 +174,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       this._content.contentEditable = properties.contentEditable + '';
     }
   }
+
   public set safeClipboard(isSafe: boolean) {
     if (isSafe) {
       this._content.addEventListener('copy', this.copyEvent);
@@ -192,19 +201,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
       y: this._rect.y,
       width: this._rect.width,
       height: this._rect.height
-    });
-  }
-
-  protected addEditCallBack(): void {
-    this._content.addEventListener('input', () => {
-      this._container.__call__(SVGEvent.ASSET_EDIT, {element: this});
-    });
-    this._content.addEventListener('blur', () => {
-      this._content.scrollTop = 0;
-      if (this._content.innerHTML !== this._lastCommittedHTML) {
-        this._container.__call__(SVGEvent.ASSET_EDIT_COMMIT, {element: this});
-        this._lastCommittedHTML = this._content.innerHTML;
-      }
     });
   }
 
@@ -247,7 +243,6 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content.style.outline = 'none';
     this.svgElement.innerHTML = '';
     this.svgElement.appendChild(this._content);
-    this._lastCommittedHTML = content;
   }
 
   public get boundingRect(): Rect {
@@ -257,6 +252,15 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   public get visibleBoundingRect(): Rect {
     const points: Point[] = this.visiblePoints;
     return ElementView.calculateRect(points);
+  }
+
+  public enable(): void {
+    this._content.addEventListener('input', this.inputEvent);
+    this._content.addEventListener('blur', this.blurEvent);
+  }
+  public disable(): void {
+    this._content.removeEventListener('input', this.inputEvent);
+    this._content.removeEventListener('blur', this.blurEvent);
   }
 
   public isComplete(): boolean {

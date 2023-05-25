@@ -38,6 +38,26 @@ export class TextBoxView extends ForeignObjectView {
     event.preventDefault();
   };
 
+  protected override inputEvent: () => void = () => {
+    this._container.__call__(SVGEvent.TEXT_TYPING, {text: this._content.value, element: this});
+  };
+  protected override blurEvent: () => void = () => {
+    this._content.blur();
+    this.__onBlur__();
+
+    this._content.scrollTop = 0;
+    if (this._content.value === '') {
+      this._container.remove(this, true);
+      this._container.__call__(SVGEvent.TEXT_BOX_REMOVED, {element: this});
+    }
+
+    /* if last committed text is equals to current text, don't call change callback */
+    if (this._lastCommittedText !== this._content.value) {
+      this._container.__call__(SVGEvent.TEXT_TYPING_COMMIT, {text: this._content.value, element: this});
+      this._lastCommittedText = this._content.value;
+    }
+  };
+
   public constructor(container: Container, properties: TextBoxProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, {}, rect, ownerId, index);
 
@@ -55,7 +75,6 @@ export class TextBoxView extends ForeignObjectView {
     /* prevent from dropping elements inside */
     this._content.ondrop = () => false;
 
-    this.addEditCallBack();
     this.addFocusEvent();
 
     this.safeClipboard = this._container.focused.__clipboard__.isSafe;
@@ -72,26 +91,6 @@ export class TextBoxView extends ForeignObjectView {
 
   public override get content(): HTMLTextAreaElement {
     return this._content;
-  }
-  public override addEditCallBack(): void {
-    this._content.addEventListener('input', () => {
-      this._container.__call__(SVGEvent.TEXT_TYPING, {text: this._content.value, element: this});
-    });
-
-    this._content.addEventListener('blur', () => {
-      this._content.scrollTop = 0;
-      if (this._content.value === '') {
-        this._container.remove(this, true);
-        this._container.__call__(SVGEvent.TEXT_BOX_REMOVED, {element: this});
-      }
-
-
-      /* if last committed text is equals to current text, don't call change callback */
-      if (this._lastCommittedText !== this._content.value) {
-        this._container.__call__(SVGEvent.TEXT_TYPING_COMMIT, {text: this._content.value, element: this});
-        this._lastCommittedText = this._content.value;
-      }
-    });
   }
 
   public replaceSelected(text: string): void {

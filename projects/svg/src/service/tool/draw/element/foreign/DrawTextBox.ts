@@ -69,15 +69,39 @@ export class DrawTextBox extends MoveDrawer {
     if (call) {
       if (this._drawableElement) {
         const textBox: TextBoxView = (this._drawableElement as TextBoxView);
-        this.drawTool.container.focus(textBox, false, undefined /* set default */, false);
+        textBox.enable();
         textBox.content.focus();
         this._isInEditMode = true;
       }
     }
   }
 
+  private findParentForeignObject(htmlElement: HTMLElement): ForeignObjectView | undefined {
+    let parentElement: HTMLElement | null = htmlElement;
+    let foreignObjectId: {ownerId: string; index: number} | null = null;
+    let isAllElementsChecked: boolean = false;
+
+    do {
+      parentElement = parentElement?.parentElement ? parentElement?.parentElement : null;
+      foreignObjectId = parentElement?.id ? ElementView.parseId(parentElement.id) : null;
+      isAllElementsChecked = parentElement?.id === 'elements';
+    } while (!isAllElementsChecked && !foreignObjectId || !(parentElement instanceof SVGForeignObjectElement));
+
+    if (foreignObjectId) {
+      return this.drawTool.container.getElementById(foreignObjectId.ownerId, foreignObjectId.index, true) as ForeignObjectView;
+    }
+
+    return undefined;
+  }
+
   public override start(call: boolean): void {
     super.start(call);
+
+    this.drawTool.container.elements.forEach((elementView: ElementView) => {
+      if (elementView instanceof ForeignObjectView && elementView.selectable) {
+        elementView.enable();
+      }
+    });
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.TEXT_TOOL_ON);
@@ -86,6 +110,15 @@ export class DrawTextBox extends MoveDrawer {
   public override stop(call: boolean): void {
     super.stop(call);
     this._isInEditMode = false;
+
+
+    this.drawTool.container.elements.forEach((elementView: ElementView) => {
+      if (elementView instanceof ForeignObjectView && elementView.selectable) {
+        elementView.__onBlur__();
+        elementView.content.blur();
+        elementView.disable();
+      }
+    });
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.TEXT_TOOL_OFF);
@@ -97,28 +130,5 @@ export class DrawTextBox extends MoveDrawer {
   }
   public get type(): ElementType {
     return ElementType.TEXT_BOX;
-  }
-
-  private findParentForeignObject(htmlElement: HTMLElement): ForeignObjectView | undefined {
-    let parentElement: HTMLElement = htmlElement;
-    let foreignObjectId: {ownerId: string; index: number} | null = null;
-    let isAllElementsChecked: boolean = false;
-
-    do {
-      if (parentElement.parentElement) {
-        parentElement = parentElement.parentElement;
-      } else {
-        break;
-      }
-
-      foreignObjectId = ElementView.parseId(parentElement.id);
-      isAllElementsChecked = parentElement.id === 'elements';
-    } while (!isAllElementsChecked && !foreignObjectId || !(parentElement instanceof SVGForeignObjectElement));
-
-    if (foreignObjectId) {
-      return this.drawTool.container.getElementById(foreignObjectId.ownerId, foreignObjectId.index, true) as ForeignObjectView;
-    }
-
-    return undefined;
   }
 }
