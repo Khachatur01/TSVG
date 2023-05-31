@@ -130,6 +130,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   protected blurEvent: () => void = () => {
     this._content.blur();
     this.__onBlur__();
+    window.getSelection()?.removeAllRanges();
 
     this._content.scrollTop = 0;
     if (this._content.innerHTML !== this._lastCommittedHTML) {
