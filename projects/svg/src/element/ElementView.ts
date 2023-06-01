@@ -208,6 +208,11 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     this._rect = rect;
     this.__updateView__();
   }
+  public setRect(rect: Rect): void {
+    this.__fixRect__();
+    this.__fixRefPoint__();
+    this.__setRect__(rect);
+  }
 
   public static normalizeRect(rect: Rect): Rect {
     if (rect.width < 0) {

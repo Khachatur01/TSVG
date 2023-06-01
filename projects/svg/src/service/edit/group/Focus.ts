@@ -523,18 +523,14 @@ export class Focus implements Draggable, Resizeable {
         visible = true;
       }
     }
-    this.boundingBox.__rotate__(angle);
-    //
-    // if (this._children.size === 1) {
-    //   const [singleChild] = this._children;
-    //   this.boundingBox.__rotate__(singleChild.angle);
-    // } else {
-    //   this.boundingBox.__rotate__(0);
-    //   visible = true;
-    // }
 
+    this.boundingBox.__rotate__(angle);
     this.boundingBox.__setRect__(this.calculateBoundingRect(visible));
     this.boundingBox.__positionGrips__();
+  }
+
+  public update(): void {
+    this.__fit__(this.boundingBox.angle);
   }
 
   public __focus__(): void {
