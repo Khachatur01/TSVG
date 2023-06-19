@@ -60,6 +60,15 @@ export class Arc extends PathCommand {
     this._point.y = position.y;
   }
 
+  public override drag(delta: Point, point0: Point, originCommand: Arc): void {
+    this._point = {
+      x: point0.x + Math.abs(originCommand.position.x - point0.x) * delta.x,
+      y: point0.y + Math.abs(originCommand.position.y - point0.y) * delta.y
+    };
+    this._rx = point0.x + Math.abs(originCommand._rx - point0.x) * delta.x;
+    this._ry = point0.y + Math.abs(originCommand._ry - point0.y) * delta.y;
+  }
+
   public get copy(): Arc {
     return new Arc(this._rx, this._ry, this._x_axis_rotation, this._large_arc_flag, this._sweep_flag, {
       x: this._point.x,

@@ -140,18 +140,15 @@ export class PathView extends ShapeView {
     }
 
     const commands: PathCommand[] = this.commands;
-    const lastPoints: Point[] = this._lastPath.points;
+    const lastCommands: PathCommand[] = this._lastPath.getAll();
 
     for (let i: number = 0; i < commands.length; i++) {
       /* points may not be fixed, and this._lastPoints[i] may be undefined */
-      if (!lastPoints[i]) {
-        lastPoints[i] = {x: 0, y: 0};
+      if (!lastCommands[i]) {
+        lastCommands[i].position = {x: 0, y: 0};
       }
 
-      commands[i].position = {
-        x: rect.x + Math.abs(lastPoints[i].x - rect.x) * dw,
-        y: rect.y + Math.abs(lastPoints[i].y - rect.y) * dh
-      };
+      commands[i].drag({x: dw, y: dh}, {x: rect.x, y: rect.y}, lastCommands[i]);
     }
 
     this._path = new Path();

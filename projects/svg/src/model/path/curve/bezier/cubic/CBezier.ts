@@ -50,6 +50,21 @@ export class CBezier extends PathCommand {
     this._cPoint1.y += delta.y;
   }
 
+  public override drag(delta: Point, point0: Point, originCommand: CBezier): void {
+    this._point = {
+      x: point0.x + Math.abs(originCommand.position.x - point0.x) * delta.x,
+      y: point0.y + Math.abs(originCommand.position.y - point0.y) * delta.y
+    };
+    this._cPoint0 = {
+      x: point0.x + Math.abs(originCommand._cPoint0.x - point0.x) * delta.x,
+      y: point0.y + Math.abs(originCommand._cPoint0.y - point0.y) * delta.y,
+    };
+    this._cPoint1 = {
+      x: point0.x + Math.abs(originCommand._cPoint1.x - point0.x) * delta.x,
+      y: point0.y + Math.abs(originCommand._cPoint1.y - point0.y) * delta.y,
+    };
+  }
+
   public get copy(): CBezier {
     return new CBezier({
       x: this._cPoint0.x,

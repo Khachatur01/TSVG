@@ -38,6 +38,17 @@ export class QBezier extends PathCommand {
     this._cPoint.y += delta.y;
   }
 
+  public override drag(delta: Point, point0: Point, originCommand: QBezier): void {
+    this._point = {
+      x: point0.x + Math.abs(originCommand.position.x - point0.x) * delta.x,
+      y: point0.y + Math.abs(originCommand.position.y - point0.y) * delta.y
+    };
+    this._cPoint = {
+      x: point0.x + Math.abs(originCommand._cPoint.x - point0.x) * delta.x,
+      y: point0.y + Math.abs(originCommand._cPoint.y - point0.y) * delta.y,
+    };
+  }
+
   public get copy(): QBezier {
     return new QBezier({
       x: this._cPoint.x,
