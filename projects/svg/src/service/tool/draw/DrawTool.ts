@@ -41,7 +41,7 @@ export class DrawTool extends Tool {
     if (!drawer) {
       return;
     }
-    this._drawer.stop();
+    this._drawer.stop(call);
     drawer.drawTool = this;
     const oldDrawer: Drawer = this._drawer;
     this._drawer = drawer;
