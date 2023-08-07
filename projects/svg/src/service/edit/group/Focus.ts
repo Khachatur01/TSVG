@@ -53,7 +53,7 @@ export class Focus implements Draggable, Resizeable {
     return this.boundingBox.SVG;
   }
 
-  public appendChild(element: ElementView, showBounding: boolean = true, changeGlobalStyle: boolean = true, angle?: number, call: boolean = true): void {
+  public appendChild(element: ElementView, showBounding: boolean = true, changeGlobalStyle: boolean = true, call: boolean = true): void {
     this._children.add(element);
 
     if (this._children.size === 1) {
@@ -73,7 +73,7 @@ export class Focus implements Draggable, Resizeable {
       }
     }
 
-    this.__fit__(angle);
+    this.__fit__();
     if (showBounding) {
       this.__focus__();
     }
@@ -295,25 +295,6 @@ export class Focus implements Draggable, Resizeable {
       });
     }
   }
-  public setPosition(position: Point, call: boolean = true): void {
-    const delta: Point = {
-      x: position.x - this.boundingBox.getRect().x,
-      y: position.y - this.boundingBox.getRect().y
-    };
-
-    this.drag(delta, false);
-
-    /*
-    * rect and reference point should be fixed before resetting translate
-    * translation reset method uses previously fixed values of rect and reference point
-    */
-    this.__fixRect__();
-    this.__fixRefPoint__();
-    this.__translate__({x: 0, y: 0});
-    if (call) {
-      this.container.__call__(SVGEvent.SET_ELEMENTS_POSITION, {elements: this._children, position});
-    }
-  }
 
   public __correct__(point: Point): void {
     this._children.forEach((child: ElementView) => child.__correct__(point, this.__lastRefPoint__));
@@ -497,6 +478,7 @@ export class Focus implements Draggable, Resizeable {
         child.__rotate__((angle + child.__lastAngle__ - this._lastAngle) % 360)
       );
     }
+
     this.boundingBox.__rotate__(angle);
   }
 
@@ -512,25 +494,21 @@ export class Focus implements Draggable, Resizeable {
     this.__rotate__(toAngle);
   }
 
-  public __fit__(angle?: number): void {
+  public __fit__(): void {
     let visible: boolean = false;
-    if (!angle) {
-      if (this._children.size === 1) {
-        const [singleChild] = this._children;
-        angle = singleChild.angle;
-      } else {
-        angle = 0;
-        visible = true;
-      }
+    let angle: number;
+
+    if (this._children.size === 1) {
+      const [singleChild] = this._children;
+      angle = singleChild.angle;
+    } else {
+      angle = 0;
+      visible = true;
     }
 
     this.boundingBox.__rotate__(angle);
     this.boundingBox.__setRect__(this.calculateBoundingRect(visible));
     this.boundingBox.__positionGrips__();
-  }
-
-  public update(): void {
-    this.__fit__(this.boundingBox.angle);
   }
 
   public __focus__(): void {
@@ -673,7 +651,7 @@ export class Focus implements Draggable, Resizeable {
       this.container.add(element);
 
       /* do not call SVGEvent.ELEMENTS_FOCUSED event now, to call after sending SVGEvent.PASTE event */
-      this.appendChild(element, showBounding, true, undefined, false);
+      this.appendChild(element, showBounding, true, false);
     });
 
     if (call) {

@@ -177,6 +177,9 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       'translate(' + delta.x + 'px, ' + delta.y + 'px) rotate(' + this._angle + 'deg)';
   }
   public abstract __drag__(delta: Point): void;
+  public getVisibleRotatedRect(angle: number = 0): Rect {
+    return ElementView.calculateRotatedRect(this.visiblePoints, this.center, angle);
+  }
   public getVisibleRect(): Rect {
     return ElementView.calculateRect(this.visiblePoints);
   };
@@ -580,6 +583,16 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
       width: size.width,
       height: size.height
     };
+  }
+
+  public static calculateRotatedRect(points: Point[], refPoint: Point, angle: number = 0): Rect {
+    points = Matrix.rotate(
+      points,
+      refPoint,
+      -angle
+    );
+
+    return ElementView.calculateRect(points);
   }
 
   public get center(): Point {

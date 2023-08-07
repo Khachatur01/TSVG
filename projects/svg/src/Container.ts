@@ -548,7 +548,7 @@ export class Container {
   }
   public focus(element: ElementView, showBounding: boolean = true, changeGlobalStyle: boolean = true, call: boolean = true): void {
     if (element.selectable) {
-      this._focus.appendChild(element, showBounding, changeGlobalStyle, undefined, call);
+      this._focus.appendChild(element, showBounding, changeGlobalStyle, call);
     }
   }
   public blur(element?: ElementView, call: boolean = true): void {
