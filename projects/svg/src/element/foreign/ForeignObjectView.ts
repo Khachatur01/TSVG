@@ -244,6 +244,11 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this._content.style.outline = 'none';
     this.svgElement.innerHTML = '';
     this.svgElement.appendChild(this._content);
+    this.pointerEvents = false;
+  }
+
+  public set pointerEvents(pointerEvents: boolean) {
+    this.content.style.pointerEvents = pointerEvents ? 'auto' : 'none';
   }
 
   public get boundingRect(): Rect {
