@@ -15,7 +15,9 @@ export class EllipseCursor extends ElementCursor {
 }
 
 export class EllipseView extends CircularView {
-  protected override svgElement: SVGEllipseElement = document.createElementNS(ElementView.svgURI, 'ellipse');
+  protected override svgElement: SVGGElement = document.createElementNS(ElementView.svgURI, 'g');
+  private svgEllipseElement: SVGEllipseElement = document.createElementNS(ElementView.svgURI, 'ellipse');
+  private svgEllipseCenterElement: SVGCircleElement = document.createElementNS(ElementView.svgURI, 'circle');
   protected override _type: ElementType = ElementType.ELLIPSE;
 
   public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
@@ -24,7 +26,30 @@ export class EllipseView extends CircularView {
 
     this.__setRect__(rect);
 
+    this.svgElement.appendChild(this.svgEllipseElement);
+    this.svgElement.appendChild(this.svgEllipseCenterElement);
+
+    this.setAttr({
+      'stroke-width': 0,
+      fill: '#000',
+      r: CircularView.CENTER_POINT_RADIUS
+    }, this.svgEllipseCenterElement);
+
     this.setProperties(properties);
+  }
+
+  public override __updateView__(): void {
+    this.setAttr({
+      cx: this._rect.x + this._rect.width / 2,
+      cy: this._rect.y + this._rect.height / 2,
+      rx: this._rect.width / 2,
+      ry: this._rect.height / 2
+    }, this.svgEllipseElement);
+
+    this.setAttr({
+      cx: this._rect.x + this._rect.width / 2,
+      cy: this._rect.y + this._rect.height / 2
+    }, this.svgEllipseCenterElement);
   }
 
   private getEllipseModel(): Ellipse {

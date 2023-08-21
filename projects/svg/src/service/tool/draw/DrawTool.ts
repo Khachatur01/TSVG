@@ -13,7 +13,8 @@ export class DrawTool extends Tool {
   private _drawer: Drawer;
   private _isDrawing: boolean = false;
   public perfect: boolean = false;
-  public readonly smooth: {isOn: boolean; realTime: boolean; coefficient: number} = {isOn: false, realTime: false, coefficient: 2};
+  public mirroring: boolean = false;
+  public readonly smooth: {isOn: boolean; realTime: boolean; coefficient: number} = {isOn: true, realTime: false, coefficient: 1};
 
   public constructor(container: Container) {
     super(container);

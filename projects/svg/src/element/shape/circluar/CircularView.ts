@@ -9,16 +9,8 @@ import {MoveDrawable} from '../../../service/tool/draw/type/MoveDrawable';
 import {ElementView} from '../../ElementView';
 
 export abstract class CircularView extends ShapeView implements MoveDrawable {
-  protected abstract override svgElement: SVGGeometryElement;
-
-  public __updateView__(): void {
-    this.setAttr({
-      cx: this._rect.x + this._rect.width / 2,
-      cy: this._rect.y + this._rect.height / 2,
-      rx: this._rect.width / 2,
-      ry: this._rect.height / 2
-    });
-  }
+  protected static readonly CENTER_POINT_RADIUS: number = 3;
+  protected abstract override svgElement: SVGGraphicsElement;
 
   public override get points(): Point[] {
     return [

@@ -15,12 +15,23 @@ export class CircleCursor extends ElementCursor {
 }
 
 export class CircleView extends CircularView {
-  protected override svgElement: SVGCircleElement = document.createElementNS(ElementView.svgURI, 'circle');
+  protected override svgElement: SVGGElement = document.createElementNS(ElementView.svgURI, 'g');
+  private svgCircleElement: SVGCircleElement = document.createElementNS(ElementView.svgURI, 'circle');
+  private svgCircleCenterElement: SVGCircleElement = document.createElementNS(ElementView.svgURI, 'circle');
   protected override _type: ElementType = ElementType.CIRCLE;
 
   public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement.id = this.id;
+
+    this.svgElement.appendChild(this.svgCircleElement);
+    this.svgElement.appendChild(this.svgCircleCenterElement);
+
+    this.setAttr({
+      'stroke-width': 0,
+      fill: '#000',
+      r: CircularView.CENTER_POINT_RADIUS
+    }, this.svgCircleCenterElement);
 
     this.__setRect__(rect);
 
@@ -32,17 +43,12 @@ export class CircleView extends CircularView {
       cx: this._rect.x + this._rect.width / 2,
       cy: this._rect.y + this._rect.height / 2,
       r: this._rect.width / 2
-    });
-  }
+    }, this.svgCircleElement);
 
-  public override get copy(): CircleView {
-    const ellipse: CircleView = new CircleView(this._container, this._properties, Object.assign({}, this._rect));
-    ellipse.refPoint = Object.assign({}, this.refPoint);
-    ellipse.__rotate__(this._angle);
-
-    ellipse.style.set = this.style;
-
-    return ellipse;
+    this.setAttr({
+      cx: this._rect.x + this._rect.width / 2,
+      cy: this._rect.y + this._rect.height / 2
+    }, this.svgCircleCenterElement);
   }
 
   public override intersectsRect(rect: Rect): boolean {
@@ -117,24 +123,13 @@ export class CircleView extends CircularView {
     };
 
     if (firstPoint.x && firstPoint.y && secondPoint.x && secondPoint.y) {
-      return  ElementView.pointDistanceFromSegment(firstPoint, line) <= 5 ||
-              ElementView.pointDistanceFromSegment(secondPoint, line) <= 5;
+      return ElementView.pointDistanceFromSegment(firstPoint, line) <= 5 ||
+        ElementView.pointDistanceFromSegment(secondPoint, line) <= 5;
     }
     return false;
   }
 
   private static sign(num: number): number {
     return num < 0 ? -1 : 1;
-  }
-
-  public override __setRect__(rect: Rect): void {
-
-    const widthSign: number = rect.width < 0 ? -1 : 1;
-    const heightSign: number = rect.height < 0 ? -1 : 1;
-    rect.width = rect.height = (Math.abs(rect.width) + Math.abs(rect.height)) / 2;
-    rect.width *= widthSign;
-    rect.height *= heightSign;
-
-    super.__setRect__(rect);
   }
 }

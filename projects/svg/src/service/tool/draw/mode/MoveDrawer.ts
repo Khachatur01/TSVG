@@ -38,33 +38,48 @@ export abstract class MoveDrawer extends Drawer {
     }
   }
   public makeMouseMove(position: Point, call: boolean = true, parameter?: any): void {
-    let rect: Rect = {
-      x: position.x,
-      y: position.y,
-      width: position.x - this.startPosition.x,
-      height: position.y - this.startPosition.y
-    };
+    let width: number = position.x - this.startPosition.x;
+    let height: number = position.y - this.startPosition.y;
 
     if (this.drawTool.perfect) {
-      rect = ElementView.rectToSquare(rect);
+      const averageSize: number = (Math.abs(width) + Math.abs(height)) / 2;
+      if (width < 0) {
+        width = -averageSize;
+      } else {
+        width = averageSize;
+      }
+      if (height < 0) {
+        height = -averageSize;
+      } else {
+        height = averageSize;
+      }
     }
 
     if (this.drawTool.container.grid.isSnapOn()) {
       const snapPoint: Point = this.drawTool.container.grid.getSnapPoint({
-        x: this.startPosition.x + rect.width,
-        y: this.startPosition.y + rect.height
+        x: this.startPosition.x + width,
+        y: this.startPosition.y + height
       });
-      rect.width = snapPoint.x - this.startPosition.x;
-      rect.height = snapPoint.y - this.startPosition.y;
+      width = snapPoint.x - this.startPosition.x;
+      height = snapPoint.y - this.startPosition.y;
     }
 
-    /* if _drawableElement instance of MoveDrawable, set drawSize */ /* TODO - change drawable element type from ElementView to MoveDrawable */
-    (this._drawableElement as unknown as MoveDrawable).__drawSize__({
+    const rect: Rect = {
       x: this.startPosition.x,
       y: this.startPosition.y,
-      width: rect.width,
-      height: rect.height
-    });
+      width,
+      height
+    };
+    if (this.drawTool.mirroring) {
+      rect.x -= width;
+      rect.y -= height;
+
+      rect.width *= 2;
+      rect.height *= 2;
+    }
+
+    /* if _drawableElement instance of MoveDrawable, set drawSize */
+    (this._drawableElement as unknown as MoveDrawable).__drawSize__(rect);
 
     if (call) {
       this.drawTool.container.__call__(SVGEvent.DRAW_MOUSE_MOVE, {position, element: this._drawableElement});

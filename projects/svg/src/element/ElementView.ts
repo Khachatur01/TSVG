@@ -644,13 +644,23 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     }
     return value;
   }
-  public setAttr(attributes: object): void {
-    for (const [key, value] of Object.entries(attributes))
-      {this.SVG.setAttribute(key, '' + value);}
+  public setAttr(attributes: object, SVG?: SVGElement): void {
+    for (const [key, value] of Object.entries(attributes)) {
+      if (SVG) {
+        SVG.setAttribute(key, '' + value);
+      } else {
+        this.SVG.setAttribute(key, '' + value);
+      }
+    }
   }
-  public delAttr(attributes: string[]): void {
-    for (const attribute of attributes)
-      {this.SVG.removeAttribute(attribute);}
+  public delAttr(attributes: string[], SVG?: HTMLElement): void {
+    for (const attribute of attributes) {
+      if (SVG) {
+        SVG.removeAttribute(attribute);
+      } else {
+        this.SVG.removeAttribute(attribute);
+      }
+    }
   }
 
   public set cursor(cursor: string) {
