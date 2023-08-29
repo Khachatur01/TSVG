@@ -23,7 +23,7 @@ export class EditNodeTool extends Tool {
     this.removeMouseEvents = this.removeMouseEvents.bind(this);
 
     this._container.addCallBack(SVGEvent.ELEMENT_ADDED, ({element}: any) => {
-      /* if edit node tool is on, add click event to newly added element */
+      /* if edit node tool is on, add click event to a newly added element */
       if (this._isOn) {
         this.addMouseEvents(element);
       }

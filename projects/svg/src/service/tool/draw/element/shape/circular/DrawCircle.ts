@@ -7,8 +7,10 @@ import {ElementType} from '../../../../../../dataSource/constant/ElementType';
 import {Rect} from "../../../../../../model/Rect";
 
 export class DrawCircle extends MoveDrawer {
+  public showCenter: boolean = true;
+
   protected createDrawableElement(position: Point): MoveDrawable {
-    const element: CircleView = new CircleView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
+    const element: CircleView = new CircleView(this.drawTool.container, {overEvent: true, globalStyle: true, showCenter: this.showCenter}, {x: position.x, y: position.y, width: 0, height: 0});
     element.__fixRect__();
     return element;
   }

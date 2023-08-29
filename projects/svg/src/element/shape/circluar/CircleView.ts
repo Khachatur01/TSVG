@@ -2,7 +2,7 @@ import {Rect} from '../../../model/Rect';
 import {ElementCursor, ElementProperties, ElementView} from '../../ElementView';
 import {Container} from '../../../Container';
 import {ElementType} from '../../../dataSource/constant/ElementType';
-import {CircularView} from './CircularView';
+import {CircularProperties, CircularView} from './CircularView';
 import {Cursor} from '../../../dataSource/constant/Cursor';
 import {Line} from '../../../model/Line';
 import {Point} from '../../../model/Point';
@@ -14,24 +14,24 @@ export class CircleCursor extends ElementCursor {
   }
 }
 
+export interface CircleProperties extends CircularProperties {}
+
 export class CircleView extends CircularView {
   protected override svgElement: SVGGElement = document.createElementNS(ElementView.svgURI, 'g');
   private svgCircleElement: SVGCircleElement = document.createElementNS(ElementView.svgURI, 'circle');
-  private svgCircleCenterElement: SVGCircleElement = document.createElementNS(ElementView.svgURI, 'circle');
   protected override _type: ElementType = ElementType.CIRCLE;
 
-  public constructor(container: Container, properties: ElementProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
+  public constructor(container: Container, properties: CircleProperties = {}, rect: Rect = {x: 0, y: 0, width: 0, height: 0}, ownerId?: string, index?: number) {
     super(container, ownerId, index);
     this.svgElement.id = this.id;
 
     this.svgElement.appendChild(this.svgCircleElement);
-    this.svgElement.appendChild(this.svgCircleCenterElement);
 
     this.setAttr({
       'stroke-width': 0,
       fill: '#000',
       r: CircularView.CENTER_POINT_RADIUS
-    }, this.svgCircleCenterElement);
+    }, this.svgCenterElement);
 
     this.__setRect__(rect);
 
@@ -39,16 +39,12 @@ export class CircleView extends CircularView {
   }
 
   public override __updateView__(): void {
+    super.__updateView__();
     this.setAttr({
       cx: this._rect.x + this._rect.width / 2,
       cy: this._rect.y + this._rect.height / 2,
       r: this._rect.width / 2
     }, this.svgCircleElement);
-
-    this.setAttr({
-      cx: this._rect.x + this._rect.width / 2,
-      cy: this._rect.y + this._rect.height / 2
-    }, this.svgCircleCenterElement);
   }
 
   public override intersectsRect(rect: Rect): boolean {

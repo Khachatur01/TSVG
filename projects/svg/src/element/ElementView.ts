@@ -160,6 +160,8 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     this._properties.globalStyle = undefined; /* global style property should be set only in creation time */
     if (properties.overEvent) {
       this.setOverEvent();
+    } else {
+      this.removeOverEvent();
     }
     if (properties.globalStyle) {
       try {

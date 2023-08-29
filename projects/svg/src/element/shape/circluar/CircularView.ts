@@ -6,11 +6,16 @@ import {Path} from '../../../model/path/Path';
 import {MoveTo} from '../../../model/path/point/MoveTo';
 import {Arc} from '../../../model/path/curve/arc/Arc';
 import {MoveDrawable} from '../../../service/tool/draw/type/MoveDrawable';
-import {ElementView} from '../../ElementView';
+import {ElementProperties, ElementView} from '../../ElementView';
+
+export interface CircularProperties extends ElementProperties {
+  showCenter?: boolean;
+}
 
 export abstract class CircularView extends ShapeView implements MoveDrawable {
   protected static readonly CENTER_POINT_RADIUS: number = 3;
   protected abstract override svgElement: SVGGraphicsElement;
+  protected svgCenterElement: SVGCircleElement = document.createElementNS(ElementView.svgURI, 'circle');
 
   public override get points(): Point[] {
     return [
@@ -19,6 +24,25 @@ export abstract class CircularView extends ShapeView implements MoveDrawable {
       {x: this._rect.x + this._rect.width, y: this._rect.y + this._rect.height / 2},
       {x: this._rect.x + this._rect.width / 2, y: this._rect.y + this._rect.height}
     ];
+  }
+
+  public override __updateView__(): void {
+    this.setAttr({
+      cx: this._rect.x + this._rect.width / 2,
+      cy: this._rect.y + this._rect.height / 2
+    }, this.svgCenterElement);
+  }
+
+  public override setProperties(properties: CircularProperties): void {
+    super.setProperties(properties);
+
+    if (properties.showCenter) {
+      this.svgElement.appendChild(this.svgCenterElement);
+    } else {
+      try {
+        this.svgElement.removeChild(this.svgCenterElement);
+      } catch (e) {}
+    }
   }
 
   public __drag__(delta: Point): void {

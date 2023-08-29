@@ -13,7 +13,7 @@ export class Node extends EllipseView {
   protected mouseCurrentPos: Point = {x: 0, y: 0};
 
   public constructor(container: Container, editTool: EditNodeTool, position: Point, order: number) {
-    super(container, {overEvent: true, globalStyle: false}, {x: position.x - 8, y: position.y - 8, width: 16, height: 16});
+    super(container, {overEvent: true, globalStyle: false, showCenter: false}, {x: position.x - 8, y: position.y - 8, width: 16, height: 16});
     this.style.fillColor = 'white';
     this.style.strokeColor = 'black';
     this.style.strokeWidth = '1';

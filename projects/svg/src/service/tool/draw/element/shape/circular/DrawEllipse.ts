@@ -6,8 +6,10 @@ import {SVGEvent} from '../../../../../../dataSource/constant/SVGEvent';
 import {ElementType} from '../../../../../../dataSource/constant/ElementType';
 
 export class DrawEllipse extends MoveDrawer {
+  public showCenter: boolean = true;
+
   protected createDrawableElement(position: Point): MoveDrawable {
-    const element: EllipseView = new EllipseView(this.drawTool.container, {overEvent: true, globalStyle: true}, {x: position.x, y: position.y, width: 0, height: 0});
+    const element: EllipseView = new EllipseView(this.drawTool.container, {overEvent: true, globalStyle: true, showCenter: this.showCenter}, {x: position.x, y: position.y, width: 0, height: 0});
     element.__fixRect__();
     return element;
   }
