@@ -32,7 +32,7 @@ export class NEGrip extends Grip {
     super.makeMouseMove(client, call);
     const elementRect: Rect = this.focus.__lastRect__;
 
-    if (this._container.perfect) {
+    if (this._container.perfect || this.focus.proportionalResizable || this.focus.containsProportionalResizable()) {
       const originPoint: Point = {
         x: elementRect.x,
         y: elementRect.y + elementRect.height

@@ -124,6 +124,7 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
   protected _properties: ElementProperties = {};
   public rotatable: boolean = true;
   public erasable: boolean = true;
+  public proportionalResizable: boolean = false;
   /* Model */
 
   private _highlight: () => void = this.__highlight__.bind(this);

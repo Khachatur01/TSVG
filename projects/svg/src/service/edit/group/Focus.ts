@@ -33,6 +33,8 @@ export class Focus implements Draggable, Resizeable {
 
   private pasteCount: number = 0;
 
+  public proportionalResizable: boolean = false;
+
   public constructor(container: Container) {
     this.container = container;
 
@@ -658,6 +660,15 @@ export class Focus implements Draggable, Resizeable {
       this.container.__call__(SVGEvent.PASTE, {elements: newElements});
       this.container.__call__(SVGEvent.ELEMENTS_FOCUSED, {elements: this._children});
     }
+  }
+
+  public containsProportionalResizable(): boolean {
+    for (const element of this._children) {
+      if (element.proportionalResizable) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public on(): void {

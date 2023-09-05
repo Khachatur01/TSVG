@@ -28,7 +28,7 @@ export class SEGrip extends Grip {
     super.makeMouseMove(client, call);
     const position: Point = this.focus.__lastRect__;
 
-    if (this._container.perfect) {
+    if (this._container.perfect || this.focus.proportionalResizable || this.focus.containsProportionalResizable()) {
       let angle: number = this._lastAngle;
       if (client.x < position.x && client.y < position.y) /* II */{
         angle = 180 - (360 - angle);
