@@ -247,6 +247,9 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.pointerEvents = false;
   }
 
+  public get pointerEvents(): boolean {
+    return this.content.style.pointerEvents === 'auto';
+  }
   public set pointerEvents(pointerEvents: boolean) {
     this.content.style.pointerEvents = pointerEvents ? 'auto' : 'none';
   }
