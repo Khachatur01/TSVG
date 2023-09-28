@@ -354,7 +354,7 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
 
   public override toJSON(): any {
     const json: any = super.toJSON();
-    json.content = encodeURIComponent(this._content.outerHTML);
+    json.content = this._content.outerHTML;
 
     json.resizeMode = this.resizeMode;
     json.contentOriginalSize = JSON.stringify(this.contentOriginalSize);
