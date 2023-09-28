@@ -8,6 +8,13 @@ import {ForeignView} from '../type/ForeignView';
 import {MoveDrawable} from '../../service/tool/draw/type/MoveDrawable';
 import {ElementType} from '../../dataSource/constant/ElementType';
 import {Cursor} from '../../dataSource/constant/Cursor';
+import {Scale} from "../../../../../src/app/modules/svg/model/Scale";
+import {Size} from "../../model/Size";
+
+export enum ResizeMode {
+  STRETCH,
+  WRAP
+}
 
 export class ForeignObjectCursor extends ElementCursor {
   constructor() {
@@ -93,6 +100,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   private _lastCommittedHTML: string = '';
   public override erasable: boolean = false;
 
+  private resizeMode: ResizeMode = ResizeMode.WRAP;
+  private contentOriginalSize: Size = {width: 0, height: 0};
+  private scale: Scale = {x: 1, y: 1};
+
   protected copyEvent: (event: ClipboardEvent) => void = (event: ClipboardEvent) => {
     const text: string | undefined = document.getSelection()?.toString();
     if (text) {
@@ -165,6 +176,8 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.setAttr({
       preserveAspectRatio: 'none'
     });
+
+    this.setResizeMode(ResizeMode.WRAP);
 
     this.setProperties(properties);
   }
@@ -245,6 +258,11 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.svgElement.innerHTML = '';
     this.svgElement.appendChild(this._content);
     this.pointerEvents = false;
+    this._lastCommittedHTML = content;
+
+    this.contentOriginalSize = this._content.getBoundingClientRect();
+    (this._content.firstElementChild as HTMLDivElement).style.transformOrigin = '0px 0px';
+    (this._content.firstElementChild as HTMLDivElement).style.willChange = 'transform;';
   }
 
   public get pointerEvents(): boolean {
@@ -254,6 +272,37 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     this.content.style.pointerEvents = pointerEvents ? 'auto' : 'none';
   }
 
+  public getResizeMode(): ResizeMode {
+    return this.resizeMode;
+  }
+
+  public setResizeMode(resizeMode: ResizeMode): void {
+    if (resizeMode === this.resizeMode) {
+      return;
+    }
+
+    this.resizeMode = resizeMode;
+
+    switch (resizeMode) {
+      case ResizeMode.STRETCH: {
+        const newSize: Size = JSON.parse(JSON.stringify(this.getRect()));
+
+        this.contentOriginalSize = {
+          width: newSize.width / this.scale.x,
+          height: newSize.height / this.scale.y
+        };
+
+        (this.content.firstElementChild as HTMLDivElement).style.width = (newSize.width / this.scale.x) + 'px';
+        (this.content.firstElementChild as HTMLDivElement).style.height = (newSize.height / this.scale.y) + 'px';
+
+        break;
+      }
+      case ResizeMode.WRAP: {
+        break;
+      }
+    }
+  }
+
   public get boundingRect(): Rect {
     const points: Point[] = this.points;
     return ElementView.calculateRect(points);
@@ -261,6 +310,30 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   public get visibleBoundingRect(): Rect {
     const points: Point[] = this.visiblePoints;
     return ElementView.calculateRect(points);
+  }
+
+  public override __setRect__(rect: Rect): void {
+    super.__setRect__(rect);
+    this.__onResize__(rect);
+  }
+
+  public __onResize__(rect: Rect): void {
+    switch (this.resizeMode) {
+      case ResizeMode.STRETCH: {
+        this.scale = {
+          x: rect.width / this.contentOriginalSize.width,
+          y: rect.height / this.contentOriginalSize.height,
+        };
+
+        (this._content.firstElementChild as HTMLDivElement).style.transform = 'scale(' + this.scale.x + ', ' + this.scale.y + ')';
+        break;
+      }
+      case ResizeMode.WRAP: {
+        (this._content.firstElementChild as HTMLDivElement).style.width = (rect.width / this.scale.x) + 'px';
+        (this._content.firstElementChild as HTMLDivElement).style.height = (rect.height / this.scale.y) + 'px';
+        break;
+      }
+    }
   }
 
   public enable(): void {
@@ -282,6 +355,11 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
   public override toJSON(): any {
     const json: any = super.toJSON();
     json.content = encodeURIComponent(this._content.outerHTML);
+
+    json.resizeMode = this.resizeMode;
+    json.contentOriginalSize = JSON.stringify(this.contentOriginalSize);
+    json.scale = JSON.stringify(this.scale);
+
     return json;
   }
   public override fromJSON(json: any): void {
@@ -289,6 +367,10 @@ export class ForeignObjectView extends ForeignView implements MoveDrawable {
     if (json.content) {
       this.svgElement.innerHTML = decodeURIComponent(json.content);
       this._content = this.svgElement.firstChild as HTMLElement;
+
+      this.resizeMode = json.resizeMode;
+      this.contentOriginalSize = JSON.parse(json.contentOriginalSize);
+      this.scale = JSON.parse(json.scale);
     }
   };
 }
