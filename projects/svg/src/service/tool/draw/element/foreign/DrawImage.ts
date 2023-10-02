@@ -7,8 +7,10 @@ import {MoveDrawable} from '../../type/MoveDrawable';
 
 export class DrawImage extends MoveDrawer {
   public src: string = '';
+  public proportionalResizable: boolean = false;
+
   protected createDrawableElement(position: Point): MoveDrawable {
-    return new ImageView(this.drawTool.container, {overEvent: true, globalStyle: true}, this.src, {x: position.x, y: position.y, width: 0, height: 0});
+    return new ImageView(this.drawTool.container, {overEvent: true, globalStyle: true, proportionalResizable: this.proportionalResizable}, this.src, {x: position.x, y: position.y, width: 0, height: 0});
   }
 
   protected override onIsNotComplete(call: boolean): void {

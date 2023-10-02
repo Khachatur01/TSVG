@@ -1,4 +1,4 @@
-import {ElementView} from '@app/modules/svg/element/ElementView';
+import {ElementView} from "../../../../../projects/svg/src/element/ElementView";
 
 export interface SVGClipboard {
   elements: Set<ElementView>;

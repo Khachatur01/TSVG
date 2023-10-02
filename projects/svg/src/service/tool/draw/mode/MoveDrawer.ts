@@ -41,7 +41,7 @@ export abstract class MoveDrawer extends Drawer {
     let width: number = position.x - this.startPosition.x;
     let height: number = position.y - this.startPosition.y;
 
-    if (this.drawTool.perfect) {
+    if (this.drawTool.perfect || this._drawableElement?.proportionalResizable) {
       const averageSize: number = (Math.abs(width) + Math.abs(height)) / 2;
       if (width < 0) {
         width = -averageSize;

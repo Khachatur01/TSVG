@@ -37,7 +37,7 @@ export class NWGrip extends Grip {
 
     const elementRect: Rect = this.focus.__lastRect__;
 
-    if (this._container.perfect || this.focus.proportionalResizable || this.focus.containsProportionalResizable()) {
+    if (this._container.perfect || this.focus.proportionalResizable) {
       const originPoint: Point = {
         x: elementRect.x + elementRect.width,
         y: elementRect.y + elementRect.height

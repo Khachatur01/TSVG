@@ -101,6 +101,7 @@ export class ElementStyle extends Style {
 export interface ElementProperties {
   overEvent?: boolean;
   globalStyle?: boolean;
+  proportionalResizable?: boolean;
 }
 
 export abstract class ElementView implements Resizeable, Draggable, Drawable {
@@ -164,11 +165,13 @@ export abstract class ElementView implements Resizeable, Draggable, Drawable {
     } else {
       this.removeOverEvent();
     }
+
     if (properties.globalStyle) {
       try {
         this.style.setGlobalStyle();
       } catch (e) {}
     }
+    this.proportionalResizable = properties.proportionalResizable || false;
   }
 
   public __translate__(delta: Point): void {

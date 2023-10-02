@@ -80,6 +80,8 @@ export class Focus implements Draggable, Resizeable {
       this.__focus__();
     }
 
+    this.proportionalResizable = this.containsProportionalResizable();
+
     if (call) {
       this.container.__call__(SVGEvent.ELEMENTS_FOCUSED, {elements: new Set([element])});
     }
@@ -103,6 +105,8 @@ export class Focus implements Draggable, Resizeable {
     } else {
       this.__focus__();
     }
+
+    this.proportionalResizable = this.containsProportionalResizable();
 
     if (call) {
       this.container.__call__(SVGEvent.ELEMENTS_BLURRED, {elements: new Set([element])});
@@ -511,6 +515,10 @@ export class Focus implements Draggable, Resizeable {
     this.boundingBox.__rotate__(angle);
     this.boundingBox.__setRect__(this.calculateBoundingRect(visible));
     this.boundingBox.__positionGrips__();
+  }
+
+  public update(): void {
+    this.__fit__();
   }
 
   public __focus__(): void {
