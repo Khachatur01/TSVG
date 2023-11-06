@@ -113,8 +113,8 @@ export class PointerTool extends Tool {
       return false;
     }
     this.add();
-    document.addEventListener('touchmove', this.mouseMoveEvent);
-    document.addEventListener('mousemove', this.mouseMoveEvent);
+    this._container.HTML.addEventListener('touchmove', this.mouseMoveEvent);
+    this._container.HTML.addEventListener('mousemove', this.mouseMoveEvent);
     this._container.blur();
 
     this._container.style.changeCursor(this.cursor);
@@ -128,8 +128,8 @@ export class PointerTool extends Tool {
       return false;
     }
     this.remove();
-    document.removeEventListener('touchmove', this.mouseMoveEvent);
-    document.removeEventListener('mousemove', this.mouseMoveEvent);
+    this._container.HTML.removeEventListener('touchmove', this.mouseMoveEvent);
+    this._container.HTML.removeEventListener('mousemove', this.mouseMoveEvent);
 
     if (call) {
       this._container.__call__(SVGEvent.POINTER_TOOl_OFF);
