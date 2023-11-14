@@ -18,17 +18,10 @@ export class HighlightTool extends Tool {
   private group: SVGGElement;
   private _highlighting: boolean = false;
 
-  public constructor(container: Container, group?: SVGGElement) {
+  public constructor(container: Container) {
     super(container);
 
     this.path = new PathView(container);
-
-    if (group) {
-      this.group = group;
-    } else {
-      this.group = document.createElementNS(ElementView.svgURI, 'g');
-      this.group.id = 'highlight';
-    }
 
     this.mouseDownEvent = this.mouseDownEvent.bind(this);
     this.mouseMoveEvent = this.mouseMoveEvent.bind(this);

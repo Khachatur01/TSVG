@@ -26,7 +26,6 @@ export class Focus implements Draggable, Resizeable {
 
   private readonly container: Container;
   private readonly _children: Set<ElementView> = new Set<ElementView>();
-  private readonly svgGroup: SVGGElement;
   private readonly svgBounding: SVGGElement;
 
   private _lastAngle: number = 0;
@@ -39,16 +38,14 @@ export class Focus implements Draggable, Resizeable {
     this.container = container;
 
     this.boundingBox = new BoundingBox(this.container, this, {x: 0, y: 0, width: 0, height: 0});
-    this.svgGroup = document.createElementNS(ElementView.svgURI, 'g');
-    this.svgGroup.id = 'focus';
     this.svgBounding = this.boundingBox.__svgGroup__;
 
-    this.svgGroup.appendChild(this.svgBounding);
-    this.svgGroup.appendChild(this.boundingBox.__refPointGroup__);
+    this.container.__focusGroup__.appendChild(this.svgBounding);
+    this.container.__focusGroup__.appendChild(this.boundingBox.__refPointGroup__);
   }
 
   public get SVG(): SVGGElement {
-    return this.svgGroup;
+    return this.container.__focusGroup__;
   }
 
   public get boundingBoxSVG(): SVGElement {
@@ -268,7 +265,7 @@ export class Focus implements Draggable, Resizeable {
 
   public __translate__(delta: Point): void {
     this._children.forEach((child: ElementView) => child.__translate__(delta));
-    this.svgGroup.style.transform = ' translate(' + delta.x + 'px, ' + delta.y + 'px)';
+    this.container.__focusGroup__.style.transform = ' translate(' + delta.x + 'px, ' + delta.y + 'px)';
   }
   public __drag__(delta: Point): void {
     this._children.forEach((child: ElementView) => child.__drag__(delta));

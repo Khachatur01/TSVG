@@ -8,7 +8,6 @@ import {SVGEvent} from '../../dataSource/constant/SVGEvent';
 
 export class Grid {
   private readonly container: Container;
-  private readonly _group: SVGGElement;
   private _snapSide: number = 20; /* default */
   private strokeWidth: number = 1; /* default */
   private strokeColor: string = '#ddd'; /* default */
@@ -17,12 +16,6 @@ export class Grid {
 
   public constructor(container: Container) {
     this.container = container;
-    this._group = document.createElementNS(ElementView.svgURI, 'g');
-    this._group.id = 'grid';
-  }
-
-  public get __group__(): SVGGElement {
-    return this._group;
   }
 
   public snapOn(call: boolean = true): void {
@@ -43,7 +36,7 @@ export class Grid {
   }
 
   public gridOn(call: boolean = true): void {
-    this._group.innerHTML = '';
+    this.container.__gridGroup__.innerHTML = '';
     this._snapSide = Math.floor(this._snapSide);
     this._isGridOn = true;
     const width: number = this.container.HTML.clientWidth;
@@ -66,14 +59,14 @@ export class Grid {
     }
 
     grid.setAttribute('d', path.toString());
-    this._group.appendChild(grid);
+    this.container.__gridGroup__.appendChild(grid);
 
     if (call) {
       this.container.__call__(SVGEvent.GRID_ON);
     }
   }
   public gridOff(call: boolean = true): void {
-    this._group.innerHTML = '';
+    this.container.__gridGroup__.innerHTML = '';
     this._isGridOn = false;
 
     if (call) {

@@ -256,6 +256,9 @@ export class Container {
   public readonly __elementsGroup__: SVGGElement;
   public readonly __pointersGroup__: SVGGElement;
   public readonly __nodesGroup__: SVGGElement;
+  public readonly __highlightsGroup__: SVGGElement;
+  public readonly __gridGroup__: SVGGElement;
+  public readonly __focusGroup__: SVGGElement;
 
   /* Model */
   public readonly id: number;
@@ -288,14 +291,6 @@ export class Container {
       throw new DOMException('Can\'t create container', 'Container not found');
     }
 
-    this.style = new GlobalStyle(this);
-    this._focus = new Focus(this);
-    this._focus.on();
-    this.tools = new Tools(this);
-    this.drawers = new Drawers(this.tools.drawTool);
-    this.grid = new Grid(this);
-    this.style = new GlobalStyle(this);
-
     this.container.addEventListener('mousedown', (event: MouseEvent) => {
       if (event.target === this.container) {
         this.__call__(SVGEvent.CLICKED_ON_CONTAINER);
@@ -318,16 +313,33 @@ export class Container {
     this.__nodesGroup__ = document.createElementNS(ElementView.svgURI, 'g');
     this.__nodesGroup__.id = 'nodes';
 
-    this.container.appendChild(this.grid.__group__); /* grid path */
+    this.__highlightsGroup__ = document.createElementNS(ElementView.svgURI, 'g');
+    this.__highlightsGroup__.id = 'highlight';
+
+    this.__gridGroup__ = document.createElementNS(ElementView.svgURI, 'g');
+    this.__gridGroup__.id = 'grid';
+
+    this.__focusGroup__ = document.createElementNS(ElementView.svgURI, 'g');
+    this.__focusGroup__.id = 'focus';
+
+    this.container.appendChild(this.__gridGroup__); /* grid path */
     this.container.appendChild(this.__elementsGroup__); /* all elements */
-    this.container.appendChild(this.tools.highlightTool.SVG); /* highlight path */
+    this.container.appendChild(this.__highlightsGroup__); /* highlight path */
     this.container.appendChild(this.__nodesGroup__); /* editing nodes */
-    this.container.appendChild(this._focus.SVG); /* bounding box, grips, rotation and reference point */
+    this.container.appendChild(this.__focusGroup__); /* bounding box, grips, rotation and reference point */
     this.container.appendChild(this.__pointersGroup__); /* all pointers */
 
     this.id = Container.nextContainerId;
     Container.allContainers[Container.nextContainerId] = this;
     Container.nextContainerId++;
+
+    this.style = new GlobalStyle(this);
+    this._focus = new Focus(this);
+    this._focus.on();
+    this.tools = new Tools(this);
+    this.drawers = new Drawers(this.tools.drawTool);
+    this.grid = new Grid(this);
+    this.style = new GlobalStyle(this);
   }
 
   public static getById(id: number): Container {
